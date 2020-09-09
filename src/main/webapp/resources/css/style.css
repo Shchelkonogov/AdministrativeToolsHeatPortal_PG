@@ -1,0 +1,59 @@
+html, body {
+    height: calc(100% - 25px);
+    margin: 1px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body .ui-datatable thead th {
+    padding: 1px;
+}
+
+body .ui-datatable .ui-datatable-data>tr>td {
+    padding: 2px 1px;
+}
+
+.ui-datatable table {
+    table-layout: unset !important;
+}
+
+.ui-state-highlight {
+    background-color: #eaeaea;
+}
+
+.centre-column {
+    text-align: center;
+}
+
+.gray {
+    color: white;
+    background-color: lightgray;
+}
+
+.red {
+    background-color: red !important;
+}
+
+#tabView\:aTab, #tabView\:cTab, #graphSelectForm\:gTab\:gTab1, #graphSelectForm\:gTab\:gTab2 {
+    height: 100%;
+    padding: 2px;
+}
+
+#tabView .ui-tabs-panels, #graphSelectForm\:gTab .ui-tabs-panels {
+    border-bottom: 1px solid #c8c8c8;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    height: calc(100% - 37px);
+}
+
+.ui-tooltip-arrow {
+    display: none;
+}
+
+.ui-dialog-content {
+    padding: 1px !important;
+}
