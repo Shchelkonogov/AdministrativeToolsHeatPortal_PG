@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <h:outputStylesheet library="css" name="style.css"/>
+</h:head>
+<h:body>
+    <p:growl id="growl" showDetail="true" />
+    <table style="width: 100%;">
+        <tr>
+            <td>
+                <h:outputText style="font-weight: bold; font-size: 20px;" value="#{specificModel.objectPath}" />
+            </td>
+            <td width="120" align="center">
+                <p:commandButton rendered="#{specificModel.write}" value="Сохранить" actionListener="#{specificModel.saveData}"
+                                 update=":tabView :growl" />
+            </td>
+        </tr>
+    </table>
+    <p:tabView id="tabView" style="height: 100%; transform: unset;" orientation="bottom">
+        <p:tab id="aTab" title="Аналоговые">
+            <h:form id="tableForm" style="height: 100%;">
+                <p:dataTable id="tableData" var="data" value="#{specificModel.tableModel}" rowHover="true" scrollable="true" scrollHeight="100%"
+                             editable="true" editMode="cell" rowIndexVar="rowIdx" rowStyleClass="#{data.additionalData.color}" rowKey="#{data.id}"
+                             filteredValue="#{specificModel.filteredTableModel}" widgetVar="tableWidget">
+
+                    <p:ajax event="cellEditInit" listener="#{specificModel.onCellEditInit}" />
+                    <p:ajax event="cellEdit" listener="#{specificModel.onCellEdit}" update=":growl" />
+
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="Обозн" width="50" filterBy="#{data.paramTypeName}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
+                                        <f:selectItem itemLabel="-" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{specificModel.paramNameFilter}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:column>
+                            <p:column rowspan="2" headerText="Стат.агр." width="150"/>
+                            <p:column rowspan="2" headerText="Зона" width="50"/>
+                            <p:column rowspan="2" headerText="Техпр" width="50" filterBy="#{data.techProcCode}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
+                                        <f:selectItem itemLabel="-" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{specificModel.techProcFilter}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:column>
+                            <p:column rowspan="2" headerText="Ед.изм" width="50"/>
+                            <p:column rowspan="2" headerText="График/Опт.знач." width="150"/>
+                            <p:column rowspan="2" headerText="Суточное снижение" width="150"/>
+                            <p:column colspan="3" headerText="Технологические границы" width="185" />
+                            <p:column colspan="4" headerText="Аварийные границы" width="215" />
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="Нижняя" width="80" />
+                            <p:column headerText="Верхняя" width="80" />
+                            <p:column headerText="%" width="25" />
+                            <p:column headerText="Нижняя" width="80" />
+                            <p:column headerText="Верхняя" width="80" />
+                            <p:column headerText="%" width="25" />
+                            <p:column headerText="Отн" width="35" />
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column>
+                        <h:outputText id="parMemo" value="#{data.parMemo}" />
+                        <p:tooltip for="parMemo" value="#{data.parName}" position="bottom"/>
+                    </p:column>
+
+                    <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
+                        <h:outputText id="statAgrName" value="#{data.statAgrName}" />
+                        <p:tooltip for="statAgrName" value="#{data.statAgrName}" position="bottom"/>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <h:outputText value="#{data.zone}"/>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <h:outputText value="#{data.techProcCode}"/>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <h:outputText value="#{data.measureName}"/>
+                    </p:column>
+
+                    <p:column id="graphColumn" styleClass="#{data.additionalData.graphColor}"
+                              style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
+                        <p:cellEditor disabled="#{data.additionalData.graphDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="graphValuePanel">
+                                    <h:outputText id="graphValue" value="#{data.additionalData.graphName}"/>
+
+                                    <p:contextMenu for="graphValuePanel" rendered="#{data.additionalData.graphID != null}">
+                                        <p:menuitem value="Посмотреть график"
+                                                    action="#{graphDecreaseDataShow.loadGraphData(data.additionalData.graphID, data.additionalData.graphName)}"
+                                                    oncomplete="PF('graphDecreaseShowDialog').show()"
+                                                    update="graphDecreaseShowDialogID" process="@this" />
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:outputText value="#{data.additionalData.graphName}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column id="decreaseColumn" styleClass="#{data.additionalData.decreaseColor}">
+                        <p:cellEditor disabled="#{data.additionalData.decreaseDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="decreaseValuePanel">
+                                    <h:outputText id="decreaseValue" value="#{data.additionalData.decreaseName}"/>
+
+                                    <p:contextMenu for="decreaseValuePanel" rendered="#{data.additionalData.decreaseID != null}">
+                                        <p:menuitem value="Посмотреть суточное снижение"
+                                                    action="#{graphDecreaseDataShow.loadDecreaseData(data.additionalData.decreaseID, data.additionalData.decreaseName)}"
+                                                    oncomplete="PF('graphDecreaseShowDialog').show()"
+                                                    update="graphDecreaseShowDialogID" process="@this" />
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:outputText value="#{data.additionalData.decreaseName}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column styleClass="centre-column #{data.additionalData.tMinColor}">
+                        <p:cellEditor disabled="#{data.additionalData.tMinDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="tMinPanel">
+                                    <h:outputText value="#{data.additionalData.tMin}" converter="doubleConverter" />
+
+                                    <p:contextMenu for="tMinPanel">
+                                        <p:menuitem value="Посмотреть историю"
+                                                    action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
+                                                    oncomplete="PF('historyDialog').show()"
+                                                    update="historyDialogID" process="@this" />
+                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                                    update=":tabView :growl" process="@this"/>
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{data.additionalData.tMin}" converter="doubleConverter" style="max-width: 60px;" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column styleClass="centre-column #{data.additionalData.tMaxColor}">
+                        <p:cellEditor disabled="#{data.additionalData.tMaxDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="tMaxPanel">
+                                    <h:outputText value="#{data.additionalData.tMax}" converter="doubleConverter"/>
+
+                                    <p:contextMenu for="tMaxPanel">
+                                        <p:menuitem value="Посмотреть историю"
+                                                    action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
+                                                    oncomplete="PF('historyDialog').show()"
+                                                    update="historyDialogID" process="@this" />
+                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                                    update=":tabView :growl" process="@this"/>
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{data.additionalData.tMax}" converter="doubleConverter" style="max-width: 60px;" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.tPersentDisable || !specificModel.write}" value="#{data.additionalData.tPercent}">
+                            <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}" />
+                        </p:selectBooleanCheckbox>
+                    </p:column>
+
+                    <p:column styleClass="centre-column #{data.additionalData.aMinColor}">
+                        <p:cellEditor disabled="#{data.additionalData.aMinDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="aMinPanel">
+                                    <h:outputText value="#{data.additionalData.aMin}" converter="doubleConverter"/>
+
+                                    <p:contextMenu for="aMinPanel">
+                                        <p:menuitem value="Посмотреть историю"
+                                                    action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
+                                                    oncomplete="PF('historyDialog').show()"
+                                                    update="historyDialogID" process="@this" />
+                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                                    update=":tabView :growl" process="@this"/>
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{data.additionalData.aMin}" converter="doubleConverter" style="max-width: 60px;" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column styleClass="centre-column #{data.additionalData.aMaxColor}">
+                        <p:cellEditor disabled="#{data.additionalData.aMaxDisable || !specificModel.write}">
+                            <f:facet name="output">
+                                <p:outputPanel id="aMaxPanel">
+                                    <h:outputText value="#{data.additionalData.aMax}" converter="doubleConverter"/>
+
+                                    <p:contextMenu for="aMaxPanel">
+                                        <p:menuitem value="Посмотреть историю"
+                                                    action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
+                                                    oncomplete="PF('historyDialog').show()"
+                                                    update="historyDialogID" process="@this" />
+                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                                    update=":tabView :growl" process="@this"/>
+                                    </p:contextMenu>
+                                </p:outputPanel>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{data.additionalData.aMax}" converter="doubleConverter" style="max-width: 60px;" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write}" id="aPercentColumn" value="#{data.additionalData.aPercent}">
+                            <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}"
+                                    update="tabView:tableForm:tableData:#{rowIdx}:absoluteColumn" />
+                        </p:selectBooleanCheckbox>
+                    </p:column>
+
+                    <p:column styleClass="centre-column">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write}" id="absoluteColumn" value="#{data.additionalData.absolute}">
+                            <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}"
+                                    update="tabView:tableForm:tableData:#{rowIdx}:aPercentColumn" />
+                        </p:selectBooleanCheckbox>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:tab>
+        <p:tab id="cTab" title="Перечислимые">
+            <h:form style="height: 100%; float: left; width: calc(100% - 305px);">
+                <p:dataTable id="tableDataCountable" var="data" value="#{specificModel.enumerableTableModel}"
+                             selection="#{specificModel.selectedEnumerateItem}" selectionMode="single" rowKey="#{data.id}"
+                             scrollable="true" scrollHeight="100%">
+                    <p:ajax event="rowSelect" listener="#{specificModel.onRowSelect}" update="tabView:conditionForm"/>
+
+                    <p:column headerText="Параметр" width="70">
+                        <h:outputText value="#{data.parMemo}"/>
+                    </p:column>
+                    <p:column headerText="Стат. агрегат" width="500"
+                              style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
+                        <h:outputText value="#{data.statAgrName}"/>
+                    </p:column>
+                    <p:column headerText="Название параметра" width="500"
+                              style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
+                        <h:outputText value="#{data.parName}"/>
+                    </p:column>
+                    <p:column styleClass="centre-column" headerText="Зона" width="50">
+                        <h:outputText value="#{data.zone}"/>
+                    </p:column>
+                    <p:column styleClass="centre-column" headerText="Техпр" width="50">
+                        <h:outputText value="#{data.techProcCode}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+            <h:form id="conditionForm" style="height: 100%; width: 300px; float: left; margin-left: 5px;">
+                <p:dataTable var="condData" value="#{specificModel.paramConditionDataModel.conditions}" scrollable="true" scrollHeight="100%"
+                             editable="true" editMode="cell">
+
+                    <p:ajax event="cellEdit" listener="#{specificModel.onCellEnumEdit}" />
+
+                    <p:column headerText="№">
+                        <h:outputText value="#{condData.enumCode}"/>
+                    </p:column>
+                    <p:column headerText="Объект">
+                        <h:outputText value="#{condData.propValue}"/>
+                    </p:column>
+                    <p:column headerText="Технолог">
+                        <p:cellEditor disabled="#{!specificModel.write}">
+                            <f:facet name="output">
+                                <h:outputText value="#{condData.conditionSer}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{condData.conditionSer}" style="width:100%">
+                                    <f:selectItems value="#{specificModel.conditions}" var="condition"
+                                                   itemLabel="#{condition.name}" itemValue="#{condition.condSer}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:tab>
+    </p:tabView>
+
+    <h:form>
+        <p:dialog header="Выберите суточное снижение" widgetVar="decreaseDialog" modal="true"
+                  resizable="false" width="600" height="300">
+            <div style="height: calc(100% - 5px);">
+                <p:dataTable var="decreaseData" value="#{specificModel.decreases}" rowKey="#{decreaseData.id}"
+                             selectionMode="single" selection="#{specificModel.selectDecrease}"
+                             scrollable="true" scrollHeight="100%">
+                    <p:column headerText="Название" width="150">
+                        <h:outputText value="#{decreaseData.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Описание">
+                        <h:outputText value="#{decreaseData.description}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <f:facet name="footer">
+                <p:commandButton value="Выбрать" action="#{specificModel.saveDecrease}" onclick="PF('decreaseDialog').hide()"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
+    <h:form id="graphSelectForm" onkeypress="if (event.keyCode === 13) { return false; }">
+        <p:dialog header="Выберите график или оптимальное значение" widgetVar="graphDialog" modal="true"
+                  resizable="false" width="600" height="300">
+            <p:tabView id="gTab" orientation="bottom" style="height: 100%; transform: unset;">
+                <p:tab id="gTab1" title="График">
+                    <f:facet name="actions">
+                        <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveGraph}"
+                                         onclick="PF('graphDialog').hide()"/>
+                    </f:facet>
+
+                    <div style="height: calc(100% - 5px);">
+                        <p:dataTable var="graphData" value="#{specificModel.graphs}" rowKey="#{graphData.id}"
+                                     selectionMode="single" selection="#{specificModel.selectGraph}"
+                                     scrollable="true" scrollHeight="100%">
+                            <p:column headerText="Название" width="150">
+                                <h:outputText value="#{graphData.name}"/>
+                            </p:column>
+
+                            <p:column headerText="Описание">
+                                <h:outputText value="#{graphData.description}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </p:tab>
+                <p:tab id="gTab2" title="Оптимальное значение">
+                    <f:facet name="actions">
+                        <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveOptValue}"
+                                          validateClient="true" oncomplete="if (!args.validationFailed) PF('graphDialog').hide();"
+                                         update="growl"/>
+                    </f:facet>
+
+                    <table id="optValueTable" style="width: 100%; margin-top: 95px;">
+                        <tr>
+                            <td align="left" style="font-weight: bold;">
+                                АварН
+                            </td>
+                            <td align="left" style="font-weight: bold;">
+                                ТехН
+                            </td>
+                            <td align="center" style="font-weight: bold;">
+                                Оптимальное значение
+                            </td>
+                            <td align="right" style="font-weight: bold;">
+                                ТехВ
+                            </td>
+                            <td align="right" style="font-weight: bold;">
+                                АварВ
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <h:outputText id="aMin" value="#{specificModel.aMin}" />
+                            </td>
+                            <td align="left">
+                                <h:outputText id="tMin" value="#{specificModel.tMin}" />
+                            </td>
+                            <td align="center">
+                                <p:inputText id="optValue" value="#{specificModel.optValue}" style="text-align: center;">
+                                    <p:ajax event="keyup" update="graphSelectForm:gTab:aMin graphSelectForm:gTab:tMin graphSelectForm:gTab:tMax graphSelectForm:gTab:aMax"/>
+                                </p:inputText>
+                                <h:inputHidden id="hidden">
+                                    <f:validator validatorId="rangeValidator" />
+                                </h:inputHidden>
+                            </td>
+                            <td align="right">
+                                <h:outputText id="tMax" value="#{specificModel.tMax}" />
+                            </td>
+                            <td align="right">
+                                <h:outputText id="aMax" value="#{specificModel.aMax}" />
+                            </td>
+                        </tr>
+                    </table>
+                </p:tab>
+            </p:tabView>
+        </p:dialog>
+    </h:form>
+
+    <p:dialog id="graphDecreaseShowDialogID" header="#{graphDecreaseDataShow.name}" widgetVar="graphDecreaseShowDialog" modal="true"
+              resizable="false" width="400" height="500">
+        <div style="height: calc(100% - 5px); margin: 2px;">
+            <p:dataTable var="graphDecreaseData" value="#{graphDecreaseDataShow.tableData}"
+                         scrollable="true" scrollHeight="100%">
+                <p:column headerText="X" styleClass="centre-column">
+                    <h:outputText value="#{graphDecreaseData.x}"/>
+                </p:column>
+
+                <p:column headerText="Y" styleClass="centre-column">
+                    <h:outputText value="#{graphDecreaseData.y}"/>
+                </p:column>
+            </p:dataTable>
+            </div>
+    </p:dialog>
+
+    <p:dialog id="historyDialogID" header="История изменений параметра #{history.name}" widgetVar="historyDialog" modal="true"
+              resizable="false" width="800" height="500">
+        <div style="height: calc(100% - 5px); margin: 2px;">
+            <p:dataTable var="historyData" value="#{history.tableData}"
+                         scrollable="true" scrollHeight="100%">
+                <p:column headerText="Дата и время" width="150" styleClass="centre-column">
+                    <h:outputText value="#{historyData.date}"/>
+                </p:column>
+
+                <p:column headerText="Имя пользователя" width="350">
+                    <h:outputText value="#{historyData.userName}"/>
+                </p:column>
+
+                <p:column headerText="Граница" width="50" styleClass="centre-column">
+                    <h:outputText value="#{historyData.description}"/>
+                </p:column>
+
+                <p:column headerText="Старое" width="100" styleClass="centre-column">
+                    <h:outputText value="#{historyData.oldValue}"/>
+                </p:column>
+
+                <p:column headerText="Новое" width="100" styleClass="centre-column">
+                    <h:outputText value="#{historyData.newValue}"/>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </p:dialog>
+</h:body>
+</html>

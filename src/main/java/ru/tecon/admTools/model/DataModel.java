@@ -1,12 +1,13 @@
 package ru.tecon.admTools.model;
 
-import ru.tecon.admTools.validation.DoubleValue;
+import ru.tecon.admTools.model.additionalModel.Additional;
+import ru.tecon.admTools.model.additionalModel.AnalogData;
 
-import java.util.List;
+import java.io.Serializable;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DataModel {
+public class DataModel implements Serializable {
 
     private static AtomicInteger idGenerator = new AtomicInteger();
 
@@ -21,36 +22,11 @@ public class DataModel {
     private String zone;
     private String techProcCode;
     private String measureName;
+    private String paramTypeName;
 
-    private Integer decreaseID;
-    private String decreaseName;
-    private boolean decreaseDisable;
+    private Additional additionalData;
 
-    private Integer graphID;
-    private String graphName;
-    private boolean graphDisable;
-
-    @DoubleValue()
-    private Double tMin;
-    private boolean tMinDisable;
-    @DoubleValue
-    private Double tMax;
-    private boolean tMaxDisable;
-    private boolean tPercent;
-
-    @DoubleValue
-    private Double aMin;
-    private boolean aMinDisable;
-    @DoubleValue
-    private Double aMax;
-    private boolean aMaxDisable;
-    private boolean aPercent;
-
-    private boolean absolute;
-
-    private boolean color;
-
-    private List<ParamConditionDataModel> paramConditions;
+    private boolean change = false;
 
     public DataModel() {
     }
@@ -109,206 +85,40 @@ public class DataModel {
         this.measureName = measureName;
     }
 
-    public String getDecreaseName() {
-        return decreaseName;
-    }
-
-    public void setDecreaseName(String decreaseName) {
-        this.decreaseName = decreaseName;
-    }
-
-    public String getGraphName() {
-        return graphName;
-    }
-
-    public void setGraphName(String graphName) {
-        this.graphName = graphName;
-    }
-
-    public boolean isAbsolute() {
-        return absolute;
-    }
-
-    public void setAbsolute(boolean absolute) {
-        if (!absolute) {
-            setaPercent(false);
-        }
-        this.absolute = absolute;
-    }
-
-    public Double gettMin() {
-        return tMin;
-    }
-
-    public void settMin(Double tMin) {
-        this.tMin = tMin;
-    }
-
-    public Double gettMax() {
-        return tMax;
-    }
-
-    public void settMax(Double tMax) {
-        this.tMax = tMax;
-    }
-
-    public Double getaMin() {
-        return aMin;
-    }
-
-    public void setaMin(Double aMin) {
-        this.aMin = aMin;
-    }
-
-    public Double getaMax() {
-        return aMax;
-    }
-
-    public void setaMax(Double aMax) {
-        this.aMax = aMax;
-    }
-
-    public boolean istPercent() {
-        return tPercent;
-    }
-
-    public void settPercent(boolean tPercent) {
-        this.tPercent = tPercent;
-    }
-
-    public boolean isaPercent() {
-        return aPercent;
-    }
-
-    public void setaPercent(boolean aPercent) {
-        if (aPercent) {
-            setAbsolute(true);
-        }
-        this.aPercent = aPercent;
-    }
-
-    public boolean isaMaxDisable() {
-        return aMaxDisable;
-    }
-
-    public void setaMaxDisable(boolean aMaxDisable) {
-        this.aMaxDisable = aMaxDisable;
-    }
-
-    public String getaMaxColor() {
-        return isaMaxDisable() ? " gray" : "";
-    }
-
-    public boolean isaMinDisable() {
-        return aMinDisable;
-    }
-
-    public void setaMinDisable(boolean aMinDisable) {
-        this.aMinDisable = aMinDisable;
-    }
-
-    public String getaMinColor() {
-        return isaMinDisable() ? " gray" : "";
-    }
-
-    public boolean isaPersentDisable() {
-        return isaMaxDisable() && isaMinDisable();
-    }
-
-    public boolean istMinDisable() {
-        return tMinDisable;
-    }
-
-    public void settMinDisable(boolean tMinDisable) {
-        this.tMinDisable = tMinDisable;
-    }
-
-    public String gettMinColor() {
-        return istMinDisable() ? " gray" : "";
-    }
-
-    public boolean istMaxDisable() {
-        return tMaxDisable;
-    }
-
-    public void settMaxDisable(boolean tMaxDisable) {
-        this.tMaxDisable = tMaxDisable;
-    }
-
-    public String gettMaxColor() {
-        return istMaxDisable() ? " gray" : "";
-    }
-
-    public boolean istPersentDisable() {
-        return istMaxDisable() && istMinDisable();
-    }
-
-    public String getColor() {
-        return color ? " red" : "";
-    }
-
-    public void setColor(boolean color) {
-        this.color = color;
-    }
-
-    public boolean isDecreaseDisable() {
-        return decreaseDisable;
-    }
-
-    public void setDecreaseDisable(boolean decreaseDisable) {
-        this.decreaseDisable = decreaseDisable;
-    }
-
-    public boolean isGraphDisable() {
-        return graphDisable;
-    }
-
-    public void setGraphDisable(boolean graphDisable) {
-        this.graphDisable = graphDisable;
-    }
-
-    public String getGraphColor() {
-        return isGraphDisable() ? " gray" : "";
-    }
-
-    public String getDecreaseColor() {
-        return isDecreaseDisable() ? " gray" : "";
-    }
-
-    public String getParName() {
-        return parName;
-    }
-
     public void setParName(String parName) {
         this.parName = parName;
     }
 
-    public List<ParamConditionDataModel> getParamConditions() {
-        return paramConditions;
+    public void setAdditionalData(Additional additionalData) {
+        this.additionalData = additionalData;
     }
 
-    public void setParamConditions(List<ParamConditionDataModel> paramConditions) {
-        this.paramConditions = paramConditions;
+    public Additional getAdditionalData() {
+        return additionalData;
     }
 
-    public Integer getDecreaseID() {
-        return decreaseID;
-    }
-
-    public void setDecreaseID(Integer decreaseID) {
-        this.decreaseID = decreaseID;
+    public boolean isChange() {
+        return change;
     }
 
     public int getId() {
         return id;
     }
 
-    public Integer getGraphID() {
-        return graphID;
+    public void setChange(boolean change) {
+        this.change = change;
     }
 
-    public void setGraphID(Integer graphID) {
-        this.graphID = graphID;
+    public String getParName() {
+        return parName;
+    }
+
+    public String getParamTypeName() {
+        return paramTypeName;
+    }
+
+    public void setParamTypeName(String paramTypeName) {
+        this.paramTypeName = paramTypeName;
     }
 
     @Override
@@ -323,25 +133,9 @@ public class DataModel {
                 .add("zone='" + zone + "'")
                 .add("techProcCode='" + techProcCode + "'")
                 .add("measureName='" + measureName + "'")
-                .add("decreaseID=" + decreaseID)
-                .add("decreaseName='" + decreaseName + "'")
-                .add("decreaseDisable=" + decreaseDisable)
-                .add("graphID=" + graphID)
-                .add("graphName='" + graphName + "'")
-                .add("graphDisable=" + graphDisable)
-                .add("tMin='" + tMin + "'")
-                .add("tMinDisable=" + tMinDisable)
-                .add("tMax='" + tMax + "'")
-                .add("tMaxDisable=" + tMaxDisable)
-                .add("tPercent=" + tPercent)
-                .add("aMin='" + aMin + "'")
-                .add("aMinDisable=" + aMinDisable)
-                .add("aMax='" + aMax + "'")
-                .add("aMaxDisable=" + aMaxDisable)
-                .add("aPercent=" + aPercent)
-                .add("absolute=" + absolute)
-                .add("color=" + color)
-                .add("paramConditions=" + paramConditions)
+                .add("paramTypeName='" + paramTypeName + "'")
+                .add("additionalData=" + additionalData)
+                .add("change=" + change)
                 .toString();
     }
 }

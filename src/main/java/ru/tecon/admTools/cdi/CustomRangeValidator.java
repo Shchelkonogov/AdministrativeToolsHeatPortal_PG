@@ -1,4 +1,4 @@
-package ru.tecon.admTools.validation;
+package ru.tecon.admTools.cdi;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -10,6 +10,9 @@ import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.inject.Named;
 
+/**
+ * Валидатор который проверяет, что бы оптимальное знаечние попадало между границ
+ */
 @Named
 @FacesValidator("rangeValidator")
 public class CustomRangeValidator implements Validator {
@@ -29,24 +32,30 @@ public class CustomRangeValidator implements Validator {
 
         try {
             double checkValue = Double.parseDouble(optValue);
-            try {
-                if ((checkValue < Double.parseDouble(tMin)) || (checkValue > Double.parseDouble(tMax))) {
-                    throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",
-                            optValue + " выходит за гранциы"));
-                }
-            } catch (NumberFormatException e) {
-                try {
-                    if ((checkValue < Double.parseDouble(aMin)) || (checkValue > Double.parseDouble(aMax))) {
-                        throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",
-                                optValue + " выходит за гранциы"));
-                    }
-                } catch (NumberFormatException ignore) {
 
-                }
+            if (checkDown(checkValue, aMin) || checkDown(checkValue, tMin) || checkUp(checkValue, tMax) || checkUp(checkValue, aMax)) {
+                throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",
+                        optValue + " выходит за гранциы"));
             }
         } catch (NumberFormatException ignore) {
             throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",
                     optValue + " не числовое значение"));
         }
+    }
+
+    private boolean checkUp(Double value, String referentValue) {
+        if (referentValue.equals("-")) {
+            return false;
+        }
+
+        return !(value <= Double.parseDouble(referentValue));
+    }
+
+    private boolean checkDown(Double value, String referentValue) {
+        if (referentValue.equals("-")) {
+            return false;
+        }
+
+        return !(value >= Double.parseDouble(referentValue));
     }
 }

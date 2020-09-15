@@ -30,6 +30,6 @@
     </dependencies>
 
     <build>
-        <finalName>AdmTools</finalName>
+        <finalName>admTools</finalName>
     </build>
 </project>

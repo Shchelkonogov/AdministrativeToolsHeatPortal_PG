@@ -20,7 +20,7 @@ public class Condition implements Serializable {
         return id;
     }
 
-    public String getCondition() throws IOException {
+    public String getCondSer() throws IOException {
         return Utils.toString(this);
     }
 

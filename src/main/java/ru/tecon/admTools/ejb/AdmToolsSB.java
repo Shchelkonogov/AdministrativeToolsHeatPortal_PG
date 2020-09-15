@@ -1,15 +1,11 @@
-package ru.tecon.admTools;
+package ru.tecon.admTools.ejb;
 
-import ru.tecon.admTools.model.Condition;
-import ru.tecon.admTools.model.DataModel;
-import ru.tecon.admTools.model.GraphDecreaseItemModel;
-import ru.tecon.admTools.model.ParamConditionDataModel;
+import ru.tecon.admTools.model.*;
+import ru.tecon.admTools.model.additionalModel.AnalogData;
+import ru.tecon.admTools.model.additionalModel.EnumerateData;
 
 import javax.annotation.Resource;
-import javax.ejb.Startup;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,7 +15,8 @@ import java.util.logging.Logger;
 
 @Startup
 @Stateless
-public class AdmToolsSB {
+@Local(SpecificModelLocal.class)
+public class AdmToolsSB implements SpecificModelLocal {
 
     private static final Logger LOG = Logger.getLogger(AdmToolsSB.class.getName());
 
@@ -32,14 +29,21 @@ public class AdmToolsSB {
     private static final String SELECT_CONDITIONS = "select * from dz_param_condition order by param_cond_name";
     private static final String SELECT_DECREASES = "select * from table(dsp_0031t.sel_decrease_list()) order by code";
     private static final String SELECT_GRAPHS = "select * from table(dsp_0031t.sel_graph_list()) order by code";
+    private static final String SELECT_GRAPH_DESCRIPTION = "select * from table(dsp_0031t.sel_graph_value(?))";
+    private static final String SELECT_DECREASE_DESCRIPTION = "select * from table(dsp_0031t.sel_decrease_value(?))";
+    private static final String SELECT_HISTORY = "select to_char(system_date, 'dd.mm.yyyy hh24:mi:ss') as system_date, " +
+            "user_name, prop_name, old_val, new_val from table(dsp_0031t.sel_change_param_ranges(?, ?, ?))";
 
     private static final String SAVE_GRAPH = "{? = call dsp_0031t.save_graph_rt(?, ?, ?, ?, ?, ?)}";
     private static final String SAVE_ENUM_PARAMS = "{? = call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?)}";
     private static final String SAVE_RANGES = "{? = call dsp_0031t.save_ranges(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SAVE_DECREASE = "{? = call dsp_0031t.save_decrease(?, ?, ?)}";
+    private static final String CLEAR_RANGES = "{? = call dsp_0031t.clear_ranges(?, ?, ?)}";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
+    @Override
     public List<DataModel> getData(int objectID) {
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -51,50 +55,46 @@ public class AdmToolsSB {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 DataModel item = new DataModel(res.getInt("par_id"), res.getInt("stat_agr_id"));
+
                 item.setParName(res.getString("par_name"));
                 item.setParMemo(res.getString("par_memo"));
                 item.setStatAgrName(res.getString("stat_agr_name"));
                 item.setZone(res.getString("zone"));
                 item.setTechProcCode(res.getString("techproc_type_code"));
                 item.setMeasureName(res.getString("measure_name"));
-                if (res.getString("decrease_id") != null) {
-                    item.setDecreaseID(res.getInt("decrease_id"));
-                }
-                item.setDecreaseName(res.getString("decrease_name"));
-                if (res.getString("graph_id") != null) {
-                    item.setGraphID(res.getInt("graph_id"));
-                }
-                item.setGraphName(res.getString("graph_name"));
-                item.setAbsolute(res.getBoolean("absolute"));
-                if (res.getString("t_min_tech") != null) {
-                    item.settMin(res.getDouble("t_min_tech"));
-                }
-                if (res.getString("t_max_tech") != null) {
-                    item.settMax(res.getDouble("t_max_tech"));
-                }
-                if (res.getString("a_min_tech") != null) {
-                    item.setaMin(res.getDouble("a_min_tech"));
-                }
-                if (res.getString("a_max_tech") != null) {
-                    item.setaMax(res.getDouble("a_max_tech"));
-                }
-                item.settPercent(res.getBoolean("t_percent"));
-                item.setaPercent(res.getBoolean("a_percent"));
-                item.setaMaxDisable(!res.getBoolean("a_max_tech_edit"));
-                item.setaMinDisable(!res.getBoolean("a_min_tech_edit"));
-                item.settMaxDisable(!res.getBoolean("t_max_tech_edit"));
-                item.settMinDisable(!res.getBoolean("t_min_tech_edit"));
-                item.setColor(res.getBoolean("color"));
-                item.setGraphDisable(!res.getBoolean("graph_edit"));
-                item.setDecreaseDisable(!res.getBoolean("decrease_edit"));
+                item.setParamTypeName(res.getString("param_type_name"));
+
+                AnalogData additionalData = new AnalogData();
+                additionalData.setGraph(res.getString("graph_id") == null ? null : res.getInt("graph_id"),
+                        res.getString("graph_name"),
+                        !res.getBoolean("graph_edit"));
+                additionalData.setDecrease(res.getString("decrease_id") == null ? null : res.getInt("decrease_id"),
+                        res.getString("decrease_name"),
+                        !res.getBoolean("decrease_edit"));
+                additionalData.setT(res.getString("t_min_tech") == null ? null : res.getDouble("t_min_tech"),
+                        res.getString("t_max_tech") == null ? null : res.getDouble("t_max_tech"),
+                        !res.getBoolean("t_min_tech_edit"),
+                        !res.getBoolean("t_max_tech_edit"),
+                        res.getBoolean("t_percent"));
+                additionalData.setA(res.getString("a_min_tech") == null ? null : res.getDouble("a_min_tech"),
+                        res.getString("a_max_tech") == null ? null : res.getDouble("a_max_tech"),
+                        !res.getBoolean("a_min_tech_edit"),
+                        !res.getBoolean("a_max_tech_edit"),
+                        res.getBoolean("a_percent"));
+                additionalData.setAbsolute(res.getBoolean("absolute"));
+                additionalData.setColor(res.getBoolean("color"));
+
+                item.setAdditionalData(additionalData);
+
                 result.add(item);
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load data", e);
+            LOG.log(Level.WARNING, "error load analog data", e);
         }
         return result;
     }
 
+    @Override
     public String getObjectPath(int objectID) {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_GET_OBJECT_PATH)) {
@@ -111,6 +111,7 @@ public class AdmToolsSB {
         return "";
     }
 
+    @Override
     public List<DataModel> getEnumerableData(int objectID) {
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -119,11 +120,14 @@ public class AdmToolsSB {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 DataModel item = new DataModel(res.getInt("par_id"), res.getInt("stat_agr_id"));
+
                 item.setParMemo(res.getString("par_memo"));
                 item.setStatAgrName(res.getString("stat_agr_name"));
                 item.setZone(res.getString("zone"));
                 item.setTechProcCode(res.getString("techproc_type_code"));
                 item.setParName(res.getString("par_name"));
+                item.setParamTypeName(res.getString("param_type_name"));
+
                 result.add(item);
             }
         } catch (SQLException e) {
@@ -132,8 +136,9 @@ public class AdmToolsSB {
         return result;
     }
 
-    public List<ParamConditionDataModel> getParamCondition(int objectID, int parId, int statAgrID) {
-        List<ParamConditionDataModel> result = new ArrayList<>();
+    @Override
+    public EnumerateData getParamCondition(int objectID, int parId, int statAgrID) {
+        EnumerateData result = new EnumerateData();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_PARAM_CONDITION)) {
             stm.setInt(1, objectID);
@@ -142,8 +147,10 @@ public class AdmToolsSB {
 
             ResultSet res = stm.executeQuery();
             while (res.next()) {
-                result.add(new ParamConditionDataModel(res.getInt("enum_code"), res.getString("prop_val"),
-                        res.getString("prop_val_tech"), res.getInt("param_cond_id")));
+                result.addCondition(res.getInt("enum_code"),
+                        res.getString("prop_val"),
+                        res.getInt("param_cond_id"),
+                        res.getString("prop_val_tech"));
             }
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "error load param condition", e);
@@ -151,6 +158,7 @@ public class AdmToolsSB {
         return result;
     }
 
+    @Override
     public List<Condition> getConditions() {
         List<Condition> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -165,14 +173,21 @@ public class AdmToolsSB {
         return result;
     }
 
+    @Override
     public List<GraphDecreaseItemModel> getDecreases() {
         return getGraphsDecreases(SELECT_DECREASES);
     }
 
+    @Override
     public List<GraphDecreaseItemModel> getGraphs() {
         return getGraphsDecreases(SELECT_GRAPHS);
     }
 
+    /**
+     * Метод обертка, выполняет запрос на получения списка графиков или снижений
+     * @param sql запрос
+     * @return полученный список
+     */
     private List<GraphDecreaseItemModel> getGraphsDecreases(String sql) {
         List<GraphDecreaseItemModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -187,9 +202,11 @@ public class AdmToolsSB {
         return result;
     }
 
+    @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public String saveGraph(int objectID, DataModel saveData) {
-        if (saveData.isGraphDisable()) {
+        AnalogData data = (AnalogData) saveData.getAdditionalData();
+        if (data.isGraphDisable()) {
             return null;
         }
         try (Connection connect = ds.getConnection();
@@ -198,11 +215,11 @@ public class AdmToolsSB {
             stm.setInt(2, objectID);
             stm.setInt(3, saveData.getParID());
             stm.setInt(4, saveData.getStatAgr());
-            if (saveData.getGraphID() == null) {
+            if (data.getGraphID() == null) {
                 stm.setNull(5, Types.INTEGER);
-                stm.setInt(6, Integer.parseInt(saveData.getGraphName()));
+                stm.setInt(6, Integer.parseInt(data.getGraphName()));
             } else {
-                stm.setInt(5, saveData.getGraphID());
+                stm.setInt(5, data.getGraphID());
                 stm.setNull(6, Types.INTEGER);
             }
             stm.registerOutParameter(7, Types.VARCHAR);
@@ -218,12 +235,13 @@ public class AdmToolsSB {
         return null;
     }
 
+    @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void saveEnumParam(int objectID, DataModel saveData) {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_ENUM_PARAMS)) {
 
-            for (ParamConditionDataModel item: saveData.getParamConditions()) {
+            for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
                 if (item.isEdited()) {
                     try {
                         stm.registerOutParameter(1, Types.INTEGER);
@@ -244,6 +262,8 @@ public class AdmToolsSB {
         }
     }
 
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public String saveRanges(int objectID, DataModel saveData) {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_RANGES)) {
@@ -252,33 +272,32 @@ public class AdmToolsSB {
             stm.setInt(3, saveData.getParID());
             stm.setInt(4, saveData.getStatAgr());
 
-            if (saveData.getaMin() == null) {
+            AnalogData data = (AnalogData) saveData.getAdditionalData();
+
+            if (data.getaMin() == null) {
                 stm.setNull(5, Types.INTEGER);
             } else {
-                stm.setDouble(5, saveData.getaMin());
+                stm.setDouble(5, data.getaMin());
             }
-            if (saveData.gettMin() == null) {
+            if (data.gettMin() == null) {
                 stm.setNull(6, Types.INTEGER);
             } else {
-                stm.setDouble(6, saveData.gettMin());
+                stm.setDouble(6, data.gettMin());
             }
-            if (saveData.gettMax() == null) {
+            if (data.gettMax() == null) {
                 stm.setNull(7, Types.INTEGER);
             } else {
-                stm.setDouble(7, saveData.gettMax());
+                stm.setDouble(7, data.gettMax());
             }
-            if (saveData.getaMax() == null) {
+            if (data.getaMax() == null) {
                 stm.setNull(8, Types.INTEGER);
             } else {
-                stm.setDouble(8, saveData.getaMax());
+                stm.setDouble(8, data.getaMax());
             }
 
-
-            System.out.println(saveData.istPercent() + " " + saveData.isaPercent() + " " + saveData.isAbsolute());
-
-            stm.setInt(9, saveData.istPercent() ? 1 : 0);
-            stm.setInt(10, saveData.isaPercent() ? 1 : 0);
-            stm.setInt(11, saveData.isAbsolute() ? 0 : 1);
+            stm.setInt(9, data.istPercent() ? 1 : 0);
+            stm.setInt(10, data.isaPercent() ? 1 : 0);
+            stm.setInt(11, data.isAbsolute() ? 0 : 1);
 
             stm.registerOutParameter(12, Types.VARCHAR);
             stm.executeUpdate();
@@ -291,5 +310,92 @@ public class AdmToolsSB {
         }
 
         return null;
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void saveDecrease(int objectID, DataModel saveData) {
+        AnalogData data = (AnalogData) saveData.getAdditionalData();
+        if (data.isDecreaseDisable()) {
+            return;
+        }
+        try (Connection connect = ds.getConnection();
+             CallableStatement stm = connect.prepareCall(SAVE_DECREASE)) {
+            stm.registerOutParameter(1, Types.INTEGER);
+            stm.setInt(2, objectID);
+            stm.setInt(3, saveData.getParID());
+            stm.setInt(4, data.getDecreaseID());
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error upload decrease", e);
+        }
+    }
+
+    @Override
+    public List<GraphDecreaseDescription> getGraphDescription(int graphID) {
+        return getGraphDecreaseDescriptions(graphID, SELECT_GRAPH_DESCRIPTION);
+    }
+
+    @Override
+    public List<GraphDecreaseDescription> getDecreaseDescription(int decreaseID) {
+        return getGraphDecreaseDescriptions(decreaseID, SELECT_DECREASE_DESCRIPTION);
+    }
+
+    /**
+     * Метод обертка, выполняет запрос на получения списка графиков или снижений
+     * @param id id графика или суточного снижения
+     * @param selectDecreaseDescription select
+     * @return полученный список
+     */
+    private List<GraphDecreaseDescription> getGraphDecreaseDescriptions(int id, String selectDecreaseDescription) {
+        List<GraphDecreaseDescription> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(selectDecreaseDescription)) {
+            stm.setInt(1, id);
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new GraphDecreaseDescription(res.getString("x"), res.getString("y")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load graph/decrease description", e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ParamHistory> getParamHistory(int objectID, int paramID, int statAgrID) {
+        List<ParamHistory> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_HISTORY)) {
+            stm.setInt(1, objectID);
+            stm.setInt(2, paramID);
+            stm.setInt(3, statAgrID);
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new ParamHistory(res.getString("system_date"),
+                        res.getString("user_name"),
+                        res.getString("prop_name"),
+                        res.getString("old_val"),
+                        res.getString("new_val")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load param history", e);
+        }
+        return result;
+    }
+
+    @Override
+    public void clearRanges(int objectID, int parID, int statAgrID) {
+        try (Connection connect = ds.getConnection();
+             CallableStatement stm = connect.prepareCall(CLEAR_RANGES)) {
+            stm.registerOutParameter(1, Types.INTEGER);
+            stm.setInt(2, objectID);
+            stm.setInt(3, parID);
+            stm.setInt(4, statAgrID);
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error clear ranges", e);
+        }
     }
 }
