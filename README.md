@@ -3,12 +3,14 @@
 Форма Конкретная модель.
 
 Строка вызова: 
-http://{url}:{port}/admTools/specificModel?objectID={objectID}&formID={formID}&sessionID={sessionID}
+http://{host}:{port}/admTools/specificModel?objectID={objectID}&formID={formID}&sessionID={sessionID}
 
-Отчеты еще не сделал:
+Отчеты:
 Режимная карта
-http://{url}:{port}/admTools/specificModel/report/modeMap?objectID={objectID}&sessionID={sessionID}
+http://{host}:{port}/admTools/specificModel/report/modeMap?objectID={objectID}&sessionID={sessionID}
 Отчет по изменению тех границ
-http://{url}:{port}/admTools/specificModel/report/technicalLimitsChangeReport?objectID={objectID}&date={dd.mm.yyyy}&sessionID={sessionID}
+http://{host}:{port}/admTools/specificModel/report/technicalLimitsChangeReport?
+    id={("S" + structID) || ("O" + objectID)}&objectType={objectType}&date={dd.mm.yyyy}&sessionID={sessionID}
 Контроль режима
-http://{url}:{port}/admTools/specificModel/report/modeControl?structID={structID}&sessionID={sessionID}
+http://{host}:{port}/admTools/specificModel/report/modeControl?
+    structID={structID}&paramID={paramID}&objectType={objectType}&sessionID={sessionID}
