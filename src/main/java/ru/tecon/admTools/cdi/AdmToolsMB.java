@@ -35,8 +35,7 @@ public class AdmToolsMB implements Serializable {
 
     private int objectID;
     private String objectPath;
-    // TODO поменять на false
-    private boolean write = true;
+    private boolean write = false;
 
     // Модели данных для закладки аналоговые параметры
     private List<DataModel> tableModel;
@@ -81,8 +80,7 @@ public class AdmToolsMB implements Serializable {
 
         try {
             objectID = Integer.parseInt(request.getParameter("objectID"));
-            // TODO включить
-//        write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
+        write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
         } catch (NumberFormatException e) {
             return;
         }

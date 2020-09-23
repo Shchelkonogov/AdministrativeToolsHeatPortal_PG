@@ -19,10 +19,10 @@ public class Servlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionID = req.getParameter("sessionID");
-//        if ((sessionID != null) && (bean.checkSession(sessionID))) {
+        if ((sessionID != null) && (bean.checkSession(sessionID))) {
             req.getRequestDispatcher("/specificModel.xhtml").forward(req, resp);
-//        } else {
-//            req.getRequestDispatcher("/error.html").forward(req, resp);
-//        }
+        } else {
+            req.getRequestDispatcher("/error.html").forward(req, resp);
+        }
     }
 }
