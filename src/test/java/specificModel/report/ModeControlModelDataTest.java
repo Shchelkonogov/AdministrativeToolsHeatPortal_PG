@@ -1,7 +1,7 @@
 package specificModel.report;
 
-import ru.tecon.admTools.report.ejb.ModeControlLocal;
-import ru.tecon.admTools.report.model.ModeControlModel;
+import ru.tecon.admTools.specificModel.report.ejb.ModeControlLocal;
+import ru.tecon.admTools.specificModel.report.model.ModeControlModel;
 
 import java.util.ArrayList;
 import java.util.List;

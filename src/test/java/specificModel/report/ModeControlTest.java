@@ -1,6 +1,6 @@
 package specificModel.report;
 
-import ru.tecon.admTools.report.ModeControl;
+import ru.tecon.admTools.specificModel.report.ModeControl;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

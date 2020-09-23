@@ -1,7 +1,7 @@
 package specificModel.report;
 
-import ru.tecon.admTools.report.ejb.ChangeRangesLocal;
-import ru.tecon.admTools.report.model.ChangeRangesModel;
+import ru.tecon.admTools.specificModel.report.ejb.ChangeRangesLocal;
+import ru.tecon.admTools.specificModel.report.model.ChangeRangesModel;
 
 import java.util.ArrayList;
 import java.util.List;

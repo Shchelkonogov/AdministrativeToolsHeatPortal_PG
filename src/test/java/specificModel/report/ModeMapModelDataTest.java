@@ -1,6 +1,6 @@
 package specificModel.report;
 
-import ru.tecon.admTools.report.ejb.ModeMapLocal;
+import ru.tecon.admTools.specificModel.report.ejb.ModeMapLocal;
 
 import java.util.*;
 

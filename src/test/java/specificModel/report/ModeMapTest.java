@@ -1,7 +1,7 @@
 package specificModel.report;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import ru.tecon.admTools.report.ModeMap;
+import ru.tecon.admTools.specificModel.report.ModeMap;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

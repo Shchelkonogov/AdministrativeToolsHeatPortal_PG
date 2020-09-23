@@ -1,6 +1,6 @@
 package specificModel.report;
 
-import ru.tecon.admTools.report.ChangeRanges;
+import ru.tecon.admTools.specificModel.report.ChangeRanges;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
