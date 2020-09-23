@@ -38,6 +38,21 @@ public class CheckUserSB {
         return false;
     }
 
+    public String getUser(String sessionID) {
+        try (Connection connection = ds.getConnection();
+             PreparedStatement stm = connection.prepareStatement(CHECK_SESSION)) {
+            stm.setString(1, sessionID);
+
+            ResultSet res = stm.executeQuery();
+            if (res.next() && (res.getString(1) != null)) {
+                return res.getString(1);
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "check session error: ", e);
+        }
+        return null;
+    }
+
     public boolean checkSessionWrite(String sessionID, int formID) {
         try (Connection connection = ds.getConnection();
              PreparedStatement stm = connection.prepareStatement(CHECK_SESSION_RIGHTS)) {
