@@ -3,9 +3,24 @@
                   xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.9/weblogic-web-app.xsd">
     <resource-description>
         <res-ref-name>jdbc/DataSource</res-ref-name>
-        <jndi-name>jdbc/OracleDataSourceTecon</jndi-name>
+        <jndi-name>jdbc/OracleDataSource</jndi-name>
     </resource-description>
     <container-descriptor>
         <prefer-web-inf-classes>true</prefer-web-inf-classes>
     </container-descriptor>
+
+<!--    <session-descriptor>-->
+<!--        <cookie-secure>false</cookie-secure>-->
+<!--        <cookie-http-only>true</cookie-http-only>-->
+<!--        <url-rewriting-enabled>false</url-rewriting-enabled>-->
+<!--        <cookie-domain>172.16.4.26</cookie-domain>-->
+<!--    </session-descriptor>-->
+
+    <session-descriptor>
+        <cookie-name>SID</cookie-name>
+        <cookie-secure>true</cookie-secure>
+        <cookie-http-only>true</cookie-http-only>
+        <url-rewriting-enabled>false</url-rewriting-enabled>
+        <cookie-path>admTools;SameSite=none</cookie-path>
+    </session-descriptor>
 </weblogic-web-app>
