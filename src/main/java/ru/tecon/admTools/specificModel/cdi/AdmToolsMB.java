@@ -80,7 +80,7 @@ public class AdmToolsMB implements Serializable {
 
         try {
             objectID = Integer.parseInt(request.getParameter("objectID"));
-        write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
+            write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
         } catch (NumberFormatException e) {
             return;
         }
@@ -141,11 +141,11 @@ public class AdmToolsMB implements Serializable {
      */
     public void saveData() {
         log.info("update analog objects:");
-        tableModel.stream().filter(DataModel::isChange).forEach(System.out::println);
+        tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> log.info(dataModel.toString()));
         log.info("end;");
 
         log.info("update enumerate objects:");
-        enumerableTableModel.stream().filter(DataModel::isChange).forEach(System.out::println);
+        enumerableTableModel.stream().filter(DataModel::isChange).forEach(dataModel -> log.info(dataModel.toString()));
         log.info("end;");
 
         FacesContext context = FacesContext.getCurrentInstance();
