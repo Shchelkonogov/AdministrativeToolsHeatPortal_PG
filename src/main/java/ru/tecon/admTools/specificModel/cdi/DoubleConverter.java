@@ -3,6 +3,7 @@ package ru.tecon.admTools.specificModel.cdi;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 import java.text.DecimalFormat;
@@ -11,9 +12,9 @@ import java.text.DecimalFormat;
  * Конвертер проверяет число на тип {@link Double} и отрезает лишние нули справа
  */
 @FacesConverter("doubleConverter")
-public class DoubleConverter implements javax.faces.convert.Converter {
+public class DoubleConverter implements Converter {
 
-    private static final DecimalFormat FORMAT = new DecimalFormat("0.#");
+    private static final DecimalFormat FORMAT = new DecimalFormat("0.##");
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
