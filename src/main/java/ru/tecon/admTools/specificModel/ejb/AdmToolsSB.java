@@ -216,8 +216,13 @@ public class AdmToolsSB implements SpecificModelLocal {
             stm.setInt(3, saveData.getParID());
             stm.setInt(4, saveData.getStatAgr());
             if (data.getGraphID() == null) {
-                stm.setNull(5, Types.INTEGER);
-                stm.setInt(6, Integer.parseInt(data.getGraphName()));
+                if ((data.getGraphName() != null) && !data.getGraphName().isEmpty()) {
+                    stm.setNull(5, Types.INTEGER);
+                    stm.setFloat(6, Float.parseFloat(data.getGraphName()));
+                } else {
+                    stm.setNull(5, Types.INTEGER);
+                    stm.setNull(6, Types.INTEGER);
+                }
             } else {
                 stm.setInt(5, data.getGraphID());
                 stm.setNull(6, Types.INTEGER);

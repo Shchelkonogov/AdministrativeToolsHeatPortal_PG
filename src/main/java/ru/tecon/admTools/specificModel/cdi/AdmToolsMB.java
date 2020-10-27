@@ -203,11 +203,31 @@ public class AdmToolsMB implements Serializable {
     }
 
     /**
+     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора суточного снижения
+     */
+    public void saveNoDecrease() {
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseName(null);
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseID(null);
+        changedDecreaseGraphItem.setChange(true);
+        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":decreaseValuePanel");
+    }
+
+    /**
      * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора графика
      */
     public void saveGraph() {
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectGraph.getName());
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(selectGraph.getId());
+        changedDecreaseGraphItem.setChange(true);
+        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+    }
+
+    /**
+     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора графика
+     */
+    public void saveNoGraph() {
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(null);
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
         changedDecreaseGraphItem.setChange(true);
         PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
     }
@@ -239,6 +259,17 @@ public class AdmToolsMB implements Serializable {
      */
     public void saveOptValue() {
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(optValue);
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
+        changedDecreaseGraphItem.setChange(true);
+        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+    }
+
+    /**
+     * Метод обрабатывает нажание кнопки выбрать в выборе графика или оптимального значения
+     * на закладке оптимальное значение
+     */
+    public void saveNoOptValue() {
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(null);
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
         changedDecreaseGraphItem.setChange(true);
         PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");

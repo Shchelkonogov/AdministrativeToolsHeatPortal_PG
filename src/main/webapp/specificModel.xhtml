@@ -316,6 +316,7 @@
             </div>
 
             <f:facet name="footer">
+                <p:commandButton value="Без снижения" action="#{specificModel.saveNoDecrease}" onclick="PF('decreaseDialog').hide()"/>
                 <p:commandButton value="Выбрать" action="#{specificModel.saveDecrease}" onclick="PF('decreaseDialog').hide()"/>
             </f:facet>
         </p:dialog>
@@ -327,6 +328,8 @@
             <p:tabView id="gTab" orientation="bottom" style="height: 100%; transform: unset;">
                 <p:tab id="gTab1" title="График">
                     <f:facet name="actions">
+                        <p:commandButton style="margin-top: 2px;" value="Без графика" action="#{specificModel.saveNoGraph}"
+                                         onclick="PF('graphDialog').hide()"/>
                         <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveGraph}"
                                          onclick="PF('graphDialog').hide()"/>
                     </f:facet>
@@ -347,6 +350,8 @@
                 </p:tab>
                 <p:tab id="gTab2" title="Оптимальное значение">
                     <f:facet name="actions">
+                        <p:commandButton style="margin-top: 2px;" value="Без Опт.знач." action="#{specificModel.saveNoOptValue}"
+                                         onclick="PF('graphDialog').hide()"/>
                         <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveOptValue}"
                                           validateClient="true" oncomplete="if (!args.validationFailed) PF('graphDialog').hide();"
                                          update="growl"/>
@@ -411,7 +416,7 @@
                     <h:outputText value="#{graphDecreaseData.y}"/>
                 </p:column>
             </p:dataTable>
-            </div>
+        </div>
     </p:dialog>
 
     <p:dialog id="historyDialogID" header="История изменений параметра #{history.name}" widgetVar="historyDialog" modal="true"
