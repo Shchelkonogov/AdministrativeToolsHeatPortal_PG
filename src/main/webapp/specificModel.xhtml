@@ -70,13 +70,11 @@
                     </p:columnGroup>
 
                     <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
-                        <h:outputText id="parMemo" value="#{data.parMemo}" />
-                        <p:tooltip for="parMemo" value="#{data.parName}" position="bottom"/>
+                        <h:outputText id="parMemo" title="#{data.parName}" value="#{data.parMemo}" />
                     </p:column>
 
                     <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
-                        <h:outputText id="statAgrName" value="#{data.statAgrName}" />
-                        <p:tooltip for="statAgrName" value="#{data.statAgrName}" position="bottom"/>
+                        <h:outputText id="statAgrName" title="#{data.statAgrName}" value="#{data.statAgrName}" />
                     </p:column>
 
                     <p:column styleClass="centre-column">
