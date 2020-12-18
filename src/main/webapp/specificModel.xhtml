@@ -44,7 +44,7 @@
                             </p:column>
                             <p:column rowspan="2" headerText="Стат.агр." width="150"/>
                             <p:column rowspan="2" headerText="Зона" width="50"/>
-                            <p:column rowspan="2" headerText="Техпр" width="50" filterBy="#{data.techProcCode}" filterMatchMode="exact">
+                            <p:column rowspan="2" headerText="Техпр" width="50" filterable="#{!specificModel.eco}" filterBy="#{data.techProcCode}" filterMatchMode="exact">
                                 <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
                                         <f:selectItem itemLabel="-" itemValue="#{null}" noSelectionOption="true" />
@@ -69,7 +69,7 @@
                         </p:row>
                     </p:columnGroup>
 
-                    <p:column>
+                    <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
                         <h:outputText id="parMemo" value="#{data.parMemo}" />
                         <p:tooltip for="parMemo" value="#{data.parName}" position="bottom"/>
                     </p:column>
@@ -242,7 +242,7 @@
                 </p:dataTable>
             </h:form>
         </p:tab>
-        <p:tab id="cTab" title="Перечислимые">
+        <p:tab id="cTab" rendered="#{!specificModel.eco}" title="Перечислимые">
             <h:form style="height: 100%; float: left; width: calc(100% - 305px);">
                 <p:dataTable id="tableDataCountable" var="data" value="#{specificModel.enumerableTableModel}"
                              selection="#{specificModel.selectedEnumerateItem}" selectionMode="single" rowKey="#{data.id}"
