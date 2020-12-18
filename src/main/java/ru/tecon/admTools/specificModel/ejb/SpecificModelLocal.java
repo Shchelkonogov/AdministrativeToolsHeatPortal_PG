@@ -20,6 +20,14 @@ public interface SpecificModelLocal {
     List<DataModel> getData(int objectID);
 
     /**
+     * Метод выгружает данные для таблицы аналоговых данных
+     * @param objectID ID объекта
+     * @param eco идентификатор показывающий является ли запрос по экомониторингу
+     * @return список данных {@link DataModel}
+     */
+    List<DataModel> getData(int objectID, boolean eco);
+
+    /**
      * Метод выгружает строку описания объекта (организационный путь и территориальный адрес)
      * @param objectID id объекта
      * @return строка описания объекта

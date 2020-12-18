@@ -29,9 +29,12 @@ import java.util.stream.Collectors;
  */
 @Named("specificModel")
 @ViewScoped
-public class AdmToolsMB implements Serializable {
+public class SpecificModelMB implements Serializable {
 
-    private static Logger log  = Logger.getLogger(AdmToolsMB.class.getName());
+    private static Logger log  = Logger.getLogger(SpecificModelMB.class.getName());
+
+    // Параметр для переключения с конкретной модели на конкретную модель экомониторинга
+    private boolean eco = false;
 
     private int objectID;
     private String objectPath;
@@ -78,6 +81,8 @@ public class AdmToolsMB implements Serializable {
     private void init() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 
+        eco = Boolean.parseBoolean(request.getParameter("eco"));
+
         try {
             objectID = Integer.parseInt(request.getParameter("objectID"));
             write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
@@ -89,7 +94,9 @@ public class AdmToolsMB implements Serializable {
 
         loadData();
 
-        conditions = bean.getConditions();
+        if (!eco) {
+            conditions = bean.getConditions();
+        }
         decreases = bean.getDecreases();
         graphs = bean.getGraphs();
 
@@ -98,12 +105,14 @@ public class AdmToolsMB implements Serializable {
     }
 
     private void loadData() {
-        tableModel = bean.getData(objectID);
+        tableModel = bean.getData(objectID, eco);
 
         filteredTableModel.clear();
         filteredTableModel.addAll(tableModel);
 
-        enumerableTableModel = bean.getEnumerableData(objectID);
+        if (!eco) {
+            enumerableTableModel = bean.getEnumerableData(objectID);
+        }
     }
 
     /**
@@ -473,5 +482,9 @@ public class AdmToolsMB implements Serializable {
 
     public boolean isWrite() {
         return write;
+    }
+
+    public boolean isEco() {
+        return eco;
     }
 }

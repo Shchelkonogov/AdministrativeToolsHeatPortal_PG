@@ -29,6 +29,9 @@ public class ChangeRangesSB implements ChangeRangesLocal {
     private static final String SELECT_LOAD_DATA = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
             "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
             "from table(dsp_0031t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?))";
+    private static final String SELECT_LOAD_DATA_ECO = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
+            "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
+            "from table(dsp_0050t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?))";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -61,9 +64,15 @@ public class ChangeRangesSB implements ChangeRangesLocal {
     @Override
     public List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID, int filterType,
                                                   String filter, String date, String user) {
+        return loadReportData(objType, structID, objID, filterType, filter, date, user, false);
+    }
+
+    @Override
+    public List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID, int filterType,
+                                                  String filter, String date, String user, boolean eco) {
         List<ChangeRangesModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SELECT_LOAD_DATA)) {
+             PreparedStatement stm = connect.prepareStatement(eco ? SELECT_LOAD_DATA_ECO : SELECT_LOAD_DATA)) {
             stm.setInt(1, objType);
             if (((structID == null) && (objID == null)) || ((structID != null) && (objID != null))) {
                 return result;

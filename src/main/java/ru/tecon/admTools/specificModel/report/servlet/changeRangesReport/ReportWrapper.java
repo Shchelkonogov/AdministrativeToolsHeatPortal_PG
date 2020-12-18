@@ -1,39 +1,25 @@
-package ru.tecon.admTools.specificModel.report.servlet;
+package ru.tecon.admTools.specificModel.report.servlet.changeRangesReport;
 
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.report.ChangeRanges;
 import ru.tecon.admTools.specificModel.report.ejb.ChangeRangesLocal;
 
-import javax.ejb.EJB;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Servlet для запроса отчета "Отчет по изменению тех границ".
- * URL запуска:
- * http://{host}:{port}/admTools/specificModel/report/technicalLimitsChangeReport?
- *     id={("S" + structID) || ("O" + objectID)}&objectType={objectType}&date={dd.mm.yyyy}&sessionID={sessionID}
- */
-@WebServlet("/specificModel/report/technicalLimitsChangeReport")
-public class ChangeRangesReport extends HttpServlet {
+class ReportWrapper {
 
-    private static Logger log = Logger.getLogger(ChangeRangesReport.class.getName());
+    private static Logger log = Logger.getLogger(ReportWrapper.class.getName());
 
-    @EJB
-    private ChangeRangesLocal bean;
-
-    @EJB
-    private CheckUserSB checkBean;
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    static void report(HttpServletRequest req, HttpServletResponse resp,
+                       CheckUserSB checkBean, ChangeRangesLocal bean,
+                       boolean eco) throws UnsupportedEncodingException {
         String user = checkBean.getUser(req.getParameter("sessionID"));
         if (user != null) {
             int objectType = Integer.parseInt(req.getParameter("objectType"));
@@ -56,7 +42,7 @@ public class ChangeRangesReport extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
 
             try (OutputStream output = resp.getOutputStream()) {
-                ChangeRanges.generateChangeRanges(objectType, structID, objID, 0, "", date, user, bean).write(output);
+                ChangeRanges.generateChangeRanges(objectType, structID, objID, 0, "", date, user, bean, eco).write(output);
                 output.flush();
             } catch (IOException e) {
                 log.log(Level.WARNING, "error send report", e);

@@ -16,13 +16,14 @@ import java.util.logging.Logger;
 @Startup
 @Stateless
 @Local(SpecificModelLocal.class)
-public class AdmToolsSB implements SpecificModelLocal {
+public class SpecificModelSB implements SpecificModelLocal {
 
-    private static final Logger LOG = Logger.getLogger(AdmToolsSB.class.getName());
+    private static final Logger LOG = Logger.getLogger(SpecificModelSB.class.getName());
 
     private static final String ALTER_SESSION = "alter session set NLS_NUMERIC_CHARACTERS = '.,'";
 
     private static final String SELECT_DATA = "select * from table(dsp_0031t.sel_a_params(?))";
+    private static final String SELECT_ECO_DATA = "select * from table(dsp_0050t.sel_a_params(?))";
     private static final String SELECT_GET_OBJECT_PATH = "select get_obj_path_all(?) || ' (' || get_obj_address(?) || ')' from dual";
     private static final String SELECT_ENUMERABLE_DATA = "select * from table(dsp_0031t.sel_p_params(?))";
     private static final String SELECT_PARAM_CONDITION = "select * from table(dsp_0031t.sel_p_param_cond(?, ?, ?))";
@@ -45,10 +46,15 @@ public class AdmToolsSB implements SpecificModelLocal {
 
     @Override
     public List<DataModel> getData(int objectID) {
+        return getData(objectID, false);
+    }
+
+    @Override
+    public List<DataModel> getData(int objectID, boolean eco) {
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement alter = connect.prepareStatement(ALTER_SESSION);
-             PreparedStatement stm = connect.prepareStatement(SELECT_DATA)) {
+             PreparedStatement stm = connect.prepareStatement(eco ? SELECT_ECO_DATA : SELECT_DATA)) {
             alter.executeQuery();
 
             stm.setInt(1, objectID);

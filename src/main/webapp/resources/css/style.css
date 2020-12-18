@@ -8,6 +8,10 @@ html, body {
     user-select: none;
 }
 
+.ui-helper-hidden-accessible {
+    position: unset !important;
+}
+
 body .ui-datatable thead th {
     padding: 1px;
 }

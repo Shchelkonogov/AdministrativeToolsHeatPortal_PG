@@ -35,4 +35,20 @@ public interface ChangeRangesLocal {
      */
     List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID, int filterType,
                                            String filter, String date, String user);
+
+    /**
+     * Выгружает данные по оптчету из базы.<br/>
+     * structID или objID должен быть null, иначе данные будут пустыми.
+     * @param objType тип объекта
+     * @param structID id структуры
+     * @param objID id объекта
+     * @param filterType тип фильтрв
+     * @param filter текст фильтра
+     * @param date дата в формате dd.MM.yyyy
+     * @param user имя пользователя
+     * @param eco обозначает использование параметров для экомониторинга
+     * @return возвращает список данных по отчету {@link ChangeRangesModel}
+     */
+    List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID, int filterType,
+                                           String filter, String date, String user, boolean eco);
 }

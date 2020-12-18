@@ -22,4 +22,10 @@ public class ChangeRangesModelDataTest implements ChangeRangesLocal {
         result.add(new ChangeRangesModel("1", "2", "3", "4", "5", "6", "7", "8"));
         return result;
     }
+
+    @Override
+    public List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID,
+                                                  int filterType, String filter, String date, String user, boolean eco) {
+        return loadReportData(objType, structID, objID, filterType, filter, date, user);
+    }
 }

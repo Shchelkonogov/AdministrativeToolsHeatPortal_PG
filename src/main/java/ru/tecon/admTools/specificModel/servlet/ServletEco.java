@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/specificModel")
-public class Servlet extends HttpServlet {
+@WebServlet("/ecoSpecificModel")
+public class ServletEco extends HttpServlet {
 
     @EJB
     private CheckUserSB bean;
@@ -20,7 +20,7 @@ public class Servlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionID = req.getParameter("sessionID");
         if ((sessionID != null) && (bean.checkSession(sessionID))) {
-            req.getRequestDispatcher("/specificModel.xhtml?eco=false").forward(req, resp);
+            req.getRequestDispatcher("/specificModel.xhtml?eco=true").forward(req, resp);
         } else {
             req.getRequestDispatcher("/error.html").forward(req, resp);
         }

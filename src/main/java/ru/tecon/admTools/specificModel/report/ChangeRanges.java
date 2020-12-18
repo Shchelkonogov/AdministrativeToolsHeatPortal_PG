@@ -30,6 +30,25 @@ public final class ChangeRanges {
      */
     public static Workbook generateChangeRanges(int objType, Integer structID, Integer objID, int filterType,
                                                 String filter, String date, String user, ChangeRangesLocal bean) {
+        return generateChangeRanges(objType, structID, objID, filterType, filter, date, user, bean, false);
+    }
+
+    /**
+     * Метод формирует excel файл отчета "Отчет по изменению тех границ"
+     * @param objType тип объекта
+     * @param structID id структуры
+     * @param objID id объекта
+     * @param filterType тип фильтра
+     * @param filter текст фильтра
+     * @param date дата в формате dd.MM.yyyy
+     * @param user имя пользователя
+     * @param bean класс для получения данных реализующий интерфейс {@link ChangeRangesLocal}
+     * @param eco обозначает использование данных для экомониторинга
+     * @return возвращает excel {@link Workbook}
+     */
+    public static Workbook generateChangeRanges(int objType, Integer structID, Integer objID, int filterType,
+                                                String filter, String date, String user, ChangeRangesLocal bean,
+                                                boolean eco) {
         Workbook wb = new XSSFWorkbook();
 
         XSSFFont font = (XSSFFont) wb.createFont();
@@ -101,7 +120,7 @@ public final class ChangeRanges {
         createStyledCell(row, 7, "Новое значение", boldBorderCenterStyle);
         createStyledCell(row, 8, "Пользователь", boldBorderCenterStyle);
 
-        List<ChangeRangesModel> data = bean.loadReportData(objType, structID, objID, filterType, filter, date, user);
+        List<ChangeRangesModel> data = bean.loadReportData(objType, structID, objID, filterType, filter, date, user, eco);
 
         for (int i = 0; i < data.size(); i++) {
             row = sheet.createRow(7 + i);
