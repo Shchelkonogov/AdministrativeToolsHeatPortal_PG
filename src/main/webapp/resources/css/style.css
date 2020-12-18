@@ -8,7 +8,7 @@ html, body {
     user-select: none;
 }
 
-.ui-helper-hidden-accessible {
+td .ui-helper-hidden-accessible {
     position: unset !important;
 }
 
