@@ -115,10 +115,10 @@ public class ReportBean {
             stm.setInt(2, requestModel.getFilterID());
             stm.setString(3, requestModel.getFilterValue());
             if (sheetType == tSheetType.Qco || sheetType == tSheetType.Qgvs) {
-                stm.setString(4, requestModel.getDate());
+                stm.setString(4, requestModel.getFirstDateAtMonthValue());
             } else {
                 stm.setString(4, sheetType.toString());
-                stm.setString(5, requestModel.getDate());
+                stm.setString(5, requestModel.getFirstDateAtMonthValue());
             }
 
             ResultSet res = stm.executeQuery();
