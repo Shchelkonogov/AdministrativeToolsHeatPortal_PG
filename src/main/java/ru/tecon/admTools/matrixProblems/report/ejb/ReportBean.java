@@ -189,7 +189,9 @@ public class ReportBean {
                             }
                             break;
                         default:
-                            cell.setCellStyle(errorStyle);
+                            if (res.getInt("p" + j + "_col") == 1) {
+                                cell.setCellStyle(errorStyle);
+                            }
                     }
 
                     cell = row.createCell(2 * j);
@@ -211,7 +213,9 @@ public class ReportBean {
                             }
                             break;
                         default:
-                            cell.setCellStyle(errorStyle);
+                            if (res.getInt("v" + j + "_col") == 1) {
+                                cell.setCellStyle(errorStyle);
+                            }
                     }
                 }
 
