@@ -15,12 +15,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * Stateless bean для формирования отчета по матрице проблем
@@ -74,7 +76,10 @@ public class ReportBean {
         Map<Integer, List<String>> tnvMap = new HashMap<>();
 
         LocalDate date = requestModel.getFirstDateAtMonth();
-        int daysCount = requestModel.getFirstDateAtMonth().lengthOfMonth();
+        int daysCount = Stream.of(YearMonth.from(requestModel.getFirstDateAtMonth()).atEndOfMonth(), LocalDate.now())
+                .min(LocalDate::compareTo)
+                .get()
+                .getDayOfMonth();
 
         // Выбираем нужный select
         String select = null;
@@ -244,7 +249,7 @@ public class ReportBean {
                         tnvMap.put(polygonID, tnv);
                     }
 
-                    for (int j = 0; j < tnv.size(); j++) {
+                    for (int j = 0; j < daysCount; j++) {
                         for (int k = 0; k < 2; k++) {
                             cell = row.createCell(2 * j + 1 + k);
                             cell.setCellValue(tnv.get(j));
