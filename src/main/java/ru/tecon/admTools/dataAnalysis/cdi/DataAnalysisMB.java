@@ -89,7 +89,7 @@ public class DataAnalysisMB implements Serializable {
         } else {
             ec.setResponseContentType("application/vnd.ms-excel; charset=UTF-8");
             ec.setResponseHeader("Content-Disposition", "attachment; filename=\"" +
-                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("качества.xlsx", "UTF-8") + "\"");
+                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("достоверности.xlsx", "UTF-8") + "\"");
             ec.setResponseCharacterEncoding("UTF-8");
 
             try (InputStream inputStream = (InputStream) response.getEntity();
