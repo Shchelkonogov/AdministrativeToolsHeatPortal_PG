@@ -122,7 +122,8 @@ public class Report extends HttpServlet {
             }
 
             resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Матрица проблем.xlsx", "UTF-8") + "\"");
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" +
+                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("первичных", "UTF-8") + " " + URLEncoder.encode("измерений.xlsx", "UTF-8") + "\"");
             resp.setCharacterEncoding("UTF-8");
 
             try (OutputStream outputStream = resp.getOutputStream()) {
