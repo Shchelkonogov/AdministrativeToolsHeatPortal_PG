@@ -26,10 +26,13 @@ import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Named("dataAnalysis")
 @ViewScoped
 public class DataAnalysisMB implements Serializable {
+
+    private static final Logger LOG = Logger.getLogger(DataAnalysisSB.class.getName());
 
     private String sessionID;
     private int filterID;
@@ -73,7 +76,9 @@ public class DataAnalysisMB implements Serializable {
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
 
-        String rootURL = request.getRequestURL().toString().replace(request.getServletPath(), "");
+        String rootURL = request.getRequestURL().toString()
+                .replace(request.getServletPath(), "")
+                .replace(request.getLocalName(), "localhost");
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(rootURL + "/dataAnalysis/report");
