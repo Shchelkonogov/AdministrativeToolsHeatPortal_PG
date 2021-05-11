@@ -141,7 +141,7 @@
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
                                                     update="historyDialogID" process="@this" />
-                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                        <p:menuitem rendered="#{specificModel.write}" value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
                                                     update=":tabView :growl" process="@this"/>
                                     </p:contextMenu>
                                 </p:outputPanel>
@@ -163,7 +163,7 @@
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
                                                     update="historyDialogID" process="@this" />
-                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                        <p:menuitem rendered="#{specificModel.write}" value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
                                                     update=":tabView :growl" process="@this"/>
                                     </p:contextMenu>
                                 </p:outputPanel>
@@ -191,7 +191,7 @@
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
                                                     update="historyDialogID" process="@this" />
-                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                        <p:menuitem rendered="#{specificModel.write}" value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
                                                     update=":tabView :growl" process="@this"/>
                                     </p:contextMenu>
                                 </p:outputPanel>
@@ -213,7 +213,7 @@
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
                                                     update="historyDialogID" process="@this" />
-                                        <p:menuitem value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
+                                        <p:menuitem rendered="#{specificModel.write}" value="Сбросить границы" action="#{specificModel.clearRanges(specificModel.objectID, data.parID, data.statAgr)}"
                                                     update=":tabView :growl" process="@this"/>
                                     </p:contextMenu>
                                 </p:outputPanel>
