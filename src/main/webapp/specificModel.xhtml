@@ -27,7 +27,7 @@
             <h:form id="tableForm" style="height: 100%;">
                 <p:dataTable id="tableData" var="data" value="#{specificModel.tableModel}" rowHover="true" scrollable="true" scrollHeight="100%"
                              editable="true" editMode="cell" rowIndexVar="rowIdx" rowStyleClass="#{data.additionalData.color}" rowKey="#{data.id}"
-                             filteredValue="#{specificModel.filteredTableModel}" widgetVar="tableWidget">
+                             filteredValue="#{specificModel.filteredTableModel}" widgetVar="tableWidget" emptyMessage="#{global['table.empty.value']}">
 
                     <p:ajax event="cellEditInit" listener="#{specificModel.onCellEditInit}" />
                     <p:ajax event="cellEdit" listener="#{specificModel.onCellEdit}" update=":growl" />
