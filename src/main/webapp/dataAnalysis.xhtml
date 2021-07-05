@@ -19,7 +19,17 @@
         }
 
         .m-t-0 {
-            margin-top: 0px;
+            margin-top: 0;
+        }
+
+        .ui-dialog-titlebar {
+            display: none;
+        }
+
+        body .ui-dialog .ui-dialog-content {
+            background-color: transparent;
+            border: none;
+            overflow: hidden;
         }
     </style>
     <script type="application/javascript">
@@ -49,41 +59,59 @@
             day: 'День',
             allDayText: 'Весь день'
         };
+
+        function start() {
+            PF('statusDialog').show();
+        }
+
+        function stop() {
+            PF('statusDialog').hide();
+        }
     </script>
 </h:head>
 <h:body>
     <h:form>
-        <div class="p-d-flex p-jc-center">
-            <div class="p-formgroup-inline">
-                <div class="p-field">
-                    <p:outputLabel style="font-size: 1.25rem; font-family: none;" styleClass="p-text-bold"
-                                   for="month" value="Дата"/>
-                    <p:datePicker id="month" view="month" value="#{dataAnalysis.date}"
-                                  pattern="MM.yyyy" locale="ru"/>
+        <h:panelGroup id="content" layout="block">
+            <div class="p-d-flex p-jc-center">
+                <div class="p-formgroup-inline">
+                    <div class="p-field">
+                        <p:outputLabel style="font-size: 1.25rem; font-family: none;" styleClass="p-text-bold"
+                                       for="month" value="Дата"/>
+                        <p:datePicker id="month" view="month" value="#{dataAnalysis.date}"
+                                      pattern="MM.yyyy" locale="ru"/>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="ui-fluid p-grid p-formgrid">
-            <div class="p-field p-col">
-                <h5 class="m-t-0">Суточные критерии</h5>
-                <p:selectManyCheckbox value="#{dataAnalysis.selectDayCriterionID}" layout="grid" columns="1" styleClass="grid-checkbox">
-                    <f:selectItems value="#{dataAnalysis.dayCriterion}" var="dayCriterion"
-                                   itemLabel="#{dayCriterion.name}" itemValue="#{dayCriterion.id}"/>
-                </p:selectManyCheckbox>
+            <div class="ui-fluid p-grid p-formgrid">
+                <div class="p-field p-col">
+                    <h5 class="m-t-0">Суточные критерии</h5>
+                    <p:selectManyCheckbox value="#{dataAnalysis.selectDayCriterionID}" layout="grid" columns="1" styleClass="grid-checkbox">
+                        <f:selectItems value="#{dataAnalysis.dayCriterion}" var="dayCriterion"
+                                       itemLabel="#{dayCriterion.name}" itemValue="#{dayCriterion.id}"/>
+                    </p:selectManyCheckbox>
+                </div>
+                <div class="p-field p-col">
+                    <h5 class="m-t-0">Месячные критерии</h5>
+                    <p:selectManyCheckbox value="#{dataAnalysis.selectMonthCriterionID}" layout="grid" columns="1" styleClass="grid-checkbox">
+                        <f:selectItems value="#{dataAnalysis.monthCriterion}" var="monthCriterion"
+                                       itemLabel="#{monthCriterion.name}" itemValue="#{monthCriterion.id}"/>
+                    </p:selectManyCheckbox>
+                </div>
             </div>
-            <div class="p-field p-col">
-                <h5 class="m-t-0">Месячные критерии</h5>
-                <p:selectManyCheckbox value="#{dataAnalysis.selectMonthCriterionID}" layout="grid" columns="1" styleClass="grid-checkbox">
-                    <f:selectItems value="#{dataAnalysis.monthCriterion}" var="monthCriterion"
-                                   itemLabel="#{monthCriterion.name}" itemValue="#{monthCriterion.id}"/>
-                </p:selectManyCheckbox>
-            </div>
-        </div>
 
-        <div class="p-d-flex p-jc-center">
-            <p:commandButton value="Сформировать отчет за выбраный период" actionListener="#{dataAnalysis.request}" ajax="false" />
-        </div>
+            <div class="p-d-flex p-jc-center">
+                <p:commandButton value="Сформировать отчет за выбраный период" actionListener="#{dataAnalysis.request}"
+                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                    <p:fileDownload value="#{dataAnalysis.file}" />
+                </p:commandButton>
+            </div>
+        </h:panelGroup>
+
+        <p:dialog modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+                  resizable="false" style="box-shadow: none;">
+            <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
+        </p:dialog>
     </h:form>
 </h:body>
 </html>

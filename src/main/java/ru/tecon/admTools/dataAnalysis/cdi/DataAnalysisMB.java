@@ -1,5 +1,7 @@
 package ru.tecon.admTools.dataAnalysis.cdi;
 
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import ru.tecon.admTools.dataAnalysis.ejb.DataAnalysisSB;
 import ru.tecon.admTools.dataAnalysis.model.Criterion;
 import ru.tecon.admTools.dataAnalysis.report.model.ReportRequestModel;
@@ -20,9 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,8 @@ public class DataAnalysisMB implements Serializable {
 
     private List<Integer> selectDayCriterionID = new ArrayList<>();
     private List<Integer> selectMonthCriterionID = new ArrayList<>();
+
+    private StreamedContent file;
 
     @EJB
     private DataAnalysisSB bean;
@@ -76,9 +78,7 @@ public class DataAnalysisMB implements Serializable {
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
 
-        String rootURL = request.getRequestURL().toString()
-                .replace(request.getServletPath(), "")
-                .replace(request.getLocalName(), "localhost");
+        String rootURL = request.getRequestURL().toString().replace(request.getServletPath(), "");
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(rootURL + "/dataAnalysis/report");
@@ -88,21 +88,17 @@ public class DataAnalysisMB implements Serializable {
         GenericEntity<ReportRequestModel> modelWrapper1 = new GenericEntity<ReportRequestModel>(requestModel){};
         Response response = target.request().post(Entity.entity(modelWrapper1, MediaType.APPLICATION_JSON));
 
+        LOG.info("report status " + response.getStatus());
+
         ec.responseReset();
         if(response.getStatus() != 200) {
             ec.responseSendError(500, "");
         } else {
-            ec.setResponseContentType("application/vnd.ms-excel; charset=UTF-8");
-            ec.setResponseHeader("Content-Disposition", "attachment; filename=\"" +
-                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("достоверности.xlsx", "UTF-8") + "\"");
-            ec.setResponseCharacterEncoding("UTF-8");
-
-            try (InputStream inputStream = (InputStream) response.getEntity();
-                 OutputStream outputStream = ec.getResponseOutputStream()) {
-                copy(inputStream, outputStream);
-
-                outputStream.flush();
-            }
+            file = DefaultStreamedContent.builder()
+                    .name("Анализ достоверности.xlsx")
+                    .contentType("application/vnd.ms-excel; charset=UTF-8")
+                    .stream(() -> (InputStream) response.getEntity())
+                    .build();
         }
 
         client.close();
@@ -110,12 +106,8 @@ public class DataAnalysisMB implements Serializable {
         fc.responseComplete();
     }
 
-    private void copy(InputStream source, OutputStream target) throws IOException {
-        byte[] buf = new byte[8192];
-        int length;
-        while ((length = source.read(buf)) > 0) {
-            target.write(buf, 0, length);
-        }
+    public StreamedContent getFile() {
+        return file;
     }
 
     public LocalDate getDate() {
