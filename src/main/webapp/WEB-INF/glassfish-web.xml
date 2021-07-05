@@ -7,4 +7,13 @@
         <jndi-name>jdbc/OracleDataSource</jndi-name>
     </resource-ref>
     <class-loader delegate="false"/>
+
+    <session-config>
+        <cookie-properties>
+            <property name="cookieName" value="SID"/>
+            <property name="cookieSecure" value="true"/>
+            <property name="cookieHttpOnly" value="true"/>
+            <property name="cookiePath" value="admTools;SameSite=none"/>
+        </cookie-properties>
+    </session-config>
 </glassfish-web-app>
