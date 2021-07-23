@@ -1,0 +1,49 @@
+html, body {
+    height: calc(100% - 20px);
+    margin: 4px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.ui-datatable-scrollable table {
+    table-layout: unset !important;
+}
+
+body .ui-datatable .ui-datatable-data>tr>td {
+    padding: 2px 1px;
+}
+
+.ui-panel, .ui-panel-content {
+    height: 100%;
+}
+
+.ui-panel .ui-panel-content {
+    padding: unset !important;
+}
+
+.ui-colorpicker>button {
+    border: none !important;
+    outline: none !important;
+    background-color: unset !important;
+    width: 100%;
+}
+
+.ui-colorpicker>button>span>span {
+    border: none !important;
+    width: unset !important;
+    height: unset !important;
+    text-indent: unset !important;
+}
+
+#statusDialog .ui-dialog-titlebar {
+    display: none;
+}
+
+#statusDialog_content {
+    background-color: transparent;
+    border: none;
+    overflow: hidden;
+}

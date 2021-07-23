@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>
+    <h:outputStylesheet name="systemParams/systemParamsStyle.css" library="css" />
+    <h:outputStylesheet name="primeflex.min.css" library="css" />
+    <h:outputScript name="script.js" library="js" />
+</h:head>
+<h:body>
+    <p:growl id="growl" showDetail="true" />
+    <div class="p-grid" style="height: 100%; flex-wrap: nowrap;">
+        <div class="p-col-fixed" style="width: 300px;">
+            <p:panel header="Категории">
+                <h:form>
+                    <p:menu style="border: unset; width: auto;">
+                        <c:forEach var="param" items="#{systemParams.parameters}">
+                            <p:menuitem value="#{param}" action="#{systemParams.updateContent(param)}" update="paramPanel" />
+                        </c:forEach>
+                    </p:menu>
+                </h:form>
+            </p:panel>
+        </div>
+        <div class="p-col" style="height: 100%;">
+            <h:panelGroup id="paramPanel" layout="block" style="height: 100%;">
+                <ui:insert>
+                    <ui:include src="#{systemParams.content}" />
+                    <ui:param name="login" value="#{systemParams.login}" />
+                    <ui:param name="ip" value="#{systemParams.ip}" />
+                    <ui:param name="write" value="#{systemParams.write}" />
+                </ui:insert>
+            </h:panelGroup>
+        </div>
+    </div>
+
+    <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;">
+        <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
+    </p:dialog>
+</h:body>
+</html>
