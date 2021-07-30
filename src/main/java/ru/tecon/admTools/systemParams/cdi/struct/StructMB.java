@@ -1,11 +1,11 @@
-package ru.tecon.admTools.systemParams.cdi;
+package ru.tecon.admTools.systemParams.cdi.struct;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.ejb.StructCurrentRemote;
-import ru.tecon.admTools.systemParams.ejb.StructSB;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
 import javax.faces.application.FacesMessage;

@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.cdi.StructMB;
+import ru.tecon.admTools.systemParams.cdi.struct.StructMB;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import javax.el.ValueExpression;

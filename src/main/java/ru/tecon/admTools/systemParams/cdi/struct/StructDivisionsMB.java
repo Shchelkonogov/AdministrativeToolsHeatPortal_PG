@@ -1,7 +1,7 @@
-package ru.tecon.admTools.systemParams.cdi;
+package ru.tecon.admTools.systemParams.cdi.struct;
 
-import ru.tecon.admTools.systemParams.ejb.StructCurrentRemote;
-import ru.tecon.admTools.systemParams.ejb.StructSB;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;

@@ -1,4 +1,4 @@
-package ru.tecon.admTools.systemParams.ejb;
+package ru.tecon.admTools.systemParams.ejb.struct;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.struct.StructType;
