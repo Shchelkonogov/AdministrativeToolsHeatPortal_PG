@@ -39,15 +39,19 @@ public class ParametersColorSB {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 String color;
-                switch (res.getString(3).toLowerCase().trim()) {
-                    case "white":
-                        color = "ffffff";
-                        break;
-                    case "black":
-                        color = "000000";
-                        break;
-                    default:
-                        color = res.getString(3);
+                if (res.getString(3) == null) {
+                    color = "ffffff";
+                } else {
+                    switch (res.getString(3).toLowerCase().trim()) {
+                        case "white":
+                            color = "ffffff";
+                            break;
+                        case "black":
+                            color = "000000";
+                            break;
+                        default:
+                            color = res.getString(3);
+                    }
                 }
                 result.add(new ParametersColor(res.getInt(1), res.getString(2), color));
             }
