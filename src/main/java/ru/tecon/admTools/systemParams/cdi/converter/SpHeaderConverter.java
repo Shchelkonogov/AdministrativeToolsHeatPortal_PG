@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.cdi.DivisionsMB;
+import ru.tecon.admTools.systemParams.cdi.StructMB;
 import ru.tecon.admTools.systemParams.model.struct.SpHeader;
 
 import javax.el.ValueExpression;
@@ -19,9 +19,9 @@ public class SpHeaderConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{" + component.getAttributes().get("bean") + "}", DivisionsMB.class);
+                .createValueExpression(context.getELContext(), "#{" + component.getAttributes().get("bean") + "}", StructMB.class);
 
-        DivisionsMB divisions = (DivisionsMB) vex.getValue(context.getELContext());
+        StructMB divisions = (StructMB) vex.getValue(context.getELContext());
 
         return divisions.getSpHeaders().stream()
                 .filter(spHeader -> {
