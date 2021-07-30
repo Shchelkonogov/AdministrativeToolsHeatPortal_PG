@@ -47,3 +47,91 @@ body .ui-datatable .ui-datatable-data>tr>td {
     border: none;
     overflow: hidden;
 }
+
+.iconOnlyButton {
+    background: transparent !important;
+    border: none !important;
+    margin: 0;
+}
+
+.iconOnlyButton:enabled:hover {
+    background: rgba(96, 125, 139, 0.04) !important;
+}
+
+.iconOnlyButton:enabled:active {
+    background: rgba(96, 125, 139, 0.16) !important;
+}
+
+.iconOnlyButton:enabled:focus {
+    outline: unset !important;
+    box-shadow: 0 0 0 0.2rem #beccd2;
+}
+
+.btnAdd {
+    background-image: url("#{resource['images/add small.png']}") !important;
+    width: 26px !important;
+    height: 26px !important;
+    top: 47% !important;
+    left: 47% !important;
+    background-position: 0 0;
+}
+
+.btnRemove {
+    background-image: url("#{resource['images/minus small.png']}") !important;
+    width: 26px !important;
+    height: 26px !important;
+    top: 47% !important;
+    left: 47% !important;
+    background-position: 0 0;
+}
+
+.btnLeft {
+    margin-right: -1px !important;
+    border: 1px solid rgb(118, 118, 118) !important;
+    border-radius: 3px 0 0 3px !important;
+}
+
+.btnRight {
+    border: 1px solid rgb(118, 118, 118) !important;
+    border-radius: 0 3px 3px 0 !important;
+}
+
+
+body .ui-button.ui-button-secondary, body .ui-splitbutton.ui-button-secondary > .ui-button {
+    background: #607D8B;
+    color: #ffffff;
+    border: 1px solid #607D8B; }
+body .ui-button.ui-button-secondary.ui-state-hover, body .ui-button.ui-button-secondary:not(:disabled):hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-hover, body .ui-splitbutton.ui-button-secondary > .ui-button:not(:disabled):hover {
+    background: #56717d;
+    border-color: #56717d;
+    color: #ffffff; }
+body .ui-button.ui-button-secondary.ui-state-focus, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-focus {
+    box-shadow: 0 0 0 0.2rem #beccd2; }
+body .ui-button.ui-button-secondary.ui-state-active, body .ui-button.ui-button-secondary:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-active, body .ui-splitbutton.ui-button-secondary > .ui-button:active {
+    background: #4d646f;
+    border-color: #4d646f;
+    color: #ffffff; }
+body .ui-button.ui-button-secondary.ui-button-outlined, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined {
+    background-color: transparent;
+    color: #607D8B;
+    border: 1px solid; }
+body .ui-button.ui-button-secondary.ui-button-outlined:enabled:hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined:enabled:hover {
+    background: rgba(96, 125, 139, 0.04);
+    color: #607D8B;
+    border: 1px solid; }
+body .ui-button.ui-button-secondary.ui-button-outlined:enabled:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined:enabled:active {
+    background: rgba(96, 125, 139, 0.16);
+    color: #607D8B;
+    border: 1px solid; }
+body .ui-button.ui-button-secondary.ui-button-flat, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat {
+    background-color: transparent;
+    color: #607D8B;
+    border-color: transparent; }
+body .ui-button.ui-button-secondary.ui-button-flat:enabled:hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat:enabled:hover {
+    background: rgba(96, 125, 139, 0.04);
+    border-color: transparent;
+    color: #607D8B; }
+body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat:enabled:active {
+    background: rgba(96, 125, 139, 0.16);
+    border-color: transparent;
+    color: #607D8B; }
