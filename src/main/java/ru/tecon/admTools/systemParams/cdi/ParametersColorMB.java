@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
+import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ParametersColorSB;
 import ru.tecon.admTools.systemParams.model.ParametersColor;
 
@@ -71,12 +72,14 @@ public class ParametersColorMB implements Serializable {
 
         parametersColorList.stream().filter(ParametersColor::isChanged).forEach(parametersColor -> {
             LOGGER.info("update for login " + login + " and ip " + ip + " parameter color " + parametersColor);
-            int result = parametersColorSB.updateParameterColor(parametersColor.getId(), parametersColor.getColor(), login, ip);
-            if (result == 0) {
+
+            try {
+                parametersColorSB.updateParameterColor(parametersColor.getId(), parametersColor.getColor(), login, ip);
                 parametersColor.updateColor();
-            } else {
+            } catch (SystemParamException e) {
                 parametersColor.revert();
                 errorMessages.add(parametersColor.getName());
+                LOGGER.warning(e.getMessage());
             }
         });
 

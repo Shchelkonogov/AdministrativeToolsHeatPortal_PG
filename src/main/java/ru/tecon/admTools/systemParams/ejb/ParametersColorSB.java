@@ -1,5 +1,6 @@
 package ru.tecon.admTools.systemParams.ejb;
 
+import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.ParametersColor;
 
 import javax.annotation.Resource;
@@ -11,6 +12,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -67,11 +69,9 @@ public class ParametersColorSB {
      * @param color новый цвет параметра
      * @param login имя пользователя от которого делается изменения
      * @param ip ip машины с которой делается изменение
-     * @return статус выполнения 0 - успешно 1 - ошибка
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public int updateParameterColor(int id, String color, String login, String ip) {
-        int result = 0;
+    public void updateParameterColor(int id, String color, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(UPDATE_PARAMETER_COLOR)) {
             cStm.registerOutParameter(1, Types.INTEGER);
@@ -81,10 +81,12 @@ public class ParametersColorSB {
             cStm.setString(5, ip);
 
             cStm.executeUpdate();
-            return cStm.getInt(1);
+            if (cStm.getInt(1) != 0) {
+                throw new SystemParamException("Ошибка записи параметра " + id + " цвет " + color);
+            }
         } catch (SQLException e) {
-            LOGGER.warning("error update parameter color. " + e.getMessage());
+            LOGGER.log(Level.WARNING, "SQLException", e);
+            throw new SystemParamException("Внутренняя ошибка сервера");
         }
-        return result;
     }
 }
