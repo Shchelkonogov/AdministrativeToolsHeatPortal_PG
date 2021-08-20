@@ -22,16 +22,16 @@ public class StructDivisionsMB extends StructMB implements Serializable {
     private static final String PROP_HEADER = "Свойства подразделения";
 
     @EJB(name = "structDivisionSB", mappedName = "ejb/structDivisionsSB")
-    private StructCurrentRemote divisionsSB;
+    private StructCurrentRemote structCurrentBean;
 
     @EJB
-    private StructSB wrapperDivisions;
+    private StructSB structBean;
 
     @Override
     @PostConstruct
     public void init() {
-        super.setStructCurrentBean(divisionsSB);
-        super.setStructBean(wrapperDivisions);
+        super.setStructCurrentBean(structCurrentBean);
+        super.setStructBean(structBean);
         super.init();
     }
 

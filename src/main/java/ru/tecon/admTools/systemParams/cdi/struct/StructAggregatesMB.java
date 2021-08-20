@@ -10,28 +10,28 @@ import javax.inject.Named;
 import java.io.Serializable;
 
 /**
- * Контроллер для формы объекты группы структур
+ * Контроллер для формы агрегаты группы структур
  * @author Maksim Shchelkonogov
  */
-@Named("structObjects")
+@Named("structAggregates")
 @ViewScoped
-public class StructObjectsMB extends StructMB implements Serializable {
+public class StructAggregatesMB extends StructMB implements Serializable {
 
-    private static final String HEADER = "Типы объектов";
-    private static final String DIALOG_HEADER = "Создать новый объект";
-    private static final String PROP_HEADER = "Свойства объекта";
+    private static final String HEADER = "Типы агрегатов";
+    private static final String DIALOG_HEADER = "Создать новый агрегат";
+    private static final String PROP_HEADER = "Свойства агрегата";
 
-    @EJB(name = "structObjectsSB", mappedName = "ejb/structObjectsSB")
-    private StructCurrentRemote structCurrentBean;
+    @EJB(name = "structAggregatesSB", mappedName = "ejb/structAggregatesSB")
+    private StructCurrentRemote divisionsSB;
 
     @EJB
-    private StructSB structBean;
+    private StructSB wrapperDivisions;
 
     @Override
     @PostConstruct
     public void init() {
-        super.setStructCurrentBean(structCurrentBean);
-        super.setStructBean(structBean);
+        super.setStructCurrentBean(divisionsSB);
+        super.setStructBean(wrapperDivisions);
         super.init();
     }
 

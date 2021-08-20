@@ -172,7 +172,7 @@
                                 <f:converter converterId="measureConverter"/>
                                 <f:attribute name="bean" value="structObjects"/>
                                 <f:selectItems value="#{structObjects.measures}" var="measure"
-                                               itemLabel="#{measure.name}" itemValue="#{measure}"/>
+                                               itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
                             </h:selectOneMenu>
                         </f:facet>
                     </p:cellEditor>
@@ -254,7 +254,7 @@
                         <f:converter converterId="measureConverter"/>
                         <f:attribute name="bean" value="structObjects"/>
                         <f:selectItems value="#{structObjects.measures}" var="measure"
-                                       itemLabel="#{measure.name}" itemValue="#{measure}"/>
+                                       itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
                     </p:selectOneMenu>
                 </div>
                 <div>

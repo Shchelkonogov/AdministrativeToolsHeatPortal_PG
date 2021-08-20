@@ -10,18 +10,18 @@ import javax.inject.Named;
 import java.io.Serializable;
 
 /**
- * Контроллер для формы объекты группы структур
+ * Контроллер для формы техпроцессы группы структур
  * @author Maksim Shchelkonogov
  */
-@Named("structObjects")
+@Named("structProcesses")
 @ViewScoped
-public class StructObjectsMB extends StructMB implements Serializable {
+public class StructProcessesMB extends StructMB implements Serializable {
 
-    private static final String HEADER = "Типы объектов";
-    private static final String DIALOG_HEADER = "Создать новый объект";
-    private static final String PROP_HEADER = "Свойства объекта";
+    private static final String HEADER = "Типы технологических процессов";
+    private static final String DIALOG_HEADER = "Создать новый технлогический процесс";
+    private static final String PROP_HEADER = "Свойства технологического процесса";
 
-    @EJB(name = "structObjectsSB", mappedName = "ejb/structObjectsSB")
+    @EJB(name = "structProcessesSB", mappedName = "ejb/structProcessesSB")
     private StructCurrentRemote structCurrentBean;
 
     @EJB

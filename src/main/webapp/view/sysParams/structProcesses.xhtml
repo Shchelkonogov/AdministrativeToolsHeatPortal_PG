@@ -9,9 +9,9 @@
 <ui:composition>
     <h:form>
         <p:remoteCommand name="saveStructWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{structDivisions.onCreateStruct}" update="divisionPanel growl" rendered="#{structDivisions.write}" />
+                         action="#{structProcesses.onCreateStruct}" update="divisionPanel growl" rendered="#{structProcesses.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{structDivisions.onCreateDivisionProp}" rendered="#{structDivisions.write}"
+                         action="#{structProcesses.onCreateDivisionProp}" rendered="#{structProcesses.write}"
                          update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl" />
     </h:form>
 
@@ -20,23 +20,23 @@
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{structDivisions.header}"/>
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{structProcesses.header}"/>
                 <div style="padding: 3px;">
                     <p:commandButton id="divisionRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{structDivisions.disableRemoveStructBtn}" update="divisionPanel growl"
+                                     disabled="#{structProcesses.disableRemoveStructBtn}" update="divisionPanel growl"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{structDivisions.onRemoveStruct()}" rendered="#{structDivisions.write}" />
+                                     action="#{structProcesses.onRemoveStruct()}" rendered="#{structProcesses.write}" />
                     <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     onclick="PF('addDialog').show();" action="#{structDivisions.loadProperties()}"
-                                     rendered="#{structDivisions.write}" />
+                                     onclick="PF('addDialog').show();" action="#{structProcesses.loadProperties()}"
+                                     rendered="#{structProcesses.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
                 <div style="height: 100%;">
-                    <p:dataTable value="#{structDivisions.structTypes}" var="structType" scrollable="true" scrollHeight="100%"
-                                 selectionMode="single" selection="#{structDivisions.selectedStruct}" rowKey="#{structType.id}">
+                    <p:dataTable value="#{structProcesses.structTypes}" var="structType" scrollable="true" scrollHeight="100%"
+                                 selectionMode="single" selection="#{structProcesses.selectedStruct}" rowKey="#{structType.id}">
 
-                        <p:ajax event="rowSelect" listener="#{structDivisions.onRowSelect}"
+                        <p:ajax event="rowSelect" listener="#{structProcesses.onRowSelect}"
                                 update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp" />
 
                         <p:column headerText="Название">
@@ -53,27 +53,27 @@
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{structDivisions.propHeader}"/>
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{structProcesses.propHeader}"/>
                 <div style="padding: 3px;">
                     <p:commandButton id="divisionRemoveProp" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{structDivisions.disableRemoveStructPropBtn}" action="#{structDivisions.onRemoveStructProp}"
+                                     disabled="#{structProcesses.disableRemoveStructPropBtn}" action="#{structProcesses.onRemoveStructProp}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl"
-                                     rendered="#{structDivisions.write}" />
+                                     rendered="#{structProcesses.write}" />
                     <p:commandButton id="divisionAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     disabled="#{structDivisions.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
-                                     action="#{structDivisions.loadProperties()}" update="addPropDialog"
-                                     rendered="#{structDivisions.write}" />
+                                     disabled="#{structProcesses.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
+                                     action="#{structProcesses.loadProperties()}" update="addPropDialog"
+                                     rendered="#{structProcesses.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 3px); padding: 3px;">
                 <div style="height: 100%;">
-                    <p:dataTable id="divisionPropTable" value="#{structDivisions.structTypeProps}" var="prop" scrollable="true" scrollHeight="100%"
-                                 selectionMode="single" selection="#{structDivisions.selectedStructProp}" rowKey="#{prop.id}"
-                                 draggableRows="#{structDivisions.write}" emptyMessage="#{global['table.empty.value']}">
+                    <p:dataTable id="divisionPropTable" value="#{structProcesses.structTypeProps}" var="prop" scrollable="true" scrollHeight="100%"
+                                 selectionMode="single" selection="#{structProcesses.selectedStructProp}" rowKey="#{prop.id}"
+                                 draggableRows="#{structProcesses.write}" emptyMessage="#{global['table.empty.value']}">
 
-                        <p:ajax event="rowReorder" listener="#{structDivisions.onRowReorder}" update="growl" />
-                        <p:ajax event="rowSelect" listener="#{structDivisions.onRowPropSelect}" update="divisionPanel:divisionRemoveProp" />
+                        <p:ajax event="rowReorder" listener="#{structProcesses.onRowReorder}" update="growl" />
+                        <p:ajax event="rowSelect" listener="#{structProcesses.onRowPropSelect}" update="divisionPanel:divisionRemoveProp" />
 
                         <p:column headerText="Название">
                             <h:outputText value="#{prop.name}" />
@@ -99,23 +99,23 @@
         </div>
     </h:form>
 
-    <p:dialog id="addDialog" rendered="#{structDivisions.write}" header="#{structDivisions.dialogHeader}" widgetVar="addDialog"
+    <p:dialog id="addDialog" rendered="#{structProcesses.write}" header="#{structProcesses.dialogHeader}" widgetVar="addDialog"
               width="1000" height="325" modal="true" resizable="false">
-        <p:ajax event="close" listener="#{structDivisions.onclose()}" update="addForm"/>
+        <p:ajax event="close" listener="#{structProcesses.onclose()}" update="addForm"/>
         <h:form id="addForm">
             <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 5px;">
                 <div>
                     <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
-                    <p:inputText value="#{structDivisions.newStructType.name}" required="true" requiredMessage="#{global['validation.view.text']}"/>
+                    <p:inputText value="#{structProcesses.newStructType.name}" required="true" requiredMessage="#{global['validation.view.text']}"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
                 <div>
                     <p:outputLabel value="Код" for="@next" style="margin-right: 5px;"/>
-                    <p:inputText value="#{structDivisions.newStructType.typeChar}" required="true" requiredMessage="#{global['validation.view.text']}"/>
+                    <p:inputText value="#{structProcesses.newStructType.typeChar}" required="true" requiredMessage="#{global['validation.view.text']}"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
             </div>
-            <p:dataTable id="newPropTable" value="#{structDivisions.newStructTypeProps}" var="prop" widgetVar="newPropTable"
+            <p:dataTable id="newPropTable" value="#{structProcesses.newStructTypeProps}" var="prop" widgetVar="newPropTable"
                          scrollable="true" scrollHeight="210" emptyMessage="#{global['table.empty.value']}"
                          editable="true">
 
@@ -140,8 +140,8 @@
                         <f:facet name="input">
                             <h:selectOneMenu value="#{prop.type}" style="width: 100%;">
                                 <f:converter converterId="propValTypeConverter"/>
-                                <f:attribute name="bean" value="structDivisions"/>
-                                <f:selectItems value="#{structDivisions.propValTypes}" var="valType"
+                                <f:attribute name="bean" value="structProcesses"/>
+                                <f:selectItems value="#{structProcesses.propValTypes}" var="valType"
                                                itemLabel="#{valType.name}" itemValue="#{valType}" />
                             </h:selectOneMenu>
                         </f:facet>
@@ -155,8 +155,8 @@
                         <f:facet name="input">
                             <h:selectOneMenu value="#{prop.cat}" style="width: 100%;">
                                 <f:converter converterId="propCatConverter"/>
-                                <f:attribute name="bean" value="structDivisions"/>
-                                <f:selectItems value="#{structDivisions.propCat}" var="cat"
+                                <f:attribute name="bean" value="structProcesses"/>
+                                <f:selectItems value="#{structProcesses.propCat}" var="cat"
                                                itemLabel="#{cat.name}" itemValue="#{cat}" />
                             </h:selectOneMenu>
                         </f:facet>
@@ -170,8 +170,8 @@
                         <f:facet name="input">
                             <h:selectOneMenu value="#{prop.measure}" style="width: 100%;">
                                 <f:converter converterId="measureConverter"/>
-                                <f:attribute name="bean" value="structDivisions"/>
-                                <f:selectItems value="#{structDivisions.measures}" var="measure"
+                                <f:attribute name="bean" value="structProcesses"/>
+                                <f:selectItems value="#{structProcesses.measures}" var="measure"
                                                itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
                             </h:selectOneMenu>
                         </f:facet>
@@ -195,8 +195,8 @@
                         <f:facet name="input">
                             <h:selectOneMenu value="#{prop.spHeader}" style="width: 100%;">
                                 <f:converter converterId="spHeaderConverter"/>
-                                <f:attribute name="bean" value="structDivisions"/>
-                                <f:selectItems value="#{structDivisions.spHeaders}" var="sp"
+                                <f:attribute name="bean" value="structProcesses"/>
+                                <f:selectItems value="#{structProcesses.spHeaders}" var="sp"
                                                itemLabel="#{sp.name}" itemValue="#{sp}" />
                             </h:selectOneMenu>
                         </f:facet>
@@ -208,41 +208,41 @@
             </p:dataTable>
 
             <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
-                             update=":addForm:newPropTable" action="#{structDivisions.onAddNew()}" />
+                             update=":addForm:newPropTable" action="#{structProcesses.onAddNew()}" />
             <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
-                             validateClient="true" update="addForm" action="#{structDivisions.saveStructWrapper()}" />
+                             validateClient="true" update="addForm" action="#{structProcesses.saveStructWrapper()}" />
             <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
                              onclick="PF('addDialog').hide();"/>
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialog" rendered="#{structDivisions.write}" header="Добавить новое свойство" widgetVar="addPropDialog"
+    <p:dialog id="addPropDialog" rendered="#{structProcesses.write}" header="Добавить новое свойство" widgetVar="addPropDialog"
               width="440" height="290" modal="true" resizable="false">
 
-        <p:ajax event="close" listener="#{structDivisions.onAddPropDialogClose()}" update="addPropForm"/>
+        <p:ajax event="close" listener="#{structProcesses.onAddPropDialogClose()}" update="addPropForm"/>
         <h:form id="addPropForm">
             <div style="text-align: center; margin-bottom: 10px;">
                 <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
-                <p:inputText required="true" value="#{structDivisions.newStructTypeProp.name}"
+                <p:inputText required="true" value="#{structProcesses.newStructTypeProp.name}"
                              requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
                 <p:message style="margin-left: 5px;" for="@previous" />
             </div>
             <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 10px;">
                 <div style="margin-right: 10px;">
                     <p:outputLabel value="Тип" for="@next"/>
-                    <p:selectOneMenu value="#{structDivisions.newStructTypeProp.type}" style="width: 200px;">
+                    <p:selectOneMenu value="#{structProcesses.newStructTypeProp.type}" style="width: 200px;">
                         <f:converter converterId="propValTypeConverter"/>
-                        <f:attribute name="bean" value="structDivisions"/>
-                        <f:selectItems value="#{structDivisions.propValTypes}" var="valType"
+                        <f:attribute name="bean" value="structProcesses"/>
+                        <f:selectItems value="#{structProcesses.propValTypes}" var="valType"
                                        itemLabel="#{valType.name}" itemValue="#{valType}" />
                     </p:selectOneMenu>
                 </div>
                 <div>
                     <p:outputLabel value="Категория" for="@next"/>
-                    <p:selectOneMenu value="#{structDivisions.newStructTypeProp.cat}" style="width: 200px;">
+                    <p:selectOneMenu value="#{structProcesses.newStructTypeProp.cat}" style="width: 200px;">
                         <f:converter converterId="propCatConverter"/>
-                        <f:attribute name="bean" value="structDivisions"/>
-                        <f:selectItems value="#{structDivisions.propCat}" var="cat"
+                        <f:attribute name="bean" value="structProcesses"/>
+                        <f:selectItems value="#{structProcesses.propCat}" var="cat"
                                        itemLabel="#{cat.name}" itemValue="#{cat}" />
                     </p:selectOneMenu>
                 </div>
@@ -250,29 +250,29 @@
             <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 10px;">
                 <div style="margin-right: 10px;">
                     <p:outputLabel value="Единицы измерения" for="@next"/>
-                    <p:selectOneMenu value="#{structDivisions.newStructTypeProp.measure}" style="width: 200px;">
+                    <p:selectOneMenu value="#{structProcesses.newStructTypeProp.measure}" style="width: 200px;">
                         <f:converter converterId="measureConverter"/>
-                        <f:attribute name="bean" value="structDivisions"/>
-                        <f:selectItems value="#{structDivisions.measures}" var="measure"
+                        <f:attribute name="bean" value="structProcesses"/>
+                        <f:selectItems value="#{structProcesses.measures}" var="measure"
                                        itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
                     </p:selectOneMenu>
                 </div>
                 <div>
                     <p:outputLabel value="Название справочника" for="@next"/>
-                    <p:selectOneMenu value="#{structDivisions.newStructTypeProp.spHeader}" style="width: 200px;">
+                    <p:selectOneMenu value="#{structProcesses.newStructTypeProp.spHeader}" style="width: 200px;">
                         <f:converter converterId="spHeaderConverter"/>
-                        <f:attribute name="bean" value="structDivisions"/>
-                        <f:selectItems value="#{structDivisions.spHeaders}" var="sp"
+                        <f:attribute name="bean" value="structProcesses"/>
+                        <f:selectItems value="#{structProcesses.spHeaders}" var="sp"
                                        itemLabel="#{sp.name}" itemValue="#{sp}" />
                     </p:selectOneMenu>
                 </div>
             </div>
             <div style="text-align: center;">
                 <p:outputLabel value="Значение по умолчанию" for="@next" style="margin-right: 5px;"/>
-                <p:inputText value="#{structDivisions.newStructTypeProp.def}" style="width: 245px;"/>
+                <p:inputText value="#{structProcesses.newStructTypeProp.def}" style="width: 245px;"/>
             </div>
             <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
-                             validateClient="true" update="addPropForm" action="#{structDivisions.savePropWrapper}"/>
+                             validateClient="true" update="addPropForm" action="#{structProcesses.savePropWrapper}"/>
             <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
                              onclick="PF('addPropDialog').hide();"/>
         </h:form>

@@ -28,7 +28,10 @@ public class SystemParamsMB implements Serializable {
 
     private Map<String, String> systemParamsMap = Stream.of(new String[][] {
             {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
-            {"Подразделения", "/view/sysParams/divisions.xhtml"}
+            {"Подразделения", "/view/sysParams/structDivisions.xhtml"},
+            {"Объекты", "/view/sysParams/structObjects.xhtml"},
+            {"Агрегаты", "/view/sysParams/structAggregates.xhtml"},
+            {"Техпроцессы", "/view/sysParams/structProcesses.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1]));
 
     private String ip;
