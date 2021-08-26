@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="objectLinksForm" style="height: 100%;">
+        <div style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;">
+            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Типы связи объектов"/>
+            <div style="padding: 3px;">
+                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                 disabled="#{objectLinks.disableRemoveBtn}" action="#{objectLinks.onRemoveLink}"
+                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                 update="objectLinksForm:objectLinksTable objectLinksForm:btnRemove growl"
+                                 rendered="#{objectLinks.write}" />
+                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                 action="#{objectLinks.onAddNew()}" update=":objectLinksForm:objectLinksTable"
+                                 rendered="#{objectLinks.write}" />
+            </div>
+        </div>
+        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+            <div style="height: 100%;">
+                <p:dataTable id="objectLinksTable" var="objectLinksData" value="#{objectLinks.objectLinks}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{objectLinks.write}" selectionMode="single" selection="#{objectLinks.selectedLink}"
+                             rowKey="#{objectLinksData.id}">
+
+                    <p:ajax event="rowEdit" listener="#{objectLinks.onRowEdit}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update=":objectLinksForm:objectLinksTable growl" />
+                    <p:ajax event="rowSelect" listener="#{objectLinks.onRowSelect}" update="objectLinksForm:btnRemove" />
+
+                    <p:column headerText="Название типа связи">
+                        <p:cellEditor disabled="#{!objectLinks.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{objectLinksData.name}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{objectLinksData.name}" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Название типа объекта-источника" width="200" style="white-space: nowrap">
+                        <p:cellEditor disabled="#{!objectLinks.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;"
+                                              value="#{objectLinks.objectTypes.get(objectLinksData.objectTypeLink1)}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink1}" style="width: 100%;">
+                                    <f:selectItems value="#{objectLinks.objectTypesAsSet}" var="type"
+                                                   itemValue="#{type.key}" itemLabel="#{type.value}"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Название типа объекта-потребителя" width="200" style="white-space: nowrap">
+                        <p:cellEditor disabled="#{!objectLinks.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;"
+                                              value="#{objectLinks.objectTypes.get(objectLinksData.objectTypeLink2)}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink2}" style="width: 100%;">
+                                    <f:selectItems value="#{objectLinks.objectTypesAsSet}" var="type"
+                                                   itemValue="#{type.key}" itemLabel="#{type.value}"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column width="30" style="text-align: center" rendered="#{objectLinks.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>

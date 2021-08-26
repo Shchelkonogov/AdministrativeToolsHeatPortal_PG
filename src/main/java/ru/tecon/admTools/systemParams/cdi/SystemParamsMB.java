@@ -32,7 +32,8 @@ public class SystemParamsMB implements Serializable {
             {"Объекты", "/view/sysParams/structObjects.xhtml"},
             {"Агрегаты", "/view/sysParams/structAggregates.xhtml"},
             {"Техпроцессы", "/view/sysParams/structProcesses.xhtml"},
-            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"}
+            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
+            {"Связи", "/view/sysParams/objectLinks.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1]));
 
     private String ip;
