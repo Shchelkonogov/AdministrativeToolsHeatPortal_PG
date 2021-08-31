@@ -67,13 +67,14 @@ public class ObjectLinksMB implements Serializable {
             } else {
                 objectLinksSB.updateObjectLink(link, login, ip);
             }
-
-            selectedLink = null;
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
             objectLinks = objectLinksSB.getObjectLinks();
         }
+
+        selectedLink = null;
+        disableRemoveBtn = true;
     }
 
     /**

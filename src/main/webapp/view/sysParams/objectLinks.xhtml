@@ -16,20 +16,20 @@
                                  update="objectLinksForm:objectLinksTable objectLinksForm:btnRemove growl"
                                  rendered="#{objectLinks.write}" />
                 <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 action="#{objectLinks.onAddNew()}" update=":objectLinksForm:objectLinksTable"
+                                 action="#{objectLinks.onAddNew()}" update="objectLinksForm:objectLinksTable"
                                  rendered="#{objectLinks.write}" />
             </div>
         </div>
         <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
             <div style="height: 100%;">
-                <p:dataTable id="objectLinksTable" var="objectLinksData" value="#{objectLinks.objectLinks}"
+                <p:dataTable id="objectLinksTable" var="objectLinksData" widgetVar="linksTable" value="#{objectLinks.objectLinks}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                              editable="#{objectLinks.write}" selectionMode="single" selection="#{objectLinks.selectedLink}"
                              rowKey="#{objectLinksData.id}">
 
                     <p:ajax event="rowEdit" listener="#{objectLinks.onRowEdit}"
-                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                            update=":objectLinksForm:objectLinksTable growl" />
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide(); PF('linksTable').unselectAllRows();"
+                            update="objectLinksForm:btnRemove growl" />
                     <p:ajax event="rowSelect" listener="#{objectLinks.onRowSelect}" update="objectLinksForm:btnRemove" />
 
                     <p:column headerText="Название типа связи">
