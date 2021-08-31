@@ -4,6 +4,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.*;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  * Класс родитель для группы контроллеров категории структура
  * @author Maksim Shchelkonogov
  */
-public class StructMB implements Serializable {
+public class StructMB implements Serializable, MyConverter {
 
     private static final Logger LOGGER = Logger.getLogger(StructMB.class.getName());
 

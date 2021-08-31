@@ -1,6 +1,5 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.cdi.struct.StructMB;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import javax.el.ValueExpression;
@@ -19,9 +18,9 @@ public class PropValTypeConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{" + component.getAttributes().get("bean") + "}", StructMB.class);
+                .createValueExpression(context.getELContext(), "#{" + component.getAttributes().get("bean") + "}", MyConverter.class);
 
-        StructMB divisions = (StructMB) vex.getValue(context.getELContext());
+        MyConverter divisions = (MyConverter) vex.getValue(context.getELContext());
 
         return divisions.getPropValTypes().stream()
                 .filter(propValType -> propValType.getCode().equals(value))
