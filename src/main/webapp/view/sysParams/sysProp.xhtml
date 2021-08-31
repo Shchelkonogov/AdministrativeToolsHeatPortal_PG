@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="sysPropForm" style="height: 100%;">
+        <div style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;">
+            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Список системных свойств"/>
+            <div style="padding: 3px;">
+                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                 disabled="#{sysProp.disableRemoveBtn}" action="#{sysProp.onRemoveProp()}"
+                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                 update="sysPropForm:sysPropTable sysPropForm:btnRemove growl"
+                                 rendered="#{sysProp.write}" />
+                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                 action="#{sysProp.onAddNewProp()}" update="sysPropForm:sysPropTable"
+                                 rendered="#{sysProp.write}" />
+            </div>
+        </div>
+        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+            <div style="height: 100%;">
+                <p:dataTable id="sysPropTable" var="sysPropData" value="#{sysProp.props}" widgetVar="propTable"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{sysProp.write}" selectionMode="single" selection="#{sysProp.selectedProp}"
+                             rowKey="#{sysPropData.id}">
+
+                    <p:ajax event="rowEdit" listener="#{sysProp.onRowEdit}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide(); PF('propTable').unselectAllRows();"
+                            update="sysPropForm:btnRemove growl" />
+                    <p:ajax event="rowSelect" listener="#{sysProp.onRowSelect}" update="sysPropForm:btnRemove" />
+
+                    <p:column headerText="Название">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{sysPropData.name}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{sysPropData.name}" style="width: 100%;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Тип" width="20" style="text-align: center;">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{sysPropData.type.code}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{sysPropData.type}" style="width: 100%;">
+                                    <f:converter converterId="propValTypeConverter"/>
+                                    <f:attribute name="bean" value="sysProp"/>
+                                    <f:selectItems value="#{sysProp.propValTypes}" var="valType"
+                                                   itemLabel="#{valType.name}" itemValue="#{valType}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Ед.изм." width="50" style="text-align: center;">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{sysPropData.measure.shortName}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{sysPropData.measure}" style="width: 100%;">
+                                    <f:converter converterId="measureConverter"/>
+                                    <f:attribute name="bean" value="sysProp"/>
+                                    <f:selectItems value="#{sysProp.measures}" var="measure"
+                                                   itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Значение по умолч." width="150">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{sysPropData.def}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{sysPropData.def}" style="width: 100%;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column width="30" style="text-align: center" rendered="#{sysProp.write}">
+                        <p:rowEditor rendered="#{sysPropData.id == 0}" editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>
