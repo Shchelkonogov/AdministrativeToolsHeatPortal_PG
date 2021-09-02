@@ -20,6 +20,7 @@ public class StructProcessesMB extends StructMB implements Serializable {
     private static final String HEADER = "Типы технологических процессов";
     private static final String DIALOG_HEADER = "Создать новый технлогический процесс";
     private static final String PROP_HEADER = "Свойства технологического процесса";
+    private static final String TYPE = "TECHPROC";
 
     @EJB(name = "structProcessesSB", mappedName = "ejb/structProcessesSB")
     private StructCurrentRemote structCurrentBean;
@@ -27,12 +28,11 @@ public class StructProcessesMB extends StructMB implements Serializable {
     @EJB
     private StructSB structBean;
 
-    @Override
     @PostConstruct
     public void init() {
         super.setStructCurrentBean(structCurrentBean);
         super.setStructBean(structBean);
-        super.init();
+        super.init(TYPE);
     }
 
     public String getHeader() {

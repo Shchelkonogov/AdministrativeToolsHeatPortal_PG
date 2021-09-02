@@ -1,16 +1,21 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
+import ru.tecon.admTools.systemParams.ejb.SysPropSB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
+import ru.tecon.admTools.systemParams.model.SysProp;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
+import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.facelets.FaceletContext;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,6 +29,8 @@ import java.util.logging.Logger;
 public class StructMB implements Serializable, MyConverter {
 
     private static final Logger LOGGER = Logger.getLogger(StructMB.class.getName());
+
+    private String type;
 
     private String login;
     private String ip;
@@ -47,18 +54,28 @@ public class StructMB implements Serializable, MyConverter {
     private boolean disableRemoveStructBtn = true;
     private boolean disableRemoveStructPropBtn = true;
 
+    private List<SysProp> sysProps = new ArrayList<>();
+    private Integer selectedSysProp;
+
     private StructCurrentRemote structCurrentBean;
     private StructSB structBean;
+
+    @EJB
+    private SysPropSB sysPropSB;
 
     /**
      * Метод инициализации контроллера
      */
-    public void init() {
+    public void init(String type) {
+        this.type = type;
+
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
         ip = (String) faceletContext.getAttribute("ip");
         login = (String) faceletContext.getAttribute("login");
         write = (boolean) faceletContext.getAttribute("write");
+
+        sysProps = sysPropSB.getSysProps();
 
         loadData();
     }
@@ -198,7 +215,11 @@ public class StructMB implements Serializable, MyConverter {
 
                 for (StructTypeProp prop: newStructTypeProps) {
                     try {
-                        structCurrentBean.addStructProp(structID, prop, login, ip);
+                        if (prop.getId() == 0) {
+                            structCurrentBean.addStructProp(structID, prop, login, ip);
+                        } else {
+                            structBean.addSystemPropToStruct(type, structID, prop.getId(), login, ip);
+                        }
                     } catch (SystemParamException e) {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
@@ -220,7 +241,11 @@ public class StructMB implements Serializable, MyConverter {
         LOGGER.info("create new struct property: " + newStructTypeProp + " for struct: " + selectedStruct);
 
         try {
-            structCurrentBean.addStructProp(selectedStruct.getId(), newStructTypeProp, login, ip);
+            if (newStructTypeProp.getId() == 0) {
+                structCurrentBean.addStructProp(selectedStruct.getId(), newStructTypeProp, login, ip);
+            } else {
+                structBean.addSystemPropToStruct(type, selectedStruct.getId(), newStructTypeProp.getId(), login, ip);
+            }
 
             structTypeProps = structCurrentBean.getStructTypeProps(selectedStruct.getId());
             selectedStructProp = null;
@@ -246,6 +271,38 @@ public class StructMB implements Serializable, MyConverter {
     public void onclose() {
         newStructType = new StructType();
         newStructTypeProps.clear();
+    }
+
+    /**
+     * Метод обрабатывает выбор значения системного свойства на диалоговом окне создания структуры
+     * @param event событие
+     */
+    public void onChange(AjaxBehaviorEvent event) {
+        SysProp value = sysProps.stream()
+                .filter(sysProp -> sysProp.getId() == (Integer) ((SelectOneMenu) event.getSource()).getValue())
+                .findFirst()
+                .orElseThrow(NullPointerException::new);
+
+        if (newStructTypeProps.stream().noneMatch(structTypeProp -> structTypeProp.getId() == value.getId())) {
+            newStructTypeProps.add(new StructTypeProp(value.getId(), value.getName(), value.getType(),
+                    new PropCat("S", "S"), value.getDef(), value.getMeasure(), new SpHeader()));
+        }
+    }
+
+    /**
+     * Метод обрабатывает выбор системного свойства на диалоговом окне добавления свойств к выбранной структуре
+     * @param event
+     */
+    public void onAddSysPropToStruct(AjaxBehaviorEvent event) {
+        SysProp value = sysProps.stream()
+                .filter(sysProp -> sysProp.getId() == (Integer) ((SelectOneMenu) event.getSource()).getValue())
+                .findFirst()
+                .orElseThrow(NullPointerException::new);
+
+        newStructTypeProp = new StructTypeProp(value.getId(), value.getName(), value.getType(),
+                new PropCat("S", "S"), value.getDef(), value.getMeasure(), new SpHeader());
+
+        savePropWrapper();
     }
 
     public StructType getNewStructType() {
@@ -318,5 +375,17 @@ public class StructMB implements Serializable, MyConverter {
 
     void setStructBean(StructSB structBean) {
         this.structBean = structBean;
+    }
+
+    public List<SysProp> getSysProps() {
+        return sysProps;
+    }
+
+    public Integer getSelectedSysProp() {
+        return selectedSysProp;
+    }
+
+    public void setSelectedSysProp(Integer selectedSysProp) {
+        this.selectedSysProp = selectedSysProp;
     }
 }

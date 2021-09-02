@@ -28,10 +28,10 @@ public class SystemParamsMB implements Serializable {
 
     private Map<String, String> systemParamsMap = Stream.of(new String[][] {
             {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
-            {"Подразделения", "/view/sysParams/structDivisions.xhtml"},
-            {"Объекты", "/view/sysParams/structObjects.xhtml"},
-            {"Агрегаты", "/view/sysParams/structAggregates.xhtml"},
-            {"Техпроцессы", "/view/sysParams/structProcesses.xhtml"},
+            {"Подразделения", "/view/sysParams/struct/structDivisions.xhtml"},
+            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
+            {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
+            {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
             {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
             {"Связи", "/view/sysParams/objectLinks.xhtml"},
             {"Системные свойства", "/view/sysParams/sysProp.xhtml"}

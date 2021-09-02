@@ -29,6 +29,7 @@ public class StructSB {
     private static final String SELECT_PROP_CAT = "select * from table(sys_0001t.sel_type_props_cat())";
     private static final String SELECT_SP_HEADERS = "select * from table(sys_0001t.sel_sp_header())";
     private static final String SELECT_MEASURE = "select * from table(sys_0001t.sel_measure())";
+    private static final String FUN_ADD_SYS_PROP_TO_STRUCT = "{? = call sys_0001t.add_sys_prop(?, ?, ?, ?, ?, ?, ?)}";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -270,6 +271,7 @@ public class StructSB {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(select)) {
             stm.setInt(1, id);
+            stm.setInt(2, id);
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 result.add(new StructTypeProp(res.getInt("prop_id"), res.getString("prop_name"),
@@ -358,5 +360,41 @@ public class StructSB {
             LOGGER.log(Level.WARNING, "SQLException", e);
         }
         return result;
+    }
+
+    /**
+     * Добавляем системное свойство в структуру
+     * @param type тип структуры (STRUCT подразделения / OBJ объекты / AGR агрегаты / TECHPROC техпроцессы / DEV устройства)
+     * @param structID id структуры
+     * @param sysPropID id системного свойства
+     * @param login имя пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошикби записи данных в базу
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void addSystemPropToStruct(String type, int structID, int sysPropID, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(FUN_ADD_SYS_PROP_TO_STRUCT)) {
+
+            cStm.registerOutParameter(1, Types.INTEGER);
+            cStm.setString(2, type);
+            cStm.setInt(3, structID);
+            cStm.setInt(4, sysPropID);
+            cStm.registerOutParameter(5, Types.INTEGER);
+            cStm.registerOutParameter(6, Types.VARCHAR);
+            cStm.setString(7, login);
+            cStm.setString(8, ip);
+
+            cStm.executeUpdate();
+
+            if (cStm.getInt(1) != 0) {
+                throw new SystemParamException(cStm.getString(6));
+            }
+
+            LOGGER.info("add system property id " + sysPropID + " to struct id " + structID);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error add system property to struct", e);
+            throw new SystemParamException("Внутренняя ошибка сервера");
+        }
     }
 }
