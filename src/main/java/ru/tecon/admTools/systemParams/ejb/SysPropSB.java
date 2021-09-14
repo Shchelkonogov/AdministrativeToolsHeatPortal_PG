@@ -2,7 +2,7 @@ package ru.tecon.admTools.systemParams.ejb;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.SysProp;
-import ru.tecon.admTools.systemParams.model.struct.Measure;
+import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import javax.annotation.Resource;

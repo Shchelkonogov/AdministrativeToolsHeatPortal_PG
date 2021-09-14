@@ -1,6 +1,5 @@
 package ru.tecon.admTools.systemParams.model;
 
-import ru.tecon.admTools.systemParams.model.struct.Measure;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import java.util.StringJoiner;

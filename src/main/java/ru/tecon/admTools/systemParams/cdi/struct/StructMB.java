@@ -6,9 +6,11 @@ import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
+import ru.tecon.admTools.systemParams.ejb.MeasureSB;
 import ru.tecon.admTools.systemParams.ejb.SysPropSB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
+import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.SysProp;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
@@ -62,6 +64,9 @@ public class StructMB implements Serializable, MyConverter {
 
     @EJB
     private SysPropSB sysPropSB;
+
+    @EJB
+    private MeasureSB measureSB;
 
     /**
      * Метод инициализации контроллера
@@ -123,7 +128,7 @@ public class StructMB implements Serializable, MyConverter {
         propValTypes = structBean.getPropValTypes();
         propCat = structBean.getPropCat();
         spHeaders = structBean.getSpHeaders();
-        measures = structBean.getMeasures();
+        measures = measureSB.getMeasures();
     }
 
     /**

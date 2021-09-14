@@ -4,10 +4,11 @@ import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
+import ru.tecon.admTools.systemParams.ejb.MeasureSB;
 import ru.tecon.admTools.systemParams.ejb.SysPropSB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.SysProp;
-import ru.tecon.admTools.systemParams.model.struct.Measure;
+import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,9 @@ public class SysPropMB implements Serializable, MyConverter {
     private StructSB structSB;
 
     @EJB
+    private MeasureSB measureSB;
+
+    @EJB
     private SysPropSB sysPropSB;
 
     @PostConstruct
@@ -55,7 +59,7 @@ public class SysPropMB implements Serializable, MyConverter {
         props = sysPropSB.getSysProps();
 
         propValTypes = structSB.getPropValTypes();
-        measures = structSB.getMeasures();
+        measures = measureSB.getMeasures();
 
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);

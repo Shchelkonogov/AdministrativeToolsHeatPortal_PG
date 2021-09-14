@@ -1,4 +1,4 @@
-package ru.tecon.admTools.systemParams.model.struct;
+package ru.tecon.admTools.systemParams.model;
 
 import java.io.Serializable;
 import java.util.StringJoiner;
@@ -9,11 +9,16 @@ import java.util.StringJoiner;
  */
 public class Measure implements Serializable {
 
-    private Integer id;
+    private Integer id = 0;
     private String name;
     private String shortName;
 
     public Measure() {
+    }
+
+    public Measure(String name) {
+        this();
+        this.name = name;
     }
 
     public Measure(Integer id, String name, String shortName) {
@@ -27,12 +32,24 @@ public class Measure implements Serializable {
         return id;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getShortName() {
         return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.ejb.struct;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
 import javax.annotation.Resource;
@@ -28,7 +29,6 @@ public class StructSB {
     private static final String SELECT_PROP_VAL_TYPES = "select * from table(ADMIN.sys_0001t.sel_type_props_type())";
     private static final String SELECT_PROP_CAT = "select * from table(sys_0001t.sel_type_props_cat())";
     private static final String SELECT_SP_HEADERS = "select * from table(sys_0001t.sel_sp_header())";
-    private static final String SELECT_MEASURE = "select * from table(sys_0001t.sel_measure())";
     private static final String FUN_ADD_SYS_PROP_TO_STRUCT = "{? = call sys_0001t.add_sys_prop(?, ?, ?, ?, ?, ?, ?)}";
 
     @Resource(name = "jdbc/DataSource")
@@ -316,25 +316,6 @@ public class StructSB {
             while (res.next()) {
                 result.add(new PropCat(res.getString("prop_cat_id"),
                         res.getString("prop_cat_name")));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "SQLException", e);
-        }
-        return result;
-    }
-
-    /**
-     * @return список возможных единиц измерений для свойств структур
-     */
-    public List<Measure> getMeasures() {
-        List<Measure> result = new ArrayList<>();
-        try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SELECT_MEASURE)) {
-            ResultSet res = stm.executeQuery();
-            while (res.next()) {
-                result.add(new Measure(res.getInt("measure_id"),
-                        res.getString("measure_name"),
-                        res.getString("short_name")));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);

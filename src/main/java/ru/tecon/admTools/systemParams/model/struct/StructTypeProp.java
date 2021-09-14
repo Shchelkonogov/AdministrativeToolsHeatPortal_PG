@@ -1,5 +1,7 @@
 package ru.tecon.admTools.systemParams.model.struct;
 
+import ru.tecon.admTools.systemParams.model.Measure;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 

@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.model.struct.Measure;
+import ru.tecon.admTools.systemParams.model.Measure;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
