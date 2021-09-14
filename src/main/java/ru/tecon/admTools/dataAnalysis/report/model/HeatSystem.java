@@ -12,11 +12,16 @@ public enum HeatSystem {
     VENT("Вентиляция", "counter_vent", true),
     VENT2("Вентиляция2", "counter_vent2", true),
     GVS("ГВС", "counter_gvs", true),
-    GVS2("ГВС2", "counter_gvs2", true);
+    GVS2("ГВС2", "counter_gvs2", true),
+    HVS("ХВС");
 
     private String selectName;
     private String name;
     private boolean odpu;
+
+    HeatSystem(String name) {
+        this.name = name;
+    }
 
     HeatSystem(String name, String selectName) {
         this.name = name;

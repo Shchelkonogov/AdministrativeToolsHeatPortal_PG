@@ -69,7 +69,10 @@ public class DataAnalysisReportSB {
              PreparedStatement stmCriterion = connect.prepareStatement(SELECT_CRITERION_NAME)) {
             sheet.setColumnWidth(0, 2 * 256);
 
-            for (int i = 0; i < TABLE_HEADER_NAMES.size() + HeatSystem.values().length; i++) {
+            List<HeatSystem> heatSystems = new ArrayList<>(Arrays.asList(HeatSystem.values()));
+            heatSystems.removeIf(heatSystem -> heatSystem.getSelectName() == null);
+
+            for (int i = 0; i < TABLE_HEADER_NAMES.size() + heatSystems.size(); i++) {
                 sheet.trackColumnForAutoSizing(i + 1);
             }
 
@@ -93,7 +96,7 @@ public class DataAnalysisReportSB {
             cell = row.createCell(3);
             cell.setCellValue("Тип / № счетчика");
             cell.setCellStyle(styles.get("tableHeader"));
-            cellAddresses = new CellRangeAddress(3, 3, 3, TABLE_HEADER_NAMES.size() + HeatSystem.values().length);
+            cellAddresses = new CellRangeAddress(3, 3, 3, TABLE_HEADER_NAMES.size() + heatSystems.size());
             sheet.addMergedRegion(cellAddresses);
             BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
             BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
@@ -112,12 +115,12 @@ public class DataAnalysisReportSB {
                     }
                     String name = criterion.get(model.getProblemID(i));
 
-                    cell = row.createCell(i + TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1 + j * model.getProblemID().size());
+                    cell = row.createCell(i + TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j * model.getProblemID().size());
                     cell.setCellValue(name);
                     cell.setCellStyle(styles.get("rotate"));
                 }
 
-                cellAddresses = new CellRangeAddress(3, 3, TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1 + j * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + HeatSystem.values().length + (j + 1) * model.getProblemID().size());
+                cellAddresses = new CellRangeAddress(3, 3, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (j + 1) * model.getProblemID().size());
                 BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
@@ -133,7 +136,7 @@ public class DataAnalysisReportSB {
                 cell.setCellStyle(styles.get("tableHeader"));
             }
 
-            for (int i = 0; i < HeatSystem.values().length; i++) {
+            for (int i = 0; i < heatSystems.size(); i++) {
                 cell = row.createCell(i + TABLE_HEADER_NAMES.size() + 1);
                 cell.setCellValue(HeatSystem.values()[i].getName());
                 cell.setCellStyle(styles.get("tableHeader"));
@@ -141,7 +144,7 @@ public class DataAnalysisReportSB {
 
             int index = 0;
             for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
-                int position = TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1 + index * model.getProblemID().size();
+                int position = TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + index * model.getProblemID().size();
                 cell = row.createCell(position);
                 cell.setCellValue(date.format(ReportRequestModel.FORMATTER));
                 cell.setCellStyle(styles.get("tableHeader"));
@@ -193,7 +196,7 @@ public class DataAnalysisReportSB {
 
                     for (int j = 0; j < endDate.getDayOfMonth(); j++) {
                         if (res.getInt("p" + (j + 1)) == 1) {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1 + i + j * model.getProblemID().size(), "X", "center"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + i + j * model.getProblemID().size(), "X", "center"));
                         }
                     }
 
@@ -209,8 +212,8 @@ public class DataAnalysisReportSB {
             ResultSet res = stmCountersData.executeQuery();
             int rowIndex = 5;
             while (res.next()) {
-                for (int j = 0; j < HeatSystem.values().length; j++) {
-                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(HeatSystem.values()[j].getSelectName()), "center"));
+                for (int j = 0; j < heatSystems.size(); j++) {
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(heatSystems.get(j).getSelectName()), "center"));
                 }
                 rowIndex++;
             }
@@ -229,28 +232,28 @@ public class DataAnalysisReportSB {
                 }
 
                 if (cellData.get(key).get(0).getStyleName().equals("centerBold")) {
-                    cellAddresses = new CellRangeAddress(key, key, 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length + model.getProblemID().size() * endDate.getDayOfMonth());
+                    cellAddresses = new CellRangeAddress(key, key, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
                     BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                     BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
-                for (int i = 0; i < HeatSystem.values().length; i++) {
+                for (int i = 0; i < heatSystems.size(); i++) {
                     cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + 1 + i, TABLE_HEADER_NAMES.size() + 1 + i);
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
                 for (int i = 0; i < endDate.getDayOfMonth(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + HeatSystem.values().length + (i + 1) * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + HeatSystem.values().length + (i + 1) * model.getProblemID().size());
+                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size());
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
             }
 
-            cellAddresses = new CellRangeAddress(cellData.lastKey(), cellData.lastKey(), 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length + model.getProblemID().size() * endDate.getDayOfMonth());
+            cellAddresses = new CellRangeAddress(cellData.lastKey(), cellData.lastKey(), 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
             BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
 
 
             // Устанавливаем размер колонок
-            for (int i = 0; i < TABLE_HEADER_NAMES.size() + HeatSystem.values().length; i++) {
+            for (int i = 0; i < TABLE_HEADER_NAMES.size() + heatSystems.size(); i++) {
                 sheet.autoSizeColumn(i + 1);
             }
 
@@ -259,7 +262,7 @@ public class DataAnalysisReportSB {
                 int minWidth = 3 * 256;
                 int width = minMergedWidth / model.getProblemID().size() + 1;
 
-                for (int i = TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1; i < TABLE_HEADER_NAMES.size() + HeatSystem.values().length + 1 + endDate.getDayOfMonth() * model.getProblemID().size(); i++) {
+                for (int i = TABLE_HEADER_NAMES.size() + heatSystems.size() + 1; i < TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + endDate.getDayOfMonth() * model.getProblemID().size(); i++) {
                     if (width < minWidth) {
                         sheet.setColumnWidth(i, minWidth);
                     } else {
@@ -452,6 +455,7 @@ public class DataAnalysisReportSB {
 
             List<HeatSystem> heatSystems = new ArrayList<>(Arrays.asList(HeatSystem.values()));
             heatSystems.removeIf(heatSystem -> !heatSystem.isOdpu());
+            heatSystems.removeIf(heatSystem -> heatSystem.getSelectName() == null);
 
             for (int i = 0; i < TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size(); i++) {
                 sheet.trackColumnForAutoSizing(i + 1);
