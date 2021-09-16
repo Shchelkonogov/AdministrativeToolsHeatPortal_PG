@@ -140,3 +140,34 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     background: rgba(96, 125, 139, 0.16);
     border-color: transparent;
     color: #607D8B; }
+
+.ui-button-flat {
+    background-color: transparent !important;
+    color: #000000 !important;
+    border-color: transparent !important;
+}
+
+.ui-button-flat:hover {
+    background-color: rgba(33, 150, 243, 0.04) !important;
+    color: #000000 !important;
+    border-color: rgba(33, 150, 243, 0.04) !important;
+}
+
+.ui-button-flat:focus {
+    outline: none !important;
+}
+
+.ui-button-selected {
+    background-color: #007ad9 !important;
+    color: #ffffff !important;
+    border-color: #007ad9 !important;
+}
+
+.ui-button-selected:focus {
+    outline: none !important;
+}
+
+#menuPanel_content {
+    overflow-y: auto;
+    overflow-x: hidden;
+}

@@ -1,5 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import org.primefaces.PrimeFaces;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 
 import javax.annotation.PostConstruct;
@@ -44,6 +45,9 @@ public class SystemParamsMB implements Serializable {
 
     private String content = "";
 
+    private String selectedButton;
+    private Integer oldSelectedButtonIndex;
+
     @EJB
     private CheckUserSB checkUserSB;
 
@@ -58,9 +62,37 @@ public class SystemParamsMB implements Serializable {
         write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.getParameter("formID")));
     }
 
-    public void updateContent(String parameter) {
+    private void updateContent(String parameter) {
         content = systemParamsMap.get(parameter);
         LOGGER.info("update content: " + content);
+    }
+
+    /**
+     * Проверка выбран ли элемент меню
+     * @param item элемент меню
+     * @return стиль для кнопки
+     */
+    public String checkSelected(String item) {
+        if (selectedButton != null) {
+            return selectedButton.equals(item) ? "ui-button-selected" : "ui-button-flat";
+        } else {
+            return "ui-button-flat";
+        }
+    }
+
+    /**
+     * Обработка нажития кнопки
+     * @param item имя меню
+     * @param index индекс меню
+     */
+    public void selectButton(String item, int index) {
+        updateContent(item);
+        selectedButton = item;
+        if (oldSelectedButtonIndex != null) {
+            PrimeFaces.current().ajax().update("menuForm:button_" + oldSelectedButtonIndex);
+        }
+        oldSelectedButtonIndex = index;
+        PrimeFaces.current().ajax().update("menuForm:button_" + index, "paramPanel");
     }
 
     public String getContent() {

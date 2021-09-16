@@ -16,13 +16,13 @@
     <p:growl id="growl" showDetail="true" />
     <div class="p-grid" style="height: 100%; flex-wrap: nowrap;">
         <div class="p-col-fixed" style="width: 300px;">
-            <p:panel header="Категории">
-                <h:form>
-                    <p:menu style="border: unset; width: auto;">
-                        <c:forEach var="param" items="#{systemParams.parameters}">
-                            <p:menuitem value="#{param}" action="#{systemParams.updateContent(param)}" update="paramPanel" />
-                        </c:forEach>
-                    </p:menu>
+            <p:panel id="menuPanel" header="Категории">
+                <h:form id="menuForm">
+                    <c:forEach var="menu" items="#{systemParams.parameters}" varStatus="loop">
+                        <p:commandButton id="button_#{loop.index}" value="#{menu}" style="width: 100%; text-align: initial;"
+                                         styleClass="#{systemParams.checkSelected(menu)}"
+                                         action="#{systemParams.selectButton(menu, loop.index)}"/>
+                    </c:forEach>
                 </h:form>
             </p:panel>
         </div>
