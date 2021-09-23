@@ -148,9 +148,9 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 }
 
 .ui-button-flat:hover {
-    background-color: rgba(33, 150, 243, 0.04) !important;
+    background-color: #eaeaea !important;
     color: #000000 !important;
-    border-color: rgba(33, 150, 243, 0.04) !important;
+    border-color: #eaeaea !important;
 }
 
 .ui-button-flat:focus {
