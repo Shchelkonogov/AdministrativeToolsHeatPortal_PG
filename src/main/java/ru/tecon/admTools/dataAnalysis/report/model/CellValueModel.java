@@ -52,9 +52,17 @@ public class CellValueModel implements Comparable<CellValueModel> {
         return styleName;
     }
 
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     @Override
     public int compareTo(CellValueModel o) {
-        return Integer.compare(this.row, o.row);
+        return Integer.compare(this.column, o.column);
     }
 
     @Override

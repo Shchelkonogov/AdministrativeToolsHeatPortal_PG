@@ -48,7 +48,7 @@ public class Report extends HttpServlet {
     private DataAnalysisReportSB reportBean;
 
     @EJB
-    private CheckUserSB checkUserbean;
+    private CheckUserSB checkUserBean;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -68,7 +68,7 @@ public class Report extends HttpServlet {
         Jsonb json = JsonbBuilder.create();
         ReportRequestModel requestModel = json.fromJson(sb.toString(), ReportRequestModel.class);
 
-        requestModel.setUser(checkUserbean.getUser(requestModel.getSessionID()));
+        requestModel.setUser(checkUserBean.getUser(requestModel.getSessionID()));
 
         LOGGER.info("Request data " + requestModel);
 
@@ -189,6 +189,7 @@ public class Report extends HttpServlet {
         style = wb.createCellStyle();
         style.setFont(font12);
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
 
         styles.put("center", style);
 

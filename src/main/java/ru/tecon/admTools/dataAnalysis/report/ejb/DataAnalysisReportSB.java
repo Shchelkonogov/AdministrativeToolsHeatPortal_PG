@@ -160,9 +160,11 @@ public class DataAnalysisReportSB {
             }
 
             // Создаем основные данные
+            TreeMap<Integer, List<Integer>> ctpWithUuIndexes = new TreeMap<>();
             TreeMap<Integer, List<CellValueModel>> cellData = new TreeMap<>();
             int ctpIndex = 1;
             int uuIndex = 1;
+            int ctpRowIndex = 0;
             for (int i = 0, rowIndex = 5; i < model.getProblemID().size(); i++, rowIndex = 5) {
                 stm.setString(1, model.getObjectID());
                 stm.setInt(2, model.getFilterID());
@@ -180,10 +182,13 @@ public class DataAnalysisReportSB {
                     if (i == 0) {
                         if (res.getInt("obj_type") == 1) {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                            ctpRowIndex = rowIndex;
+                            ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                             ctpIndex++;
                             uuIndex = 1;
                         } else {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                            ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                             uuIndex++;
                         }
 
@@ -195,8 +200,8 @@ public class DataAnalysisReportSB {
                     }
 
                     for (int j = 0; j < endDate.getDayOfMonth(); j++) {
-                        if (res.getInt("p" + (j + 1)) == 1) {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + i + j * model.getProblemID().size(), "X", "center"));
+                        if (res.getString("p" + (j + 1)) != null) {
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + i + j * model.getProblemID().size(), res.getString("p" + (j + 1)), "centerWrap"));
                         }
                     }
 
@@ -213,43 +218,91 @@ public class DataAnalysisReportSB {
             int rowIndex = 5;
             while (res.next()) {
                 for (int j = 0; j < heatSystems.size(); j++) {
-                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(heatSystems.get(j).getSelectName()), "center"));
+                    if (res.getString(heatSystems.get(j).getSelectName()) != null) {
+                        cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(heatSystems.get(j).getSelectName()), "center"));
+                    }
                 }
                 rowIndex++;
             }
 
+            // Удаление кустов в которых нет проблем
+            cellData.forEach((integer, cellValueModels) -> Collections.sort(cellValueModels));
+
+            List<Integer> removeCtpIndexes = new ArrayList<>();
+
+            outer: for (Map.Entry<Integer, List<Integer>> ctpEntry: ctpWithUuIndexes.entrySet()) {
+                if (cellData.get(ctpEntry.getKey()).stream()
+                        .reduce((left, right) -> right)
+                        .orElseThrow(NullPointerException::new)
+                        .getColumn() <= (TABLE_HEADER_NAMES.size() + heatSystems.size())) {
+                    for (Integer uuRowIndex: ctpEntry.getValue()) {
+                        if (cellData.get(uuRowIndex).stream()
+                                .reduce((left, right) -> right)
+                                .orElseThrow(NullPointerException::new)
+                                .getColumn() > (TABLE_HEADER_NAMES.size() + heatSystems.size())) {
+                            continue outer;
+                        }
+                    }
+
+                    removeCtpIndexes.add(ctpEntry.getKey());
+                    removeCtpIndexes.addAll(ctpEntry.getValue());
+                }
+            }
+
+            cellData.keySet().removeAll(removeCtpIndexes);
+
+            rowIndex = 5;
+            for (List<CellValueModel> rowData: cellData.values()) {
+                for (CellValueModel celItem: rowData) {
+                    celItem.setRow(rowIndex);
+                }
+                rowIndex++;
+            }
+
+            ctpIndex = 1;
+            for (Integer ctpPosition: ctpWithUuIndexes.keySet()) {
+                if (cellData.containsKey(ctpPosition)) {
+                    cellData.get(ctpPosition).get(0).setValue(String.valueOf(ctpIndex));
+                    ctpIndex++;
+                }
+            }
+
             // Отрисовываем данные
-            for (Integer key: cellData.keySet()) {
-                row = sheet.getRow(key);
+            for (List<CellValueModel> rowData: cellData.values()) {
+                int rowindex = rowData.get(0).getRow();
+                row = sheet.getRow(rowindex);
                 if (row == null) {
-                    row = sheet.createRow(key);
+                    row = sheet.createRow(rowindex);
                 }
 
-                for (CellValueModel cellValueModel : cellData.get(key)) {
+                for (CellValueModel cellValueModel: rowData) {
                     cell = row.createCell(cellValueModel.getColumn());
                     cell.setCellValue(cellValueModel.getValue());
                     cell.setCellStyle(styles.get(cellValueModel.getStyleName()));
                 }
 
-                if (cellData.get(key).get(0).getStyleName().equals("centerBold")) {
-                    cellAddresses = new CellRangeAddress(key, key, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
+                if (rowData.get(0).getStyleName().equals("centerBold")) {
+                    cellAddresses = new CellRangeAddress(rowindex, rowindex, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
                     BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                     BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
                 for (int i = 0; i < heatSystems.size(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + 1 + i, TABLE_HEADER_NAMES.size() + 1 + i);
+                    cellAddresses = new CellRangeAddress(rowindex, rowindex, TABLE_HEADER_NAMES.size() + 1 + i, TABLE_HEADER_NAMES.size() + 1 + i);
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
                 for (int i = 0; i < endDate.getDayOfMonth(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size());
+                    cellAddresses = new CellRangeAddress(rowindex, rowindex, TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * model.getProblemID().size());
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
             }
 
-            cellAddresses = new CellRangeAddress(cellData.lastKey(), cellData.lastKey(), 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
-            BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            if (!cellData.isEmpty()) {
+                int lastRowIndex = cellData.lastEntry().getValue().get(0).getRow();
+                cellAddresses = new CellRangeAddress(lastRowIndex, lastRowIndex, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + model.getProblemID().size() * endDate.getDayOfMonth());
+                BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            }
 
 
             // Устанавливаем размер колонок
@@ -259,7 +312,7 @@ public class DataAnalysisReportSB {
 
             if (!model.getProblemID().isEmpty()) {
                 int minMergedWidth = 15 * 256;
-                int minWidth = 3 * 256;
+                int minWidth = 6 * 256;
                 int width = minMergedWidth / model.getProblemID().size() + 1;
 
                 for (int i = TABLE_HEADER_NAMES.size() + heatSystems.size() + 1; i < TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + endDate.getDayOfMonth() * model.getProblemID().size(); i++) {
@@ -346,9 +399,11 @@ public class DataAnalysisReportSB {
             }
 
             // Создаем основные данные
+            TreeMap<Integer, List<Integer>> ctpWithUuIndexes = new TreeMap<>();
             TreeMap<Integer, List<CellValueModel>> cellData = new TreeMap<>();
             int ctpIndex = 1;
             int uuIndex = 1;
+            int ctpRowIndex = 0;
             // Загружаем данные
             for (int i = 0, rowIndex = 5; i < model.getProblemID().size(); i++, rowIndex = 5) {
                 stm.setString(1, model.getObjectID());
@@ -367,10 +422,13 @@ public class DataAnalysisReportSB {
                     if (i == 0) {
                         if (res.getInt("obj_type") == 1) {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                            ctpRowIndex = rowIndex;
+                            ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                             ctpIndex++;
                             uuIndex = 1;
                         } else {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                            ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                             uuIndex++;
                         }
 
@@ -391,32 +449,70 @@ public class DataAnalysisReportSB {
                 }
             }
 
+            // Удаление кустов в которых нет проблем
+            List<Integer> removeCtpIndexes = new ArrayList<>();
+
+            outer: for (Map.Entry<Integer, List<Integer>> ctpEntry: ctpWithUuIndexes.entrySet()) {
+                if (cellData.get(ctpEntry.getKey()).size() <= TABLE_HEADER_NAMES.size()) {
+                    for (Integer uuRowIndex: ctpEntry.getValue()) {
+                        if (cellData.get(uuRowIndex).size() > TABLE_HEADER_NAMES.size()) {
+                            continue outer;
+                        }
+                    }
+
+                    removeCtpIndexes.add(ctpEntry.getKey());
+                    removeCtpIndexes.addAll(ctpEntry.getValue());
+                }
+            }
+
+            cellData.keySet().removeAll(removeCtpIndexes);
+
+            int rowIndex = 5;
+            for (List<CellValueModel> rowData: cellData.values()) {
+                for (CellValueModel celItem: rowData) {
+                    celItem.setRow(rowIndex);
+                }
+                rowIndex++;
+            }
+
+            ctpIndex = 1;
+            for (Integer ctpPosition: ctpWithUuIndexes.keySet()) {
+                if (cellData.containsKey(ctpPosition)) {
+                    cellData.get(ctpPosition).get(0).setValue(String.valueOf(ctpIndex));
+                    ctpIndex++;
+                }
+            }
+
             // Отрисовываем данные
-            for (Integer key: cellData.keySet()) {
-                row = sheet.getRow(key);
+            for (List<CellValueModel> rowData: cellData.values()) {
+                int rowindex = rowData.get(0).getRow();
+                row = sheet.getRow(rowindex);
                 if (row == null) {
-                    row = sheet.createRow(key);
+                    row = sheet.createRow(rowindex);
                 }
 
-                for (CellValueModel cellValueModel : cellData.get(key)) {
+                for (CellValueModel cellValueModel: rowData) {
                     cell = row.createCell(cellValueModel.getColumn());
                     cell.setCellValue(cellValueModel.getValue());
                     cell.setCellStyle(styles.get(cellValueModel.getStyleName()));
                 }
 
-                if (cellData.get(key).get(0).getStyleName().equals("centerBold")) {
-                    cellAddresses = new CellRangeAddress(key, key, 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length * model.getProblemID().size());
+                if (rowData.get(0).getStyleName().equals("centerBold")) {
+                    cellAddresses = new CellRangeAddress(rowindex, rowindex, 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length * model.getProblemID().size());
                     BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                     BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
                 }
                 for (int i = 0; i < model.getProblemID().size(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + 1 + i + (i + 1) * (HeatSystem.values().length - 1), TABLE_HEADER_NAMES.size() + 1 + i + (i + 1) * (HeatSystem.values().length - 1));
+                    cellAddresses = new CellRangeAddress(rowindex, rowindex, TABLE_HEADER_NAMES.size() + 1 + i + (i + 1) * (HeatSystem.values().length - 1), TABLE_HEADER_NAMES.size() + 1 + i + (i + 1) * (HeatSystem.values().length - 1));
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
             }
 
-            cellAddresses = new CellRangeAddress(cellData.lastKey(), cellData.lastKey(), 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length * model.getProblemID().size());
-            BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            if (!cellData.isEmpty()) {
+                int lastRowIndex = cellData.lastEntry().getValue().get(0).getRow();
+                cellAddresses = new CellRangeAddress(lastRowIndex, lastRowIndex, 1, TABLE_HEADER_NAMES.size() + HeatSystem.values().length * model.getProblemID().size());
+                BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            }
 
             // Устанавливаем размер колонок
             for (int i = 0; i < TABLE_HEADER_NAMES.size(); i++) {
@@ -526,10 +622,12 @@ public class DataAnalysisReportSB {
             }
 
             // Создаем основные данные
+            TreeMap<Integer, List<Integer>> ctpWithUuIndexes = new TreeMap<>();
             TreeMap<Integer, List<CellValueModel>> cellData = new TreeMap<>();
             int ctpIndex = 1;
             int uuIndex = 1;
             int rowIndex = 5;
+            int ctpRowIndex = 0;
 
             stm.setString(1, model.getObjectID());
             stm.setInt(2, model.getFilterID());
@@ -545,10 +643,13 @@ public class DataAnalysisReportSB {
 
                 if (res.getInt("obj_type") == 1) {
                     cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                    ctpRowIndex = rowIndex;
+                    ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                     ctpIndex++;
                     uuIndex = 1;
                 } else {
                     cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                    ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                     uuIndex++;
                 }
 
@@ -561,7 +662,7 @@ public class DataAnalysisReportSB {
                 for (int i = 0; i < model.getProblemOdpuID().size(); i++) {
                     for (int j = 0; j < heatSystems.size(); j++) {
                         if (res.getString("v" + model.getProblemOdpuID(i) + heatSystems.get(j).name()) != null) {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j + i * heatSystems.size(), "X", "center"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j + i * heatSystems.size(), res.getString("v" + model.getProblemOdpuID(i) + heatSystems.get(j).name()), "center"));
                         }
                     }
                 }
@@ -578,43 +679,91 @@ public class DataAnalysisReportSB {
             rowIndex = 5;
             while (res.next()) {
                 for (int j = 0; j < heatSystems.size(); j++) {
-                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(heatSystems.get(j).getSelectName()), "center"));
+                    if (res.getString(heatSystems.get(j).getSelectName()) != null) {
+                        cellData.get(rowIndex).add(new CellValueModel(rowIndex, j + TABLE_HEADER_NAMES.size() + 1, res.getString(heatSystems.get(j).getSelectName()), "center"));
+                    }
                 }
                 rowIndex++;
             }
 
+            // Удаление кустов в которых нет проблем
+            cellData.forEach((integer, cellValueModels) -> Collections.sort(cellValueModels));
+
+            List<Integer> removeCtpIndexes = new ArrayList<>();
+
+            outer: for (Map.Entry<Integer, List<Integer>> ctpEntry: ctpWithUuIndexes.entrySet()) {
+                if (cellData.get(ctpEntry.getKey()).stream()
+                        .reduce((left, right) -> right)
+                        .orElseThrow(NullPointerException::new)
+                        .getColumn() <= (TABLE_HEADER_NAMES.size() + heatSystems.size())) {
+                    for (Integer uuRowIndex: ctpEntry.getValue()) {
+                        if (cellData.get(uuRowIndex).stream()
+                                .reduce((left, right) -> right)
+                                .orElseThrow(NullPointerException::new)
+                                .getColumn() > (TABLE_HEADER_NAMES.size() + heatSystems.size())) {
+                            continue outer;
+                        }
+                    }
+
+                    removeCtpIndexes.add(ctpEntry.getKey());
+                    removeCtpIndexes.addAll(ctpEntry.getValue());
+                }
+            }
+
+            cellData.keySet().removeAll(removeCtpIndexes);
+
+            rowIndex = 5;
+            for (List<CellValueModel> rowData: cellData.values()) {
+                for (CellValueModel celItem: rowData) {
+                    celItem.setRow(rowIndex);
+                }
+                rowIndex++;
+            }
+
+            ctpIndex = 1;
+            for (Integer ctpPosition: ctpWithUuIndexes.keySet()) {
+                if (cellData.containsKey(ctpPosition)) {
+                    cellData.get(ctpPosition).get(0).setValue(String.valueOf(ctpIndex));
+                    ctpIndex++;
+                }
+            }
+
             // Отрисовываем данные
-            for (Integer key: cellData.keySet()) {
-                row = sheet.getRow(key);
+            for (List<CellValueModel> rowData: cellData.values()) {
+                int index = rowData.get(0).getRow();
+                row = sheet.getRow(index);
                 if (row == null) {
-                    row = sheet.createRow(key);
+                    row = sheet.createRow(index);
                 }
 
-                for (CellValueModel cellValueModel : cellData.get(key)) {
+                for (CellValueModel cellValueModel: rowData) {
                     cell = row.createCell(cellValueModel.getColumn());
                     cell.setCellValue(cellValueModel.getValue());
                     cell.setCellStyle(styles.get(cellValueModel.getStyleName()));
                 }
 
-                if (cellData.get(key).get(0).getStyleName().equals("centerBold")) {
-                    cellAddresses = new CellRangeAddress(key, key, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size());
+                if (rowData.get(0).getStyleName().equals("centerBold")) {
+                    cellAddresses = new CellRangeAddress(index, index, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size());
                     BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                     BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
                 for (int i = 0; i < heatSystems.size(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + 1 + i, TABLE_HEADER_NAMES.size() + 1 + i);
+                    cellAddresses = new CellRangeAddress(index, index, TABLE_HEADER_NAMES.size() + 1 + i, TABLE_HEADER_NAMES.size() + 1 + i);
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
 
                 for (int i = 0; i < model.getProblemOdpuID().size(); i++) {
-                    cellAddresses = new CellRangeAddress(key, key, TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * heatSystems.size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * heatSystems.size());
+                    cellAddresses = new CellRangeAddress(index, index, TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * heatSystems.size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (i + 1) * heatSystems.size());
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 }
             }
 
-            cellAddresses = new CellRangeAddress(cellData.lastKey(), cellData.lastKey(), 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size());
-            BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            if (!cellData.isEmpty()) {
+                int lastRowIndex = cellData.lastEntry().getValue().get(0).getRow();
+                cellAddresses = new CellRangeAddress(lastRowIndex, lastRowIndex, 1, TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size());
+                BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
+            }
 
             // Устанавливаем размер колонок
             for (int i = 0; i < TABLE_HEADER_NAMES.size() + heatSystems.size() + heatSystems.size() * model.getProblemOdpuID().size(); i++) {
