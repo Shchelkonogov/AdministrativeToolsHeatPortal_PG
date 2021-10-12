@@ -6,6 +6,10 @@ package ru.tecon.admTools.systemParams;
  */
 public class SystemParamException extends Exception {
 
+    public SystemParamException() {
+        super();
+    }
+
     public SystemParamException(String message) {
         super(message);
     }
