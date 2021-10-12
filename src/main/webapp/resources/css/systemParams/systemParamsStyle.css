@@ -171,3 +171,13 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#catalogPanel\:catalogProp .ui-datatable-scrollable-body {
+    overflow-y: scroll;
+}
+
+#catalogPanel\:catalogProp\:propValue\:filter, #catalogPanel\:catalogType\:typeValue\:filter {
+    width: unset;
+    display: unset;
+    margin-left: 5px;
+}

@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form>
+        <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{catalog.onCreateCatalogType}" update="catalogPanel growl" rendered="#{catalog.write}" />
+        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{catalog.onCreateCatalogProp}" rendered="#{catalog.write}"
+                         update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl" />
+    </h:form>
+
+    <h:form id="catalogPanel" style="height: 100%; display: flex;">
+        <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Справочники"/>
+                <div style="padding: 3px;">
+                    <p:commandButton id="catalogRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                     disabled="#{catalog.disableRemoveCatalogBtn}" update="catalogPanel growl"
+                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                     action="#{catalog.onRemoveCatalog()}" rendered="#{catalog.write}" />
+                    <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                     onclick="PF('addTypeDialog').show();" rendered="#{catalog.write}" />
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="catalogType" value="#{catalog.catalogTypes}" var="catalogType" scrollable="true" scrollHeight="100%"
+                                 selectionMode="single" selection="#{catalog.selectedCatalogType}" rowKey="#{catalogType.id}"
+                                 emptyMessage="#{global['table.empty.value']}">
+
+                        <p:ajax event="rowSelect" listener="#{catalog.onCatalogTypeSelect}"
+                                update="catalogPanel:catalogProp catalogPanel:catalogRemove
+                                    catalogPanel:catalogAddProp catalogPanel:catalogRemoveProp"
+                                onstart="PF('buiTable').show();" oncomplete="PF('buiTable').hide();"/>
+
+                        <p:column headerText="Название" id="typeValue" filterBy="#{catalogType.typeName}" filterMatchMode="contains">
+                            <h:outputText value="#{catalogType.typeName}" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </div>
+        <div style="height: 100%; flex: 1 1 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Значения справочника"/>
+                <div style="padding: 3px;">
+                    <p:commandButton id="catalogRemoveProp" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                     disabled="#{catalog.disableRemovePropBtn}" action="#{catalog.onRemoveProp}"
+                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                     update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl"
+                                     rendered="#{catalog.write}" />
+                    <p:commandButton id="catalogAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                     disabled="#{catalog.disableRemoveCatalogBtn}" onclick="PF('addPropDialog').show();"
+                                     rendered="#{catalog.write}" />
+                </div>
+            </div>
+            <h:panelGroup id="contentToBlock" layout="block" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="catalogProp" value="#{catalog.catalogProps}" var="catalogProp"
+                                 scrollable="true" scrollHeight="100%" selectionMode="single"
+                                 selection="#{catalog.selectedCatalogProp}" rowKey="#{catalogProp.id}"
+                                 emptyMessage="#{global['table.empty.value']}" scrollRows="100" virtualScroll="true" lazy="true">
+
+                        <p:ajax event="rowSelect" listener="#{catalog.onCatalogPropSelect}" update="catalogPanel:catalogRemoveProp" />
+
+                        <p:column headerText="Значение" id="propValue" filterBy="#{catalogProp.propName}">
+                            <h:outputText value="#{catalogProp.propName}" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:panelGroup>
+        </div>
+
+        <p:blockUI block="contentToBlock" widgetVar="buiTable"/>
+    </h:form>
+
+    <p:dialog id="addTypeDialog" rendered="#{catalog.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
+              width="800" height="325" modal="true" resizable="false">
+        <p:ajax event="close" listener="#{catalog.onAddTypeDialogClose()}" update="addForm"/>
+        <h:form id="addForm">
+            <div style="text-align: center; margin-bottom: 5px;">
+                <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
+                <p:inputText required="true" value="#{catalog.newCatalogType.typeName}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
+                <p:message style="margin-left: 5px;" for="@previous" />
+            </div>
+            <p:dataTable id="newPropTable" value="#{catalog.newCatalogType.catalogProps}" var="prop" widgetVar="newPropTable"
+                         scrollable="true" scrollHeight="200" emptyMessage="#{global['table.empty.value']}"
+                         editable="true">
+                <p:column headerText="Название">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{prop.propName}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{prop.propName}" style="width: 100%;"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column width="30" style="text-align: center;">
+                    <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
+                             update=":addForm:newPropTable" action="#{catalog.onAddNew()}" />
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                             validateClient="true" update="addForm" action="#{catalog.saveStructWrapper()}" />
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addTypeDialog').hide();"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="addPropDialog" rendered="#{catalog.write}" header="Добавить новое значение справочника" widgetVar="addPropDialog"
+              width="450" modal="true" resizable="false">
+
+        <p:ajax event="close" listener="#{catalog.onAddPropDialogClose()}" update="addPropForm"/>
+        <h:form id="addPropForm">
+            <div style="text-align: center; margin-bottom: 5px;">
+                <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
+                <p:inputText required="true" value="#{catalog.newCatalogPropName}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
+            </div>
+            <div style="display: flex;">
+                <p:message style="margin: auto" for="@previous" />
+            </div>
+            <div style="height: 35px;"></div>
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                             validateClient="true" update="addPropForm" action="#{catalog.savePropWrapper}"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addPropDialog').hide();"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
