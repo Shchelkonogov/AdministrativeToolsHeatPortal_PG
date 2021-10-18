@@ -21,8 +21,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -44,6 +46,7 @@ public class DataAnalysisReportSB {
     private static final String SELECT_ODPU_DATA = "select * from table(ul_report.sel_svod_crit(?, ?, ?, ?, to_date(?, 'dd.mm.yyyy')))";
     private static final String SELECT_CRITERION_NAME = "select alt_crit_name from dz_quality_criteria where crit_id = ?";
     private static final String SELECT_COUNTERS_DATA = "select * from table(ul_report.sel_counters(?, ?, ?, ?))";
+    private static final String SELECT_FULL_PATH = "select dsp_0091t.get_full_path(?) from dual";
 
     private static final List<String> TABLE_HEADER_NAMES = new ArrayList<>(Arrays.asList("№", "Объект"));
 
@@ -66,7 +69,8 @@ public class DataAnalysisReportSB {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_SUMMARY_DATA);
              PreparedStatement stmCountersData = connect.prepareStatement(SELECT_COUNTERS_DATA);
-             PreparedStatement stmCriterion = connect.prepareStatement(SELECT_CRITERION_NAME)) {
+             PreparedStatement stmCriterion = connect.prepareStatement(SELECT_CRITERION_NAME);
+             PreparedStatement stmFullPath = connect.prepareStatement(SELECT_FULL_PATH)) {
             sheet.setColumnWidth(0, 2 * 256);
 
             List<HeatSystem> heatSystems = new ArrayList<>(Arrays.asList(HeatSystem.values()));
@@ -91,12 +95,36 @@ public class DataAnalysisReportSB {
             CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1, 20);
             sheet.addMergedRegion(cellAddresses);
 
-            // Строка названий проблем
+            row = sheet.createRow(2);
+            cell = row.createCell(1);
+
+            try {
+                stmFullPath.setString(1, model.getObjectID());
+                ResultSet res = stmFullPath.executeQuery();
+                if (res.next()) {
+                    cell.setCellValue(res.getString(1));
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "error load full path for " + model.getObjectID(), e);
+            }
+
+            cell.setCellStyle(styles.get("center"));
+            cellAddresses = new CellRangeAddress(2, 2, 1, 20);
+            sheet.addMergedRegion(cellAddresses);
+
             row = sheet.createRow(3);
+            cell = row.createCell(1);
+            cell.setCellValue("Отчет сформирован " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm.ss")));
+            cell.setCellStyle(styles.get("center"));
+            cellAddresses = new CellRangeAddress(3, 3, 1, 20);
+            sheet.addMergedRegion(cellAddresses);
+
+            // Строка названий проблем
+            row = sheet.createRow(5);
             cell = row.createCell(3);
             cell.setCellValue("Тип / № счетчика");
             cell.setCellStyle(styles.get("tableHeader"));
-            cellAddresses = new CellRangeAddress(3, 3, 3, TABLE_HEADER_NAMES.size() + heatSystems.size());
+            cellAddresses = new CellRangeAddress(5, 5, 3, TABLE_HEADER_NAMES.size() + heatSystems.size());
             sheet.addMergedRegion(cellAddresses);
             BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
             BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
@@ -120,7 +148,7 @@ public class DataAnalysisReportSB {
                     cell.setCellStyle(styles.get("rotate"));
                 }
 
-                cellAddresses = new CellRangeAddress(3, 3, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (j + 1) * model.getProblemID().size());
+                cellAddresses = new CellRangeAddress(5, 5, TABLE_HEADER_NAMES.size() + heatSystems.size() + 1 + j * model.getProblemID().size(), TABLE_HEADER_NAMES.size() + heatSystems.size() + (j + 1) * model.getProblemID().size());
                 BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
@@ -128,7 +156,7 @@ public class DataAnalysisReportSB {
             }
 
             // Строка заголовка таблицы
-            row = sheet.createRow(4);
+            row = sheet.createRow(6);
 
             for (int i = 0; i < TABLE_HEADER_NAMES.size(); i++) {
                 cell = row.createCell(i + 1);
@@ -149,7 +177,7 @@ public class DataAnalysisReportSB {
                 cell.setCellValue(date.format(ReportRequestModel.FORMATTER));
                 cell.setCellStyle(styles.get("tableHeader"));
                 if (model.getProblemID().size() > 1) {
-                    cellAddresses = new CellRangeAddress(4, 4, position, position + model.getProblemID().size() - 1);
+                    cellAddresses = new CellRangeAddress(6, 6, position, position + model.getProblemID().size() - 1);
                     sheet.addMergedRegion(cellAddresses);
                     BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                     BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
@@ -165,7 +193,7 @@ public class DataAnalysisReportSB {
             int ctpIndex = 1;
             int uuIndex = 1;
             int ctpRowIndex = 0;
-            for (int i = 0, rowIndex = 5; i < model.getProblemID().size(); i++, rowIndex = 5) {
+            for (int i = 0, rowIndex = 7; i < model.getProblemID().size(); i++, rowIndex = 7) {
                 stm.setString(1, model.getObjectID());
                 stm.setInt(2, model.getFilterID());
                 stm.setString(3, model.getFilterValue());
@@ -215,7 +243,7 @@ public class DataAnalysisReportSB {
             stmCountersData.setString(4, model.getUser());
 
             ResultSet res = stmCountersData.executeQuery();
-            int rowIndex = 5;
+            int rowIndex = 7;
             while (res.next()) {
                 for (int j = 0; j < heatSystems.size(); j++) {
                     if (res.getString(heatSystems.get(j).getSelectName()) != null) {
@@ -251,7 +279,7 @@ public class DataAnalysisReportSB {
 
             cellData.keySet().removeAll(removeCtpIndexes);
 
-            rowIndex = 5;
+            rowIndex = 7;
             for (List<CellValueModel> rowData: cellData.values()) {
                 for (CellValueModel celItem: rowData) {
                     celItem.setRow(rowIndex);
@@ -324,7 +352,7 @@ public class DataAnalysisReportSB {
                 }
             }
 
-            sheet.createFreezePane(3, 5);
+            sheet.createFreezePane(3, 7);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error load summary sheet data", e);
         }
