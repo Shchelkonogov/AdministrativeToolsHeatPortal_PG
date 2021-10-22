@@ -39,7 +39,9 @@ public class SystemParamsMB implements Serializable {
             {"Единицы измерения", "/view/sysParams/measure.xhtml"},
             {"Справочники", "/view/sysParams/catalog.xhtml"},
             {"Значения по умолчанию", "/view/sysParams/defaultValues.xhtml"},
-            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"}
+            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
+            {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
+            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1]));
 
     private String ip;

@@ -181,3 +181,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     display: unset;
     margin-left: 5px;
 }
+
+#addForm\:newTemperaturePropTable input {
+    width: 100%;
+}
