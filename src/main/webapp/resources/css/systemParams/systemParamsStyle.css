@@ -182,6 +182,10 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     margin-left: 5px;
 }
 
-#addForm\:newTemperaturePropTable input {
+#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input {
     width: 100%;
+}
+
+.center {
+    text-align: center;
 }

@@ -10,6 +10,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -27,22 +28,23 @@ public class SystemParamsMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(SystemParamsMB.class.getName());
 
-    private Map<String, String> systemParamsMap = Stream.of(new String[][] {
-            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
+    private static final Map<String, String> SYSTEM_PARAMS_MAP = Stream.of(new String[][] {
             {"Подразделения", "/view/sysParams/struct/structDivisions.xhtml"},
             {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
+            {"Связи", "/view/sysParams/objectLinks.xhtml"},
             {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
             {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
-            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
-            {"Связи", "/view/sysParams/objectLinks.xhtml"},
             {"Системные свойства", "/view/sysParams/sysProp.xhtml"},
             {"Единицы измерения", "/view/sysParams/measure.xhtml"},
             {"Справочники", "/view/sysParams/catalog.xhtml"},
             {"Значения по умолчанию", "/view/sysParams/defaultValues.xhtml"},
-            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
             {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
-            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"}
-    }).collect(Collectors.toMap(k -> k[0], v -> v[1]));
+            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
+            {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
+            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
+            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
+            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"}
+    }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String ip;
     private String login;
@@ -68,7 +70,7 @@ public class SystemParamsMB implements Serializable {
     }
 
     private void updateContent(String parameter) {
-        content = systemParamsMap.get(parameter);
+        content = SYSTEM_PARAMS_MAP.get(parameter);
         LOGGER.info("update content: " + content);
     }
 
@@ -105,7 +107,7 @@ public class SystemParamsMB implements Serializable {
     }
 
     public Set<String> getParameters() {
-        return systemParamsMap.keySet();
+        return SYSTEM_PARAMS_MAP.keySet();
     }
 
     public String getLogin() {
