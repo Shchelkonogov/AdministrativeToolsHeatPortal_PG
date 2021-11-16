@@ -69,7 +69,7 @@
                     </p:column>
                     <p:column styleClass="center">
                         <p:outputPanel id="tColumn">
-                            <p:selectBooleanCheckbox value="#{coefficientData.t}">
+                            <p:selectBooleanCheckbox value="#{coefficientData.t}" disabled="#{!coefficientsRC.write}">
                                 <p:ajax listener="#{coefficientsRC.onChange(coefficientData, 'tColumn')}"/>
                             </p:selectBooleanCheckbox>
                         </p:outputPanel>
@@ -96,7 +96,7 @@
                     </p:column>
                     <p:column styleClass="center">
                         <p:outputPanel id="aColumn">
-                            <p:selectBooleanCheckbox value="#{coefficientData.a}">
+                            <p:selectBooleanCheckbox value="#{coefficientData.a}" disabled="#{!coefficientsRC.write}">
                                 <p:ajax listener="#{coefficientsRC.onChange(coefficientData, 'aColumn')}"/>
                             </p:selectBooleanCheckbox>
                         </p:outputPanel>
