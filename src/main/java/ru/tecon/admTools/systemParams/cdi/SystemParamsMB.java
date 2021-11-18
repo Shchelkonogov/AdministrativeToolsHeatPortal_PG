@@ -43,7 +43,8 @@ public class SystemParamsMB implements Serializable {
             {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
             {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
             {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
-            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"}
+            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
+            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String ip;

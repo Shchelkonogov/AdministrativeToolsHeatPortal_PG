@@ -1,0 +1,435 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form>
+        <p:remoteCommand autoRun="true" action="#{normIndicators.onFormLoad}" update="normIndicators" />
+    </h:form>
+
+    <h:form id="normIndicators" style="height: calc(100% + 37px); overflow: auto;">
+        <div style="height: 150px; display: flex; margin-bottom: 40px;">
+            <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Тепловой ввод"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('TV')}" update="indicatorTVTable growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="indicatorTVTable" value="#{normIndicators.indicatorTVList}" var="tv"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="Тип объекта" >
+                                <h:outputText value="Источник"/>
+                            </p:column>
+                            <p:column headerText="Кп_н [%]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;|#{tv.kpn}|%"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{tv.kpn}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{tv.kz}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{tv.kz}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Кп [%]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{tv.kp}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{tv.kp}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 100%; flex: 1 1 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Центральное отопление"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('CO')}" update="indicatorCOTable growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="indicatorCOTable" value="#{normIndicators.indicatorCOList}" var="co"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="Тип объекта">
+                                <h:outputText value="#{co.name}"/>
+                            </p:column>
+                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{co.kz}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{co.kz}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Кп [%]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{co.kp}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{co.kp}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 150px; display: flex; margin-bottom: 40px;">
+            <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Горячее водоснабжение"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('GVS')}" update="indicatorGVSTable growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="indicatorGVSTable" value="#{normIndicators.indicatorGVSList}" var="gvs"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="Тип объекта" >
+                                <h:outputText value="#{gvs.name}"/>
+                            </p:column>
+                            <p:column headerText="Кц [%]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&gt;#{gvs.kc}%"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{gvs.kc}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 100%; flex: 1 1 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Вентиляция"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('VENT')}" update="indicatorVENTTable growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="indicatorVENTTable" value="#{normIndicators.indicatorVENTList}" var="vent"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="Тип объекта">
+                                <h:outputText value="#{vent.name}"/>
+                            </p:column>
+                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{vent.kz}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{vent.kz}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Кп [%]" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="&lt;#{vent.kp}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{vent.kp}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 150px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Граничные значения"/>
+                <div style="padding: 3px;">
+                    <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                     action="#{normIndicators.onSaveChanges('Other')}" update="borderValues growl"
+                                     oncomplete="PF('statusDialog').hide();" />
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="borderValues" value="#{normIndicators.indicatorOtherList}" var="other"
+                                 editable="#{normIndicators.write}" editMode="cell"
+                                 emptyMessage="#{global['table.empty.value']}" style="height: 100%;" >
+
+                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column rowspan="2" headerText="Тип объекта" width="150" />
+                                <p:column rowspan="2" headerText="Т7 [℃]" width="50" />
+                                <p:column rowspan="2" headerText="∆T7 (Т7 ТП - Т7потр.) [℃]" width="170" />
+                                <p:column rowspan="2" headerText="Кт [%]" width="50" />
+                                <p:column rowspan="2" headerText="Ктo [%]" width="50" />
+                                <p:column rowspan="2" headerText="КG [%]" width="50" />
+                                <p:column rowspan="2" headerText="КV [%]" width="50" />
+                                <p:column colspan="3" headerText="КУ [тонн]" width="150" />
+                                <p:column rowspan="2" headerText="КР цо" width="50" />
+                                <p:column rowspan="2" headerText="К∆G цо" width="50" />
+                                <p:column rowspan="2" headerText="К1 недоотпуск [%]" width="130" />
+                                <p:column rowspan="2" headerText="К2 перетоп [%]" width="115" />
+                                <p:column rowspan="2" headerText="КР гвс" width="50" />
+                                <p:column rowspan="2" headerText="К∆G гвс" width="55" />
+                                <p:column rowspan="2" headerText="КQ гвс лето" width="85" />
+                                <p:column rowspan="2" headerText="∆Tгвс" width="50" />
+                                <p:column rowspan="2" headerText="Кгвс цирк" width="85" />
+                            </p:row>
+                            <p:row>
+                                <p:column headerText="ЦО" />
+                                <p:column headerText="В" />
+                                <p:column headerText="ГВС" />
+                            </p:row>
+                        </p:columnGroup>
+                        <p:column>
+                            <h:outputText value="Источник - Потребитель" />
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="&gt;#{other.t7}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.t7}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="&#8804;#{other.dt7}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.dt7}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kt}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kt}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kto}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kto}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kg}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kg}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kv}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kv}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kuco}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kuco}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kuvent}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kuvent}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kugvs}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kugvs}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kpco}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kpco}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kdgco}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kdgco}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;" styleClass="double">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.k1min}&lt;К1&lt;#{other.k1max}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.k1min}" decimalPlaces="2"/>
+                                    <p:inputNumber value="#{other.k1max}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;" styleClass="double">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.k2min}&lt;К2&lt;#{other.k2max}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.k2min}" decimalPlaces="2"/>
+                                    <p:inputNumber value="#{other.k2max}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kpgvs}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kpgvs}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kdggvs}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kdggvs}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{other.kqgvsl}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kqgvsl}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="&#8804;#{other.gvsdt}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.gvsdt}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="&gt;#{other.kgvsc}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{other.kgvsc}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>

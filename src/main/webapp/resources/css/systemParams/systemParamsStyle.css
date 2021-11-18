@@ -182,10 +182,18 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     margin-left: 5px;
 }
 
-#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input {
+#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input, #normIndicators input {
     width: 100%;
+}
+
+#normIndicators .double input {
+    width: 50%;
 }
 
 .center {
     text-align: center;
+}
+
+#normIndicators\:borderValues > .ui-datatable-tablewrapper {
+    height: 100%;
 }
