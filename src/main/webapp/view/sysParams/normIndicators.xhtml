@@ -420,7 +420,7 @@
                         <p:column style="text-align: center;">
                             <p:cellEditor disabled="#{!normIndicators.write}">
                                 <f:facet name="output">
-                                    <h:outputText value="&gt;#{other.kgvsc}"/>
+                                    <h:outputText value="&lt;#{other.kgvsc}"/>
                                 </f:facet>
                                 <f:facet name="input">
                                     <p:inputNumber value="#{other.kgvsc}" decimalPlaces="2"/>
