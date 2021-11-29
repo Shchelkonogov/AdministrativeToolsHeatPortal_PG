@@ -182,7 +182,8 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     margin-left: 5px;
 }
 
-#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input, #normIndicators input {
+#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input,
+#normIndicators input, #groundTempForm\:referenceValueTable input {
     width: 100%;
 }
 

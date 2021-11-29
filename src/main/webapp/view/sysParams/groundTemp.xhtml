@@ -34,51 +34,126 @@
     </script>
 
     <h:form id="groundTempForm" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
+        <div style="height: 85%">
+            <div style="display: flex; align-items: center; justify-content: space-between;
                 border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                 border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Температура грунта"/>
-            <div style="padding: 3px;">
-                <p:commandButton icon="btnAdd" style="border-radius: 3px !important;" styleClass="iconOnlyButton btnRight"
-                                 action="#{groundTempMB.onAddNew()}" update="groundTempForm:groundTempTable"
-                                 rendered="#{groundTempMB.write}" />
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Температура грунта"/>
+                <div style="padding: 3px;">
+                    <p:commandButton icon="btnAdd" style="border-radius: 3px !important;" styleClass="iconOnlyButton btnRight"
+                                     action="#{groundTempMB.onAddNew()}" update="groundTempForm:groundTempTable"
+                                     rendered="#{groundTempMB.write}" />
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="groundTempTable" var="groundTempData" value="#{groundTempMB.groundTemps}"
+                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                                 editable="#{groundTempMB.write}">
+
+                        <p:ajax event="rowEdit" listener="#{groundTempMB.onRowEdit}"
+                                onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                                update="groundTempForm:groundTempTable growl" />
+
+                        <p:column headerText="Дата" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempData.editable}">
+                                <f:facet name="output">
+                                    <h:outputText style="display: block;" value="#{groundTempData.stringDate}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:datePicker value="#{groundTempData.date}" view="month" pattern="MM.yyyy"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Температура" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempData.editable}">
+                                <f:facet name="output">
+                                    <h:outputText style="display: block;" value="#{groundTempData.value}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{groundTempData.value}" />
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column width="30" style="text-align: center" rendered="#{groundTempMB.write}">
+                            <p:rowEditor rendered="#{groundTempData.editable}" editTitle="Изменить строку"
+                                         cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
             </div>
         </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
-                <p:dataTable id="groundTempTable" var="groundTempData" value="#{groundTempMB.groundTemps}"
-                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{groundTempMB.write}">
+        <div style="height: 15%">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Эталонные значения температур"/>
+                <div style="padding: 3px;">
+                    <p:commandButton rendered="#{groundTempMB.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                     action="#{groundTempMB.onSaveChanges()}" update="referenceValueTable growl"
+                                     oncomplete="PF('statusDialog').hide();" />
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="referenceValueTable" value="#{groundTempMB.referenceValues}" var="ref"
+                                 editable="#{groundTempMB.write}" editMode="cell"
+                                 emptyMessage="#{global['table.empty.value']}">
 
-                    <p:ajax event="rowEdit" listener="#{groundTempMB.onRowEdit}"
-                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                            update="groundTempForm:groundTempTable growl" />
+                        <p:ajax event="cellEdit" listener="#{groundTempMB.onCellEdit}" />
 
-                    <p:column headerText="Дата" style="text-align: center;">
-                        <p:cellEditor disabled="#{!groundTempData.editable}">
-                            <f:facet name="output">
-                                <h:outputText style="display: block;" value="#{groundTempData.stringDate}" />
-                            </f:facet>
-                            <f:facet name="input">
-                                <p:datePicker value="#{groundTempData.date}" view="month" pattern="MM.yyyy"/>
-                            </f:facet>
-                        </p:cellEditor>
-                    </p:column>
-                    <p:column headerText="Температура" style="text-align: center;">
-                        <p:cellEditor disabled="#{!groundTempData.editable}">
-                            <f:facet name="output">
-                                <h:outputText style="display: block;" value="#{groundTempData.value}" />
-                            </f:facet>
-                            <f:facet name="input">
-                                <p:inputNumber value="#{groundTempData.value}" />
-                            </f:facet>
-                        </p:cellEditor>
-                    </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{groundTempMB.write}">
-                        <p:rowEditor rendered="#{groundTempData.editable}" editTitle="Изменить строку"
-                                     cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                    </p:column>
-                </p:dataTable>
+                        <p:column headerText="T3" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempMB.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{ref.t3}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{ref.t3}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="T4" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempMB.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{ref.t4}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{ref.t4}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="T7" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempMB.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{ref.t7}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{ref.t7}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="T13" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempMB.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{ref.t13}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{ref.t13}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Tгр" style="text-align: center;">
+                            <p:cellEditor disabled="#{!groundTempMB.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{ref.tgr}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{ref.tgr}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                    </p:dataTable>
+                </div>
             </div>
         </div>
     </h:form>

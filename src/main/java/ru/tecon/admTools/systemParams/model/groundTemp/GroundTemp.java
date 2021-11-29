@@ -1,4 +1,4 @@
-package ru.tecon.admTools.systemParams.model;
+package ru.tecon.admTools.systemParams.model.groundTemp;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
