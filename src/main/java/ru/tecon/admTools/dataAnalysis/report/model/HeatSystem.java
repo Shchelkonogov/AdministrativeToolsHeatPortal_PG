@@ -6,7 +6,7 @@ package ru.tecon.admTools.dataAnalysis.report.model;
  */
 public enum HeatSystem {
 
-    TV("ТВ", "counter_tv"),
+    TV("ТВ", "counter_tv", true),
     CO("ЦО", "counter_co", true),
     CO2("ЦО2", "counter_co2", true),
     VENT("Вентиляция", "counter_vent", true),
