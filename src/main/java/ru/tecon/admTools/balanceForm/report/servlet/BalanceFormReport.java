@@ -43,12 +43,16 @@ public class BalanceFormReport extends HttpServlet {
                         URLEncoder.encode("Баланс", "UTF-8") + " " +
                         URLEncoder.encode("по", "UTF-8") + " " +
                         URLEncoder.encode("ЦТП", "UTF-8") + " " +
-                        URLEncoder.encode("(месяц).xlsx", "UTF-8") +
+                        URLEncoder.encode("(период).xlsx", "UTF-8") +
                         "\"");
         resp.setCharacterEncoding("UTF-8");
 
         try (OutputStream output = resp.getOutputStream()) {
-            Report.createMonthReport(object, LocalDate.parse(startDate, FORMATTER), bean).write(output);
+            if (startDate.equals(endDate)) {
+                Report.createDayReport(object, LocalDate.parse(startDate, FORMATTER), bean).write(output);
+            } else {
+                Report.createMonthReport(object, LocalDate.parse(startDate, FORMATTER), LocalDate.parse(endDate, FORMATTER), bean).write(output);
+            }
             output.flush();
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "error send created report", e);
