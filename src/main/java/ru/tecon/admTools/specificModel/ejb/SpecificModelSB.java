@@ -335,7 +335,11 @@ public class SpecificModelSB implements SpecificModelLocal {
             stm.registerOutParameter(1, Types.INTEGER);
             stm.setInt(2, objectID);
             stm.setInt(3, saveData.getParID());
-            stm.setInt(4, data.getDecreaseID());
+            if (data.getDecreaseID() == null) {
+                stm.setNull(4, Types.INTEGER);
+            } else {
+                stm.setInt(4, data.getDecreaseID());
+            }
             stm.executeUpdate();
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "error upload decrease", e);
