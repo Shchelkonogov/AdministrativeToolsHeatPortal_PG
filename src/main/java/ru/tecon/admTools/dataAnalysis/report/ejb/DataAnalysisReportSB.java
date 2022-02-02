@@ -48,7 +48,7 @@ public class DataAnalysisReportSB {
     private static final String SELECT_COUNTERS_DATA = "select * from table(ul_report.sel_counters(?, ?, ?, ?))";
     private static final String SELECT_FULL_PATH = "select dsp_0091t.get_full_path(?) from dual";
 
-    private static final List<String> TABLE_HEADER_NAMES = new ArrayList<>(Arrays.asList("№", "Объект"));
+    private static final List<String> TABLE_HEADER_NAMES = new ArrayList<>(Arrays.asList("№", "Филиал", "Предприятие", "Объект"));
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -85,18 +85,18 @@ public class DataAnalysisReportSB {
 
             // Строка заголовка
             Row row = sheet.createRow(1);
-            Cell cell = row.createCell(1);
+            Cell cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Анализ достоверности измерений за " +
                     Month.of(model.getFirstDateAtMonth().getMonthValue())
                             .getDisplayName(TextStyle.FULL_STANDALONE, new Locale("ru"))
                             .toLowerCase() +
                     " " + model.getFirstDateAtMonth().getYear());
             cell.setCellStyle(styles.get("header"));
-            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1, 20);
+            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1 + TABLE_HEADER_NAMES.size(), 20 + TABLE_HEADER_NAMES.size());
             sheet.addMergedRegion(cellAddresses);
 
             row = sheet.createRow(2);
-            cell = row.createCell(1);
+            cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
 
             try {
                 stmFullPath.setString(1, model.getObjectID());
@@ -109,22 +109,22 @@ public class DataAnalysisReportSB {
             }
 
             cell.setCellStyle(styles.get("center"));
-            cellAddresses = new CellRangeAddress(2, 2, 1, 20);
+            cellAddresses = new CellRangeAddress(2, 2, 1 + TABLE_HEADER_NAMES.size(), 20 + TABLE_HEADER_NAMES.size());
             sheet.addMergedRegion(cellAddresses);
 
             row = sheet.createRow(3);
-            cell = row.createCell(1);
+            cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Отчет сформирован " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm.ss")));
             cell.setCellStyle(styles.get("center"));
-            cellAddresses = new CellRangeAddress(3, 3, 1, 20);
+            cellAddresses = new CellRangeAddress(3, 3, 1 + TABLE_HEADER_NAMES.size(), 20 + TABLE_HEADER_NAMES.size());
             sheet.addMergedRegion(cellAddresses);
 
             // Строка названий проблем
             row = sheet.createRow(5);
-            cell = row.createCell(3);
+            cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Тип / № счетчика");
             cell.setCellStyle(styles.get("tableHeader"));
-            cellAddresses = new CellRangeAddress(5, 5, 3, TABLE_HEADER_NAMES.size() + heatSystems.size());
+            cellAddresses = new CellRangeAddress(5, 5, 1 + TABLE_HEADER_NAMES.size(), TABLE_HEADER_NAMES.size() + heatSystems.size());
             sheet.addMergedRegion(cellAddresses);
             BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
             BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
@@ -210,20 +210,20 @@ public class DataAnalysisReportSB {
                     if (i == 0) {
                         if (res.getInt("obj_type") == 1) {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "centerBold"));
                             ctpRowIndex = rowIndex;
                             ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                             ctpIndex++;
                             uuIndex = 1;
                         } else {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "left"));
                             ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                             uuIndex++;
-                        }
-
-                        if (res.getInt("obj_type") == 1) {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "centerBold"));
-                        } else {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "left"));
                         }
                     }
 
@@ -352,7 +352,7 @@ public class DataAnalysisReportSB {
                 }
             }
 
-            sheet.createFreezePane(3, 7);
+            sheet.createFreezePane(1 + TABLE_HEADER_NAMES.size(), 7);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error load summary sheet data", e);
         }
@@ -384,10 +384,10 @@ public class DataAnalysisReportSB {
 
             // Строка заголовка
             Row row = sheet.createRow(1);
-            Cell cell = row.createCell(1);
+            Cell cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Анализ достоверности измерений за " + date);
             cell.setCellStyle(styles.get("header"));
-            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1, 20);
+            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1 + TABLE_HEADER_NAMES.size(), 20 + TABLE_HEADER_NAMES.size());
             sheet.addMergedRegion(cellAddresses);
 
             // Строка с перечислением проблем
@@ -396,12 +396,12 @@ public class DataAnalysisReportSB {
                 stmCriterion.setInt(1, model.getProblemID(i));
                 ResultSet res = stmCriterion.executeQuery();
 
-                cell = row.createCell(i + 3 + i * (HeatSystem.values().length - 1));
+                cell = row.createCell(i + 1 + TABLE_HEADER_NAMES.size() + i * (HeatSystem.values().length - 1));
                 if (res.next()) {
                     cell.setCellValue(res.getString(1));
                 }
                 cell.setCellStyle(styles.get("tableHeader"));
-                cellAddresses = new CellRangeAddress(3, 3 , i + 3 + i * (HeatSystem.values().length - 1), i + 3 + (i + 1) * (HeatSystem.values().length - 1));
+                cellAddresses = new CellRangeAddress(3, 3 , i + 1 + TABLE_HEADER_NAMES.size() + i * (HeatSystem.values().length - 1), i + 1 + TABLE_HEADER_NAMES.size() + (i + 1) * (HeatSystem.values().length - 1));
                 BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
                 BorderUtil.createBorder("bottom", BorderStyle.THIN, cellAddresses, sheet);
@@ -450,20 +450,20 @@ public class DataAnalysisReportSB {
                     if (i == 0) {
                         if (res.getInt("obj_type") == 1) {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "centerBold"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "centerBold"));
                             ctpRowIndex = rowIndex;
                             ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                             ctpIndex++;
                             uuIndex = 1;
                         } else {
                             cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "left"));
+                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "left"));
                             ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                             uuIndex++;
-                        }
-
-                        if (res.getInt("obj_type") == 1) {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "centerBold"));
-                        } else {
-                            cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "left"));
                         }
                     }
 
@@ -551,7 +551,7 @@ public class DataAnalysisReportSB {
                 sheet.setColumnWidth(i + 1 + TABLE_HEADER_NAMES.size(), 20 * 256);
             }
 
-            sheet.createFreezePane(3, 5);
+            sheet.createFreezePane(1 + TABLE_HEADER_NAMES.size(), 5);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error load day sheet data", e);
         }
@@ -587,22 +587,22 @@ public class DataAnalysisReportSB {
 
             // Строка заголовка
             Row row = sheet.createRow(1);
-            Cell cell = row.createCell(1);
+            Cell cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Анализ достоверности измерений за " +
                     Month.of(model.getFirstDateAtMonth().getMonthValue())
                             .getDisplayName(TextStyle.FULL_STANDALONE, new Locale("ru"))
                             .toLowerCase() +
                     " " + model.getFirstDateAtMonth().getYear());
             cell.setCellStyle(styles.get("header"));
-            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1, 20);
+            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1 + TABLE_HEADER_NAMES.size(), 20 + TABLE_HEADER_NAMES.size());
             sheet.addMergedRegion(cellAddresses);
 
             // Строка названий проблем
             row = sheet.createRow(3);
-            cell = row.createCell(3);
+            cell = row.createCell(1 + TABLE_HEADER_NAMES.size());
             cell.setCellValue("Тип / № счетчика");
             cell.setCellStyle(styles.get("tableHeader"));
-            cellAddresses = new CellRangeAddress(3, 3, 3, TABLE_HEADER_NAMES.size() + heatSystems.size());
+            cellAddresses = new CellRangeAddress(3, 3, 1 + TABLE_HEADER_NAMES.size(), TABLE_HEADER_NAMES.size() + heatSystems.size());
             sheet.addMergedRegion(cellAddresses);
             BorderUtil.createBorder("top", BorderStyle.THIN, cellAddresses, sheet);
             BorderUtil.createBorder("right", BorderStyle.THIN, cellAddresses, sheet);
@@ -671,20 +671,20 @@ public class DataAnalysisReportSB {
 
                 if (res.getInt("obj_type") == 1) {
                     cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(ctpIndex), "centerBold"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "centerBold"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "centerBold"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "centerBold"));
                     ctpRowIndex = rowIndex;
                     ctpWithUuIndexes.put(ctpRowIndex, new ArrayList<>());
                     ctpIndex++;
                     uuIndex = 1;
                 } else {
                     cellData.get(rowIndex).add(new CellValueModel(rowIndex, 1, String.valueOf(uuIndex), "left"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("filial"), "left"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 3, res.getString("predpr"), "left"));
+                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 4, res.getString("obj_name"), "left"));
                     ctpWithUuIndexes.get(ctpRowIndex).add(rowIndex);
                     uuIndex++;
-                }
-
-                if (res.getInt("obj_type") == 1) {
-                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "centerBold"));
-                } else {
-                    cellData.get(rowIndex).add(new CellValueModel(rowIndex, 2, res.getString("obj_name"), "left"));
                 }
 
                 for (int i = 0; i < model.getProblemOdpuID().size(); i++) {
@@ -798,7 +798,7 @@ public class DataAnalysisReportSB {
                 sheet.autoSizeColumn(i + 1);
             }
 
-            sheet.createFreezePane(3, 5);
+            sheet.createFreezePane(1 + TABLE_HEADER_NAMES.size(), 5);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error load summary sheet data", e);
         }
