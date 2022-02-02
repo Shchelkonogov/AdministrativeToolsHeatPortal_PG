@@ -1,8 +1,6 @@
 package ru.tecon.admTools.matrixProblems.report.servlet;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -19,13 +17,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -110,7 +110,8 @@ public class Report extends HttpServlet {
                 for (tSheetType type: tSheetType.values()) {
                     sheet = wb.createSheet(type.toString());
                     futures.add(reportBean.createSheetT(requestModel, type, sheet,
-                            rowColorStyleCtp, rowColorStyleCtpError , rowColorStyleSum, rowColorStyleSumError, headerStyle, errorStyle));
+                            rowColorStyleCtp, rowColorStyleCtpError , rowColorStyleSum,
+                            rowColorStyleSumError, headerStyle, errorStyle, createStyles(wb)));
                 }
 
                 for (Future<Void> future: futures) {
@@ -134,5 +135,36 @@ public class Report extends HttpServlet {
                 resp.sendError(500);
             }
         }
+    }
+
+    /**
+     * Метод формирует набор стилей для excel документа
+     * @param wb документ
+     * @return набор стилей
+     */
+    private Map<String, CellStyle> createStyles(Workbook wb) {
+        Map<String, CellStyle> styles = new HashMap<>();
+
+        XSSFFont font16 = (XSSFFont) wb.createFont();
+        font16.setBold(true);
+        font16.setFontHeight(16);
+
+        XSSFFont font12 = (XSSFFont) wb.createFont();
+        font12.setFontHeight(12);
+
+        CellStyle style = wb.createCellStyle();
+        style.setFont(font16);
+        style.setAlignment(HorizontalAlignment.CENTER);
+
+        styles.put("header", style);
+
+        style = wb.createCellStyle();
+        style.setFont(font12);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        styles.put("center", style);
+
+        return styles;
     }
 }

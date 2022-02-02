@@ -1,6 +1,9 @@
 package ru.tecon.admTools.matrixProblems.report.ejb;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import ru.tecon.admTools.matrixProblems.report.model.ReportRequestModel;
 import ru.tecon.admTools.matrixProblems.report.model.tSheetType;
@@ -15,12 +18,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.*;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -46,6 +51,8 @@ public class ReportBean {
 
     private static final String SELECT_RATIO = "select dt, dto, dgv, dgvo from dz_norm_koef where obj_type_id = 1";
 
+    private static final String SELECT_FULL_PATH = "select dsp_0091t.get_full_path(?) from dual";
+
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
@@ -60,13 +67,14 @@ public class ReportBean {
      * @param rowStyleSumError стиль ячейки сумма, итог с ошибочными данными
      * @param headerStyle стиль заголовка
      * @param errorStyle стиль ошибочных данных
+     * @param styles набор стилей
      * @return ничего не возвращет (используется для ожидания выполнения)
      */
     @Asynchronous
     public Future<Void> createSheetT(ReportRequestModel requestModel, tSheetType sheetType, SXSSFSheet sheet,
                                      CellStyle rowStyleCtp, CellStyle rowStyleCtpError,
                                      CellStyle rowStyleSum, CellStyle rowStyleSumError,
-                                     CellStyle headerStyle, CellStyle errorStyle) {
+                                     CellStyle headerStyle, CellStyle errorStyle, Map<String, CellStyle> styles) {
         // Переменные для определения времени выполнения
         long startTime = System.currentTimeMillis();
         long stopTime;
@@ -112,8 +120,45 @@ public class ReportBean {
              PreparedStatement alter = connect.prepareStatement(ALTER_SQL);
              PreparedStatement stm = connect.prepareStatement(select);
              PreparedStatement stmTnv = connect.prepareStatement(SELECT_TNV);
-             PreparedStatement stmRatio = connect.prepareStatement(SELECT_RATIO)) {
+             PreparedStatement stmRatio = connect.prepareStatement(SELECT_RATIO);
+             PreparedStatement stmFullPath = connect.prepareStatement(SELECT_FULL_PATH)) {
             alter.executeQuery();
+
+            // Строка заголовка
+            Row row = sheet.createRow(1);
+            Cell cell = row.createCell(1);
+            cell.setCellValue("Анализ первичных измерений за " +
+                    Month.of(requestModel.getFirstDateAtMonth().getMonthValue())
+                            .getDisplayName(TextStyle.FULL_STANDALONE, new Locale("ru"))
+                            .toLowerCase() +
+                    " " + requestModel.getFirstDateAtMonth().getYear());
+            cell.setCellStyle(styles.get("header"));
+            CellRangeAddress cellAddresses = new CellRangeAddress(1, 1, 1, 20);
+            sheet.addMergedRegion(cellAddresses);
+
+            row = sheet.createRow(2);
+            cell = row.createCell(1);
+
+            try {
+                stmFullPath.setString(1, "S" + requestModel.getStructID());
+                ResultSet res = stmFullPath.executeQuery();
+                if (res.next()) {
+                    cell.setCellValue(res.getString(1));
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "error load full path for " + requestModel.getStructID(), e);
+            }
+
+            cell.setCellStyle(styles.get("center"));
+            cellAddresses = new CellRangeAddress(2, 2, 1, 20);
+            sheet.addMergedRegion(cellAddresses);
+
+            row = sheet.createRow(3);
+            cell = row.createCell(1);
+            cell.setCellValue("Отчет сформирован " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm.ss")));
+            cell.setCellStyle(styles.get("center"));
+            cellAddresses = new CellRangeAddress(3, 3, 1, 20);
+            sheet.addMergedRegion(cellAddresses);
 
             // Заносим параметры в основной select получения данных
             stm.setInt(1, requestModel.getStructID());
@@ -129,17 +174,15 @@ public class ReportBean {
             ResultSet res = stm.executeQuery();
             res.setFetchSize(100);
 
-            Cell cell;
-            Row row = sheet.createRow(0);
-
             // Определяет коэффициент рассогласования и заносим его в первую ячейку
+            row = sheet.createRow(5);
             ResultSet resRatio = stmRatio.executeQuery();
             if (resRatio.next()) {
                 row.createCell(0).setCellValue("Коэффициент рассогласования: " + resRatio.getString(sheetType.getRatio()));
             }
 
             // Создаем строку заголовка с датами
-            row = sheet.createRow(2);
+            row = sheet.createRow(7);
             cell = row.createCell(0);
             cell.setCellValue("Объект");
             cell.setCellStyle(headerStyle);
@@ -156,7 +199,7 @@ public class ReportBean {
                 cell.setCellStyle(headerStyle);
             }
 
-            int i = 3;
+            int i = 8;
             while (res.next()) {
                 row = sheet.createRow(i);
 
