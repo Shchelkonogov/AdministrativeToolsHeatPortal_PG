@@ -33,6 +33,8 @@ public class NormIndicatorsMB implements Serializable {
     private List<IndicatorGVS> indicatorGVSList = new ArrayList<>();
     private List<IndicatorVENT> indicatorVENTList = new ArrayList<>();
     private List<IndicatorOther> indicatorOtherList = new ArrayList<>();
+    private List<IndicatorT7> indicatorT7List = new ArrayList<>();
+    private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
 
     private String login;
     private String ip;
@@ -70,6 +72,8 @@ public class NormIndicatorsMB implements Serializable {
         indicatorGVSList = normIndicatorsBean.getGVS();
         indicatorVENTList = normIndicatorsBean.getVENT();
         indicatorOtherList = normIndicatorsBean.getOther();
+        indicatorT7List = normIndicatorsBean.getT7();
+        indicatorDT7List = normIndicatorsBean.getDT7();
     }
 
     /**
@@ -94,6 +98,7 @@ public class NormIndicatorsMB implements Serializable {
                 });
 
                 indicatorTVList = normIndicatorsBean.getTV();
+                break;
             }
             case "CO": {
                 indicatorCOList.stream().filter(IndicatorCO::isChange).forEach(indicatorCO -> {
@@ -108,6 +113,7 @@ public class NormIndicatorsMB implements Serializable {
                 });
 
                 indicatorCOList = normIndicatorsBean.getCO();
+                break;
             }
             case "GVS": {
                 indicatorGVSList.stream().filter(IndicatorGVS::isChange).forEach(indicatorGVS -> {
@@ -122,6 +128,7 @@ public class NormIndicatorsMB implements Serializable {
                 });
 
                 indicatorGVSList = normIndicatorsBean.getGVS();
+                break;
             }
             case "VENT": {
                 indicatorVENTList.stream().filter(IndicatorVENT::isChange).forEach(indicatorVENT -> {
@@ -136,6 +143,7 @@ public class NormIndicatorsMB implements Serializable {
                 });
 
                 indicatorVENTList = normIndicatorsBean.getVENT();
+                break;
             }
             case "Other": {
                 indicatorOtherList.stream().filter(IndicatorOther::isChange).forEach(indicatorOther -> {
@@ -150,6 +158,37 @@ public class NormIndicatorsMB implements Serializable {
                 });
 
                 indicatorOtherList = normIndicatorsBean.getOther();
+                break;
+            }
+            case "T7": {
+                indicatorT7List.stream().filter(IndicatorT7::isChange).forEach(indicatorT7 -> {
+                    LOGGER.info("update T7 indicator " + indicatorT7);
+
+                    try {
+                        normIndicatorsBean.updateT7(indicatorT7, login, ip);
+                    } catch (SystemParamException e) {
+                        errorMessages.add("Анализ потребителей T7");
+                        LOGGER.warning(e.getMessage());
+                    }
+                });
+
+                indicatorT7List = normIndicatorsBean.getT7();
+                break;
+            }
+            case "dT7": {
+                indicatorDT7List.stream().filter(IndicatorDT7::isChange).forEach(indicatorDT7 -> {
+                    LOGGER.info("update dT7 indicator " + indicatorDT7);
+
+                    try {
+                        normIndicatorsBean.updateDT7(indicatorDT7, login, ip);
+                    } catch (SystemParamException e) {
+                        errorMessages.add("Анализ потребителей ΔT7");
+                        LOGGER.warning(e.getMessage());
+                    }
+                });
+
+                indicatorDT7List = normIndicatorsBean.getDT7();
+                break;
             }
         }
 
@@ -186,6 +225,14 @@ public class NormIndicatorsMB implements Serializable {
 
     public List<IndicatorOther> getIndicatorOtherList() {
         return indicatorOtherList;
+    }
+
+    public List<IndicatorT7> getIndicatorT7List() {
+        return indicatorT7List;
+    }
+
+    public List<IndicatorDT7> getIndicatorDT7List() {
+        return indicatorDT7List;
     }
 
     public boolean isWrite() {

@@ -197,7 +197,7 @@
                 </div>
             </div>
         </div>
-        <div style="height: 150px;">
+        <div style="height: 150px; margin-bottom: 40px;">
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
@@ -355,25 +355,24 @@
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column style="text-align: center;" styleClass="double">
+<!--                       два вводе в строке <p:column style="text-align: center;" styleClass="double">-->
+                        <p:column style="text-align: center;">
                             <p:cellEditor disabled="#{!normIndicators.write}">
                                 <f:facet name="output">
-                                    <h:outputText value="#{other.k1min}&lt;К1&lt;#{other.k1max}"/>
+                                    <h:outputText value="К1&lt;#{other.k1}"/>
                                 </f:facet>
                                 <f:facet name="input">
-                                    <p:inputNumber value="#{other.k1min}" decimalPlaces="2"/>
-                                    <p:inputNumber value="#{other.k1max}" decimalPlaces="2"/>
+                                    <p:inputNumber value="#{other.k1}" decimalPlaces="2"/>
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column style="text-align: center;" styleClass="double">
+                        <p:column style="text-align: center;">
                             <p:cellEditor disabled="#{!normIndicators.write}">
                                 <f:facet name="output">
-                                    <h:outputText value="#{other.k2min}&lt;К2&lt;#{other.k2max}"/>
+                                    <h:outputText value="К2&lt;#{other.k2}"/>
                                 </f:facet>
                                 <f:facet name="input">
-                                    <p:inputNumber value="#{other.k2min}" decimalPlaces="2"/>
-                                    <p:inputNumber value="#{other.k2max}" decimalPlaces="2"/>
+                                    <p:inputNumber value="#{other.k2}" decimalPlaces="2"/>
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
@@ -428,6 +427,127 @@
                             </p:cellEditor>
                         </p:column>
                     </p:dataTable>
+                </div>
+            </div>
+        </div>
+        <div style="height: 150px; display: flex;">
+            <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Анализ потребителей T7"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('T7')}" update="consumerAnalisisT7Table growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="consumerAnalisisT7Table" value="#{normIndicators.indicatorT7List}" var="t7"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="Тип объекта" >
+                                <h:outputText value="#{t7.name}"/>
+                            </p:column>
+                            <p:column headerText="T7min Ж" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{t7.minG}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{t7.minG}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="T7max Ж" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{t7.maxG}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{t7.maxG}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="T7min П" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{t7.minP}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{t7.minP}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="T7max П" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{t7.maxP}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{t7.maxP}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 100%; flex: 1 1 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Анализ потребителей ΔT7"/>
+                    <div style="padding: 3px;">
+                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                         action="#{normIndicators.onSaveChanges('dT7')}" update="consumerAnalisisDeltaT7Table growl"
+                                         oncomplete="PF('statusDialog').hide();" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                    <div style="height: 100%;">
+                        <p:dataTable id="consumerAnalisisDeltaT7Table" value="#{normIndicators.indicatorDT7List}" var="dT7"
+                                     editable="#{normIndicators.write}" editMode="cell"
+                                     emptyMessage="#{global['table.empty.value']}">
+
+                            <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                            <p:column headerText="ΔTmin" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{dT7.dtMin}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{dT7.dtMin}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="ΔTmax" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{dT7.dtMax}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{dT7.dtMax}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="ΔTнорм" style="text-align: center;">
+                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                    <f:facet name="output">
+                                        <h:outputText value="#{dT7.dtNorm}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{dT7.dtNorm}" decimalPlaces="2"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
                 </div>
             </div>
         </div>

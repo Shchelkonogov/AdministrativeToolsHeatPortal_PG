@@ -19,10 +19,8 @@ public class IndicatorOther {
     private double kugvs;
     private double kpco;
     private double kdgco;
-    private double k1min;
-    private double k1max;
-    private double k2min;
-    private double k2max;
+    private double k1;
+    private double k2;
     private double kpgvs;
     private double kdggvs;
     private double kqgvsl;
@@ -32,8 +30,8 @@ public class IndicatorOther {
     private boolean change = false;
 
     public IndicatorOther(double t7, double dt7, double kt, double kto, double kg, double kv, double kuco,
-                          double kuvent, double kugvs, double kpco, double kdgco, double k1min, double k1max,
-                          double k2min, double k2max, double kpgvs, double kdggvs, double kqgvsl, double gvsdt,
+                          double kuvent, double kugvs, double kpco, double kdgco, double k1,
+                          double k2, double kpgvs, double kdggvs, double kqgvsl, double gvsdt,
                           double kgvsc) {
         this.t7 = t7;
         this.dt7 = dt7;
@@ -46,10 +44,8 @@ public class IndicatorOther {
         this.kugvs = kugvs;
         this.kpco = kpco;
         this.kdgco = kdgco;
-        this.k1min = k1min;
-        this.k1max = k1max;
-        this.k2min = k2min;
-        this.k2max = k2max;
+        this.k1 = k1;
+        this.k2 = k2;
         this.kpgvs = kpgvs;
         this.kdggvs = kdggvs;
         this.kqgvsl = kqgvsl;
@@ -156,40 +152,22 @@ public class IndicatorOther {
         this.kdgco = kdgco;
     }
 
-    public double getK1min() {
-        return k1min;
+    public double getK1() {
+        return k1;
     }
 
-    public void setK1min(double k1min) {
+    public void setK1(double k1) {
         this.change = true;
-        this.k1min = k1min;
+        this.k1 = k1;
     }
 
-    public double getK1max() {
-        return k1max;
+    public double getK2() {
+        return k2;
     }
 
-    public void setK1max(double k1max) {
+    public void setK2(double k2) {
         this.change = true;
-        this.k1max = k1max;
-    }
-
-    public double getK2min() {
-        return k2min;
-    }
-
-    public void setK2min(double k2min) {
-        this.change = true;
-        this.k2min = k2min;
-    }
-
-    public double getK2max() {
-        return k2max;
-    }
-
-    public void setK2max(double k2max) {
-        this.change = true;
-        this.k2max = k2max;
+        this.k2 = k2;
     }
 
     public double getKpgvs() {
@@ -254,10 +232,8 @@ public class IndicatorOther {
                 .add("kugvs=" + kugvs)
                 .add("kpco=" + kpco)
                 .add("kdgco=" + kdgco)
-                .add("k1min=" + k1min)
-                .add("k1max=" + k1max)
-                .add("k2min=" + k2min)
-                .add("k2max=" + k2max)
+                .add("k1min=" + k1)
+                .add("k2min=" + k2)
                 .add("kpgvs=" + kpgvs)
                 .add("kdggvs=" + kdggvs)
                 .add("kqgvsl=" + kqgvsl)
