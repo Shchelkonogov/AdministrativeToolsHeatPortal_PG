@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form>
+        <p:remoteCommand autoRun="true" action="#{multiYearTemp.onFormLoad}" update="multiYearTemp"/>
+    </h:form>
+
+    <h:form id="multiYearTemp" style="height: 100%;">
+        <div style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;">
+            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Тнв по многолетним наблюдениям"/>
+        </div>
+        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+            <div style="height: 100%;">
+                <p:dataTable id="tempTable" var="tempData" value="#{multiYearTemp.multiYearTemps}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{multiYearTemp.write}">
+
+                    <p:ajax event="rowEdit" listener="#{multiYearTemp.onRowEdit}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update="growl" />
+
+                    <p:column headerText="Месяц">
+                        <h:outputText style="display: block;" value="#{tempData.name}" />
+                    </p:column>
+                    <p:column headerText="Температура" width="200" style="white-space: nowrap; text-align: center;">
+                        <p:cellEditor disabled="#{!multiYearTemp.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{tempData.value}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{tempData.value}" decimalPlaces="2"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column width="30" style="text-align: center" rendered="#{multiYearTemp.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>

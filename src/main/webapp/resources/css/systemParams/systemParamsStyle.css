@@ -183,7 +183,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 }
 
 #addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input,
-#normIndicators input, #groundTempForm\:referenceValueTable input {
+#normIndicators input, #groundTempForm\:referenceValueTable input, #multiYearTemp\:tempTable input {
     width: 100%;
 }
 
