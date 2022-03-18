@@ -28,14 +28,17 @@ public class DailyReductionMB extends TemperatureMB {
         super.init();
     }
 
+    @Override
     public String getHeaderType() {
         return HEADER_TYPE;
     }
 
+    @Override
     public String getHeaderProp() {
         return HEADER_PROP;
     }
 
+    @Override
     public String getHeaderAddDialog() {
         return HEADER_ADD_DIALOG;
     }

@@ -34,8 +34,17 @@ public class TemperatureSB {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(select)) {
             ResultSet res = stm.executeQuery();
+            int columnCount = res.getMetaData().getColumnCount();
             while (res.next()) {
-                result.add(new Temperature(res.getInt("graph_id"), res.getString("code"), res.getString("name")));
+                switch (columnCount) {
+                    case 3:
+                        result.add(new Temperature(res.getInt("graph_id"), res.getString("code"), res.getString("name")));
+                        break;
+                    case 5:
+                        result.add(new Temperature(res.getInt("graph_id"), res.getString("code"), res.getString("name"),
+                                res.getInt("min_val"), res.getInt("max_val")));
+                        break;
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error load temperatures", e);
@@ -142,9 +151,17 @@ public class TemperatureSB {
             cStm.registerOutParameter(1, Types.INTEGER);
             cStm.setString(2, temperature.getName());
             cStm.setString(3, temperature.getDescription());
-            cStm.registerOutParameter(4, Types.INTEGER);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            if ((temperature.getMin() != null) && (temperature.getMax() != null)) {
+                cStm.setInt(4, temperature.getMin());
+                cStm.setInt(5, temperature.getMax());
+                cStm.registerOutParameter(6, Types.INTEGER);
+                cStm.setString(7, login);
+                cStm.setString(8, ip);
+            } else {
+                cStm.registerOutParameter(4, Types.INTEGER);
+                cStm.setString(5, login);
+                cStm.setString(6, ip);
+            }
 
             cStm.executeUpdate();
 
@@ -154,7 +171,11 @@ public class TemperatureSB {
                 throw new SystemParamException("Ошибка добавления справочника " + temperature.getName() + " " + temperature.getDescription());
             }
 
-            return cStm.getInt(4);
+            if ((temperature.getMin() != null) && (temperature.getMax() != null)) {
+                return cStm.getInt(6);
+            } else {
+                return cStm.getInt(4);
+            }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");

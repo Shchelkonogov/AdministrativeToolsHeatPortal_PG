@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * Суперкласс для контроллеров форм температурные графики и суточные снижения
  * @author Maksim Shchelkonogov
  */
-public class TemperatureMB implements Serializable {
+public abstract class TemperatureMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(TemperatureMB.class.getName());
 
@@ -38,6 +38,10 @@ public class TemperatureMB implements Serializable {
     private boolean disableRemovePropBtn = true;
 
     private TemperatureRemote temperatureBean;
+
+    public abstract String getHeaderType();
+    public abstract String getHeaderProp();
+    public abstract String getHeaderAddDialog();
 
     protected void init() {
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()

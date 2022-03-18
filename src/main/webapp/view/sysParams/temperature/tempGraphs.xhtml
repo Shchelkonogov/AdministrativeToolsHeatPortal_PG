@@ -6,6 +6,8 @@
     <ui:insert>
         <ui:include src="temperature.xhtml">
             <ui:param name="bean" value="#{tempGraphs}"/>
+            <ui:param name="flex" value="flex: 1.5 1 0" />
+            <ui:param name="isShowAdditionalData" value="true" />
         </ui:include>
     </ui:insert>
 </ui:composition>

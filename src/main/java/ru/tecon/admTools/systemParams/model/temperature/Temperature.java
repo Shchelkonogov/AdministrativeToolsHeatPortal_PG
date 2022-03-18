@@ -14,6 +14,8 @@ public class Temperature implements Serializable {
     private int id;
     private String name;
     private String description;
+    private Integer min;
+    private Integer max;
     private List<TemperatureProp> temperatureProps = new ArrayList<>();
 
     public Temperature() {
@@ -23,6 +25,14 @@ public class Temperature implements Serializable {
         this.id = id;
         this.name = name;
         this.description = description;
+    }
+
+    public Temperature(int id, String name, String description, Integer min, Integer max) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.min = min;
+        this.max = max;
     }
 
     public int getId() {
@@ -49,6 +59,22 @@ public class Temperature implements Serializable {
         this.name = name;
     }
 
+    public Integer getMin() {
+        return min;
+    }
+
+    public void setMin(Integer min) {
+        this.min = min;
+    }
+
+    public Integer getMax() {
+        return max;
+    }
+
+    public void setMax(Integer max) {
+        this.max = max;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -59,6 +85,8 @@ public class Temperature implements Serializable {
                 .add("id=" + id)
                 .add("name='" + name + "'")
                 .add("description='" + description + "'")
+                .add("min='" + min + "'")
+                .add("max='" + max + "'")
                 .toString();
     }
 }

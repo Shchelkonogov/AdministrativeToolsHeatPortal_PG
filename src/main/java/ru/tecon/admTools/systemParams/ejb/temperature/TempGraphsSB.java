@@ -21,7 +21,7 @@ public class TempGraphsSB implements TemperatureRemote {
     private static final String SEL_TEMP_GRAPH_PROPS = "select * from table(dsp_0031t.sel_graph_value(?))";
     private static final String FUN_REMOVE_TEMP_GRAPH = "{? = call sys_0001t.del_graph(?, ?, ?, ?)}";
     private static final String FUN_REMOVE_TEMP_GRAPH_PROP = "{? = call sys_0001t.del_graph_value(?, ?, ?, ?, ?)}";
-    private static final String FUN_CREATE_TEMP_GRAPH = "{? = call sys_0001t.add_graph(?, ?, ?, ?, ?)}";
+    private static final String FUN_CREATE_TEMP_GRAPH = "{? = call sys_0001t.add_graph(?, ?, ?, ?, ?, ?, ?)}";
     private static final String FUN_CREATE_TEMP_GRAPH_PROP = "{? = call sys_0001t.add_graph_value(?, ?, ?, ?, ?)}";
 
     @EJB

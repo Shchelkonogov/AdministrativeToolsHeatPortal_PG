@@ -22,20 +22,24 @@ public class TempGraphsMB extends TemperatureMB {
     @EJB(name = "tempGraphSB", mappedName = "ejb/tempGraphSB")
     private TemperatureRemote temperatureBean;
 
+    @Override
     @PostConstruct
     protected void init() {
         super.setTemperatureBean(temperatureBean);
         super.init();
     }
 
+    @Override
     public String getHeaderType() {
         return HEADER_TYPE;
     }
 
+    @Override
     public String getHeaderProp() {
         return HEADER_PROP;
     }
 
+    @Override
     public String getHeaderAddDialog() {
         return HEADER_ADD_DIALOG;
     }

@@ -12,7 +12,7 @@
     </h:form>
 
     <h:form id="temperaturePanel" style="height: 100%; display: flex;">
-        <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+        <div style="height: 100%; #{flex == null ? 'flex: 1 1 0' : flex}; margin-right: 5px;">
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
@@ -41,6 +41,12 @@
                         </p:column>
                         <p:column headerText="Описание">
                             <h:outputText value="#{temperature.description}" />
+                        </p:column>
+                        <p:column headerText="Min" width="30" rendered="#{isShowAdditionalData}" style="text-align: center;">
+                            <h:outputText value="#{temperature.min}" />
+                        </p:column>
+                        <p:column headerText="Max" width="30" rendered="#{isShowAdditionalData}" style="text-align: center;">
+                            <h:outputText value="#{temperature.max}" />
                         </p:column>
                     </p:dataTable>
                 </div>
@@ -91,52 +97,73 @@
         <p:ajax event="close" listener="#{bean.onAddTypeDialogClose()}" update="addForm"/>
 
         <h:form id="addForm">
-            <div style="text-align: center; margin-bottom: 5px;">
-                <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
-                <p:inputText required="true" value="#{bean.newTemperature.name}"
-                             requiredMessage="#{global['validation.view.text']}" />
-                <p:message style="margin-left: 5px;" for="@previous" />
-            </div>
-            <div style="text-align: center; margin-bottom: 5px;">
-                <p:outputLabel value="Описание" for="@next" style="margin-right: 5px;"/>
-                <p:inputText required="true" value="#{bean.newTemperature.description}"
-                             requiredMessage="#{global['validation.view.text']}" />
-                <p:message style="margin-left: 5px;" for="@previous" />
-            </div>
-            <p:dataTable id="newTemperaturePropTable" value="#{bean.newTemperature.temperatureProps}" var="prop" widgetVar="newPropTable"
-                         scrollable="true" scrollHeight="200" emptyMessage="#{global['table.empty.value']}"
-                         editable="true">
-                <p:column headerText="Температура" style="text-align: center;">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{prop.tnv}" />
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{prop.tnv}" style="width: 100%;"/>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column headerText="Значение" style="text-align: center;">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{prop.value}" />
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{prop.value}" style="width: 100%;"/>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column width="30" style="text-align: center;">
-                    <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
-                </p:column>
-            </p:dataTable>
+            <p:scrollPanel mode="native" style="height: 290px; padding: 0; border: none;">
+                <div style="#{isShowAdditionalData ? 'display: flex;' : ''}">
+                    <div style="#{isShowAdditionalData ? 'flex: 1 1 0; margin-left: 90px;' : ''}">
+                        <div style="text-align: center; margin-bottom: 5px;">
+                            <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
+                            <p:inputText required="true" value="#{bean.newTemperature.name}"
+                                         requiredMessage="#{global['validation.view.text']}" />
+                            <p:message style="margin-left: 5px;" for="@previous" />
+                        </div>
+                        <div style="text-align: center; margin-bottom: 5px;">
+                            <p:outputLabel value="Описание" for="@next" style="margin-right: 5px;"/>
+                            <p:inputText required="true" value="#{bean.newTemperature.description}"
+                                         requiredMessage="#{global['validation.view.text']}" />
+                            <p:message style="margin-left: 5px;" for="@previous" />
+                        </div>
+                    </div>
+                    <h:panelGroup layout="block" rendered="#{isShowAdditionalData}" style="flex: 1 1 0; margin-right: 90px;">
+                        <div style="text-align: center; margin-bottom: 5px;">
+                            <p:outputLabel value="Min" for="@next" style="margin-right: 5px;"/>
+                            <p:inputNumber required="true" value="#{bean.newTemperature.min}" decimalPlaces="0"
+                                         requiredMessage="#{global['validation.view.text']}" />
+                            <p:message style="margin-left: 5px;" for="@previous" />
+                        </div>
+                        <div style="text-align: center; margin-bottom: 5px;">
+                            <p:outputLabel value="Max" for="@next" style="margin-right: 5px;"/>
+                            <p:inputNumber required="true" value="#{bean.newTemperature.max}" decimalPlaces="0"
+                                         requiredMessage="#{global['validation.view.text']}" />
+                            <p:message style="margin-left: 5px;" for="@previous" />
+                        </div>
+                    </h:panelGroup>
+                </div>
 
-            <p:commandButton value="Добавить значение" process="@this" style="position: absolute; bottom: 5px;"
-                             update=":addForm:newTemperaturePropTable" action="#{bean.onAddNew()}" />
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
-                             validateClient="true" update="addForm" action="#{bean.saveStructWrapper()}" />
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addTypeDialog').hide();"/>
+                <p:dataTable id="newTemperaturePropTable" value="#{bean.newTemperature.temperatureProps}" var="prop" widgetVar="newPropTable"
+                             scrollable="true" scrollHeight="170" emptyMessage="#{global['table.empty.value']}"
+                             editable="true">
+                    <p:column headerText="Температура" style="text-align: center;">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{prop.tnv}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{prop.tnv}" style="width: 100%;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Значение" style="text-align: center;">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{prop.value}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{prop.value}" style="width: 100%;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column width="30" style="text-align: center;">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:commandButton value="Добавить значение" process="@this" style="position: absolute; bottom: 5px;"
+                                 update=":addForm:newTemperaturePropTable" action="#{bean.onAddNew()}" />
+                <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                                 validateClient="true" update="addForm" action="#{bean.saveStructWrapper()}" />
+                <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                                 onclick="PF('addTypeDialog').hide();"/>
+            </p:scrollPanel>
         </h:form>
     </p:dialog>
 
