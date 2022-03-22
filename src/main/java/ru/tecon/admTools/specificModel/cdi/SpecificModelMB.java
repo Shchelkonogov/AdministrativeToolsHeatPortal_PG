@@ -112,6 +112,8 @@ public class SpecificModelMB implements Serializable {
 
         if (!eco) {
             enumerableTableModel = bean.getEnumerableData(objectID);
+        } else {
+            enumerableTableModel = new ArrayList<>();
         }
     }
 
