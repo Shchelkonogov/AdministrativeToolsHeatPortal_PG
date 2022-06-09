@@ -175,7 +175,7 @@
                     </p:column>
 
                     <p:column styleClass="centre-column">
-                        <p:selectBooleanCheckbox disabled="#{data.additionalData.tPersentDisable || !specificModel.write}" value="#{data.additionalData.tPercent}">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.tPersentDisable || !specificModel.write || data.additionalData.graphDisable}" value="#{data.additionalData.tPercent}">
                             <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}" />
                         </p:selectBooleanCheckbox>
                     </p:column>
@@ -225,14 +225,14 @@
                     </p:column>
 
                     <p:column styleClass="centre-column">
-                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write}" id="aPercentColumn" value="#{data.additionalData.aPercent}">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write || data.additionalData.graphDisable}" id="aPercentColumn" value="#{data.additionalData.aPercent}">
                             <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}"
                                     update="tabView:tableForm:tableData:#{rowIdx}:absoluteColumn" />
                         </p:selectBooleanCheckbox>
                     </p:column>
 
                     <p:column styleClass="centre-column">
-                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write}" id="absoluteColumn" value="#{data.additionalData.absolute}">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.aPersentDisable || !specificModel.write || data.additionalData.graphDisable}" id="absoluteColumn" value="#{data.additionalData.absolute}">
                             <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}"
                                     update="tabView:tableForm:tableData:#{rowIdx}:aPercentColumn" />
                         </p:selectBooleanCheckbox>
