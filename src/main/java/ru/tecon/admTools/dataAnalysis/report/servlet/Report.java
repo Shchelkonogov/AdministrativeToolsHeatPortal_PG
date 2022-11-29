@@ -100,7 +100,7 @@ public class Report extends HttpServlet {
                 }
 
                 for (Future<Void> future: futures) {
-                    future.get(10, TimeUnit.MINUTES);
+                    future.get(30, TimeUnit.MINUTES);
                 }
 
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
