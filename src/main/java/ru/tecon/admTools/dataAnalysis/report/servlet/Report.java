@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -63,6 +64,7 @@ public class Report extends HttpServlet {
         } catch (Exception e) {
             LOGGER.warning("Error read request message " + e.getMessage());
             resp.sendError(500);
+            return;
         }
 
         Jsonb json = JsonbBuilder.create();
@@ -104,8 +106,9 @@ public class Report extends HttpServlet {
                 }
 
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOGGER.warning("Error create excel pages " + e.getMessage());
+                LOGGER.log(Level.WARNING, "Error create excel pages", e);
                 resp.sendError(500);
+                return;
             }
 
             resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
