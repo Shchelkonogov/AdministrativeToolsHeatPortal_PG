@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 @ViewScoped
 public class DataAnalysisMB implements Serializable {
 
-    private static final Logger LOG = Logger.getLogger(DataAnalysisSB.class.getName());
+    private static final Logger LOG = Logger.getLogger(DataAnalysisMB.class.getName());
 
     private String sessionID;
     private int filterID;
