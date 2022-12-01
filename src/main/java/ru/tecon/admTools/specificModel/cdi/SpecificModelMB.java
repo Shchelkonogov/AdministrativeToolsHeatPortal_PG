@@ -125,7 +125,8 @@ public class SpecificModelMB implements Serializable {
         rowIndex = event.getRowIndex();
         changedDecreaseGraphItem = filteredTableModel.get(rowIndex);
         if (event.getColumn().getClientId().endsWith("graphColumn")) {
-            if (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphID() == null) {
+            if ((((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphID() == null) &&
+                    (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphName() != null)) {
                 optValue = ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphName();
             } else {
                 optValue = "";
@@ -168,12 +169,12 @@ public class SpecificModelMB implements Serializable {
 
             message = bean.saveGraph(objectID, dataModel);
             if (message != null) {
-                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + message));
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + ": " + message));
             }
 
             message = bean.saveRanges(objectID, dataModel);
             if (message != null) {
-                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + message));
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + ": " + message));
             }
 
             bean.saveDecrease(objectID, dataModel);
@@ -237,7 +238,7 @@ public class SpecificModelMB implements Serializable {
      * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора графика
      */
     public void saveNoGraph() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(null);
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
         changedDecreaseGraphItem.setChange(true);
         PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
@@ -269,10 +270,32 @@ public class SpecificModelMB implements Serializable {
      * на закладке оптимальное значение
      */
     public void saveOptValue() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(optValue);
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
+        AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+        List<String> updateList = new ArrayList<>();
+
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            data.setA(-10d, 10d, true, true, true);
+            data.setT(-5d, 5d, true, true, true);
+            data.setAbsolute(true);
+
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":tMinCellEditor");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":tMaxCellEditor");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":tPercentColumn");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":aMinCellEditor");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":aMaxCellEditor");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":aPercentColumn");
+            updateList.add("tabView:tableForm:tableData:" + rowIndex + ":absoluteColumn");
+
+            PrimeFaces.current().executeScript("blockRow(" + rowIndex + ");");
+        }
+
+        data.setGraphName(optValue);
+        data.setGraphID(null);
+
+        updateList.add("tabView:tableForm:tableData:" + rowIndex + ":graphCellEditor");
+
         changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+        PrimeFaces.current().ajax().update(updateList);
     }
 
     /**
@@ -280,10 +303,21 @@ public class SpecificModelMB implements Serializable {
      * на закладке оптимальное значение
      */
     public void saveNoOptValue() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(null);
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
         changedDecreaseGraphItem.setChange(true);
         PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+    }
+
+    public String getLabelForNewOptValue() {
+        if (changedDecreaseGraphItem == null) {
+            return "";
+        }
+        AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            return "Новое оптимальное значение. Границы будут сброшены!";
+        }
+        return "";
     }
 
     /**
@@ -296,6 +330,17 @@ public class SpecificModelMB implements Serializable {
         }
 
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            try {
+                return new BigDecimal(5)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return 5 + "%";
+            }
+        }
 
         if (data.gettMax() == null) {
             return "-";
@@ -311,7 +356,13 @@ public class SpecificModelMB implements Serializable {
                 return data.gettMax() + "%";
             }
         } else {
-            return data.gettMax().toString();
+            try {
+                return new BigDecimal(data.gettMax())
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return data.gettMax().toString();
+            }
         }
     }
 
@@ -325,6 +376,17 @@ public class SpecificModelMB implements Serializable {
         }
 
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            try {
+                return new BigDecimal(-5)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return -5 + "%";
+            }
+        }
 
         if (data.gettMin() == null) {
             return "-";
@@ -340,7 +402,13 @@ public class SpecificModelMB implements Serializable {
                 return data.gettMin() + "%";
             }
         } else {
-            return data.gettMin().toString();
+            try {
+                return new BigDecimal(data.gettMin())
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return data.gettMin().toString();
+            }
         }
     }
 
@@ -354,6 +422,17 @@ public class SpecificModelMB implements Serializable {
         }
 
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            try {
+                return new BigDecimal(10)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return 10 + "%";
+            }
+        }
 
         if (data.getaMax() == null) {
             return "-";
@@ -369,7 +448,17 @@ public class SpecificModelMB implements Serializable {
                 return data.getaMax() + "%";
             }
         } else {
-            return data.getaMax().toString();
+            if (data.isAbsolute()) {
+                try {
+                    return new BigDecimal(data.getaMax())
+                            .add(new BigDecimal(optValue))
+                            .setScale(2, RoundingMode.HALF_EVEN).toString();
+                } catch (NumberFormatException e) {
+                    return data.getaMax().toString();
+                }
+            } else {
+                return data.getaMax().toString();
+            }
         }
     }
 
@@ -383,6 +472,17 @@ public class SpecificModelMB implements Serializable {
         }
 
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
+
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+            try {
+                return new BigDecimal(-10)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                        .add(new BigDecimal(optValue))
+                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+            } catch (NumberFormatException e) {
+                return -10 + "%";
+            }
+        }
 
         if (data.getaMin() == null) {
             return "-";
@@ -398,7 +498,17 @@ public class SpecificModelMB implements Serializable {
                 return data.getaMin() + "%";
             }
         } else {
-            return data.getaMin().toString();
+            if (data.isAbsolute()) {
+                try {
+                    return new BigDecimal(data.getaMin())
+                            .add(new BigDecimal(optValue))
+                            .setScale(2, RoundingMode.HALF_EVEN).toString();
+                } catch (NumberFormatException e) {
+                    return data.getaMin().toString();
+                }
+            } else {
+                return data.getaMin().toString();
+            }
         }
     }
 

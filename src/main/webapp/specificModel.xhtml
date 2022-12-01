@@ -8,6 +8,7 @@
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputScript library="js" name="specificModelScript.js"/>
 </h:head>
 <h:body>
     <p:growl id="growl" showDetail="true" />
@@ -17,7 +18,10 @@
                 <h:outputText style="font-weight: bold; font-size: 20px;" value="#{specificModel.objectPath}" />
             </td>
             <td width="120" align="center">
-                <p:commandButton rendered="#{specificModel.write}" value="Сохранить" actionListener="#{specificModel.saveData}"
+                <p:commandButton widgetVar="saveButton" rendered="#{specificModel.write}" value="Сохранить"
+                                 action="#{specificModel.saveData}"
+                                 onclick="PF('statusDialog').show(); PF('saveButton').disable();"
+                                 oncomplete="PF('statusDialog').hide(); PF('saveButton').enable();"
                                  update=":tabView :growl" />
             </td>
         </tr>
@@ -91,12 +95,12 @@
 
                     <p:column id="graphColumn" styleClass="#{data.additionalData.graphColor}"
                               style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
-                        <p:cellEditor disabled="#{data.additionalData.graphDisable || !specificModel.write}">
+                        <p:cellEditor id="graphCellEditor" disabled="#{data.additionalData.graphDisable || !specificModel.write}">
                             <f:facet name="output">
                                 <p:outputPanel id="graphValuePanel">
                                     <h:outputText id="graphValue" value="#{data.additionalData.graphName}"/>
 
-                                    <p:contextMenu for="graphValuePanel" rendered="#{data.additionalData.graphID != null}">
+                                    <p:contextMenu id="graphContext" for="graphValuePanel" rendered="#{data.additionalData.graphID != null}">
                                         <p:menuitem value="Посмотреть график"
                                                     action="#{graphDecreaseDataShow.loadGraphData(data.additionalData.graphID, data.additionalData.graphName)}"
                                                     oncomplete="PF('graphDecreaseShowDialog').show()"
@@ -131,12 +135,12 @@
                     </p:column>
 
                     <p:column styleClass="centre-column #{data.additionalData.tMinColor}">
-                        <p:cellEditor disabled="#{data.additionalData.tMinDisable || !specificModel.write}">
+                        <p:cellEditor id="tMinCellEditor" disabled="#{data.additionalData.tMinDisable || !specificModel.write}">
                             <f:facet name="output">
                                 <p:outputPanel id="tMinPanel">
                                     <h:outputText value="#{data.additionalData.tMin}" converter="doubleConverter" />
 
-                                    <p:contextMenu for="tMinPanel">
+                                    <p:contextMenu id="tMinContext" for="tMinPanel">
                                         <p:menuitem value="Посмотреть историю"
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
@@ -153,12 +157,12 @@
                     </p:column>
 
                     <p:column styleClass="centre-column #{data.additionalData.tMaxColor}">
-                        <p:cellEditor disabled="#{data.additionalData.tMaxDisable || !specificModel.write}">
+                        <p:cellEditor id="tMaxCellEditor" disabled="#{data.additionalData.tMaxDisable || !specificModel.write}">
                             <f:facet name="output">
                                 <p:outputPanel id="tMaxPanel">
                                     <h:outputText value="#{data.additionalData.tMax}" converter="doubleConverter"/>
 
-                                    <p:contextMenu for="tMaxPanel">
+                                    <p:contextMenu id="tMaxContext" for="tMaxPanel">
                                         <p:menuitem value="Посмотреть историю"
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
@@ -175,18 +179,18 @@
                     </p:column>
 
                     <p:column styleClass="centre-column">
-                        <p:selectBooleanCheckbox disabled="#{data.additionalData.tPersentDisable || !specificModel.write || data.additionalData.graphDisable}" value="#{data.additionalData.tPercent}">
+                        <p:selectBooleanCheckbox disabled="#{data.additionalData.tPersentDisable || !specificModel.write || data.additionalData.graphDisable}" id="tPercentColumn" value="#{data.additionalData.tPercent}">
                             <p:ajax event="change" listener="#{specificModel.onBooleanValueChange(rowIdx)}" />
                         </p:selectBooleanCheckbox>
                     </p:column>
 
                     <p:column styleClass="centre-column #{data.additionalData.aMinColor}">
-                        <p:cellEditor disabled="#{data.additionalData.aMinDisable || !specificModel.write}">
+                        <p:cellEditor id="aMinCellEditor" disabled="#{data.additionalData.aMinDisable || !specificModel.write}">
                             <f:facet name="output">
                                 <p:outputPanel id="aMinPanel">
                                     <h:outputText value="#{data.additionalData.aMin}" converter="doubleConverter"/>
 
-                                    <p:contextMenu for="aMinPanel">
+                                    <p:contextMenu id="aMinContext" for="aMinPanel">
                                         <p:menuitem value="Посмотреть историю"
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
@@ -203,12 +207,12 @@
                     </p:column>
 
                     <p:column styleClass="centre-column #{data.additionalData.aMaxColor}">
-                        <p:cellEditor disabled="#{data.additionalData.aMaxDisable || !specificModel.write}">
+                        <p:cellEditor id="aMaxCellEditor" disabled="#{data.additionalData.aMaxDisable || !specificModel.write}">
                             <f:facet name="output">
                                 <p:outputPanel id="aMaxPanel">
                                     <h:outputText value="#{data.additionalData.aMax}" converter="doubleConverter"/>
 
-                                    <p:contextMenu for="aMaxPanel">
+                                    <p:contextMenu id="aMaxContext" for="aMaxPanel">
                                         <p:menuitem value="Посмотреть историю"
                                                     action="#{history.loadData(data.parMemo, specificModel.objectID, data.parID, data.statAgr)}"
                                                     oncomplete="PF('historyDialog').show()"
@@ -355,6 +359,9 @@
                                          update="growl"/>
                     </f:facet>
 
+                    <h:outputLabel value="#{specificModel.getLabelForNewOptValue()}"
+                                   style="position:absolute; left: 99px; top: 40px; font-weight: bold;"/>
+
                     <table id="optValueTable" style="width: 100%; margin-top: 95px;">
                         <tr>
                             <td align="left" style="font-weight: bold;">
@@ -443,6 +450,11 @@
                 </p:column>
             </p:dataTable>
         </div>
+    </p:dialog>
+
+    <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;">
+        <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
     </p:dialog>
 </h:body>
 </html>

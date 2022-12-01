@@ -61,3 +61,13 @@ body .ui-datatable .ui-datatable-data>tr>td {
 .ui-dialog-content {
     padding: 1px !important;
 }
+
+#statusDialog .ui-dialog-titlebar {
+    display: none;
+}
+
+#statusDialog_content {
+    background-color: transparent;
+    border: none;
+    overflow: hidden;
+}

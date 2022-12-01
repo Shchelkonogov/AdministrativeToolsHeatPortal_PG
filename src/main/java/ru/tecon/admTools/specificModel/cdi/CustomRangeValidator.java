@@ -27,7 +27,8 @@ public class CustomRangeValidator implements Validator {
         String optValue = (String) ((UIInput) context.getViewRoot().findComponent("graphSelectForm:gTab:optValue")).getValue();
 
         if (optValue.isEmpty()) {
-            return;
+            throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",
+                    "Нельзя задать пустое значение"));
         }
 
         try {
