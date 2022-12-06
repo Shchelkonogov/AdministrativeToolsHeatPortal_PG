@@ -331,9 +331,9 @@
                 <p:tab id="gTab1" title="График">
                     <f:facet name="actions">
                         <p:commandButton style="margin-top: 2px;" value="Без графика" action="#{specificModel.saveNoGraph}"
-                                         onclick="PF('graphDialog').hide()"/>
+                                         onclick="PF('graphDialog').hide()" process="@this"/>
                         <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveGraph}"
-                                         onclick="PF('graphDialog').hide()"/>
+                                         onclick="PF('graphDialog').hide()" process="gTab1"/>
                     </f:facet>
 
                     <div style="height: calc(100% - 5px);">
@@ -353,10 +353,10 @@
                 <p:tab id="gTab2" title="Оптимальное значение">
                     <f:facet name="actions">
                         <p:commandButton style="margin-top: 2px;" value="Без Опт.знач." action="#{specificModel.saveNoOptValue}"
-                                         onclick="PF('graphDialog').hide()"/>
+                                         onclick="PF('graphDialog').hide()" process="@this"/>
                         <p:commandButton style="margin-top: 2px;" value="Выбрать" action="#{specificModel.saveOptValue}"
-                                          validateClient="true" oncomplete="if (!args.validationFailed) PF('graphDialog').hide();"
-                                         update="growl"/>
+                                         oncomplete="if (!args.validationFailed) PF('graphDialog').hide();"
+                                         update="growl" process="gTab2"/>
                     </f:facet>
 
                     <h:outputLabel value="#{specificModel.getLabelForNewOptValue()}"
