@@ -35,6 +35,7 @@ public class NormIndicatorsMB implements Serializable {
     private List<IndicatorOther> indicatorOtherList = new ArrayList<>();
     private List<IndicatorT7> indicatorT7List = new ArrayList<>();
     private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
+    private List<IndicatorUnderSupply> indicatorUnderSupplyList = new ArrayList<>();
 
     private String login;
     private String ip;
@@ -74,6 +75,7 @@ public class NormIndicatorsMB implements Serializable {
         indicatorOtherList = normIndicatorsBean.getOther();
         indicatorT7List = normIndicatorsBean.getT7();
         indicatorDT7List = normIndicatorsBean.getDT7();
+        indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
     }
 
     /**
@@ -190,6 +192,21 @@ public class NormIndicatorsMB implements Serializable {
                 indicatorDT7List = normIndicatorsBean.getDT7();
                 break;
             }
+            case "underSupply": {
+                indicatorUnderSupplyList.stream().filter(IndicatorUnderSupply::isChange).forEach(indicatorUnderSupply -> {
+                    LOGGER.info("update underSupply indicator " + indicatorUnderSupply);
+
+                    try {
+                        normIndicatorsBean.updateUnderSupply(indicatorUnderSupply, login, ip);
+                    } catch (SystemParamException e) {
+                        errorMessages.add(e.getMessage());
+                        LOGGER.warning(e.getMessage());
+                    }
+                });
+
+                indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
+                break;
+            }
         }
 
         if (!errorMessages.isEmpty()) {
@@ -233,6 +250,10 @@ public class NormIndicatorsMB implements Serializable {
 
     public List<IndicatorDT7> getIndicatorDT7List() {
         return indicatorDT7List;
+    }
+
+    public List<IndicatorUnderSupply> getIndicatorUnderSupplyList() {
+        return indicatorUnderSupplyList;
     }
 
     public boolean isWrite() {

@@ -430,7 +430,7 @@
                 </div>
             </div>
         </div>
-        <div style="height: 150px; display: flex;">
+        <div style="height: 150px; display: flex; margin-bottom: 40px;">
             <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
                 <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
@@ -548,6 +548,103 @@
                             </p:column>
                         </p:dataTable>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 150px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                    border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Недоотпуск"/>
+                <div style="padding: 3px;">
+                    <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                                     action="#{normIndicators.onSaveChanges('underSupply')}" update="underSupplyValues growl"
+                                     oncomplete="PF('statusDialog').hide();" />
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="underSupplyValues" value="#{normIndicators.indicatorUnderSupplyList}" var="underSupply"
+                                 editable="#{normIndicators.write}" editMode="cell"
+                                 emptyMessage="#{global['table.empty.value']}" style="height: 100%;" >
+
+                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column colspan="3" headerText="Недоотпуск по Т3"/>
+                                <p:column colspan="3" headerText="Недоотпуск по Т4"/>
+                            </p:row>
+                            <p:row>
+                                <p:column headerText="k1" />
+                                <p:column headerText="k2" />
+                                <p:column headerText="k3" />
+                                <p:column headerText="k1" />
+                                <p:column headerText="k2" />
+                                <p:column headerText="k3" />
+                            </p:row>
+                        </p:columnGroup>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t3K1}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t3K1}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t3K2}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t3K2}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t3K3}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t3K3}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t4K1}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t4K1}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t4K2}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t4K2}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="text-align: center;">
+                            <p:cellEditor disabled="#{!normIndicators.write}">
+                                <f:facet name="output">
+                                    <h:outputText value="#{underSupply.t4K3}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{underSupply.t4K3}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                    </p:dataTable>
                 </div>
             </div>
         </div>
