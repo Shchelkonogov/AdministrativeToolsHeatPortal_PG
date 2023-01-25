@@ -17,22 +17,24 @@ public class StructProcessesSB implements StructCurrentRemote {
 
     private static final String SELECT_STRUCT_TYPES = "select techproc_type_id as type_id, techproc_type_name as type_name, techproc_type_char as type_char " +
             "from table(sys_0001t.sel_techproc_type())";
-    private static final String SELECT_STRUCT_TYPE_PROPS = "select a.techproc_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
-            "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, c.prop_cat_name, " +
-            "d.measure_name, d.short_name " +
-                "from table(sys_0001t.sel_techproc_type_props(?)) a, " +
-                        "table(sys_0001t.sel_type_props_type()) b, " +
-                        "table(sys_0001t.sel_type_props_cat()) c, " +
-                        "table(sys_0001t.sel_measure()) d " +
-                    "where b.prop_val_type = a.prop_type and c.prop_cat_id = a.prop_cat and d.measure_id = a.prop_measure " +
-            "union all " +
+    private static final String SELECT_STRUCT_TYPE_PROPS = "select * from ( " +
             "select a.techproc_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
-            "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, null, " +
-            "d.measure_name, d.short_name " +
-                "from table(sys_0001t.sel_techproc_type_props(?)) a, " +
-                        "table(sys_0001t.sel_type_props_type()) b, " +
-                        "table(sys_0001t.sel_measure()) d " +
-                    "where a.prop_cat = 'S' and b.prop_val_type = a.prop_type and d.measure_id = a.prop_measure";
+                "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, c.prop_cat_name, " +
+                "d.measure_name, d.short_name, a.display_id " +
+                    "from table(sys_0001t.sel_techproc_type_props(?)) a, " +
+                            "table(sys_0001t.sel_type_props_type()) b, " +
+                            "table(sys_0001t.sel_type_props_cat()) c, " +
+                            "table(sys_0001t.sel_measure()) d " +
+                        "where b.prop_val_type = a.prop_type and c.prop_cat_id = a.prop_cat and d.measure_id = a.prop_measure " +
+                "union all " +
+                "select a.techproc_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
+                "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, null, " +
+                "d.measure_name, d.short_name, a.display_id " +
+                    "from table(sys_0001t.sel_techproc_type_props(?)) a, " +
+                            "table(sys_0001t.sel_type_props_type()) b, " +
+                            "table(sys_0001t.sel_measure()) d " +
+                        "where a.prop_cat = 'S' and b.prop_val_type = a.prop_type and d.measure_id = a.prop_measure) " +
+            "order by display_id";
 
     private static final String ADD_STRUCT_TYPE = "{? = call sys_0001t.add_techproc_type(?, ?, ?, ?, ?)}";
     private static final String REMOVE_STRUCT_TYPE = "{? = call sys_0001t.del_techproc_type(?, ?, ?, ?)}";
