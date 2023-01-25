@@ -16,6 +16,14 @@ body .ui-datatable .ui-datatable-data>tr>td {
     padding: 2px 1px;
 }
 
+.ui-treetable table {
+    table-layout: unset !important;
+}
+
+body .ui-treetable .ui-treetable-data>tr>td {
+    padding: 2px 1px;
+}
+
 .ui-panel, .ui-panel-content {
     height: 100%;
 }
@@ -197,4 +205,12 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 
 #normIndicators\:borderValues > .ui-datatable-tablewrapper {
     height: 100%;
+}
+
+#divisionPanel\:structType {
+    height: 100%;
+}
+
+#divisionPanel\:structType > .ui-treetable-scrollable-body {
+    height: calc(100% - 37px);
 }

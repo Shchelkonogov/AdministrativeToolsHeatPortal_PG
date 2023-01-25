@@ -12,6 +12,7 @@ public class StructType implements Serializable {
     private int id;
     private String name;
     private String typeChar;
+    private Integer parentID;
 
     public StructType() {
     }
@@ -20,6 +21,13 @@ public class StructType implements Serializable {
         this.id = id;
         this.name = name;
         this.typeChar = typeChar;
+    }
+
+    public StructType(int id, String name, String typeChar, Integer parentID) {
+        this.id = id;
+        this.name = name;
+        this.typeChar = typeChar;
+        this.parentID = parentID;
     }
 
     public int getId() {
@@ -42,12 +50,21 @@ public class StructType implements Serializable {
         this.typeChar = typeChar;
     }
 
+    public Integer getParentID() {
+        return parentID;
+    }
+
+    public void setParentID(Integer parentID) {
+        this.parentID = parentID;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", StructType.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
                 .add("name='" + name + "'")
                 .add("typeChar='" + typeChar + "'")
+                .add("parentID=" + parentID)
                 .toString();
     }
 }

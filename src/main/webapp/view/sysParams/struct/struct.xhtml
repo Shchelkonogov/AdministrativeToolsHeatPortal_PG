@@ -33,10 +33,10 @@
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
                 <div style="height: 100%;">
-                    <p:dataTable value="#{bean['structTypes']}" var="structType" scrollable="true" scrollHeight="100%"
-                                 selectionMode="single" selection="#{bean.selectedStruct}" rowKey="#{structType.id}">
+                    <p:treeTable value="#{bean['root']}" var="structType" id="structType" scrollable="true" scrollHeight="100%"
+                                 selectionMode="single" selection="#{bean.selectedStructNode}" rowKey="#{structType.id}">
 
-                        <p:ajax event="rowSelect" listener="#{bean.onRowSelect}"
+                        <p:ajax event="select" listener="#{bean.onRowSelect}"
                                 update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp" />
 
                         <p:column headerText="Название">
@@ -45,7 +45,7 @@
                         <p:column headerText="Код" width="50" style="text-align: center;">
                             <h:outputText value="#{structType.typeChar}" />
                         </p:column>
-                    </p:dataTable>
+                    </p:treeTable>
                 </div>
             </div>
         </div>
@@ -209,7 +209,7 @@
 
             <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
                              update=":addForm:newPropTable" action="#{bean.onAddNew()}" />
-            <p:selectOneMenu value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
+            <p:selectOneMenu rendered="#{bean.showSysProps}" value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
                              style="position: absolute; bottom: 5px; left: 175px;">
                 <p:ajax event="itemSelect" listener="#{bean.onChange}" update="addForm:newPropTable" />
                 <f:selectItems value="#{bean.sysProps}" var="sysPropVal"
@@ -277,7 +277,7 @@
                 <p:outputLabel value="Значение по умолчанию" for="@next" style="margin-right: 5px;"/>
                 <p:inputText value="#{bean.newStructTypeProp.def}" style="width: 245px;"/>
             </div>
-            <p:selectOneMenu value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
+            <p:selectOneMenu rendered="#{bean.showSysProps}" value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
                              style="position: absolute; bottom: 5px; right: 205px;">
                 <p:ajax event="itemSelect" listener="#{bean.onAddSysPropToStruct}" />
                 <f:selectItems value="#{bean.sysProps}" var="sysPropVal"

@@ -2,8 +2,11 @@ package ru.tecon.admTools.systemParams.cdi.struct;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
 import ru.tecon.admTools.systemParams.ejb.MeasureSB;
@@ -21,7 +24,9 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.facelets.FaceletContext;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -38,7 +43,10 @@ public class StructMB implements Serializable, MyConverter {
     private String ip;
     private boolean write;
 
+    private TreeNode root;
+
     private List<StructType> structTypes;
+    private TreeNode selectedStructNode;
     private StructType selectedStruct;
     private List<StructTypeProp> structTypeProps;
     private StructTypeProp selectedStructProp;
@@ -60,6 +68,8 @@ public class StructMB implements Serializable, MyConverter {
     private Integer selectedSysProp;
 
     private StructCurrentRemote structCurrentBean;
+
+    @EJB
     private StructSB structBean;
 
     @EJB
@@ -74,6 +84,10 @@ public class StructMB implements Serializable, MyConverter {
     public void init(String type) {
         this.type = type;
 
+        initForm();
+    }
+
+    void initForm() {
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
         ip = (String) faceletContext.getAttribute("ip");
@@ -82,6 +96,8 @@ public class StructMB implements Serializable, MyConverter {
 
         sysProps = sysPropSB.getSysProps();
 
+        root = new DefaultTreeNode(new StructType(), null);
+
         loadData();
     }
 
@@ -89,7 +105,18 @@ public class StructMB implements Serializable, MyConverter {
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
+        root.getChildren().clear();
+
         structTypes = structCurrentBean.getStructTypes();
+
+        Map<Integer, TreeNode> nodes = new HashMap<>();
+        nodes.put(null, root);
+        for (StructType structType: structTypes) {
+            TreeNode parent = nodes.get(structType.getParentID());
+            DefaultTreeNode treeNode = new DefaultTreeNode(structType, parent);
+            nodes.put(structType.getId(), treeNode);
+        }
+
         structTypeProps = null;
         selectedStruct = null;
         selectedStructProp = null;
@@ -101,9 +128,10 @@ public class StructMB implements Serializable, MyConverter {
      * Метод обрабатывает выбор строки в таблице типы, для получения данных в таблицу свойства
      * @param event событие выбора строки
      */
-    public void onRowSelect(SelectEvent<StructType> event) {
-        LOGGER.info("select struct: " + event.getObject());
-        structTypeProps = structCurrentBean.getStructTypeProps(event.getObject().getId());
+    public void onRowSelect(NodeSelectEvent event) {
+        StructType selectedRow = (StructType) event.getTreeNode().getData();
+        LOGGER.info("select struct: " + selectedRow);
+        structTypeProps = structCurrentBean.getStructTypeProps(selectedRow.getId());
         disableRemoveStructBtn = false;
 
         selectedStructProp = null;
@@ -213,6 +241,10 @@ public class StructMB implements Serializable, MyConverter {
         FacesContext context = FacesContext.getCurrentInstance();
 
         try {
+            if (selectedStruct == null) {
+                throw new SystemParamException("Не выбран тип к которому добавить новое устройство");
+            }
+            newStructType.setParentID(selectedStruct.getId());
             int structID = structCurrentBean.addStruct(newStructType, login, ip);
 
             if (newStructTypeProps != null) {
@@ -322,12 +354,17 @@ public class StructMB implements Serializable, MyConverter {
         return structTypes;
     }
 
-    public StructType getSelectedStruct() {
-        return selectedStruct;
+    public TreeNode getSelectedStructNode() {
+        return selectedStructNode;
     }
 
-    public void setSelectedStruct(StructType selectedStruct) {
-        this.selectedStruct = selectedStruct;
+    public void setSelectedStructNode(TreeNode selectedStructNode) {
+        this.selectedStructNode = selectedStructNode;
+        if (selectedStructNode != null) {
+            this.selectedStruct = (StructType) selectedStructNode.getData();
+        } else {
+            this.selectedStruct = null;
+        }
     }
 
     public List<StructTypeProp> getNewStructTypeProps() {
@@ -392,5 +429,13 @@ public class StructMB implements Serializable, MyConverter {
 
     public void setSelectedSysProp(Integer selectedSysProp) {
         this.selectedSysProp = selectedSysProp;
+    }
+
+    public TreeNode getRoot() {
+        return root;
+    }
+
+    public boolean isShowSysProps() {
+        return type != null;
     }
 }
