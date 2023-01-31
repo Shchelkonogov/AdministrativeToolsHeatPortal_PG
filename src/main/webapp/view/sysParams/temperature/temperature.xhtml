@@ -79,7 +79,8 @@
                         <p:ajax event="rowSelect" listener="#{bean.onTemperaturePropSelect}"
                                 update="temperaturePanel:temperatureRemoveProp" />
 
-                        <p:column headerText="Температура" style="text-align: center;">
+                        <p:column headerText="#{table2Header1Name == null ? 'Температура' : table2Header1Name}"
+                                  style="text-align: center;">
                             <h:outputText value="#{temperatureProp.tnv}" />
                         </p:column>
                         <p:column headerText="Значение" style="text-align: center;">
