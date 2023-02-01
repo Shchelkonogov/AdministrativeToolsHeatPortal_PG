@@ -46,95 +46,98 @@ public class Report extends HttpServlet {
 
     private static final byte[] GREEN = new byte[]{(byte)146, (byte)208, (byte)80};
 
-    @EJB
-    private ReportBean reportBean;
+//    @EJB
+//    private ReportBean reportBean;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        req.setCharacterEncoding("UTF-8");
+        // TODO модуль в стадии переработки под PostgreSQL
+        resp.sendError(200, "The module is under development");
 
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            BufferedReader reader = req.getReader();
-            while ((line = reader.readLine()) != null)
-                sb.append(line);
-        } catch (Exception e) {
-            LOGGER.warning("Error read request message " + e.getMessage());
-            resp.sendError(500);
-        }
-
-        Jsonb json = JsonbBuilder.create();
-        ReportRequestModel requestModel = json.fromJson(sb.toString(), ReportRequestModel.class);
-
-        LOGGER.info("Request data " + requestModel);
-
-        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-            SXSSFSheet sheet;
-
-            XSSFFont font = (XSSFFont) wb.createFont();
-            font.setBold(true);
-            font.setFontHeight(14);
-
-            CellStyle headerStyle = wb.createCellStyle();
-            headerStyle.setFont(font);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-            XSSFFont colorFont = (XSSFFont) wb.createFont();
-            colorFont.setBold(true);
-            colorFont.setColor(new XSSFColor(Color.RED, null));
-
-            CellStyle errorStyle = wb.createCellStyle();
-            errorStyle.setFont(colorFont);
-
-            XSSFCellStyle rowColorStyleCtp = (XSSFCellStyle) wb.createCellStyle();
-            rowColorStyleCtp.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            rowColorStyleCtp.setFillForegroundColor(new XSSFColor(GREEN, null));
-
-            XSSFCellStyle rowColorStyleCtpError = (XSSFCellStyle) wb.createCellStyle();
-            rowColorStyleCtpError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            rowColorStyleCtpError.setFillForegroundColor(new XSSFColor(GREEN, null));
-            rowColorStyleCtpError.setFont(colorFont);
-
-            XSSFCellStyle rowColorStyleSum = (XSSFCellStyle) wb.createCellStyle();
-            rowColorStyleSum.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            rowColorStyleSum.setFillForegroundColor(new XSSFColor(Color.YELLOW, null));
-
-            XSSFCellStyle rowColorStyleSumError = (XSSFCellStyle) wb.createCellStyle();
-            rowColorStyleSumError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            rowColorStyleSumError.setFillForegroundColor(new XSSFColor(Color.YELLOW, null));
-            rowColorStyleSumError.setFont(colorFont);
-
-            try {
-                List<Future<Void>> futures = new ArrayList<>();
-                for (tSheetType type: tSheetType.values()) {
-                    sheet = wb.createSheet(type.toString());
-                    futures.add(reportBean.createSheetT(requestModel, type, sheet,
-                            rowColorStyleCtp, rowColorStyleCtpError , rowColorStyleSum,
-                            rowColorStyleSumError, headerStyle, errorStyle, createStyles(wb)));
-                }
-
-                for (Future<Void> future: futures) {
-                    future.get(10, TimeUnit.MINUTES);
-                }
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOGGER.warning("Error create excel pages " + e.getMessage());
-                resp.sendError(500);
-            }
-
-            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" +
-                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("первичных", "UTF-8") + " " + URLEncoder.encode("измерений.xlsx", "UTF-8") + "\"");
-            resp.setCharacterEncoding("UTF-8");
-
-            try (OutputStream outputStream = resp.getOutputStream()) {
-                wb.write(outputStream);
-                outputStream.flush();
-            } catch (IOException e) {
-                LOGGER.warning("Error send excel file " + e.getMessage());
-                resp.sendError(500);
-            }
-        }
+//        req.setCharacterEncoding("UTF-8");
+//
+//        StringBuilder sb = new StringBuilder();
+//        String line;
+//        try {
+//            BufferedReader reader = req.getReader();
+//            while ((line = reader.readLine()) != null)
+//                sb.append(line);
+//        } catch (Exception e) {
+//            LOGGER.warning("Error read request message " + e.getMessage());
+//            resp.sendError(500);
+//        }
+//
+//        Jsonb json = JsonbBuilder.create();
+//        ReportRequestModel requestModel = json.fromJson(sb.toString(), ReportRequestModel.class);
+//
+//        LOGGER.info("Request data " + requestModel);
+//
+//        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+//            SXSSFSheet sheet;
+//
+//            XSSFFont font = (XSSFFont) wb.createFont();
+//            font.setBold(true);
+//            font.setFontHeight(14);
+//
+//            CellStyle headerStyle = wb.createCellStyle();
+//            headerStyle.setFont(font);
+//            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+//
+//            XSSFFont colorFont = (XSSFFont) wb.createFont();
+//            colorFont.setBold(true);
+//            colorFont.setColor(new XSSFColor(Color.RED, null));
+//
+//            CellStyle errorStyle = wb.createCellStyle();
+//            errorStyle.setFont(colorFont);
+//
+//            XSSFCellStyle rowColorStyleCtp = (XSSFCellStyle) wb.createCellStyle();
+//            rowColorStyleCtp.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//            rowColorStyleCtp.setFillForegroundColor(new XSSFColor(GREEN, null));
+//
+//            XSSFCellStyle rowColorStyleCtpError = (XSSFCellStyle) wb.createCellStyle();
+//            rowColorStyleCtpError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//            rowColorStyleCtpError.setFillForegroundColor(new XSSFColor(GREEN, null));
+//            rowColorStyleCtpError.setFont(colorFont);
+//
+//            XSSFCellStyle rowColorStyleSum = (XSSFCellStyle) wb.createCellStyle();
+//            rowColorStyleSum.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//            rowColorStyleSum.setFillForegroundColor(new XSSFColor(Color.YELLOW, null));
+//
+//            XSSFCellStyle rowColorStyleSumError = (XSSFCellStyle) wb.createCellStyle();
+//            rowColorStyleSumError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//            rowColorStyleSumError.setFillForegroundColor(new XSSFColor(Color.YELLOW, null));
+//            rowColorStyleSumError.setFont(colorFont);
+//
+//            try {
+//                List<Future<Void>> futures = new ArrayList<>();
+//                for (tSheetType type: tSheetType.values()) {
+//                    sheet = wb.createSheet(type.toString());
+//                    futures.add(reportBean.createSheetT(requestModel, type, sheet,
+//                            rowColorStyleCtp, rowColorStyleCtpError , rowColorStyleSum,
+//                            rowColorStyleSumError, headerStyle, errorStyle, createStyles(wb)));
+//                }
+//
+//                for (Future<Void> future: futures) {
+//                    future.get(10, TimeUnit.MINUTES);
+//                }
+//            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+//                LOGGER.warning("Error create excel pages " + e.getMessage());
+//                resp.sendError(500);
+//            }
+//
+//            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
+//            resp.setHeader("Content-Disposition", "attachment; filename=\"" +
+//                    URLEncoder.encode("Анализ", "UTF-8") + " " + URLEncoder.encode("первичных", "UTF-8") + " " + URLEncoder.encode("измерений.xlsx", "UTF-8") + "\"");
+//            resp.setCharacterEncoding("UTF-8");
+//
+//            try (OutputStream outputStream = resp.getOutputStream()) {
+//                wb.write(outputStream);
+//                outputStream.flush();
+//            } catch (IOException e) {
+//                LOGGER.warning("Error send excel file " + e.getMessage());
+//                resp.sendError(500);
+//            }
+//        }
     }
 
     /**

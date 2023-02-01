@@ -5,6 +5,7 @@ import ru.tecon.admTools.specificModel.report.ModeMap;
 import ru.tecon.admTools.specificModel.report.ejb.ModeMapLocal;
 
 import javax.ejb.EJB;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,27 +26,34 @@ public class ModeMapReport extends HttpServlet {
 
     private static Logger log = Logger.getLogger(ModeMapReport.class.getName());
 
-    @EJB
-    private ModeMapLocal bean;
+//    @EJB
+//    private ModeMapLocal bean;
 
-    @EJB
-    private CheckUserSB checkBean;
+//    @EJB
+//    private CheckUserSB checkBean;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if (checkBean.checkSession(req.getParameter("sessionID"))) {
-            int object = Integer.parseInt(req.getParameter("objectID"));
-
-            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Режимная карта.xlsx", "UTF-8") + "\"");
-            resp.setCharacterEncoding("UTF-8");
-
-            try (OutputStream output = resp.getOutputStream()) {
-                ModeMap.generateModeMap(object, bean).write(output);
-                output.flush();
-            } catch (IOException e) {
-                log.log(Level.WARNING, "error send report", e);
-            }
+        // TODO модуль в стадии переработки под PostgreSQL
+        try {
+            req.getRequestDispatcher("/inWork.html").forward(req, resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
+
+//        if (checkBean.checkSession(req.getParameter("sessionID"))) {
+//            int object = Integer.parseInt(req.getParameter("objectID"));
+//
+//            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
+//            resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Режимная карта.xlsx", "UTF-8") + "\"");
+//            resp.setCharacterEncoding("UTF-8");
+//
+//            try (OutputStream output = resp.getOutputStream()) {
+//                ModeMap.generateModeMap(object, bean).write(output);
+//                output.flush();
+//            } catch (IOException e) {
+//                log.log(Level.WARNING, "error send report", e);
+//            }
+//        }
     }
 }

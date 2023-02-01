@@ -45,84 +45,87 @@ public class Report extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(Report.class.getName());
 
-    @EJB
-    private DataAnalysisReportSB reportBean;
+//    @EJB
+//    private DataAnalysisReportSB reportBean;
 
-    @EJB
-    private CheckUserSB checkUserBean;
+//    @EJB
+//    private CheckUserSB checkUserBean;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        req.setCharacterEncoding("UTF-8");
+        // TODO модуль в стадии переработки под PostgreSQL
+        resp.sendError(200, "The module is under development");
 
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            BufferedReader reader = req.getReader();
-            while ((line = reader.readLine()) != null)
-                sb.append(line);
-        } catch (Exception e) {
-            LOGGER.warning("Error read request message " + e.getMessage());
-            resp.sendError(500);
-            return;
-        }
-
-        Jsonb json = JsonbBuilder.create();
-        ReportRequestModel requestModel = json.fromJson(sb.toString(), ReportRequestModel.class);
-
-        requestModel.setUser(checkUserBean.getUser(requestModel.getSessionID()));
-
-        LOGGER.info("Request data " + requestModel);
-
-        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-            SXSSFSheet sheet;
-            try {
-                List<Future<Void>> futures = new ArrayList<>();
-
-                Map<String, CellStyle> styles = createStyles(wb);
-
-                if (!requestModel.getProblemID().isEmpty()) {
-                    sheet = wb.createSheet("Сводные данные");
-                    futures.add(reportBean.createSummarySheet(requestModel, sheet, styles));
-                }
-
-                if (!requestModel.getProblemOdpuID().isEmpty()) {
-                    sheet = wb.createSheet("Анализ ОДПУ");
-                    futures.add(reportBean.createODPUSheet(requestModel, sheet, styles));
-                }
-
-                if (!requestModel.getProblemID().isEmpty()) {
-                    LocalDate startDate = requestModel.getFirstDateAtMonth();
-                    LocalDate endDate = Stream.of(YearMonth.from(startDate).atEndOfMonth(), LocalDate.now()).min(LocalDate::compareTo).get();
-
-                    for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
-                        sheet = wb.createSheet(date.format(ReportRequestModel.FORMATTER));
-                        futures.add(reportBean.createDaySheet(date.format(ReportRequestModel.FORMATTER), requestModel, sheet, styles));
-                    }
-                }
-
-                for (Future<Void> future: futures) {
-                    future.get(30, TimeUnit.MINUTES);
-                }
-
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOGGER.log(Level.WARNING, "Error create excel pages", e);
-                resp.sendError(500);
-                return;
-            }
-
-            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Анализ качества.xlsx", "UTF-8") + "\"");
-            resp.setCharacterEncoding("UTF-8");
-
-            try (OutputStream outputStream = resp.getOutputStream()) {
-                wb.write(outputStream);
-                outputStream.flush();
-            } catch (IOException e) {
-                LOGGER.warning("Error send excel file " + e.getMessage());
-                resp.sendError(500);
-            }
-        }
+//        req.setCharacterEncoding("UTF-8");
+//
+//        StringBuilder sb = new StringBuilder();
+//        String line;
+//        try {
+//            BufferedReader reader = req.getReader();
+//            while ((line = reader.readLine()) != null)
+//                sb.append(line);
+//        } catch (Exception e) {
+//            LOGGER.warning("Error read request message " + e.getMessage());
+//            resp.sendError(500);
+//            return;
+//        }
+//
+//        Jsonb json = JsonbBuilder.create();
+//        ReportRequestModel requestModel = json.fromJson(sb.toString(), ReportRequestModel.class);
+//
+//        requestModel.setUser(checkUserBean.getUser(requestModel.getSessionID()));
+//
+//        LOGGER.info("Request data " + requestModel);
+//
+//        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+//            SXSSFSheet sheet;
+//            try {
+//                List<Future<Void>> futures = new ArrayList<>();
+//
+//                Map<String, CellStyle> styles = createStyles(wb);
+//
+//                if (!requestModel.getProblemID().isEmpty()) {
+//                    sheet = wb.createSheet("Сводные данные");
+//                    futures.add(reportBean.createSummarySheet(requestModel, sheet, styles));
+//                }
+//
+//                if (!requestModel.getProblemOdpuID().isEmpty()) {
+//                    sheet = wb.createSheet("Анализ ОДПУ");
+//                    futures.add(reportBean.createODPUSheet(requestModel, sheet, styles));
+//                }
+//
+//                if (!requestModel.getProblemID().isEmpty()) {
+//                    LocalDate startDate = requestModel.getFirstDateAtMonth();
+//                    LocalDate endDate = Stream.of(YearMonth.from(startDate).atEndOfMonth(), LocalDate.now()).min(LocalDate::compareTo).get();
+//
+//                    for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
+//                        sheet = wb.createSheet(date.format(ReportRequestModel.FORMATTER));
+//                        futures.add(reportBean.createDaySheet(date.format(ReportRequestModel.FORMATTER), requestModel, sheet, styles));
+//                    }
+//                }
+//
+//                for (Future<Void> future: futures) {
+//                    future.get(30, TimeUnit.MINUTES);
+//                }
+//
+//            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+//                LOGGER.log(Level.WARNING, "Error create excel pages", e);
+//                resp.sendError(500);
+//                return;
+//            }
+//
+//            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
+//            resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Анализ качества.xlsx", "UTF-8") + "\"");
+//            resp.setCharacterEncoding("UTF-8");
+//
+//            try (OutputStream outputStream = resp.getOutputStream()) {
+//                wb.write(outputStream);
+//                outputStream.flush();
+//            } catch (IOException e) {
+//                LOGGER.warning("Error send excel file " + e.getMessage());
+//                resp.sendError(500);
+//            }
+//        }
     }
 
     /**

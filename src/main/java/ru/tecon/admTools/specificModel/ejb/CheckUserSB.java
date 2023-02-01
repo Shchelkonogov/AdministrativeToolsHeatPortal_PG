@@ -17,8 +17,8 @@ public class CheckUserSB {
 
     private static final Logger LOG = Logger.getLogger(CheckUserSB.class.getName());
 
-    private static final String CHECK_SESSION = "select td_adm.get_active_session_login(?) from dual";
-    private static final String CHECK_SESSION_RIGHTS = "select td_adm.get_active_session_rights(?, ?) from dual";
+    private static final String CHECK_SESSION = "select td_adm.get_active_session_login(?)";
+    private static final String CHECK_SESSION_RIGHTS = "select td_adm.get_active_session_rights(?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;

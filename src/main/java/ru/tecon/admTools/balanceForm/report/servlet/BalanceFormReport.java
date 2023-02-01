@@ -4,6 +4,7 @@ import ru.tecon.admTools.balanceForm.report.Report;
 import ru.tecon.admTools.balanceForm.report.ejb.BalanceFormReportSBLocal;
 
 import javax.ejb.EJB;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +25,10 @@ public class BalanceFormReport extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(BalanceFormReport.class.getName());
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+//    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    @EJB(name = "balanceFormReport")
-    private BalanceFormReportSBLocal bean;
+//    @EJB(name = "balanceFormReport")
+//    private BalanceFormReportSBLocal bean;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -37,25 +38,32 @@ public class BalanceFormReport extends HttpServlet {
 
         LOGGER.info("load period report with params: objectID " + object + " startDate " + startDate + " endDate " + endDate);
 
-        resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-        resp.setHeader("Content-Disposition",
-                "attachment; filename=\"" +
-                        URLEncoder.encode("Баланс", "UTF-8") + " " +
-                        URLEncoder.encode("по", "UTF-8") + " " +
-                        URLEncoder.encode("ЦТП", "UTF-8") + " " +
-                        URLEncoder.encode("(период).xlsx", "UTF-8") +
-                        "\"");
-        resp.setCharacterEncoding("UTF-8");
-
-        try (OutputStream output = resp.getOutputStream()) {
-            if (startDate.equals(endDate)) {
-                Report.createDayReport(object, LocalDate.parse(startDate, FORMATTER), bean).write(output);
-            } else {
-                Report.createMonthReport(object, LocalDate.parse(startDate, FORMATTER), LocalDate.parse(endDate, FORMATTER), bean).write(output);
-            }
-            output.flush();
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "error send created report", e);
+        // TODO модуль в стадии переработки под PostgreSQL
+        try {
+            req.getRequestDispatcher("/inWork.html").forward(req, resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
+
+//        resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
+//        resp.setHeader("Content-Disposition",
+//                "attachment; filename=\"" +
+//                        URLEncoder.encode("Баланс", "UTF-8") + " " +
+//                        URLEncoder.encode("по", "UTF-8") + " " +
+//                        URLEncoder.encode("ЦТП", "UTF-8") + " " +
+//                        URLEncoder.encode("(период).xlsx", "UTF-8") +
+//                        "\"");
+//        resp.setCharacterEncoding("UTF-8");
+//
+//        try (OutputStream output = resp.getOutputStream()) {
+//            if (startDate.equals(endDate)) {
+//                Report.createDayReport(object, LocalDate.parse(startDate, FORMATTER), bean).write(output);
+//            } else {
+//                Report.createMonthReport(object, LocalDate.parse(startDate, FORMATTER), LocalDate.parse(endDate, FORMATTER), bean).write(output);
+//            }
+//            output.flush();
+//        } catch (IOException e) {
+//            LOGGER.log(Level.WARNING, "error send created report", e);
+//        }
     }
 }
