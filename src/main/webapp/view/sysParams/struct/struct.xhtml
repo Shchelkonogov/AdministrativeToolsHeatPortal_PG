@@ -209,12 +209,6 @@
 
             <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
                              update=":addForm:newPropTable" action="#{bean.onAddNew()}" />
-            <p:selectOneMenu rendered="#{bean.showSysProps}" value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
-                             style="position: absolute; bottom: 5px; left: 175px;">
-                <p:ajax event="itemSelect" listener="#{bean.onChange}" update="addForm:newPropTable" />
-                <f:selectItems value="#{bean.sysProps}" var="sysPropVal"
-                               itemLabel="#{sysPropVal.name}" itemValue="#{sysPropVal.id}" />
-            </p:selectOneMenu>
             <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
                              validateClient="true" update="addForm" action="#{bean.saveStructWrapper()}" />
             <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
@@ -277,12 +271,6 @@
                 <p:outputLabel value="Значение по умолчанию" for="@next" style="margin-right: 5px;"/>
                 <p:inputText value="#{bean.newStructTypeProp.def}" style="width: 245px;"/>
             </div>
-            <p:selectOneMenu rendered="#{bean.showSysProps}" value="#{bean.selectedSysProp}" labelTemplate="Добавить системное свойство"
-                             style="position: absolute; bottom: 5px; right: 205px;">
-                <p:ajax event="itemSelect" listener="#{bean.onAddSysPropToStruct}" />
-                <f:selectItems value="#{bean.sysProps}" var="sysPropVal"
-                               itemLabel="#{sysPropVal.name}" itemValue="#{sysPropVal.id}" />
-            </p:selectOneMenu>
             <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
                              validateClient="true" update="addPropForm" action="#{bean.savePropWrapper}"/>
             <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"

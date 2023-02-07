@@ -25,7 +25,7 @@ public class MeasureSB {
 
     private static final Logger LOGGER = Logger.getLogger(MeasureSB.class.getName());
 
-    private static final String SELECT_MEASURE = "select * from table(sys_0001t.sel_measure())";
+    private static final String SELECT_MEASURE = "select * from sys_0001t.sel_measure()";
     private static final String FUN_ADD_MEAUSRE = "{? = call sys_0001t.add_measure(?, ?, ?, ?, ?)}";
     private static final String FUN_UPD_MEASURE = "{? = call sys_0001t.upd_measure(?, ?, ?, ?, ?)}";
     private static final String FUN_DEL_MEASURE = "{? = call sys_0001t.del_measure(?, ?, ?, ?)}";

@@ -5,10 +5,7 @@ import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
 import javax.annotation.Resource;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,13 +23,15 @@ public class StructSB {
 
     private static final Logger LOGGER = Logger.getLogger(StructSB.class.getName());
 
-    private static final String SELECT_PROP_VAL_TYPES = "select * from table(ADMIN.sys_0001t.sel_type_props_type())";
-    private static final String SELECT_PROP_CAT = "select * from table(sys_0001t.sel_type_props_cat())";
-    private static final String SELECT_SP_HEADERS = "select * from table(sys_0001t.sel_sp_header())";
-    private static final String FUN_ADD_SYS_PROP_TO_STRUCT = "{? = call sys_0001t.add_sys_prop(?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SELECT_PROP_VAL_TYPES = "select * from sys_0001t.sel_type_props_type()";
+    private static final String SELECT_PROP_CAT = "select * from sys_0001t.sel_type_props_cat()";
+    private static final String SELECT_SP_HEADERS = "select * from sys_0001t.sel_sp_header()";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
+
+    @Resource
+    private EJBContext context;
 
     /**
      * Метод удаляет из базы выбранную структуру
@@ -46,18 +45,18 @@ public class StructSB {
     public void removeStruct(StructType structType, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, String.valueOf(structType.getId()));
-            cStm.registerOutParameter(3, Types.VARCHAR);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, structType.getId());
+            cStm.registerOutParameter(2, Types.VARCHAR);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("remove struct " + structType.getName() + " result " + cStm.getInt(1) + " message " + cStm.getString(3));
+            LOGGER.info("remove struct " + structType.getName() + " result " + cStm.getShort(5) + " message " + cStm.getString(2));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(3));
+            if (cStm.getShort(5) != 0) {
+                throw new SystemParamException(cStm.getString(2));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -78,20 +77,20 @@ public class StructSB {
     public void removeStructProp(int structTypeID, StructTypeProp structTypeProp, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, structTypeID);
-            cStm.setInt(3, structTypeProp.getId());
-            cStm.registerOutParameter(4, Types.VARCHAR);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, structTypeID);
+            cStm.setInt(2, structTypeProp.getId());
+            cStm.registerOutParameter(3, Types.VARCHAR);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("remove struct property " + structTypeProp.getName() + " for struct id " + structTypeID +
-                    " result " + cStm.getInt(1) + " message " + cStm.getString(4));
+                    " result " + cStm.getShort(6) + " message " + cStm.getString(3));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(4));
+            if (cStm.getShort(6) != 0) {
+                throw new SystemParamException(cStm.getString(3));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -113,23 +112,24 @@ public class StructSB {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
 
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, structType.getName());
-            cStm.setString(3, structType.getTypeChar());
-            cStm.registerOutParameter(4, Types.INTEGER);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setString(1, structType.getName());
+            cStm.setString(2, structType.getTypeChar());
+            cStm.registerOutParameter(3, Types.INTEGER);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("add struct " + structType.getName() + " result " + cStm.getInt(1));
+            LOGGER.info("add struct " + structType.getName() + " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка добавления структуры " + structType.getName());
             }
 
-            return cStm.getInt(4);
+            return cStm.getInt(3);
         } catch (SQLException e) {
+            context.setRollbackOnly();
             LOGGER.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
         }
@@ -148,37 +148,37 @@ public class StructSB {
     public void addStructProp(int structTypeID, StructTypeProp structTypeProp, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, structTypeID);
-            cStm.setString(3, structTypeProp.getName());
-            cStm.setString(4, structTypeProp.getType().getCode());
-            cStm.setString(5, structTypeProp.getCat().getId());
-            cStm.setInt(6, structTypeProp.getMeasure().getId());
+            cStm.setInt(1, structTypeID);
+            cStm.setString(2, structTypeProp.getName());
+            cStm.setString(3, structTypeProp.getType().getCode());
+            cStm.setString(4, structTypeProp.getCat().getId());
+            cStm.setInt(5, structTypeProp.getMeasure().getId());
 
             if (structTypeProp.getDef() == null) {
-                cStm.setNull(7, Types.VARCHAR);
+                cStm.setNull(6, Types.VARCHAR);
             } else {
-                cStm.setString(7, structTypeProp.getDef());
+                cStm.setString(6, structTypeProp.getDef());
             }
 
             if (structTypeProp.getSpHeader().getId() == null) {
-                cStm.setNull(8, Types.INTEGER);
+                cStm.setNull(7, Types.INTEGER);
             } else {
-                cStm.setInt(8, structTypeProp.getSpHeader().getId());
+                cStm.setInt(7, structTypeProp.getSpHeader().getId());
             }
 
-            cStm.registerOutParameter(9, Types.INTEGER);
-            cStm.registerOutParameter(10, Types.VARCHAR);
-            cStm.setString(11, login);
-            cStm.setString(12, ip);
+            cStm.registerOutParameter(8, Types.INTEGER);
+            cStm.registerOutParameter(9, Types.VARCHAR);
+            cStm.setString(10, login);
+            cStm.setString(11, ip);
+            cStm.registerOutParameter(12, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("add struct property " + structTypeProp.getName() + " for struct id " + structTypeID +
-                    " result " + cStm.getInt(1) + " message " + cStm.getString(10));
+                    " result " + cStm.getShort(12) + " message " + cStm.getString(9));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(structTypeProp.getName() + ": " + cStm.getString(10));
+            if (cStm.getShort(12) != 0) {
+                throw new SystemParamException(structTypeProp.getName() + ": " + cStm.getString(9));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -209,28 +209,28 @@ public class StructSB {
             }
 
             if (direction < 0) {
-                cStmUp.registerOutParameter(1, Types.INTEGER);
-                cStmUp.setInt(2, typeID);
-                cStmUp.setInt(3, propID);
+                cStmUp.setInt(1, typeID);
+                cStmUp.setInt(2, propID);
+                cStmUp.registerOutParameter(3, Types.SMALLINT);
 
                 for (int i = 0; i < Math.abs(direction); i++) {
                     cStmUp.executeUpdate();
 
-                    LOGGER.info("up move return: " + cStmUp.getInt(1));
-                    if (cStmUp.getInt(1) != 0) {
+                    LOGGER.info("up move return: " + cStmUp.getShort(3));
+                    if (cStmUp.getShort(3) != 0) {
                         throw new SystemParamException("Ошибка перемещения свойства");
                     }
                 }
             } else {
-                cStmDown.registerOutParameter(1, Types.INTEGER);
-                cStmDown.setInt(2, typeID);
-                cStmDown.setInt(3, propID);
+                cStmDown.setInt(1, typeID);
+                cStmDown.setInt(2, propID);
+                cStmDown.registerOutParameter(3, Types.SMALLINT);
 
                 for (int i = 0; i < Math.abs(direction); i++) {
                     cStmDown.executeUpdate();
 
-                    LOGGER.info("down move return: " + cStmDown.getInt(1));
-                    if (cStmDown.getInt(1) != 0) {
+                    LOGGER.info("down move return: " + cStmDown.getShort(3));
+                    if (cStmDown.getShort(3) != 0) {
                         throw new SystemParamException("Ошибка перемещения свойства");
                     }
                 }
@@ -341,41 +341,5 @@ public class StructSB {
             LOGGER.log(Level.WARNING, "SQLException", e);
         }
         return result;
-    }
-
-    /**
-     * Добавляем системное свойство в структуру
-     * @param type тип структуры (STRUCT подразделения / OBJ объекты / AGR агрегаты / TECHPROC техпроцессы / DEV устройства)
-     * @param structID id структуры
-     * @param sysPropID id системного свойства
-     * @param login имя пользователя
-     * @param ip адрес пользователя
-     * @throws SystemParamException в случае ошикби записи данных в базу
-     */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void addSystemPropToStruct(String type, int structID, int sysPropID, String login, String ip) throws SystemParamException {
-        try (Connection connect = ds.getConnection();
-             CallableStatement cStm = connect.prepareCall(FUN_ADD_SYS_PROP_TO_STRUCT)) {
-
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, type);
-            cStm.setInt(3, structID);
-            cStm.setInt(4, sysPropID);
-            cStm.registerOutParameter(5, Types.INTEGER);
-            cStm.registerOutParameter(6, Types.VARCHAR);
-            cStm.setString(7, login);
-            cStm.setString(8, ip);
-
-            cStm.executeUpdate();
-
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(6));
-            }
-
-            LOGGER.info("add system property id " + sysPropID + " to struct id " + structID);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error add system property to struct", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
-        }
     }
 }

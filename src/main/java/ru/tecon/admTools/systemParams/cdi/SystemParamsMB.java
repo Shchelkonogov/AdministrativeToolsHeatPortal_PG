@@ -30,23 +30,23 @@ public class SystemParamsMB implements Serializable {
 
     private static final Map<String, String> SYSTEM_PARAMS_MAP = Stream.of(new String[][] {
             {"Подразделения", "/view/sysParams/struct/structDivisions.xhtml"},
-            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
-            {"Связи", "/view/sysParams/objectLinks.xhtml"},
-            {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
-            {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
-            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
-            {"Системные свойства", "/view/sysParams/sysProp.xhtml"},
-            {"Единицы измерения", "/view/sysParams/measure.xhtml"},
-            {"Справочники", "/view/sysParams/catalog.xhtml"},
-            {"Значения по умолчанию", "/view/sysParams/defaultValues.xhtml"},
-            {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
-            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
-            {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
-            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
-            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
-            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
-            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
-            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"}
+//            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
+//            {"Связи", "/view/sysParams/objectLinks.xhtml"},
+//            {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
+//            {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
+//            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
+//            {"Системные свойства", "/view/sysParams/sysProp.xhtml"},
+//            {"Единицы измерения", "/view/sysParams/measure.xhtml"},
+//            {"Справочники", "/view/sysParams/catalog.xhtml"},
+//            {"Значения по умолчанию", "/view/sysParams/defaultValues.xhtml"},
+//            {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
+//            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
+//            {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
+//            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
+//            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
+//            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
+//            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
+//            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String ip;
