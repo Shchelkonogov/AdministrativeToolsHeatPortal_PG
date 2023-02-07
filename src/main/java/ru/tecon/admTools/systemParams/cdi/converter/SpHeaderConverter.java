@@ -28,7 +28,7 @@ public class SpHeaderConverter implements Converter {
                     if (value.equals("null")) {
                         return spHeader.getId() == null;
                     } else {
-                        return spHeader.getId() == Integer.parseInt(value);
+                        return (spHeader.getId() != null) && (spHeader.getId() == Integer.parseInt(value));
                     }
                 })
                 .findFirst()
