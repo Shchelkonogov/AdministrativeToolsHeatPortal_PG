@@ -69,6 +69,8 @@ public class StructMB implements Serializable, MyConverter {
 
     private StructCurrentRemote structCurrentBean;
 
+    private boolean addToRoot = true;
+
     @EJB
     private StructSB structBean;
 
@@ -241,10 +243,12 @@ public class StructMB implements Serializable, MyConverter {
         FacesContext context = FacesContext.getCurrentInstance();
 
         try {
-            if (selectedStruct == null) {
-                throw new SystemParamException("Не выбран тип к которому добавить новое устройство");
+            if (!addToRoot) {
+                if (selectedStruct == null) {
+                    throw new SystemParamException("Не выбран тип к которому добавить новое устройство");
+                }
+                newStructType.setParentID(selectedStruct.getId());
             }
-            newStructType.setParentID(selectedStruct.getId());
             int structID = structCurrentBean.addStruct(newStructType, login, ip);
 
             if (newStructTypeProps != null) {
@@ -437,5 +441,14 @@ public class StructMB implements Serializable, MyConverter {
 
     public boolean isShowSysProps() {
         return type != null;
+    }
+
+    /**
+     * Устанавливаем параметр способа добавления Типа в структуре
+     * @param addToRoot true - добавлять в таблицу (к корневому элементу)
+     *                  false - добавлять в дерево (к выбранному элементу)
+     */
+    public void setAddToRoot(boolean addToRoot) {
+        this.addToRoot = addToRoot;
     }
 }

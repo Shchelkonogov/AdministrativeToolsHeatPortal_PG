@@ -27,6 +27,7 @@ public class StructDevicesMB extends StructMB implements Serializable {
     @PostConstruct
     public void init() {
         super.setStructCurrentBean(devicesSB);
+        super.setAddToRoot(false);
         super.initForm();
     }
 
