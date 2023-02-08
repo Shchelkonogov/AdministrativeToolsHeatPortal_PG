@@ -26,9 +26,9 @@ public class MeasureSB {
     private static final Logger LOGGER = Logger.getLogger(MeasureSB.class.getName());
 
     private static final String SELECT_MEASURE = "select * from sys_0001t.sel_measure()";
-    private static final String FUN_ADD_MEAUSRE = "{? = call sys_0001t.add_measure(?, ?, ?, ?, ?)}";
-    private static final String FUN_UPD_MEASURE = "{? = call sys_0001t.upd_measure(?, ?, ?, ?, ?)}";
-    private static final String FUN_DEL_MEASURE = "{? = call sys_0001t.del_measure(?, ?, ?, ?)}";
+    private static final String FUN_ADD_MEASURE = "call sys_0001t.add_measure(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_UPD_MEASURE = "call sys_0001t.upd_measure(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_DEL_MEASURE = "call sys_0001t.del_measure(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -63,16 +63,16 @@ public class MeasureSB {
     public void updateMeasure(Measure measure, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_MEASURE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, measure.getId());
-            cStm.setString(3, measure.getName());
-            cStm.setString(4, measure.getShortName());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, measure.getId());
+            cStm.setString(2, measure.getName());
+            cStm.setString(3, measure.getShortName());
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка обновления " + measure.getName());
             }
 
@@ -94,23 +94,23 @@ public class MeasureSB {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public int addMeasure(Measure measure, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
-             CallableStatement cStm = connect.prepareCall(FUN_ADD_MEAUSRE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, measure.getName());
-            cStm.setString(3, measure.getShortName());
-            cStm.registerOutParameter(4, Types.INTEGER);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+             CallableStatement cStm = connect.prepareCall(FUN_ADD_MEASURE)) {
+            cStm.setString(1, measure.getName());
+            cStm.setString(2, measure.getShortName());
+            cStm.registerOutParameter(3, Types.INTEGER);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка создания " + measure.getName());
             }
 
-            LOGGER.info("add measure " + measure.getName() + " new id " + cStm.getInt(4));
+            LOGGER.info("add measure " + measure.getName() + " new id " + cStm.getInt(3));
 
-            return cStm.getInt(4);
+            return cStm.getInt(3);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error add measure", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
@@ -128,18 +128,18 @@ public class MeasureSB {
     public void removeMeasure(Measure measure, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_DEL_MEASURE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, measure.getId());
-            cStm.registerOutParameter(3, Types.VARCHAR);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, measure.getId());
+            cStm.registerOutParameter(2, Types.VARCHAR);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 LOGGER.warning("error remove measure " + measure.getName());
 
-                throw new SystemParamException("Ошибка удаления " + cStm.getString(3));
+                throw new SystemParamException("Ошибка удаления " + cStm.getString(2));
             }
 
             LOGGER.info("remove measure " + measure.getName());

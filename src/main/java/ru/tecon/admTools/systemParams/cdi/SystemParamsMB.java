@@ -35,7 +35,7 @@ public class SystemParamsMB implements Serializable {
             {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
             {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
 //            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
-//            {"Единицы измерения", "/view/sysParams/measure.xhtml"},
+            {"Единицы измерения", "/view/sysParams/measure.xhtml"},
 //            {"Справочники", "/view/sysParams/catalog.xhtml"},
 //            {"Значения по умолчанию", "/view/sysParams/defaultValues.xhtml"},
 //            {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
