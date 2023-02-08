@@ -27,11 +27,11 @@ public class ObjectLinksSB {
 
     private static final Logger LOGGER = Logger.getLogger(ObjectLinksSB.class.getName());
 
-    private static final String SELECT_OBJECT_TYPES = "select * from table(sys_0001t.sel_obj_type())";
-    private static final String SELECT_OBJECT_LINKS = "select * from table(sys_0001t.sel_rel_type())";
-    private static final String FUN_UPDATE_REL_TYPE = "{? = call sys_0001t.upd_rel_type(?, ?, ?, ?, ?, ?)}";
-    private static final String FUN_ADD_REL_TYPE = "{? = call sys_0001t.add_rel_type(?, ?, ?, ?, ?, ?)}";
-    private static final String FUN_DEL_REL_TYPE = "{? = call sys_0001t.del_rel_type(?, ?, ?, ?)}";
+    private static final String SELECT_OBJECT_TYPES = "select * from sys_0001t.sel_obj_type()";
+    private static final String SELECT_OBJECT_LINKS = "select * from sys_0001t.sel_rel_type()";
+    private static final String FUN_UPDATE_REL_TYPE = "call sys_0001t.upd_rel_type(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FUN_ADD_REL_TYPE = "call sys_0001t.add_rel_type(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FUN_DEL_REL_TYPE = "call sys_0001t.del_rel_type(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -84,19 +84,19 @@ public class ObjectLinksSB {
     public void updateObjectLink(ObjectLink link, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPDATE_REL_TYPE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, link.getId());
-            cStm.setString(3, link.getName());
-            cStm.setInt(4, link.getObjectTypeLink1());
-            cStm.setInt(5, link.getObjectTypeLink2());
-            cStm.setString(6, login);
-            cStm.setString(7, ip);
+            cStm.setInt(1, link.getId());
+            cStm.setString(2, link.getName());
+            cStm.setInt(3, link.getObjectTypeLink1());
+            cStm.setInt(4, link.getObjectTypeLink2());
+            cStm.setString(5, login);
+            cStm.setString(6, ip);
+            cStm.registerOutParameter(7, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("update link " + link.getName() + " result " + cStm.getInt(1));
+            LOGGER.info("update link " + link.getName() + " result " + cStm.getShort(7));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(7) != 0) {
                 throw new SystemParamException("Ошибка обновления " + link.getName());
             }
         } catch (SQLException e) {
@@ -117,22 +117,22 @@ public class ObjectLinksSB {
     public int addObjectLink(ObjectLink link, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_ADD_REL_TYPE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, link.getName());
-            cStm.setInt(3, link.getObjectTypeLink1());
-            cStm.setInt(4, link.getObjectTypeLink2());
-            cStm.registerOutParameter(5, Types.INTEGER);
-            cStm.setString(6, login);
-            cStm.setString(7, ip);
+            cStm.setString(1, link.getName());
+            cStm.setInt(2, link.getObjectTypeLink1());
+            cStm.setInt(3, link.getObjectTypeLink2());
+            cStm.registerOutParameter(4, Types.INTEGER);
+            cStm.setString(5, login);
+            cStm.setString(6, ip);
+            cStm.registerOutParameter(7, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("add link " + link.getName() + " result " + cStm.getInt(1) + " new id " + cStm.getInt(5));
+            LOGGER.info("add link " + link.getName() + " result " + cStm.getShort(7) + " new id " + cStm.getInt(4));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(7) != 0) {
                 throw new SystemParamException("Ошибка создания " + link.getName());
             }
-            return cStm.getInt(5);
+            return cStm.getInt(4);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error add object link", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
@@ -150,18 +150,18 @@ public class ObjectLinksSB {
     public void removeObjectLink(ObjectLink link, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_DEL_REL_TYPE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, String.valueOf(link.getId()));
-            cStm.registerOutParameter(3, Types.VARCHAR);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, link.getId());
+            cStm.registerOutParameter(2, Types.VARCHAR);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.INTEGER);
 
             cStm.executeUpdate();
 
-            LOGGER.info("remove link " + link.getName() + " result " + cStm.getInt(1));
+            LOGGER.info("remove link " + link.getName() + " result " + cStm.getInt(5));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException("Ошибка удаления " + cStm.getString(3));
+            if (cStm.getInt(5) != 0) {
+                throw new SystemParamException("Ошибка удаления " + cStm.getString(2));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error remove object link", e);
