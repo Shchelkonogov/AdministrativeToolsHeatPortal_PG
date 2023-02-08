@@ -30,9 +30,6 @@ public class DefaultValuesMB implements Serializable {
     private ObjectType selectedObjectType;
     private List<ObjectType> objectTypes = new LinkedList<>();
 
-    private String selectedDataBase;
-    private List<String> dataBaseList = new LinkedList<>();
-
     private String login;
     private String ip;
     private boolean write = false;
@@ -43,7 +40,6 @@ public class DefaultValuesMB implements Serializable {
     @PostConstruct
     private void init() {
         loadDefaultTypes();
-        loadDataBaseList();
 
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
@@ -73,22 +69,6 @@ public class DefaultValuesMB implements Serializable {
     }
 
     /**
-     * Загруска списка баз данных
-     */
-    private void loadDataBaseList() {
-        dataBaseList = defaultValuesBean.getDataBaseList();
-
-        try {
-            String defaultDataBase = defaultValuesBean.getDefaultDataBase();
-
-            dataBaseList.remove(defaultDataBase);
-            dataBaseList.add(0, defaultDataBase);
-        } catch (SystemParamException e) {
-            LOGGER.log(Level.WARNING, "error load default data base", e);
-        }
-    }
-
-    /**
      * обработка сохранения нового типа объекта по умолчанию
      */
     public void onUpdateDefaultType() {
@@ -98,22 +78,6 @@ public class DefaultValuesMB implements Serializable {
             defaultValuesBean.updateDefaultObjectType(selectedObjectType, login, ip);
 
             loadDefaultTypes();
-        } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
-        }
-    }
-
-    /**
-     * Обработка сохранения нового имени базы по умолчанию
-     */
-    public void onUpdateDefaultDataBase() {
-        LOGGER.info("update default data base " + selectedDataBase);
-
-        try {
-            defaultValuesBean.updateDefaultDataBase(selectedDataBase, login, ip);
-
-            loadDataBaseList();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -134,17 +98,5 @@ public class DefaultValuesMB implements Serializable {
 
     public void setSelectedObjectType(ObjectType selectedObjectType) {
         this.selectedObjectType = selectedObjectType;
-    }
-
-    public List<String> getDataBaseList() {
-        return dataBaseList;
-    }
-
-    public String getSelectedDataBase() {
-        return selectedDataBase;
-    }
-
-    public void setSelectedDataBase(String selectedDataBase) {
-        this.selectedDataBase = selectedDataBase;
     }
 }

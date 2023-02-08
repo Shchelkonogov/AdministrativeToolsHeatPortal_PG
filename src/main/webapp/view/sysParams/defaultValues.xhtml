@@ -27,26 +27,5 @@
                 </div>
             </div>
         </div>
-        <div style="height: 100%; flex: 1 1 0;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Первичная база по умолчанию"/>
-                <div style="padding: 3px;">
-                    <p:commandButton rendered="#{defaultValues.write}" value="Сохранить" onclick="PF('statusDialog').show();"
-                                     action="#{defaultValues.onUpdateDefaultDataBase}" update="dataBaseSelector growl"
-                                     oncomplete="PF('statusDialog').hide();" />
-                </div>
-            </div>
-            <h:panelGroup id="contentToBlock" layout="block" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: 100%; text-align: center;">
-                    <p:selectOneMenu id="dataBaseSelector" value="#{defaultValues.selectedDataBase}"
-                                     style="width: 300px; margin-top: 5px;" rendered="#{defaultValues.write}">
-                        <f:selectItems value="#{defaultValues.dataBaseList}"/>
-                    </p:selectOneMenu>
-                    <h:outputText rendered="#{!defaultValues.write}" value="#{defaultValues.dataBaseList.get(0)}"/>
-                </div>
-            </h:panelGroup>
-        </div>
     </h:form>
 </ui:composition>
