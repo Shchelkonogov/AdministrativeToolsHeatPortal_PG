@@ -23,12 +23,12 @@ public class CatalogSB {
 
     private static final Logger LOGGER = Logger.getLogger(CatalogSB.class.getName());
 
-    private static final String SEL_CATALOG_TYPES = "select * from table(sys_0001t.sel_sp_header())";
-    private static final String SEL_CATALOG_PROPS = "select * from table(sys_0001t.sel_sp_body(?))";
-    private static final String FUN_REMOVE_CATALOG_TYPE = "{? = call sys_0001t.del_sp_header(?, ?, ?, ?)}";
-    private static final String FUN_REMOVE_CATALOG_PROP = "{? = call sys_0001t.del_sp_body(?, ?, ?, ?, ?)}";
-    private static final String FUN_CREATE_NEW_CATALOG_PROP = "{? = call sys_0001t.add_sp_body(?, ?, ?, ?, ?)}";
-    private static final String FUN_CREATE_NEW_CATALOG_TYPE = "{? = call sys_0001t.add_sp_header(?, ?, ?, ?)}";
+    private static final String SEL_CATALOG_TYPES = "select * from sys_0001t.sel_sp_header()";
+    private static final String SEL_CATALOG_PROPS = "select * from sys_0001t.sel_sp_body(?)";
+    private static final String FUN_REMOVE_CATALOG_TYPE = "call sys_0001t.del_sp_header(?, ?, ?, ?, ?)";
+    private static final String FUN_REMOVE_CATALOG_PROP = "call sys_0001t.del_sp_body(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_CREATE_NEW_CATALOG_PROP = "call sys_0001t.add_sp_body(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_CREATE_NEW_CATALOG_TYPE = "call sys_0001t.add_sp_header(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -84,18 +84,18 @@ public class CatalogSB {
     public void removeCatalog(CatalogType catalogType, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_REMOVE_CATALOG_TYPE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, catalogType.getId());
-            cStm.registerOutParameter(3, Types.VARCHAR);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, catalogType.getId());
+            cStm.registerOutParameter(2, Types.VARCHAR);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("remove catalog " + catalogType.getTypeName() + " result " + cStm.getInt(1) + " message " + cStm.getString(3));
+            LOGGER.info("remove catalog " + catalogType.getTypeName() + " result " + cStm.getShort(5) + " message " + cStm.getString(2));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(3));
+            if (cStm.getShort(5) != 0) {
+                throw new SystemParamException(cStm.getString(2));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -115,20 +115,20 @@ public class CatalogSB {
     public void removeCatalogProp(Integer catalogTypeID, CatalogProp catalogProp, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_REMOVE_CATALOG_PROP)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, catalogTypeID);
-            cStm.setLong(3, catalogProp.getId());
-            cStm.registerOutParameter(4, Types.VARCHAR);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, catalogTypeID);
+            cStm.setLong(2, catalogProp.getId());
+            cStm.registerOutParameter(3, Types.VARCHAR);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("remove catalog property " + catalogProp.getPropName() + " for struct id " + catalogTypeID +
-                    " result " + cStm.getInt(1) + " message " + cStm.getString(4));
+                    " result " + cStm.getShort(6) + " message " + cStm.getString(3));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(4));
+            if (cStm.getShort(6) != 0) {
+                throw new SystemParamException(cStm.getString(3));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -148,19 +148,19 @@ public class CatalogSB {
     public void addCatalogProp(Integer catalogID, String newPropName, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_CREATE_NEW_CATALOG_PROP)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, catalogID);
-            cStm.setString(3, newPropName);
-            cStm.registerOutParameter(4, Types.INTEGER);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, catalogID);
+            cStm.setString(2, newPropName);
+            cStm.registerOutParameter(3, Types.INTEGER);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("add catalog property " + newPropName + " for struct id " + catalogID +
-                    " result " + cStm.getInt(1) + " new prop ID " + cStm.getInt(4));
+                    " result " + cStm.getShort(6) + " new prop ID " + cStm.getInt(3));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException(newPropName + ": невозможно создать");
             }
         } catch (SQLException e) {
@@ -181,21 +181,21 @@ public class CatalogSB {
     public int createCatalogType(String catalogTypeName, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_CREATE_NEW_CATALOG_TYPE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, catalogTypeName);
-            cStm.registerOutParameter(3, Types.INTEGER);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setString(1, catalogTypeName);
+            cStm.registerOutParameter(2, Types.INTEGER);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("create catalog type " + catalogTypeName + " result " + cStm.getInt(1));
+            LOGGER.info("create catalog type " + catalogTypeName + " result " + cStm.getShort(5));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Ошибка добавления справочника " + catalogTypeName);
             }
 
-            return cStm.getInt(3);
+            return cStm.getInt(2);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
