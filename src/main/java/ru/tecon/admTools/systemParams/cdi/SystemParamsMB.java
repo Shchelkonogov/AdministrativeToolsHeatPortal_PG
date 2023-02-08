@@ -30,7 +30,7 @@ public class SystemParamsMB implements Serializable {
 
     private static final Map<String, String> SYSTEM_PARAMS_MAP = Stream.of(new String[][] {
             {"Подразделения", "/view/sysParams/struct/structDivisions.xhtml"},
-//            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
+            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
 //            {"Связи", "/view/sysParams/objectLinks.xhtml"},
 //            {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
 //            {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
