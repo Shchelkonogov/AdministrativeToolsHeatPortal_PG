@@ -4,15 +4,15 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
-import javax.ejb.Remote;
+import javax.ejb.Local;
 import java.util.List;
 
 /**
  * Интерфейс для загрузки данных для группы форм температур (температурные графики, суточные снижения)
  * @author Maksim Shchelkonogov
  */
-@Remote
-public interface TemperatureRemote {
+@Local
+public interface TemperatureLocal {
 
     /**
      * Получение списка типов

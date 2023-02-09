@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.temerature;
 
-import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureRemote;
+import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -19,8 +19,8 @@ public class TempGraphsMB extends TemperatureMB {
     private static final String HEADER_PROP = "Значения температурного графика";
     private static final String HEADER_ADD_DIALOG = "Добавить новое значение температурного графика";
 
-    @EJB(name = "tempGraphSB", mappedName = "ejb/tempGraphSB")
-    private TemperatureRemote temperatureBean;
+    @EJB(beanName = "tempGraphSB")
+    private TemperatureLocal temperatureBean;
 
     @Override
     @PostConstruct

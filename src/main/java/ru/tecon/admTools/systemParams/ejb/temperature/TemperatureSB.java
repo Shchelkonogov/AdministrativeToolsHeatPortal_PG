@@ -74,18 +74,18 @@ public class TemperatureSB {
     public void removeTemperature(Temperature temperature, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, temperature.getId());
-            cStm.registerOutParameter(3, Types.VARCHAR);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, temperature.getId());
+            cStm.registerOutParameter(2, Types.VARCHAR);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("remove temperature " + temperature.getName() + " result " + cStm.getInt(1) + " message " + cStm.getString(3));
+            LOGGER.info("remove temperature " + temperature.getName() + " result " + cStm.getShort(5) + " message " + cStm.getString(2));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(3));
+            if (cStm.getShort(5) != 0) {
+                throw new SystemParamException(cStm.getString(2));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -97,20 +97,20 @@ public class TemperatureSB {
     public void removeTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, id);
-            cStm.setInt(3, temperatureProp.getTnv());
-            cStm.registerOutParameter(4, Types.VARCHAR);
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, id);
+            cStm.setInt(2, temperatureProp.getTnv());
+            cStm.registerOutParameter(3, Types.VARCHAR);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("remove temperature property " + temperatureProp + " for temperature id " + id +
-                    " result " + cStm.getInt(1) + " message " + cStm.getString(4));
+                    " result " + cStm.getShort(6) + " message " + cStm.getString(3));
 
-            if (cStm.getInt(1) != 0) {
-                throw new SystemParamException(cStm.getString(4));
+            if (cStm.getShort(6) != 0) {
+                throw new SystemParamException(cStm.getString(3));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -122,19 +122,19 @@ public class TemperatureSB {
     public void addTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, id);
-            cStm.setInt(3, temperatureProp.getTnv());
-            cStm.setInt(4, temperatureProp.getValue());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, id);
+            cStm.setInt(2, temperatureProp.getTnv());
+            cStm.setInt(3, temperatureProp.getValue());
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
             LOGGER.info("add temperature property " + temperatureProp + " for temperature id " + id +
-                    " result " + cStm.getInt(1));
+                    " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Новое значение " + temperatureProp.getTnv() + " " + temperatureProp.getValue() +
                         ": невозможно создать");
             }
@@ -148,34 +148,37 @@ public class TemperatureSB {
     public int createTemperature(Temperature temperature, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, temperature.getName());
-            cStm.setString(3, temperature.getDescription());
+            int index;
+
+            cStm.setString(1, temperature.getName());
+            cStm.setString(2, temperature.getDescription());
             if ((temperature.getMin() != null) && (temperature.getMax() != null)) {
-                cStm.setInt(4, temperature.getMin());
-                cStm.setInt(5, temperature.getMax());
-                cStm.registerOutParameter(6, Types.INTEGER);
-                cStm.setString(7, login);
-                cStm.setString(8, ip);
+                cStm.setInt(3, temperature.getMin());
+                cStm.setInt(4, temperature.getMax());
+                cStm.registerOutParameter(5, Types.INTEGER);
+                cStm.setString(6, login);
+                cStm.setString(7, ip);
+
+                index = 5;
             } else {
-                cStm.registerOutParameter(4, Types.INTEGER);
-                cStm.setString(5, login);
-                cStm.setString(6, ip);
+                cStm.registerOutParameter(3, Types.INTEGER);
+                cStm.setString(4, login);
+                cStm.setString(5, ip);
+
+                index = 3;
             }
+
+            cStm.registerOutParameter(index + 3, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("create temperature " + temperature + " result " + cStm.getInt(1));
+            LOGGER.info("create temperature " + temperature + " result " + cStm.getShort(index + 3));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(index + 3) != 0) {
                 throw new SystemParamException("Ошибка добавления справочника " + temperature.getName() + " " + temperature.getDescription());
             }
 
-            if ((temperature.getMin() != null) && (temperature.getMax() != null)) {
-                return cStm.getInt(6);
-            } else {
-                return cStm.getInt(4);
-            }
+            return cStm.getInt(index);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");

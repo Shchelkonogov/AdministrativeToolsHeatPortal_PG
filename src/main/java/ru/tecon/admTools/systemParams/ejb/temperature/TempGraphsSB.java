@@ -5,7 +5,7 @@ import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
 import javax.ejb.EJB;
-import javax.ejb.Remote;
+import javax.ejb.Local;
 import javax.ejb.Stateless;
 import java.util.List;
 
@@ -13,16 +13,16 @@ import java.util.List;
  * Stateless bean для получения данных по форме температурные графики
  * @author Maksim Shchelkonogov
  */
-@Stateless(name = "tempGraphSB", mappedName = "ejb/tempGraphSB")
-@Remote(TemperatureRemote.class)
-public class TempGraphsSB implements TemperatureRemote {
+@Stateless(name = "tempGraphSB")
+@Local(TemperatureLocal.class)
+public class TempGraphsSB implements TemperatureLocal {
 
-    private static final String SEL_TEMP_GRAPHS = "select * from table(dsp_0031t.sel_graph_list)";
-    private static final String SEL_TEMP_GRAPH_PROPS = "select * from table(dsp_0031t.sel_graph_value(?))";
-    private static final String FUN_REMOVE_TEMP_GRAPH = "{? = call sys_0001t.del_graph(?, ?, ?, ?)}";
-    private static final String FUN_REMOVE_TEMP_GRAPH_PROP = "{? = call sys_0001t.del_graph_value(?, ?, ?, ?, ?)}";
-    private static final String FUN_CREATE_TEMP_GRAPH = "{? = call sys_0001t.add_graph(?, ?, ?, ?, ?, ?, ?)}";
-    private static final String FUN_CREATE_TEMP_GRAPH_PROP = "{? = call sys_0001t.add_graph_value(?, ?, ?, ?, ?)}";
+    private static final String SEL_TEMP_GRAPHS = "select * from dsp_0031t.sel_graph_list()";
+    private static final String SEL_TEMP_GRAPH_PROPS = "select * from dsp_0031t.sel_graph_value(?)";
+    private static final String FUN_REMOVE_TEMP_GRAPH = "call sys_0001t.del_graph(?, ?, ?, ?, ?)";
+    private static final String FUN_REMOVE_TEMP_GRAPH_PROP = "call sys_0001t.del_graph_value(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_CREATE_TEMP_GRAPH = "call sys_0001t.add_graph(?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String FUN_CREATE_TEMP_GRAPH_PROP = "call sys_0001t.add_graph_value(?, ?, ?, ?, ?, ?)";
 
     @EJB
     private TemperatureSB wrapperTemperatureBean;

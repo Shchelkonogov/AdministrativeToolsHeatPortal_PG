@@ -3,7 +3,7 @@ package ru.tecon.admTools.systemParams.cdi.temerature;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureRemote;
+import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
@@ -37,7 +37,7 @@ public abstract class TemperatureMB implements Serializable {
     private boolean disableRemoveTemperatureBtn = true;
     private boolean disableRemovePropBtn = true;
 
-    private TemperatureRemote temperatureBean;
+    private TemperatureLocal temperatureBean;
 
     public abstract String getHeaderType();
     public abstract String getHeaderProp();
@@ -246,7 +246,7 @@ public abstract class TemperatureMB implements Serializable {
         return newTemperatureProp;
     }
 
-    public void setTemperatureBean(TemperatureRemote temperatureBean) {
+    public void setTemperatureBean(TemperatureLocal temperatureBean) {
         this.temperatureBean = temperatureBean;
     }
 }
