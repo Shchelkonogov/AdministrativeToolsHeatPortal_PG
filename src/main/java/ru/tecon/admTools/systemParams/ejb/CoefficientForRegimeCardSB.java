@@ -25,8 +25,8 @@ public class CoefficientForRegimeCardSB {
 
     private static final Logger LOGGER = Logger.getLogger(CoefficientForRegimeCardSB.class.getName());
 
-    private static final String SEL_COEFFICIENTS = "select * from table(sys_0001t.sel_rk_param())";
-    private static final String FUN_UPDATE_COEFFICIENT = "{? = call sys_0001t.upd_rk_param(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SEL_COEFFICIENTS = "select * from sys_0001t.sel_rk_param()";
+    private static final String FUN_UPDATE_COEFFICIENT = "call sys_0001t.upd_rk_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -62,22 +62,22 @@ public class CoefficientForRegimeCardSB {
     public void updateCoefficient(CoefficientRC coefficient, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPDATE_COEFFICIENT)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, coefficient.getId());
-            cStm.setDouble(3, coefficient.gettMin());
-            cStm.setDouble(4, coefficient.gettMax());
-            cStm.setBoolean(5, coefficient.isT());
-            cStm.setDouble(6, coefficient.getaMin());
-            cStm.setDouble(7, coefficient.getaMax());
-            cStm.setBoolean(8, coefficient.isA());
-            cStm.setString(9, login);
-            cStm.setString(10, ip);
+            cStm.setInt(1, coefficient.getId());
+            cStm.setObject(2, coefficient.gettMin(), Types.NUMERIC);
+            cStm.setObject(3, coefficient.gettMax(), Types.NUMERIC);
+            cStm.setShort(4, (short) (coefficient.isT() ? 1 : 0));
+            cStm.setObject(5, coefficient.getaMin(), Types.NUMERIC);
+            cStm.setObject(6, coefficient.getaMax(), Types.NUMERIC);
+            cStm.setShort(7, (short) (coefficient.isA() ? 1 : 0));
+            cStm.setString(8, login);
+            cStm.setString(9, ip);
+            cStm.registerOutParameter(10, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("update coefficient " + coefficient + " result " + cStm.getInt(1));
+            LOGGER.info("update coefficient " + coefficient + " result " + cStm.getShort(10));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(10) != 0) {
                 throw new SystemParamException("Ошибка обновления коэффициента " + coefficient.getName());
             }
         } catch (SQLException e) {
