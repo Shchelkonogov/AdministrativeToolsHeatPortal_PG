@@ -39,7 +39,7 @@ public class SystemParamsMB implements Serializable {
             {"Справочники", "/view/sysParams/catalog.xhtml"},
             {"Тип объекта по умолчанию", "/view/sysParams/defaultValues.xhtml"},
             {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
-//            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
+            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
 //            {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
 //            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
 //            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
