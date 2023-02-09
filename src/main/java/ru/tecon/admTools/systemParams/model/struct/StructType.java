@@ -12,7 +12,7 @@ public class StructType implements Serializable {
     private int id;
     private String name;
     private String typeChar;
-    private Integer parentID;
+    private Long parentID;
 
     public StructType() {
     }
@@ -23,7 +23,7 @@ public class StructType implements Serializable {
         this.typeChar = typeChar;
     }
 
-    public StructType(int id, String name, String typeChar, Integer parentID) {
+    public StructType(int id, String name, String typeChar, Long parentID) {
         this.id = id;
         this.name = name;
         this.typeChar = typeChar;
@@ -50,11 +50,11 @@ public class StructType implements Serializable {
         this.typeChar = typeChar;
     }
 
-    public Integer getParentID() {
+    public Long getParentID() {
         return parentID;
     }
 
-    public void setParentID(Integer parentID) {
+    public void setParentID(Long parentID) {
         this.parentID = parentID;
     }
 

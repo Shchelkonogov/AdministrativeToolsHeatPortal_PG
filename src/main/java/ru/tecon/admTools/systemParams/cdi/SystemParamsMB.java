@@ -34,7 +34,7 @@ public class SystemParamsMB implements Serializable {
             {"Связи", "/view/sysParams/objectLinks.xhtml"},
             {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
             {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
-//            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
+            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
             {"Единицы измерения", "/view/sysParams/measure.xhtml"},
             {"Справочники", "/view/sysParams/catalog.xhtml"},
             {"Тип объекта по умолчанию", "/view/sysParams/defaultValues.xhtml"},

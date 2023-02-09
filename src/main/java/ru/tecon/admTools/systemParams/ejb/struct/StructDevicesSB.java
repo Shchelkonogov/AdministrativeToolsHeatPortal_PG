@@ -23,36 +23,37 @@ public class StructDevicesSB implements StructCurrentRemote {
 
     private static final Logger LOGGER = Logger.getLogger(StructDevicesSB.class.getName());
 
-    private static final String SELECT_STRUCT_TYPES = "select dev_type_id as type_id, dev_type_name as type_name, dev_type_char as type_char, parent_id " +
-            "from table(sys_0001t.sel_dev_type) " +
-                "connect by prior dev_type_id = parent_id start with parent_id is null " +
-                "order siblings by dev_type_name";
+    private static final String SELECT_STRUCT_TYPES = "with recursive cur (type_id, type_name, parent_id, type_char, comments) " +
+            "    as (select a.* from sys_0001t.sel_dev_type() a where a.parent_id is null " +
+            "            union " +
+            "        select b.* from sys_0001t.sel_dev_type() b join cur on cur.type_id=b.parent_id) " +
+            "select * from cur";
     private static final String SELECT_STRUCT_TYPE_PROPS = "select * from ( " +
             "select a.dev_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
                 "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, c.prop_cat_name, " +
                 "d.measure_name, d.short_name, a.display_id " +
-                    "from table(sys_0001t.sel_dev_type_props(?)) a, " +
-                            "table(sys_0001t.sel_type_props_type()) b, " +
-                            "table(sys_0001t.sel_type_props_cat()) c, " +
-                            "table(sys_0001t.sel_measure()) d " +
+                    "from sys_0001t.sel_dev_type_props(?) a, " +
+                            "sys_0001t.sel_type_props_type() b, " +
+                            "sys_0001t.sel_type_props_cat() c, " +
+                            "sys_0001t.sel_measure() d " +
                         "where b.prop_val_type = a.prop_type and c.prop_cat_id = a.prop_cat and d.measure_id = a.prop_measure " +
                 "union all " +
                 "select a.dev_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
                 "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, null, " +
                 "d.measure_name, d.short_name, a.display_id " +
-                    "from table(sys_0001t.sel_dev_type_props(?)) a, " +
-                            "table(sys_0001t.sel_type_props_type()) b, " +
-                            "table(sys_0001t.sel_measure()) d " +
-                        "where a.prop_cat = 'S' and b.prop_val_type = a.prop_type and d.measure_id = a.prop_measure) " +
+                    "from sys_0001t.sel_dev_type_props(?) a, " +
+                            "sys_0001t.sel_type_props_type() b, " +
+                            "sys_0001t.sel_measure() d " +
+                        "where a.prop_cat = 'S' and b.prop_val_type = a.prop_type and d.measure_id = a.prop_measure) result " +
             "order by display_id";
 
-    private static final String ADD_STRUCT_TYPE = "{? = call sys_0001t.add_dev_type(?, ?, ?, ?, ?, ?, ?)}";
-    private static final String REMOVE_STRUCT_TYPE = "{? = call sys_0001t.del_dev_type(?, ?, ?, ?)}";
-    private static final String ADD_STRUCT_TYPE_PROP = "{? = call sys_0001t.add_dev_type_prop(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-    private static final String REMOVE_STRUCT_TYPE_PROP = "{? = call sys_0001t.del_dev_type_prop(?, ?, ?, ?, ?)}";
+    private static final String ADD_STRUCT_TYPE = "call sys_0001t.add_dev_type(?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String REMOVE_STRUCT_TYPE = "call sys_0001t.del_dev_type(?, ?, ?, ?, ?)";
+    private static final String ADD_STRUCT_TYPE_PROP = "call sys_0001t.add_dev_type_prop(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String REMOVE_STRUCT_TYPE_PROP = "call sys_0001t.del_dev_type_prop(?, ?, ?, ?, ?, ?)";
 
-    private static final String MOVE_PROP_UP = "{? = call sys_0001t.set_dev_type_prop_up(?, ?)}";
-    private static final String MOVE_PROP_DOWN = "{? = call sys_0001t.set_dev_type_prop_down(?, ?)}";
+    private static final String MOVE_PROP_UP = "call sys_0001t.set_dev_type_prop_up(?, ?, ?)";
+    private static final String MOVE_PROP_DOWN = "call sys_0001t.set_dev_type_prop_down(?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -75,29 +76,28 @@ public class StructDevicesSB implements StructCurrentRemote {
     public int addStruct(StructType structType, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(ADD_STRUCT_TYPE)) {
-
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setString(2, structType.getName());
-            cStm.setString(3, structType.getTypeChar());
+            cStm.setString(1, structType.getName());
+            cStm.setString(2, structType.getTypeChar());
             if (structType.getParentID() == null) {
-                cStm.setNull(4, Types.INTEGER);
+                cStm.setNull(3, Types.INTEGER);
             } else {
-                cStm.setInt(4, structType.getParentID());
+                cStm.setLong(3, structType.getParentID());
             }
-            cStm.setString(5, structType.getName());
-            cStm.registerOutParameter(6, Types.INTEGER);
-            cStm.setString(7, login);
-            cStm.setString(8, ip);
+            cStm.setString(4, structType.getName());
+            cStm.registerOutParameter(5, Types.INTEGER);
+            cStm.setString(6, login);
+            cStm.setString(7, ip);
+            cStm.registerOutParameter(8, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOGGER.info("add struct " + structType.getName() + " result " + cStm.getInt(1));
+            LOGGER.info("add struct " + structType.getName() + " result " + cStm.getShort(8));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(8) != 0) {
                 throw new SystemParamException("Ошибка добавления структуры " + structType.getName());
             }
 
-            return cStm.getInt(6);
+            return cStm.getInt(5);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
@@ -121,7 +121,7 @@ public class StructDevicesSB implements StructCurrentRemote {
                 result.add(new StructType(res.getInt("type_id"),
                         res.getString("type_name"),
                         res.getString("type_char"),
-                        res.getObject("parent_id", Integer.class)));
+                        res.getObject("parent_id", Long.class)));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);

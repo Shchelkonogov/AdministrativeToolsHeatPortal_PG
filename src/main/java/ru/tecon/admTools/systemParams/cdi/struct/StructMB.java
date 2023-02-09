@@ -88,12 +88,12 @@ public class StructMB implements Serializable, MyConverter {
 
         structTypes = structCurrentBean.getStructTypes();
 
-        Map<Integer, TreeNode> nodes = new HashMap<>();
+        Map<Long, TreeNode> nodes = new HashMap<>();
         nodes.put(null, root);
         for (StructType structType: structTypes) {
             TreeNode parent = nodes.get(structType.getParentID());
             DefaultTreeNode treeNode = new DefaultTreeNode(structType, parent);
-            nodes.put(structType.getId(), treeNode);
+            nodes.put((long) structType.getId(), treeNode);
         }
 
         structTypeProps = null;
@@ -224,7 +224,7 @@ public class StructMB implements Serializable, MyConverter {
                 if (selectedStruct == null) {
                     throw new SystemParamException("Не выбран тип к которому добавить новое устройство");
                 }
-                newStructType.setParentID(selectedStruct.getId());
+                newStructType.setParentID((long) selectedStruct.getId());
             }
             int structID = structCurrentBean.addStruct(newStructType, login, ip);
 
