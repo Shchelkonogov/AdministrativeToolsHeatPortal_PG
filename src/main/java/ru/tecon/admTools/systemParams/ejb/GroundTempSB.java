@@ -26,11 +26,11 @@ public class GroundTempSB {
 
     private static final Logger LOGGER = Logger.getLogger(GroundTempSB.class.getName());
 
-    private static final String SEL_GROUND_TEMPS = "select time_stamp, value from table(sys_0001t.sel_ground_temp())";
-    private static final String FUN_ADD_GROUND_TEMP = "{? = call sys_0001t.add_ground_temp(?, ?, ?, ?)}";
+    private static final String SEL_GROUND_TEMPS = "select time_stamp, value from sys_0001t.sel_ground_temp()";
+    private static final String FUN_ADD_GROUND_TEMP = "call sys_0001t.add_ground_temp(?, ?, ?, ?, ?)";
 
-    private static final String SEL_REFERENCE_VALUES = "select * from table(sys_0001t.sel_norm_ind_te())";
-    private static final String FUN_UPD_REFERENCE_VALUE = "{? = call sys_0001t.upd_norm_ind_te(?, ?, ?, ?, ?, ?)}";
+    private static final String SEL_REFERENCE_VALUES = "select * from sys_0001t.sel_norm_ind_te()";
+    private static final String FUN_UPD_REFERENCE_VALUE = "call sys_0001t.upd_norm_ind_te(?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -64,15 +64,15 @@ public class GroundTempSB {
     public void addGroundTemp(GroundTemp groundTemp, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_ADD_GROUND_TEMP)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDate(2, java.sql.Date.valueOf(groundTemp.getDate()));
-            cStm.setDouble(3, groundTemp.getValue());
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setObject(1, Timestamp.valueOf(groundTemp.getDate().atStartOfDay()), Types.TIMESTAMP);
+            cStm.setObject(2, groundTemp.getValue(), Types.NUMERIC);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Невозможно добавить температуру грунта");
             }
 
@@ -113,17 +113,18 @@ public class GroundTempSB {
     public void updateReferenceValue(ReferenceValue referenceValue, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_REFERENCE_VALUE)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, referenceValue.getT3());
-            cStm.setDouble(3, referenceValue.getT4());
-            cStm.setDouble(4, referenceValue.getT7());
-            cStm.setDouble(5, referenceValue.getT13());
+            cStm.setObject(1, referenceValue.getT3(), Types.NUMERIC);
+            cStm.setObject(2, referenceValue.getT4(), Types.NUMERIC);
+            cStm.setObject(3, referenceValue.getT7(), Types.NUMERIC);
+            cStm.setObject(4, referenceValue.getT13(), Types.NUMERIC);
+            cStm.setObject(5, referenceValue.getTgr(), Types.NUMERIC);
             cStm.setString(6, login);
             cStm.setString(7, ip);
+            cStm.registerOutParameter(8, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(8) != 0) {
                 throw new SystemParamException("Невозможно обновить эталонные значения температуры");
             }
 
