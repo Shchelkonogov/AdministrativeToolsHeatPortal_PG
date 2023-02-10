@@ -1,7 +1,6 @@
 package ru.tecon.admTools.systemParams.ejb;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.model.ParametersColor;
 import ru.tecon.admTools.systemParams.model.ProblemPriority;
 
 import javax.annotation.Resource;
@@ -26,8 +25,8 @@ public class ProblemPrioritySB {
 
     private static final Logger LOGGER = Logger.getLogger(ProblemPrioritySB.class.getName());
 
-    private static final String SELECT_PROBLEM_PRIORITY = "select * from table(dsp_0090t.sel_problem_cat_list())";
-    private static final String UPDATE_PROBLEM_PRIORITY = "{? = call dsp_0090t.upd_problem_cat(?, ?, ?, ?)}";
+    private static final String SELECT_PROBLEM_PRIORITY = "select * from dsp_0090t.sel_problem_cat_list()";
+    private static final String UPDATE_PROBLEM_PRIORITY = "call dsp_0090t.upd_problem_cat(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -60,14 +59,14 @@ public class ProblemPrioritySB {
     public void updateProblemPriority(int id, int priority, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(UPDATE_PROBLEM_PRIORITY)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, id);
-            cStm.setInt(3, priority);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, id);
+            cStm.setShort(2, (short) priority);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Ошибка записи проблемы " + id + " приоритет " + priority);
             }
         } catch (SQLException e) {
