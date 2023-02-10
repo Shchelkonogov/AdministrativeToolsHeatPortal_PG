@@ -25,8 +25,8 @@ public class ParametersColorSB {
 
     private static final Logger LOGGER = Logger.getLogger(ParametersColorSB.class.getName());
 
-    private static final String SELECT_PARAMETERS_COLOR = "select * from table(sys_0001t.sel_param_condition())";
-    private static final String UPDATE_PARAMETER_COLOR = "{? = call sys_0001t.upd_param_cond_color(?, ?, ?, ?)}";
+    private static final String SELECT_PARAMETERS_COLOR = "select * from sys_0001t.sel_param_condition()";
+    private static final String UPDATE_PARAMETER_COLOR = "call sys_0001t.upd_param_cond_color(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -74,14 +74,14 @@ public class ParametersColorSB {
     public void updateParameterColor(int id, String color, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(UPDATE_PARAMETER_COLOR)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, id);
-            cStm.setString(3, color);
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, id);
+            cStm.setString(2, color);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Ошибка записи параметра " + id + " цвет " + color);
             }
         } catch (SQLException e) {
