@@ -25,8 +25,8 @@ public class MultiYearTempSB {
 
     private static final Logger LOGGER = Logger.getLogger(MultiYearTempSB.class.getName());
 
-    private static final String SEL_TNV = "select * from table(sys_0001t.sel_tnvsm)";
-    private static final String FUN_UPD_TNV = "{? = call sys_0001t.upd_tnvsm(?, ?, ?, ?)}";
+    private static final String SEL_TNV = "select * from sys_0001t.sel_tnvsm()";
+    private static final String FUN_UPD_TNV = "call sys_0001t.upd_tnvsm(?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -61,15 +61,15 @@ public class MultiYearTempSB {
     public void updateMultiYearTemp(MultiYearTemp temp, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_TNV)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setInt(2, temp.getId());
-            cStm.setDouble(3, temp.getValue());
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, temp.getId());
+            cStm.setObject(2, temp.getValue(), Types.NUMERIC);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Ошибка обновления " + temp.getName());
             }
         } catch (SQLException e) {
