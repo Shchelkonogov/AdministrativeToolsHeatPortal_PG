@@ -8,21 +8,21 @@ import java.util.StringJoiner;
  */
 public class IndicatorCO {
 
-    private double id;
+    private int id;
     private String name;
     private double kz;
     private double kp;
 
     private boolean change = false;
 
-    public IndicatorCO(double id, String name, double kz, double kp) {
+    public IndicatorCO(int id, String name, double kz, double kp) {
         this.id = id;
         this.name = name;
         this.kz = kz;
         this.kp = kp;
     }
 
-    public double getId() {
+    public int getId() {
         return id;
     }
 

@@ -8,19 +8,19 @@ import java.util.StringJoiner;
  */
 public class IndicatorGVS {
 
-    private double id;
+    private int id;
     private String name;
     private double kc;
 
     private boolean change = false;
 
-    public IndicatorGVS(double id, String name, double kc) {
+    public IndicatorGVS(int id, String name, double kc) {
         this.id = id;
         this.name = name;
         this.kc = kc;
     }
 
-    public double getId() {
+    public int getId() {
         return id;
     }
 

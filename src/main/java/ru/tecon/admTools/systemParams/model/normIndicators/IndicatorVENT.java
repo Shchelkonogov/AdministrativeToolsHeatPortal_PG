@@ -8,14 +8,14 @@ import java.util.StringJoiner;
  */
 public class IndicatorVENT {
 
-    private double id;
+    private int id;
     private String name;
     private double kz;
     private double kp;
 
     private boolean change = false;
 
-    public IndicatorVENT(double id, String name, double kz, double kp) {
+    public IndicatorVENT(int id, String name, double kz, double kp) {
         this.id = id;
         this.name = name;
         this.kz = kz;
@@ -31,7 +31,7 @@ public class IndicatorVENT {
         this.kz = kz;
     }
 
-    public double getId() {
+    public int getId() {
         return id;
     }
 

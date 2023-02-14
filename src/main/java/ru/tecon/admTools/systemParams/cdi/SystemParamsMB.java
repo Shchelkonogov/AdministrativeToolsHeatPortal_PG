@@ -44,7 +44,7 @@ public class SystemParamsMB implements Serializable {
             {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
             {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
             {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
-//            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
+            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
             {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 

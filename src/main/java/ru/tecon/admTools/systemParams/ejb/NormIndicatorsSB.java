@@ -25,30 +25,30 @@ public class NormIndicatorsSB {
 
     private static final Logger LOG = Logger.getLogger(NormIndicatorsSB.class.getName());
 
-    private static final String SEL_TV = "select * from table(sys_0001t.sel_norm_ind_tv())";
-    private static final String FUN_UPD_TV = "{? = call sys_0001t.upd_norm_ind_tv(?, ?, ?, ?, ?)}";
+    private static final String SEL_TV = "select * from sys_0001t.sel_norm_ind_tv()";
+    private static final String FUN_UPD_TV = "call sys_0001t.upd_norm_ind_tv(?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_CO = "select * from table(sys_0001t.sel_norm_ind_co(?))";
-    private static final String FUN_UPD_CO = "{? = call sys_0001t.upd_norm_ind_co(?, ?, ?, ?, ?)}";
+    private static final String SEL_CO = "select * from sys_0001t.sel_norm_ind_co(?)";
+    private static final String FUN_UPD_CO = "call sys_0001t.upd_norm_ind_co(?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_GVS = "select * from table(sys_0001t.sel_norm_ind_gvs(?))";
-    private static final String FUN_UPD_GVS = "{? = call sys_0001t.upd_norm_ind_gvs(?, ?, ?, ?)}";
+    private static final String SEL_GVS = "select * from sys_0001t.sel_norm_ind_gvs(?)";
+    private static final String FUN_UPD_GVS = "call sys_0001t.upd_norm_ind_gvs(?, ?, ?, ?, ?)";
 
-    private static final String SEL_VENT = "select * from table(sys_0001t.sel_norm_ind_vent(?))";
-    private static final String FUN_UPD_VENT = "{? = call sys_0001t.upd_norm_ind_vent(?, ?, ?, ?, ?)}";
+    private static final String SEL_VENT = "select * from sys_0001t.sel_norm_ind_vent(?)";
+    private static final String FUN_UPD_VENT = "call sys_0001t.upd_norm_ind_vent(?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_OTHER = "select * from table(sys_0001t.sel_norm_ind_other())";
-    private static final String FUN_UPD_OTHER = "{? = call sys_0001t.upd_norm_ind_other(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SEL_OTHER = "select * from sys_0001t.sel_norm_ind_other()";
+    private static final String FUN_UPD_OTHER = "call sys_0001t.upd_norm_ind_other(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_T7 = "select * from table(sys_0001t.sel_norm_ind_t7_uu())";
-    private static final String FUN_UPD_T7_ITP = "{? = call sys_0001t.upd_norm_ind_t7_uu_itp(?, ?, ?, ?, ?, ?)}";
-    private static final String FUN_UPD_T7_CTP = "{? = call sys_0001t.upd_norm_ind_t7_uu_ctp(?, ?, ?, ?, ?, ?)}";
+    private static final String SEL_T7 = "select * from sys_0001t.sel_norm_ind_t7_uu()";
+    private static final String FUN_UPD_T7_ITP = "call sys_0001t.upd_norm_ind_t7_uu_itp(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FUN_UPD_T7_CTP = "call sys_0001t.upd_norm_ind_t7_uu_ctp(?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_DT7 = "select * from table(sys_0001t.sel_norm_ind_dt_uu())";
-    private static final String FUN_UPD_DT7 = "{? = call sys_0001t.upd_norm_ind_dt_uu(?, ?, ?, ?, ?)}";
+    private static final String SEL_DT7 = "select * from sys_0001t.sel_norm_ind_dt_uu()";
+    private static final String FUN_UPD_DT7 = "call sys_0001t.upd_norm_ind_dt_uu(?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_UNDERSUPPLY = "select * from table(sys_0001t.sel_norm_ind_no())";
-    private static final String FUN_UPD_UNDERSUPPLY = "{? = call sys_0001t.upd_norm_ind_no(?, ?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SEL_UNDERSUPPLY = "select * from sys_0001t.sel_norm_ind_no()";
+    private static final String FUN_UPD_UNDERSUPPLY = "call sys_0001t.upd_norm_ind_no(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -82,18 +82,18 @@ public class NormIndicatorsSB {
     public void updateTV(IndicatorTV indicatorTV, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_TV)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorTV.getKpn());
-            cStm.setDouble(3, indicatorTV.getKz());
-            cStm.setDouble(4, indicatorTV.getKp());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setObject(1, indicatorTV.getKpn(), Types.NUMERIC);
+            cStm.setObject(2, indicatorTV.getKz(), Types.NUMERIC);
+            cStm.setObject(3, indicatorTV.getKp(), Types.NUMERIC);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update norm indicator TV " + indicatorTV + " result " + cStm.getInt(1));
+            LOG.info("update norm indicator TV " + indicatorTV + " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя теплового ввода");
             }
         } catch (SQLException e) {
@@ -138,18 +138,18 @@ public class NormIndicatorsSB {
     public void updateCO(IndicatorCO indicatorCO, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_CO)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorCO.getId());
-            cStm.setDouble(3, indicatorCO.getKz());
-            cStm.setDouble(4, indicatorCO.getKp());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, indicatorCO.getId());
+            cStm.setObject(2, indicatorCO.getKz(), Types.NUMERIC);
+            cStm.setObject(3, indicatorCO.getKp(), Types.NUMERIC);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update norm indicator CO " + indicatorCO + " result " + cStm.getInt(1));
+            LOG.info("update norm indicator CO " + indicatorCO + " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя центрального отопления");
             }
         } catch (SQLException e) {
@@ -194,17 +194,17 @@ public class NormIndicatorsSB {
     public void updateGVS(IndicatorGVS indicatorGVS, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_GVS)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorGVS.getId());
-            cStm.setDouble(3, indicatorGVS.getKc());
-            cStm.setString(4, login);
-            cStm.setString(5, ip);
+            cStm.setInt(1, indicatorGVS.getId());
+            cStm.setObject(2, indicatorGVS.getKc(), Types.NUMERIC);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+            cStm.registerOutParameter(5, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update norm indicator GVS " + indicatorGVS + " result " + cStm.getInt(1));
+            LOG.info("update norm indicator GVS " + indicatorGVS + " result " + cStm.getShort(5));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(5) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя горячего водоснабжения");
             }
         } catch (SQLException e) {
@@ -249,18 +249,18 @@ public class NormIndicatorsSB {
     public void updateVENT(IndicatorVENT indicatorVENT, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_VENT)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorVENT.getId());
-            cStm.setDouble(3, indicatorVENT.getKz());
-            cStm.setDouble(4, indicatorVENT.getKp());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setInt(1, indicatorVENT.getId());
+            cStm.setObject(2, indicatorVENT.getKz(), Types.NUMERIC);
+            cStm.setObject(3, indicatorVENT.getKp(), Types.NUMERIC);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update norm indicator VENT " + indicatorVENT + " result " + cStm.getInt(1));
+            LOG.info("update norm indicator VENT " + indicatorVENT + " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя вентиляции");
             }
         } catch (SQLException e) {
@@ -302,33 +302,33 @@ public class NormIndicatorsSB {
     public void updateOther(IndicatorOther indicatorOther, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_OTHER)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorOther.getT7());
-            cStm.setDouble(3, indicatorOther.getDt7());
-            cStm.setDouble(4, indicatorOther.getKt());
-            cStm.setDouble(5, indicatorOther.getKto());
-            cStm.setDouble(6, indicatorOther.getKg());
-            cStm.setDouble(7, indicatorOther.getKv());
-            cStm.setDouble(8, indicatorOther.getKuco());
-            cStm.setDouble(9, indicatorOther.getKuvent());
-            cStm.setDouble(10, indicatorOther.getKugvs());
-            cStm.setDouble(11, indicatorOther.getKpco());
-            cStm.setDouble(12, indicatorOther.getKdgco());
-            cStm.setDouble(13, indicatorOther.getK1());
-            cStm.setDouble(14, indicatorOther.getK2());
-            cStm.setDouble(15, indicatorOther.getKpgvs());
-            cStm.setDouble(16, indicatorOther.getKdggvs());
-            cStm.setDouble(17, indicatorOther.getKqgvsl());
-            cStm.setDouble(18, indicatorOther.getGvsdt());
-            cStm.setDouble(19, indicatorOther.getKgvsc());
-            cStm.setString(20, login);
-            cStm.setString(21, ip);
+            cStm.setObject(1, indicatorOther.getT7(), Types.NUMERIC);
+            cStm.setObject(2, indicatorOther.getDt7(), Types.NUMERIC);
+            cStm.setObject(3, indicatorOther.getKt(), Types.NUMERIC);
+            cStm.setObject(4, indicatorOther.getKto(), Types.NUMERIC);
+            cStm.setObject(5, indicatorOther.getKg(), Types.NUMERIC);
+            cStm.setObject(6, indicatorOther.getKv(), Types.NUMERIC);
+            cStm.setObject(7, indicatorOther.getKuco(), Types.NUMERIC);
+            cStm.setObject(8, indicatorOther.getKuvent(), Types.NUMERIC);
+            cStm.setObject(9, indicatorOther.getKugvs(), Types.NUMERIC);
+            cStm.setObject(10, indicatorOther.getKpco(), Types.NUMERIC);
+            cStm.setObject(11, indicatorOther.getKdgco(), Types.NUMERIC);
+            cStm.setObject(12, indicatorOther.getK1(), Types.NUMERIC);
+            cStm.setObject(13, indicatorOther.getK2(), Types.NUMERIC);
+            cStm.setObject(14, indicatorOther.getKpgvs(), Types.NUMERIC);
+            cStm.setObject(15, indicatorOther.getKdggvs(), Types.NUMERIC);
+            cStm.setObject(16, indicatorOther.getKqgvsl(), Types.NUMERIC);
+            cStm.setObject(17, indicatorOther.getGvsdt(), Types.NUMERIC);
+            cStm.setObject(18, indicatorOther.getKgvsc(), Types.NUMERIC);
+            cStm.setString(19, login);
+            cStm.setString(20, ip);
+            cStm.registerOutParameter(21, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update norm indicator other " + indicatorOther + " result " + cStm.getInt(1));
+            LOG.info("update norm indicator other " + indicatorOther + " result " + cStm.getShort(21));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(21) != 0) {
                 throw new SystemParamException("Ошибка обновления граничных значений");
             }
         } catch (SQLException e) {
@@ -390,19 +390,19 @@ public class NormIndicatorsSB {
                     return;
             }
             try (CallableStatement cStm = connect.prepareCall(select)) {
-                cStm.registerOutParameter(1, Types.INTEGER);
-                cStm.setDouble(2, indicatorT7.getMinG());
-                cStm.setDouble(3, indicatorT7.getMinP());
-                cStm.setDouble(4, indicatorT7.getMaxG());
-                cStm.setDouble(5, indicatorT7.getMaxP());
-                cStm.setString(6, login);
-                cStm.setString(7, ip);
+                cStm.setObject(1, indicatorT7.getMinG(), Types.NUMERIC);
+                cStm.setObject(2, indicatorT7.getMinP(), Types.NUMERIC);
+                cStm.setObject(3, indicatorT7.getMaxG(), Types.NUMERIC);
+                cStm.setObject(4, indicatorT7.getMaxP(), Types.NUMERIC);
+                cStm.setString(5, login);
+                cStm.setString(6, ip);
+                cStm.registerOutParameter(7, Types.SMALLINT);
 
                 cStm.executeUpdate();
 
-                LOG.info("update T7 indicator " + indicatorT7 + " result " + cStm.getInt(1));
+                LOG.info("update T7 indicator " + indicatorT7 + " result " + cStm.getShort(7));
 
-                if (cStm.getInt(1) != 0) {
+                if (cStm.getShort(7) != 0) {
                     throw new SystemParamException("Ошибка обновления показателя T7");
                 }
             }
@@ -441,18 +441,18 @@ public class NormIndicatorsSB {
     public void updateDT7(IndicatorDT7 indicatorDT7, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_DT7)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorDT7.getDtMin());
-            cStm.setDouble(3, indicatorDT7.getDtMax());
-            cStm.setDouble(4, indicatorDT7.getDtNorm());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setObject(1, indicatorDT7.getDtMin(), Types.NUMERIC);
+            cStm.setObject(2, indicatorDT7.getDtMax(), Types.NUMERIC);
+            cStm.setObject(3, indicatorDT7.getDtNorm(), Types.NUMERIC);
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+            cStm.registerOutParameter(6, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update ΔT7 indicator " + indicatorDT7 + " result " + cStm.getInt(1));
+            LOG.info("update ΔT7 indicator " + indicatorDT7 + " result " + cStm.getShort(6));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(6) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя ΔT7");
             }
         } catch (SQLException e) {
@@ -491,21 +491,21 @@ public class NormIndicatorsSB {
     public void updateUnderSupply(IndicatorUnderSupply indicatorUnderSupply, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_UNDERSUPPLY)) {
-            cStm.registerOutParameter(1, Types.INTEGER);
-            cStm.setDouble(2, indicatorUnderSupply.getT3K1());
-            cStm.setDouble(3, indicatorUnderSupply.getT3K2());
-            cStm.setDouble(4, indicatorUnderSupply.getT3K3());
-            cStm.setDouble(5, indicatorUnderSupply.getT4K1());
-            cStm.setDouble(6, indicatorUnderSupply.getT4K2());
-            cStm.setDouble(7, indicatorUnderSupply.getT4K3());
-            cStm.setString(8, login);
-            cStm.setString(9, ip);
+            cStm.setObject(1, indicatorUnderSupply.getT3K1(), Types.NUMERIC);
+            cStm.setObject(2, indicatorUnderSupply.getT3K2(), Types.NUMERIC);
+            cStm.setObject(3, indicatorUnderSupply.getT3K3(), Types.NUMERIC);
+            cStm.setObject(4, indicatorUnderSupply.getT4K1(), Types.NUMERIC);
+            cStm.setObject(5, indicatorUnderSupply.getT4K2(), Types.NUMERIC);
+            cStm.setObject(6, indicatorUnderSupply.getT4K3(), Types.NUMERIC);
+            cStm.setString(7, login);
+            cStm.setString(8, ip);
+            cStm.registerOutParameter(9, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update underSupply indicator " + indicatorUnderSupply + " result " + cStm.getInt(1));
+            LOG.info("update underSupply indicator " + indicatorUnderSupply + " result " + cStm.getShort(9));
 
-            if (cStm.getInt(1) != 0) {
+            if (cStm.getShort(9) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя недоотпуск");
             }
         } catch (SQLException e) {
