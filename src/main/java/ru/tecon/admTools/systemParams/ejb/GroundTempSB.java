@@ -30,7 +30,7 @@ public class GroundTempSB {
     private static final String FUN_ADD_GROUND_TEMP = "{? = call sys_0001t.add_ground_temp(?, ?, ?, ?)}";
 
     private static final String SEL_REFERENCE_VALUES = "select * from table(sys_0001t.sel_norm_ind_te())";
-    private static final String FUN_UPD_REFERENCE_VALUE = "{? = call sys_0001t.upd_norm_ind_te(?, ?, ?, ?, ?, ?)}";
+    private static final String FUN_UPD_REFERENCE_VALUE = "{? = call sys_0001t.upd_norm_ind_te(?, ?, ?, ?, ?, ?, ?)}";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -118,8 +118,9 @@ public class GroundTempSB {
             cStm.setDouble(3, referenceValue.getT4());
             cStm.setDouble(4, referenceValue.getT7());
             cStm.setDouble(5, referenceValue.getT13());
-            cStm.setString(6, login);
-            cStm.setString(7, ip);
+            cStm.setDouble(6, referenceValue.getTgr());
+            cStm.setString(7, login);
+            cStm.setString(8, ip);
 
             cStm.executeUpdate();
 
