@@ -14,14 +14,6 @@ public class TechProc implements Serializable {
     private String characteristics;
 
 
-    public int getObjid() {
-        return objid;
-    }
-
-    public void setObjid(int objid) {
-        this.objid = objid;
-    }
-
     public int getId() {
         return id;
     }
@@ -37,15 +29,6 @@ public class TechProc implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getCharacteristics() {
-        return characteristics;
-    }
-
-    public void setCharacteristics(String characteristics) {
-        this.characteristics = characteristics;
-    }
-
 
     public TechProc(String name) {
         this.name = name;

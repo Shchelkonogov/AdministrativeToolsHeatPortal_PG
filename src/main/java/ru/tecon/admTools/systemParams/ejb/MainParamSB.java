@@ -179,8 +179,6 @@ public class MainParamSB {
             cStm.setString(5, login);
             cStm.setString(6, ip);
 
-
-
             ResultSet resultSet = cStm.executeQuery();
             while (resultSet.next()) {
                 LOGGER.log(Level.INFO,"result: " + resultSet.getInt(1));

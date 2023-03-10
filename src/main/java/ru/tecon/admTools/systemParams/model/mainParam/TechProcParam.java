@@ -19,16 +19,8 @@ public class TechProcParam implements Serializable {
         return techprid;
     }
 
-    public void setTechprid(int techprid) {
-        this.techprid = techprid;
-    }
-
     public int getPartypeid() {
         return partypeid;
-    }
-
-    public void setPartypeid(int partypeid) {
-        this.partypeid = partypeid;
     }
 
     public int getId() {

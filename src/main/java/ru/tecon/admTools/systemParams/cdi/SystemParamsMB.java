@@ -46,7 +46,8 @@ public class SystemParamsMB implements Serializable {
             {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
             {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
             {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"},
-            {"Основные параметры", "/view/sysParams/mainParam.xhtml"}
+            {"Основные параметры", "/view/sysParams/mainParam.xhtml"},
+            {"Статистические агрегаты", "/view/sysParams/statAggr.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String ip;
@@ -70,6 +71,8 @@ public class SystemParamsMB implements Serializable {
         ip = request.getParameter("ip");
         login = checkUserSB.getUser(sessionID);
         write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.getParameter("formID")));
+
+        write = true;
     }
 
     private void updateContent(String parameter) {

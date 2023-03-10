@@ -29,14 +29,6 @@ public class ObjType implements Serializable {
         this.name = name;
     }
 
-    public String getCharacteristics() {
-        return characteristics;
-    }
-
-    public void setCharacteristics(String characteristics) {
-        this.characteristics = characteristics;
-    }
-
     public ObjType(int id, String name, String characteristics) {
         this.id = id;
         this.name = name;

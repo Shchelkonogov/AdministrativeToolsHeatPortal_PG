@@ -108,9 +108,7 @@ public class MainParamMB implements Serializable {
     public void tableUpdateAfterEvent(){
         if (leftOneLine != null) {
             tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
-            disableAddBtn=false;
         }
-
     }
 
     /**
@@ -139,7 +137,6 @@ public class MainParamMB implements Serializable {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
         }
-
     }
 
     /**
@@ -167,6 +164,7 @@ public class MainParamMB implements Serializable {
     /**
      * Обработчик сохранения изменения нового параметра в таблицу, нажатие на копку сохранить
      */
+
     public void onSaveChanges() {
 
         try {
@@ -208,7 +206,6 @@ public class MainParamMB implements Serializable {
     }
 
     public void setLeftOneLine(ObjType leftOneLine) {
-        System.out.println("int " + leftOneLine);
         this.leftOneLine = leftOneLine;
     }
 
