@@ -39,7 +39,7 @@
     </div>
 
     <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
-              resizable="false" style="box-shadow: none;">
+              resizable="false" style="box-shadow: none;" position="center center" onShow="PF('statusDialog').initPosition();">
         <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
     </p:dialog>
 </h:body>
