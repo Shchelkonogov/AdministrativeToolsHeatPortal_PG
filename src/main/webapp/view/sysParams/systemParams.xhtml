@@ -21,7 +21,8 @@
                     <c:forEach var="menu" items="#{systemParams.parameters}" varStatus="loop">
                         <p:commandButton id="button_#{loop.index}" value="#{menu}" style="width: 100%; text-align: initial;"
                                          styleClass="#{systemParams.checkSelected(menu)}"
-                                         action="#{systemParams.selectButton(menu, loop.index)}"/>
+                                         action="#{systemParams.selectButton(menu, loop.index)}"
+                                         onstart="init()" oncomplete="load()" />
                     </c:forEach>
                 </h:form>
             </p:panel>
@@ -39,7 +40,7 @@
     </div>
 
     <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
-              resizable="false" style="box-shadow: none;">
+              resizable="false" style="box-shadow: none;" position="center center" onShow="PF('statusDialog').initPosition();">
         <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
     </p:dialog>
 </h:body>

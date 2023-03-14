@@ -7,7 +7,7 @@ import java.util.StringJoiner;
  * Класс описывающий структуру
  * @author Maksim Shchelkonogov
  */
-public class StructType implements Serializable {
+public class StructType implements Serializable, Comparable<StructType> {
 
     private int id;
     private String name;
@@ -66,5 +66,10 @@ public class StructType implements Serializable {
                 .add("typeChar='" + typeChar + "'")
                 .add("parentID=" + parentID)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(StructType o) {
+        return getName().compareTo(o.getName());
     }
 }
