@@ -71,14 +71,15 @@
                         </p:column>
                     </p:dataTable>
 
-                    <p:contextMenu for="typeTable" style="width: 205px;">
+                    <p:contextMenu for="typeTable" style="width: 205px;" rendered="#{paramTypeSetting.write}">
                         <p:menuitem value="Удалить тип параметра" action="#{paramTypeSetting.removeType}" icon="pi pi-trash"
                                     oncomplete="PF('typeTableWV').filter(); PF('statusDialog').hide();" update="typeSettingForm growl">
                             <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить тип?" icon="pi pi-info-circle"/>
                         </p:menuitem>
                     </p:contextMenu>
 
-                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350"
+                                     rendered="#{paramTypeSetting.write}">
                         <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no"/>
                         <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes"
                                          onclick="PF('statusDialog').show();"/>
