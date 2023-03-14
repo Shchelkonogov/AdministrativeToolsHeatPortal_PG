@@ -214,3 +214,11 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 #divisionPanel\:structType > .ui-treetable-scrollable-body {
     height: calc(100% - 37px);
 }
+
+#typeSettingForm\:typeTable_data .ui-helper-hidden-accessible {
+    position: unset;
+}
+
+#addPropFormP\:inputNumberP_input {
+    width: 30px;
+}

@@ -1,0 +1,311 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form>
+        <p:remoteCommand name="onLoad" action="#{paramTypeSetting.loadData}"
+                         onsuccess="PF('typeTableWV').filter()" update="typeSettingForm"/>
+        <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{paramTypeSetting.onCreateType}" update="typeSettingForm growl" rendered="#{paramTypeSetting.write}" />
+        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{paramTypeSetting.onCreateProp(paramTypeSetting.selectedType.category)}" rendered="#{paramTypeSetting.write}"
+                         update="typeSettingForm:propTable typeSettingForm:propRemove growl" />
+    </h:form>
+
+    <h:form id="typeSettingForm" style="height: 100%;">
+        <div style="height: 60%;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Типы параметров"/>
+                <div style="padding: 3px;">
+                    <p:commandButton id="typeRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                     disabled="#{paramTypeSetting.disableTypeRemoveBtn}" update="typeSettingForm growl"
+                                     onclick="PF('statusDialog').show();"
+                                     oncomplete="PF('typeTableWV').filter(); PF('statusDialog').hide();"
+                                     action="#{paramTypeSetting.onRemoveTypeAggregate}" rendered="#{paramTypeSetting.write}"/>
+                    <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                     oncomplete="PF('addTypeDialog').show();"
+                                     action="#{paramTypeSetting.initAddType}" update="@(addTypeForm :not(editSelect))"
+                                     rendered="#{paramTypeSetting.write}"/>
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
+                <div style="height: 100%;">
+                    <p:dataTable id="typeTable" value="#{paramTypeSetting.types}" var="type" filteredValue="#{paramTypeSetting.typesFilter}"
+                                 selection="#{paramTypeSetting.selectedType}" selectionMode="single" rowKey="#{type.rowIndex}" rowIndexVar="rowIndex"
+                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                                 widgetVar="typeTableWV">
+
+                        <p:ajax event="rowSelect" listener="#{paramTypeSetting.onTypeSelect}"
+                                update="typeSettingForm:propTable typeSettingForm:typeRemove
+                                        typeSettingForm:propRemove typeSettingForm:propAdd
+                                        typeSettingForm:propHeader growl"/>
+
+                        <p:column headerText="Тип параметра" groupRow="true" filterBy="#{type.paramType.name}" filterMatchMode="exact"
+                                  styleClass="center" width="250">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('typeTableWV').filter()">
+                                    <f:selectItem itemLabel="Выберите" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{paramTypeSetting.typeFilterValues}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{type.paramType.name}" />
+                        </p:column>
+                        <p:column headerText="Название статистического агрегата">
+                            <h:outputText value="#{type.aggregate != null ? type.aggregate.name : ''}"/>
+                        </p:column>
+                        <p:column headerText="Ед.изм." width="50" styleClass="center">
+                            <h:outputText value="#{type.measure != null ? type.measure.shortName : ''}"/>
+                        </p:column>
+                        <p:column headerText="Кат" width="20" styleClass="center">
+                            <h:outputText value="#{type.category}"/>
+                        </p:column>
+                        <p:column headerText="Визуализация" width="100" styleClass="center">
+                            <p:selectBooleanCheckbox id="mainAggregate" value="#{type.mainAggregate}" disabled="#{(type.aggregate == null) || type.mainAggregate}">
+                                <p:ajax listener="#{paramTypeSetting.onChange(type, rowIndex)}"
+                                        onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"/>
+                            </p:selectBooleanCheckbox>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:contextMenu for="typeTable" style="width: 205px;">
+                        <p:menuitem value="Удалить тип параметра" action="#{paramTypeSetting.removeType}" icon="pi pi-trash"
+                                    oncomplete="PF('typeTableWV').filter(); PF('statusDialog').hide();" update="typeSettingForm growl">
+                            <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить тип?" icon="pi pi-info-circle"/>
+                        </p:menuitem>
+                    </p:contextMenu>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                        <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no"/>
+                        <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes"
+                                         onclick="PF('statusDialog').show();"/>
+                    </p:confirmDialog>
+                </div>
+            </div>
+        </div>
+        <div style="height: 40%;">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;">
+                <h:outputText id="propHeader" value="#{paramTypeSetting.propHeader}"
+                              style="font-weight: 700; margin-left: 15px; color: #333;"/>
+                <div style="padding: 3px;">
+                    <p:commandButton id="propRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                     disabled="#{paramTypeSetting.disablePropRemoveBtn}"
+                                     action="#{paramTypeSetting.onRemoveProp(paramTypeSetting.selectedType.category)}"
+                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                     update="typeSettingForm:propTable typeSettingForm:propRemove growl"
+                                     rendered="#{paramTypeSetting.write}"/>
+                    <p:commandButton id="propAdd" icon="btnAdd" styleClass="iconOnlyButton btnRight"
+                                     disabled="#{paramTypeSetting.disablePropAddBtn}"
+                                     action="#{paramTypeSetting.loadProperties(paramTypeSetting.selectedType.category)}"
+                                     rendered="#{paramTypeSetting.write}"/>
+                </div>
+            </div>
+            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
+                <p:outputPanel id="propTable" style="height: 100%;">
+                    <p:dataTable value="#{paramTypeSetting.propTableA}" var="propA"
+                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                                 selection="#{paramTypeSetting.selectedPropA}" selectionMode="single" rowKey="#{propA.rowIndex}"
+                                 rendered="#{(paramTypeSetting.selectedType != null) and (paramTypeSetting.selectedType.category != null) and (paramTypeSetting.selectedType.category.equals('A'))}">
+                        <p:ajax event="rowSelect" listener="#{paramTypeSetting.onPropSelect}"
+                                update="typeSettingForm:propRemove"/>
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column rowspan="2" headerText="Название"/>
+                                <p:column colspan="2" headerText="Граничные состояния"/>
+                            </p:row>
+                            <p:row>
+                                <p:column headerText="Нижние" width="100"/>
+                                <p:column headerText="Верхние" width="100"/>
+                            </p:row>
+                        </p:columnGroup>
+
+                        <p:column>
+                            <h:outputText value="#{propA.prop.name}"/>
+                        </p:column>
+                        <p:column styleClass="center">
+                            <h:outputText value="#{propA.lessCond.name}"/>
+                        </p:column>
+                        <p:column styleClass="center">
+                            <h:outputText value="#{propA.greatCond.name}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dataTable value="#{paramTypeSetting.propTableP}" var="propP"
+                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                                 selection="#{paramTypeSetting.selectedPropP}" selectionMode="single" rowKey="#{propP.rowIndex}"
+                                 rendered="#{(paramTypeSetting.selectedType != null) and (paramTypeSetting.selectedType.category != null) and (paramTypeSetting.selectedType.category.equals('P'))}">
+                        <p:ajax event="rowSelect" listener="#{paramTypeSetting.onPropSelect}"
+                                update="typeSettingForm:propRemove"/>
+
+                        <p:column headerText="Код" width="50" styleClass="center">
+                            <h:outputText value="#{propP.code}"/>
+                        </p:column>
+                        <p:column headerText="Название">
+                            <h:outputText value="#{propP.prop}"/>
+                        </p:column>
+                        <p:column headerText="Состояние" width="100" styleClass="center">
+                            <h:outputText value="#{propP.condition.name}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </div>
+        </div>
+    </h:form>
+
+    <p:dialog id="addTypeDialog" rendered="#{paramTypeSetting.write}" header="Добавить новый тип параметра" widgetVar="addTypeDialog"
+              width="1012" height="325" modal="true" resizable="false"
+              position="center center" onShow="PF('addTypeDialog').initPosition();">
+        <p:ajax event="close" listener="#{paramTypeSetting.onAddTypeDialogClose()}" update="addTypeForm"/>
+
+        <h:form id="addTypeForm">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <p:outputLabel value="Тип параметра" for="@next" style="margin-right: 5px;"/>
+                <p:selectOneMenu id="editSelect" value="#{paramTypeSetting.newParamType}" style="width: 340px;" editable="true"
+                                 required="true" requiredMessage="#{global['validation.view.text']}" widgetVar="selectAddTypeVW">
+
+                    <p:ajax event="valueChange" listener="#{paramTypeSetting.loadPropertiesForNewType}" update="newTypeTable addPropButton"/>
+
+                    <f:converter converterId="paramTypeConverter"/>
+                    <f:selectItems value="#{paramTypeSetting.typesList}" var="selectType"
+                                   itemLabel="#{selectType.name}" itemValue="#{selectType}" />
+                </p:selectOneMenu>
+                <p:message id="messageSelect" style="margin-left: 5px;" for="@previous" />
+            </div>
+            <p:dataTable id="newTypeTable" value="#{paramTypeSetting.newTypes}" var="newAggr"
+                         scrollable="true" scrollHeight="210" emptyMessage="#{global['table.empty.value']}"
+                         editable="true">
+
+                <p:ajax event="rowEdit" />
+                <p:ajax event="rowEditCancel" />
+
+                <p:column headerText="Название статистического агрегата">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{newAggr.aggregate.name}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{newAggr.aggregate}" style="width: 100%;">
+                                <f:converter converterId="statAggregateConverter"/>
+                                <f:selectItems value="#{paramTypeSetting.statAggregates}" var="statAggr"
+                                               itemLabel="#{statAggr.name}" itemValue="#{statAggr}"/>
+                            </h:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Ед.изм." width="50" styleClass="center">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{newAggr.measure.shortName}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{newAggr.measure}" style="width: 100%;">
+                                <f:converter converterId="measureConverterParamTypeSettings"/>
+                                <f:selectItems value="#{paramTypeSetting.measures}" var="measure"
+                                               itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
+                            </h:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Кат" width="20" styleClass="center">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{newAggr.category}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{newAggr.category}" style="width: 100%;">
+                                <f:selectItem itemLabel="Аналоговый" itemValue="A"/>
+                                <f:selectItem itemLabel="Перечеслимый" itemValue="P"/>
+                            </h:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column width="30" style="text-align: center;">
+                    <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
+                             disabled="#{paramTypeSetting.newParamType == null}" id="addPropButton"
+                             update=":addTypeForm:newTypeTable" action="#{paramTypeSetting.onAddNewRow()}" />
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                             validateClient="true" update="@(addTypeForm :not(editSelect)) messageSelect"
+                             action="#{paramTypeSetting.onCreateTypeWrapper()}" />
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addTypeDialog').hide();"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="addPropDialogA" rendered="#{paramTypeSetting.write}" header="Добавить новое свойство" widgetVar="addPropDialogA"
+              width="450" height="185" modal="true" resizable="false">
+        <p:ajax event="close" listener="#{paramTypeSetting.onAddPropDialogAClose()}" update="addPropFormA"/>
+
+        <h:form id="addPropFormA">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
+                <p:selectOneMenu value="#{paramTypeSetting.newPropA.prop}" style="width: 340px;">
+                    <f:converter converterId="paramPropConverter"/>
+                    <f:selectItems value="#{paramTypeSetting.paramProperties}" var="prop"
+                                   itemLabel="#{prop.name}" itemValue="#{prop}" />
+                </p:selectOneMenu>
+            </div>
+            <h:outputLabel value="Граничные состояния" style="display: flex; justify-content: center; margin-bottom: 10px; font-weight: bold;"/>
+            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 10px;">
+                <div style="margin-right: 10px;">
+                    <p:outputLabel value="Нижние" for="@next"/>
+                    <p:selectOneMenu value="#{paramTypeSetting.newPropA.lessCond}" style="width: 200px;">
+                        <f:converter converterId="conditionConverter"/>
+                        <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                       itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div>
+                    <p:outputLabel value="Верхние" for="@next"/>
+                    <p:selectOneMenu value="#{paramTypeSetting.newPropA.greatCond}" style="width: 200px;">
+                        <f:converter converterId="conditionConverter"/>
+                        <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                       itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                             update="addPropFormA" action="#{paramTypeSetting.onCreatePropWrapper()}"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addPropDialogA').hide();"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="addPropDialogP" rendered="#{paramTypeSetting.write}" header="Добавить новое свойство" widgetVar="addPropDialogP"
+              width="450" height="195" modal="true" resizable="false">
+        <p:ajax event="close" listener="#{paramTypeSetting.onAddPropDialogPClose()}" update="addPropFormP"/>
+
+        <h:form id="addPropFormP">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <p:outputLabel value="Код" for="@next" style="margin-right: 5px;"/>
+                <p:inputNumber id="inputNumberP" value="#{paramTypeSetting.newPropP.code}" minValue="0" maxValue="99"/>
+            </div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
+                <p:inputText required="true" value="#{paramTypeSetting.newPropP.prop}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
+                <p:message style="margin-left: 5px;" for="@previous" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <p:outputLabel value="Состояние" for="@next" style="margin-right: 5px;"/>
+                <p:selectOneMenu value="#{paramTypeSetting.newPropP.condition}" style="width: 200px;">
+                    <f:converter converterId="conditionConverter"/>
+                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                   itemLabel="#{cond.name}" itemValue="#{cond}" />
+                </p:selectOneMenu>
+            </div>
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+                             validateClient="true" update="addPropFormP" action="#{paramTypeSetting.onCreatePropWrapper()}"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addPropDialogP').hide();"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

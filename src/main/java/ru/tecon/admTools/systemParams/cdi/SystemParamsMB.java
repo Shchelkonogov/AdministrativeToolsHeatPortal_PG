@@ -45,7 +45,8 @@ public class SystemParamsMB implements Serializable {
             {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
             {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
             {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
-            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"}
+            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"},
+            {"Настройка типа параметра", "/view/sysParams/paramTypeSetting.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String ip;
