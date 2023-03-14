@@ -16,7 +16,7 @@
     </h:form>
 
     <h:form id="divisionPanel" style="height: 100%;">
-        <div style="height: 40%;">
+        <div style="height: 50%;">
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
@@ -34,7 +34,8 @@
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
                 <div style="height: 100%;">
                     <p:treeTable value="#{bean['root']}" var="structType" id="structType" scrollable="true" scrollHeight="100%"
-                                 selectionMode="single" selection="#{bean.selectedStructNode}" rowKey="#{structType.id}">
+                                 selectionMode="single" selection="#{bean.selectedStructNode}" rowKey="#{structType.id}"
+                                 sortBy="#{structType.name}">
 
                         <p:ajax event="select" listener="#{bean.onRowSelect}"
                                 update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp" />
@@ -49,7 +50,7 @@
                 </div>
             </div>
         </div>
-        <div style="height: 60%;">
+        <div style="height: 50%;">
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
