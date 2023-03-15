@@ -81,21 +81,21 @@
         </div>
     </h:form>
 
-    <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true" width="650px" height="110px" resizable="false" rendered="#{mainParamMB.write}" >
+    <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true" width="450px" height="202px" resizable="false" rendered="#{mainParamMB.write}" >
 
         <h:form id="paramsForm">
 
-            <div>
+            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                 <h:outputLabel value="#{'Тип объекта: '.concat(' ').concat(mainParamMB.leftOneLine.name)}" style="margin: 10px" />
             </div>
 
-            <div>
+            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                 <h:outputLabel value="#{'Техпроцесс: '.concat(' ').concat(mainParamMB.adaptRightPartSelectOneMenu.name)}" style="margin: 10px"/>
             </div>
 
             <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="Параметр: "/>
-                <p:selectOneMenu id="params" value="#{mainParamMB.adaptParametrsOfTechProc}" style="width: 300px; margin: 10px">
+                <h:outputLabel value="Параметр: " style="margin-right: 10px; margin-left: 10px"/>
+                <p:selectOneMenu id="params" value="#{mainParamMB.adaptParametrsOfTechProc}" style="width: 300px; margin: 5px">
                     <f:converter converterId="parametrsTypeConverter"/>
                     <f:selectItems value="#{mainParamMB.parametrsOfTechProcsList}"
                                    var="paramType"
