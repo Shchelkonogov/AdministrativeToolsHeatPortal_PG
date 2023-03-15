@@ -156,8 +156,12 @@ public class MainParamSB {
             ResultSet resultSet = cStm.executeQuery();
             while (resultSet.next()) {
                 LOGGER.log(Level.INFO,"result: " + resultSet.getInt(1));
-            }
+                if (resultSet.getInt(1) !=0) {
+                    LOGGER.warning("deleting params at table error ");
 
+                    throw new SystemParamException("Не удалось осуществить удаление объекта");
+                }
+            }
 
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error del tableparam", e);
@@ -182,6 +186,11 @@ public class MainParamSB {
             ResultSet resultSet = cStm.executeQuery();
             while (resultSet.next()) {
                 LOGGER.log(Level.INFO,"result: " + resultSet.getInt(1));
+                if (resultSet.getInt(1) !=0) {
+                    LOGGER.warning("adding params at table error ");
+
+                    throw new SystemParamException("Не удалось осуществить добавление параметра");
+                }
             }
 
         } catch (SQLException e) {
