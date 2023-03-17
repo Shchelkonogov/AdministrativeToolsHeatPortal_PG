@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Контроллер для формы основные параметры
+ * Контроллер для формы статистические агрегаты
  * @author Aleksey Sergeev
  */
 @Named("statAggrMB")
@@ -62,7 +62,7 @@ public class StatAggrMB implements Serializable {
     }
 
     /**
-     * Обработчик удаления татистического агрегата из таблицы, возникает при нажатии на кнопку удалить (-)
+     * Обработчик удаления статистического агрегата из таблицы, возникает при нажатии на кнопку удалить (-)
      */
     public void onRemoveTableParam() {
         LOGGER.info("remove param: " + selectedPartInSATable);

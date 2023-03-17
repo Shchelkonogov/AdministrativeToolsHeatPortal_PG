@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.StringJoiner;
 
+/**
+ * Класс описывающий структуру таблицы для формы переключение сезона
+ * @author Aleksey Sergeev
+ */
 public class SeasonChangeTable implements Serializable {
 
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");

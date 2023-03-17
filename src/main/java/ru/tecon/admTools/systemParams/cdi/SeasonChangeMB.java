@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Контроллер для формы основные параметры
+ * Контроллер для формы переключение сезона
  * @author Aleksey Sergeev
  */
 @Named("seasonChangeMB")
@@ -52,6 +52,9 @@ public class SeasonChangeMB implements Serializable {
         }
     }
 
+    /**
+     * Обработчик переключения сезона, нажатие на копку изменить
+     */
     public void onSeasonChange(){
         try {
             seasonChangeSB.changeSeason(seasonChangeTable, login, ip);
@@ -63,6 +66,9 @@ public class SeasonChangeMB implements Serializable {
         seasonChangeTableList=seasonChangeSB.getTableParams();
     }
 
+    /**
+     * Обработчик активности кнопки изменить в зависимости от выбранного в списке сезона
+     */
     public void buttonChangeAfterSelect() {
         disableSaveBtn = seasonChangeTable.equals("ZIMA") && seasonChangeTableList.get(0).getSeason().equals("Зима") ||
                 seasonChangeTable.equals("LETO") && seasonChangeTableList.get(0).getSeason().equals("Лето");

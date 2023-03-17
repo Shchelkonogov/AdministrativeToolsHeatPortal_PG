@@ -30,6 +30,10 @@ public class SeasonChangeSB {
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
+    /**
+     * Обновление табличных значений
+     * @return наименование сезона, начала и конца сезона и переключившего сезон
+     */
     public List<SeasonChangeTable> getTableParams(){
         List <SeasonChangeTable> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -47,6 +51,9 @@ public class SeasonChangeSB {
         return result;
     }
 
+    /**
+     * Метод для переключения сезона
+     */
     public void changeSeason (String seasonChangeTable, String login, String ip) throws SystemParamException{
         try (Connection connect = ds.getConnection();
              PreparedStatement cStm = connect.prepareStatement(SQL_SELECT_SEASONS_CHANGE)) {
