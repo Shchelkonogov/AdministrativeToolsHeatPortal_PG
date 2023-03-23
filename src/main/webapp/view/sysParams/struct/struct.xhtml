@@ -9,9 +9,9 @@
 <ui:composition>
     <h:form>
         <p:remoteCommand name="saveStructWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{bean.onCreateStruct}" update="divisionPanel growl" rendered="#{bean.write}" />
+                         action="#{bean.onCreateStruct}" update="divisionPanel growl" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{bean.onCreateDivisionProp}" rendered="#{bean.write}"
+                         action="#{bean.onCreateDivisionProp}" rendered="#{systemParamsUtil.write}"
                          update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl" />
     </h:form>
 
@@ -25,10 +25,10 @@
                     <p:commandButton id="divisionRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
                                      disabled="#{bean.disableRemoveStructBtn}" update="divisionPanel growl"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{bean.onRemoveStruct()}" rendered="#{bean.write}" />
+                                     action="#{bean.onRemoveStruct()}" rendered="#{systemParamsUtil.write}" />
                     <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      onclick="PF('addDialog').show();" action="#{bean.loadProperties()}"
-                                     rendered="#{bean.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
@@ -60,18 +60,18 @@
                                      disabled="#{bean.disableRemoveStructPropBtn}" action="#{bean.onRemoveStructProp}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl"
-                                     rendered="#{bean.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                     <p:commandButton id="divisionAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      disabled="#{bean.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
                                      action="#{bean.loadProperties()}" update="addPropDialog"
-                                     rendered="#{bean.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 3px); padding: 3px;">
                 <div style="height: 100%;">
                     <p:dataTable id="divisionPropTable" value="#{bean.structTypeProps}" var="prop" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{bean.selectedStructProp}" rowKey="#{prop.id}"
-                                 draggableRows="#{bean.write}" emptyMessage="#{global['table.empty.value']}">
+                                 draggableRows="#{systemParamsUtil.write}" emptyMessage="#{global['table.empty.value']}">
 
                         <p:ajax event="rowReorder" listener="#{bean.onRowReorder}" update="growl" />
                         <p:ajax event="rowSelect" listener="#{bean.onRowPropSelect}" update="divisionPanel:divisionRemoveProp" />
@@ -100,7 +100,7 @@
         </div>
     </h:form>
 
-    <p:dialog id="addDialog" rendered="#{bean.write}" header="#{bean.dialogHeader}" widgetVar="addDialog"
+    <p:dialog id="addDialog" rendered="#{systemParamsUtil.write}" header="#{bean.dialogHeader}" widgetVar="addDialog"
               width="1012" height="325" modal="true" resizable="false">
         <p:ajax event="close" listener="#{bean.onclose()}" update="addForm"/>
         <h:form id="addForm">
@@ -223,7 +223,7 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialog" rendered="#{bean.write}" header="Добавить новое свойство" widgetVar="addPropDialog"
+    <p:dialog id="addPropDialog" rendered="#{systemParamsUtil.write}" header="Добавить новое свойство" widgetVar="addPropDialog"
               width="450" height="290" modal="true" resizable="false">
 
         <p:ajax event="close" listener="#{bean.onAddPropDialogClose()}" update="addPropForm"/>

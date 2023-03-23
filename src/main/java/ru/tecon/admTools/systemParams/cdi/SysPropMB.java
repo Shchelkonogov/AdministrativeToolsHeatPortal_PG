@@ -7,8 +7,8 @@ import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
 import ru.tecon.admTools.systemParams.ejb.MeasureSB;
 import ru.tecon.admTools.systemParams.ejb.SysPropSB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
-import ru.tecon.admTools.systemParams.model.SysProp;
 import ru.tecon.admTools.systemParams.model.Measure;
+import ru.tecon.admTools.systemParams.model.SysProp;
 import ru.tecon.admTools.systemParams.model.struct.PropValType;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +16,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,10 +41,6 @@ public class SysPropMB implements Serializable, MyConverter {
 
     private boolean disableRemoveBtn = true;
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private StructSB structSB;
 
@@ -54,18 +50,15 @@ public class SysPropMB implements Serializable, MyConverter {
     @EJB
     private SysPropSB sysPropSB;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
         props = sysPropSB.getSysProps();
 
         propValTypes = structSB.getPropValTypes();
         measures = measureSB.getMeasures();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -75,7 +68,7 @@ public class SysPropMB implements Serializable, MyConverter {
         LOGGER.info("remove system property: " + selectedProp);
 
         try {
-            sysPropSB.removeSysProp(selectedProp, login, ip);
+            sysPropSB.removeSysProp(selectedProp, utilMB.getLogin(), utilMB.getIp());
 
             selectedProp = null;
             disableRemoveBtn = true;
@@ -104,7 +97,7 @@ public class SysPropMB implements Serializable, MyConverter {
         SysProp prop = event.getObject();
 
         try {
-            prop.setId(sysPropSB.addSysProp(prop, login, ip));
+            prop.setId(sysPropSB.addSysProp(prop, utilMB.getLogin(), utilMB.getIp()));
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -127,10 +120,6 @@ public class SysPropMB implements Serializable, MyConverter {
 
     public boolean isDisableRemoveBtn() {
         return disableRemoveBtn;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public List<SysProp> getProps() {

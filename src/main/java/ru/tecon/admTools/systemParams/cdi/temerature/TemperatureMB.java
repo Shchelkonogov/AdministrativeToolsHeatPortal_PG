@@ -3,13 +3,14 @@ package ru.tecon.admTools.systemParams.cdi.temerature;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureRemote;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,6 @@ import java.util.logging.Logger;
 public abstract class TemperatureMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(TemperatureMB.class.getName());
-
-    private String login;
-    private String ip;
-    private boolean write;
 
     private List<Temperature> temperatureTypes = new ArrayList<>();
     private Temperature selectedTemperatureType;
@@ -43,13 +40,10 @@ public abstract class TemperatureMB implements Serializable {
     public abstract String getHeaderProp();
     public abstract String getHeaderAddDialog();
 
-    protected void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
+    protected void init() {
         loadData();
     }
 
@@ -72,7 +66,7 @@ public abstract class TemperatureMB implements Serializable {
         LOGGER.info("remove temperature: " + selectedTemperatureType);
 
         try {
-            temperatureBean.removeTemperature(selectedTemperatureType, login, ip);
+            temperatureBean.removeTemperature(selectedTemperatureType, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
         } catch (SystemParamException e) {
@@ -105,7 +99,7 @@ public abstract class TemperatureMB implements Serializable {
         LOGGER.info("remove temperature property: " + selectedTemperatureProp);
 
         try {
-            temperatureBean.removeTemperatureProp(selectedTemperatureType.getId(), selectedTemperatureProp, login, ip);
+            temperatureBean.removeTemperatureProp(selectedTemperatureType.getId(), selectedTemperatureProp, utilMB.getLogin(), utilMB.getIp());
 
             selectedTemperatureProp = null;
             disableRemovePropBtn = true;
@@ -149,7 +143,7 @@ public abstract class TemperatureMB implements Serializable {
         LOGGER.info("create new temperature property: " + newTemperatureProp + " for temperature: " + selectedTemperatureType);
 
         try {
-            temperatureBean.addTemperatureProp(selectedTemperatureType.getId(), newTemperatureProp, login, ip);
+            temperatureBean.addTemperatureProp(selectedTemperatureType.getId(), newTemperatureProp, utilMB.getLogin(), utilMB.getIp());
 
             selectedTemperatureType.setTemperatureProps(temperatureBean.loadTemperatureProps(selectedTemperatureType));
 
@@ -172,14 +166,14 @@ public abstract class TemperatureMB implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
 
         try {
-            int tempGraphID = temperatureBean.createTemperature(newTemperature, login, ip);
+            int tempGraphID = temperatureBean.createTemperature(newTemperature, utilMB.getLogin(), utilMB.getIp());
 
             if (!newTemperature.getTemperatureProps().isEmpty()) {
                 newTemperature.getTemperatureProps().removeIf(TemperatureProp::check);
 
                 for (TemperatureProp prop: newTemperature.getTemperatureProps()) {
                     try {
-                        temperatureBean.addTemperatureProp(tempGraphID, prop, login, ip);
+                        temperatureBean.addTemperatureProp(tempGraphID, prop, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
@@ -224,10 +218,6 @@ public abstract class TemperatureMB implements Serializable {
 
     public void setSelectedTemperatureProp(TemperatureProp selectedTemperatureProp) {
         this.selectedTemperatureProp = selectedTemperatureProp;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public boolean isDisableRemovePropBtn() {

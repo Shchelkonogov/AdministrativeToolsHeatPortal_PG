@@ -14,17 +14,17 @@
                                  disabled="#{sysProp.disableRemoveBtn}" action="#{sysProp.onRemoveProp()}"
                                  onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                  update="sysPropForm:sysPropTable sysPropForm:btnRemove growl"
-                                 rendered="#{sysProp.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
                 <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                  action="#{sysProp.onAddNewProp()}" update="sysPropForm:sysPropTable"
-                                 rendered="#{sysProp.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
             </div>
         </div>
         <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
             <div style="height: 100%;">
                 <p:dataTable id="sysPropTable" var="sysPropData" value="#{sysProp.props}" widgetVar="propTable"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{sysProp.write}" selectionMode="single" selection="#{sysProp.selectedProp}"
+                             editable="#{systemParamsUtil.write}" selectionMode="single" selection="#{sysProp.selectedProp}"
                              rowKey="#{sysPropData.id}">
 
                     <p:ajax event="rowEdit" listener="#{sysProp.onRowEdit}"
@@ -82,7 +82,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{sysProp.write}">
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
                         <p:rowEditor rendered="#{sysPropData.id == 0}" editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>

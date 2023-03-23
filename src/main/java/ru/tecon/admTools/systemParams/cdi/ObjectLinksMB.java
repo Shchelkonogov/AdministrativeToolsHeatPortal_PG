@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.*;
@@ -33,23 +33,16 @@ public class ObjectLinksMB implements Serializable {
 
     private boolean disableRemoveBtn = true;
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private ObjectLinksSB objectLinksSB;
+
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
         objectLinks = objectLinksSB.getObjectLinks();
         objectTypes = objectLinksSB.getObjectTypes();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -63,9 +56,9 @@ public class ObjectLinksMB implements Serializable {
 
         try {
             if (link.getId() == 0) {
-                link.setId(objectLinksSB.addObjectLink(link, login, ip));
+                link.setId(objectLinksSB.addObjectLink(link, utilMB.getLogin(), utilMB.getIp()));
             } else {
-                objectLinksSB.updateObjectLink(link, login, ip);
+                objectLinksSB.updateObjectLink(link, utilMB.getLogin(), utilMB.getIp());
             }
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
@@ -94,7 +87,7 @@ public class ObjectLinksMB implements Serializable {
         LOGGER.info("remove link: " + selectedLink);
 
         try {
-            objectLinksSB.removeObjectLink(selectedLink, login, ip);
+            objectLinksSB.removeObjectLink(selectedLink, utilMB.getLogin(), utilMB.getIp());
 
             selectedLink = null;
             disableRemoveBtn = true;
@@ -123,10 +116,6 @@ public class ObjectLinksMB implements Serializable {
 
     public Set<Map.Entry<Integer, String>> getObjectTypesAsSet() {
         return getObjectTypes().entrySet();
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public ObjectLink getSelectedLink() {

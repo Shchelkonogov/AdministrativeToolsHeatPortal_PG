@@ -5,12 +5,11 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.MultiYearTempSB;
 import ru.tecon.admTools.systemParams.model.MultiYearTemp;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,21 +28,11 @@ public class MultiYearTempMB implements Serializable {
 
     private List<MultiYearTemp> multiYearTemps = new ArrayList<>();
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private MultiYearTempSB multiYearTempSB;
 
-    @PostConstruct
-    private void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
-    }
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     /**
      * Метод выполняется при загрузки формы
@@ -68,7 +57,7 @@ public class MultiYearTempMB implements Serializable {
         MultiYearTemp temp = event.getObject();
 
         try {
-            multiYearTempSB.updateMultiYearTemp(temp, login, ip);
+            multiYearTempSB.updateMultiYearTemp(temp, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -78,9 +67,5 @@ public class MultiYearTempMB implements Serializable {
 
     public List<MultiYearTemp> getMultiYearTemps() {
         return multiYearTemps;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 }

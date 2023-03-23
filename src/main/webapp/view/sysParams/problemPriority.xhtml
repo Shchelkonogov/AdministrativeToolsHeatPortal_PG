@@ -9,7 +9,7 @@
                 border-top-left-radius: 3px; height: 41px;">
             <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Приоритет категорий проблем"/>
             <div style="padding: 3px;">
-                <p:commandButton rendered="#{problemPriority.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                  action="#{problemPriority.onSaveChanges}" update="problemTable growl"
                                  oncomplete="PF('statusDialog').hide();" />
             </div>
@@ -17,7 +17,7 @@
         <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
             <div style="height: 100%;">
                 <p:dataTable id="problemTable" value="#{problemPriority.problemPriorityList}" var="problemData"
-                             scrollable="true" scrollHeight="100%" editable="#{problemPriority.write}" editMode="cell">
+                             scrollable="true" scrollHeight="100%" editable="#{systemParamsUtil.write}" editMode="cell">
                     <p:column headerText="Наименование проблемы">
                         <h:outputText value="#{problemData.name}" />
                     </p:column>

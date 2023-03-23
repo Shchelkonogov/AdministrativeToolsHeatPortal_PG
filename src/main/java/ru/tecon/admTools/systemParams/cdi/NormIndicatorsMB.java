@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,21 +37,14 @@ public class NormIndicatorsMB implements Serializable {
     private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
     private List<IndicatorUnderSupply> indicatorUnderSupplyList = new ArrayList<>();
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private NormIndicatorsSB normIndicatorsBean;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
-
         loadData();
     }
 
@@ -92,7 +85,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update norm indicator TV " + indicatorTV);
 
                     try {
-                        normIndicatorsBean.updateTV(indicatorTV, login, ip);
+                        normIndicatorsBean.updateTV(indicatorTV, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Тепловой ввод");
                         LOGGER.warning(e.getMessage());
@@ -107,7 +100,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update norm indicator CO " + indicatorCO);
 
                     try {
-                        normIndicatorsBean.updateCO(indicatorCO, login, ip);
+                        normIndicatorsBean.updateCO(indicatorCO, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorCO.getName());
                         LOGGER.warning(e.getMessage());
@@ -122,7 +115,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update norm indicator GVS " + indicatorGVS);
 
                     try {
-                        normIndicatorsBean.updateGVS(indicatorGVS, login, ip);
+                        normIndicatorsBean.updateGVS(indicatorGVS, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorGVS.getName());
                         LOGGER.warning(e.getMessage());
@@ -137,7 +130,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update norm indicator VENT " + indicatorVENT);
 
                     try {
-                        normIndicatorsBean.updateVENT(indicatorVENT, login, ip);
+                        normIndicatorsBean.updateVENT(indicatorVENT, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorVENT.getName());
                         LOGGER.warning(e.getMessage());
@@ -152,7 +145,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update norm indicator other " + indicatorOther);
 
                     try {
-                        normIndicatorsBean.updateOther(indicatorOther, login, ip);
+                        normIndicatorsBean.updateOther(indicatorOther, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Источник - Потребитель");
                         LOGGER.warning(e.getMessage());
@@ -167,7 +160,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update T7 indicator " + indicatorT7);
 
                     try {
-                        normIndicatorsBean.updateT7(indicatorT7, login, ip);
+                        normIndicatorsBean.updateT7(indicatorT7, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Анализ потребителей T7");
                         LOGGER.warning(e.getMessage());
@@ -182,7 +175,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update dT7 indicator " + indicatorDT7);
 
                     try {
-                        normIndicatorsBean.updateDT7(indicatorDT7, login, ip);
+                        normIndicatorsBean.updateDT7(indicatorDT7, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Анализ потребителей ΔT7");
                         LOGGER.warning(e.getMessage());
@@ -197,7 +190,7 @@ public class NormIndicatorsMB implements Serializable {
                     LOGGER.info("update underSupply indicator " + indicatorUnderSupply);
 
                     try {
-                        normIndicatorsBean.updateUnderSupply(indicatorUnderSupply, login, ip);
+                        normIndicatorsBean.updateUnderSupply(indicatorUnderSupply, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(e.getMessage());
                         LOGGER.warning(e.getMessage());
@@ -254,9 +247,5 @@ public class NormIndicatorsMB implements Serializable {
 
     public List<IndicatorUnderSupply> getIndicatorUnderSupplyList() {
         return indicatorUnderSupplyList;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 }

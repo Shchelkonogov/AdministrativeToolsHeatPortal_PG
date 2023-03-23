@@ -17,7 +17,7 @@
             <div style="height: 100%;">
                 <p:dataTable id="tempTable" var="tempData" value="#{multiYearTemp.multiYearTemps}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{multiYearTemp.write}">
+                             editable="#{systemParamsUtil.write}">
 
                     <p:ajax event="rowEdit" listener="#{multiYearTemp.onRowEdit}"
                             onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
@@ -27,7 +27,7 @@
                         <h:outputText style="display: block;" value="#{tempData.name}" />
                     </p:column>
                     <p:column headerText="Температура" width="200" style="white-space: nowrap; text-align: center;">
-                        <p:cellEditor disabled="#{!multiYearTemp.write}">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;" value="#{tempData.value}" />
                             </f:facet>
@@ -36,7 +36,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{multiYearTemp.write}">
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
                         <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>
