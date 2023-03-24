@@ -7,8 +7,8 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,10 +53,6 @@ public class SystemParamsMB implements Serializable {
             {"Настройка типа параметра", "/view/sysParams/paramTypeSetting.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
-    private String ip;
-    private String login;
-    private boolean write = false;
-
     private String content = "";
 
     private String selectedButton;
@@ -65,15 +61,18 @@ public class SystemParamsMB implements Serializable {
     @EJB
     private CheckUserSB checkUserSB;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
-        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        Map<String, String> request = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 
-        String sessionID = request.getParameter("sessionID");
+        String sessionID = request.get("sessionID");
 
-        ip = request.getParameter("ip");
-        login = checkUserSB.getUser(sessionID);
-        write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.getParameter("formID")));
+        utilMB.setIp(request.get("ip"));
+        utilMB.setLogin(checkUserSB.getUser(sessionID));
+        utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formID"))));
     }
 
     private void updateContent(String parameter) {
@@ -115,17 +114,5 @@ public class SystemParamsMB implements Serializable {
 
     public Set<String> getParameters() {
         return SYSTEM_PARAMS_MAP.keySet();
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public boolean isWrite() {
-        return write;
-    }
-
-    public String getIp() {
-        return ip;
     }
 }

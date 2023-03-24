@@ -16,7 +16,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Тепловой ввод"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('TV')}" update="indicatorTVTable growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -24,7 +24,7 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="indicatorTVTable" value="#{normIndicators.indicatorTVList}" var="tv"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -33,7 +33,7 @@
                                 <h:outputText value="Источник"/>
                             </p:column>
                             <p:column headerText="Кп_н [%]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;|#{tv.kpn}|%"/>
                                     </f:facet>
@@ -43,7 +43,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{tv.kz}"/>
                                     </f:facet>
@@ -53,7 +53,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="Кп [%]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{tv.kp}"/>
                                     </f:facet>
@@ -72,7 +72,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Центральное отопление"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('CO')}" update="indicatorCOTable growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -80,7 +80,7 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="indicatorCOTable" value="#{normIndicators.indicatorCOList}" var="co"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -89,7 +89,7 @@
                                 <h:outputText value="#{co.name}"/>
                             </p:column>
                             <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{co.kz}"/>
                                     </f:facet>
@@ -99,7 +99,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="Кп [%]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{co.kp}"/>
                                     </f:facet>
@@ -120,7 +120,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Горячее водоснабжение"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('GVS')}" update="indicatorGVSTable growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -128,7 +128,7 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="indicatorGVSTable" value="#{normIndicators.indicatorGVSList}" var="gvs"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -137,7 +137,7 @@
                                 <h:outputText value="#{gvs.name}"/>
                             </p:column>
                             <p:column headerText="Кц [%]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&gt;#{gvs.kc}%"/>
                                     </f:facet>
@@ -156,7 +156,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Вентиляция"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('VENT')}" update="indicatorVENTTable growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -164,7 +164,7 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="indicatorVENTTable" value="#{normIndicators.indicatorVENTList}" var="vent"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -173,7 +173,7 @@
                                 <h:outputText value="#{vent.name}"/>
                             </p:column>
                             <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{vent.kz}"/>
                                     </f:facet>
@@ -183,7 +183,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="Кп [%]" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{vent.kp}"/>
                                     </f:facet>
@@ -203,7 +203,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                 <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Граничные значения"/>
                 <div style="padding: 3px;">
-                    <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                    <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                      action="#{normIndicators.onSaveChanges('Other')}" update="borderValues growl"
                                      oncomplete="PF('statusDialog').hide();" />
                 </div>
@@ -211,7 +211,7 @@
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                 <div style="height: 100%;">
                     <p:dataTable id="borderValues" value="#{normIndicators.indicatorOtherList}" var="other"
-                                 editable="#{normIndicators.write}" editMode="cell"
+                                 editable="#{systemParamsUtil.write}" editMode="cell"
                                  emptyMessage="#{global['table.empty.value']}" style="height: 100%;" >
 
                         <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -246,7 +246,7 @@
                             <h:outputText value="Источник - Потребитель" />
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="&gt;#{other.t7}"/>
                                 </f:facet>
@@ -256,7 +256,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="&#8804;#{other.dt7}"/>
                                 </f:facet>
@@ -266,7 +266,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kt}"/>
                                 </f:facet>
@@ -276,7 +276,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kto}"/>
                                 </f:facet>
@@ -286,7 +286,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kg}"/>
                                 </f:facet>
@@ -296,7 +296,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kv}"/>
                                 </f:facet>
@@ -306,7 +306,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kuco}"/>
                                 </f:facet>
@@ -316,7 +316,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kuvent}"/>
                                 </f:facet>
@@ -326,7 +326,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kugvs}"/>
                                 </f:facet>
@@ -336,7 +336,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kpco}"/>
                                 </f:facet>
@@ -346,7 +346,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kdgco}"/>
                                 </f:facet>
@@ -357,7 +357,7 @@
                         </p:column>
 <!--                       два вводе в строке <p:column style="text-align: center;" styleClass="double">-->
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="К1&lt;#{other.k1}"/>
                                 </f:facet>
@@ -367,7 +367,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="К2&lt;#{other.k2}"/>
                                 </f:facet>
@@ -377,7 +377,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kpgvs}"/>
                                 </f:facet>
@@ -387,7 +387,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kdggvs}"/>
                                 </f:facet>
@@ -397,7 +397,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{other.kqgvsl}"/>
                                 </f:facet>
@@ -407,7 +407,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="&#8804;#{other.gvsdt}"/>
                                 </f:facet>
@@ -417,7 +417,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="&lt;#{other.kgvsc}"/>
                                 </f:facet>
@@ -437,7 +437,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Анализ потребителей T7"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('T7')}" update="consumerAnalisisT7Table growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -445,7 +445,7 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="consumerAnalisisT7Table" value="#{normIndicators.indicatorT7List}" var="t7"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -454,7 +454,7 @@
                                 <h:outputText value="#{t7.name}"/>
                             </p:column>
                             <p:column headerText="T7min Ж" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.minG}"/>
                                     </f:facet>
@@ -464,7 +464,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="T7max Ж" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.maxG}"/>
                                     </f:facet>
@@ -474,7 +474,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="T7min П" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.minP}"/>
                                     </f:facet>
@@ -484,7 +484,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="T7max П" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.maxP}"/>
                                     </f:facet>
@@ -503,7 +503,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                     <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Анализ потребителей ΔT7"/>
                     <div style="padding: 3px;">
-                        <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                        <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                          action="#{normIndicators.onSaveChanges('dT7')}" update="consumerAnalisisDeltaT7Table growl"
                                          oncomplete="PF('statusDialog').hide();" />
                     </div>
@@ -511,13 +511,13 @@
                 <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                     <div style="height: 100%;">
                         <p:dataTable id="consumerAnalisisDeltaT7Table" value="#{normIndicators.indicatorDT7List}" var="dT7"
-                                     editable="#{normIndicators.write}" editMode="cell"
+                                     editable="#{systemParamsUtil.write}" editMode="cell"
                                      emptyMessage="#{global['table.empty.value']}">
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
 
                             <p:column headerText="ΔTmin" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtMin}"/>
                                     </f:facet>
@@ -527,7 +527,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="ΔTmax" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtMax}"/>
                                     </f:facet>
@@ -537,7 +537,7 @@
                                 </p:cellEditor>
                             </p:column>
                             <p:column headerText="ΔTнорм" style="text-align: center;">
-                                <p:cellEditor disabled="#{!normIndicators.write}">
+                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtNorm}"/>
                                     </f:facet>
@@ -557,7 +557,7 @@
                     border-top-left-radius: 3px; height: 41px;">
                 <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Недоотпуск"/>
                 <div style="padding: 3px;">
-                    <p:commandButton rendered="#{normIndicators.write}" value="Сохранить" onclick="PF('statusDialog').show();"
+                    <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
                                      action="#{normIndicators.onSaveChanges('underSupply')}" update="underSupplyValues growl"
                                      oncomplete="PF('statusDialog').hide();" />
                 </div>
@@ -565,7 +565,7 @@
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
                 <div style="height: 100%;">
                     <p:dataTable id="underSupplyValues" value="#{normIndicators.indicatorUnderSupplyList}" var="underSupply"
-                                 editable="#{normIndicators.write}" editMode="cell"
+                                 editable="#{systemParamsUtil.write}" editMode="cell"
                                  emptyMessage="#{global['table.empty.value']}" style="height: 100%;" >
 
                         <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
@@ -585,7 +585,7 @@
                             </p:row>
                         </p:columnGroup>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t3K1}"/>
                                 </f:facet>
@@ -595,7 +595,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t3K2}"/>
                                 </f:facet>
@@ -605,7 +605,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t3K3}"/>
                                 </f:facet>
@@ -615,7 +615,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t4K1}"/>
                                 </f:facet>
@@ -625,7 +625,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t4K2}"/>
                                 </f:facet>
@@ -635,7 +635,7 @@
                             </p:cellEditor>
                         </p:column>
                         <p:column style="text-align: center;">
-                            <p:cellEditor disabled="#{!normIndicators.write}">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                 <f:facet name="output">
                                     <h:outputText value="#{underSupply.t4K3}"/>
                                 </f:facet>

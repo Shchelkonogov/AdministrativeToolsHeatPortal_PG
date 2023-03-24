@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,22 +33,15 @@ public class MeasureMB implements Serializable {
 
     private boolean disableRemoveBtn = true;
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private MeasureSB measureSB;
+
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
         measures = measureSB.getMeasures();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -62,9 +55,9 @@ public class MeasureMB implements Serializable {
 
         try {
             if (measure.getId() == 0) {
-                measure.setId(measureSB.addMeasure(measure, login, ip));
+                measure.setId(measureSB.addMeasure(measure, utilMB.getLogin(), utilMB.getIp()));
             } else {
-                measureSB.updateMeasure(measure, login, ip);
+                measureSB.updateMeasure(measure, utilMB.getLogin(), utilMB.getIp());
             }
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
@@ -93,7 +86,7 @@ public class MeasureMB implements Serializable {
         LOGGER.info("remove measure: " + selectedMeasure);
 
         try {
-            measureSB.removeMeasure(selectedMeasure, login, ip);
+            measureSB.removeMeasure(selectedMeasure, utilMB.getLogin(), utilMB.getIp());
 
             selectedMeasure = null;
             disableRemoveBtn = true;
@@ -114,10 +107,6 @@ public class MeasureMB implements Serializable {
 
     public List<Measure> getMeasures() {
         return measures;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public Measure getSelectedMeasure() {

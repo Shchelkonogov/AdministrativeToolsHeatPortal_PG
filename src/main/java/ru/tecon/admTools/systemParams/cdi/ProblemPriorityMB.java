@@ -9,7 +9,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,22 +28,15 @@ public class ProblemPriorityMB implements Serializable {
 
     private List<ProblemPriority> problemPriorityList = new ArrayList<>();
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private ProblemPrioritySB problemPrioritySB;
+
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
         problemPriorityList = problemPrioritySB.getProblemPriority();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -55,10 +48,10 @@ public class ProblemPriorityMB implements Serializable {
         List<String> errorMessages = new ArrayList<>();
 
         problemPriorityList.stream().filter(ProblemPriority::isChanged).forEach(problemPriority -> {
-            LOGGER.info("update for login " + login + " and ip " + ip + " problem priority " + problemPriority);
+            LOGGER.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " problem priority " + problemPriority);
 
             try {
-                problemPrioritySB.updateProblemPriority(problemPriority.getId(), problemPriority.getPriority(), login, ip);
+                problemPrioritySB.updateProblemPriority(problemPriority.getId(), problemPriority.getPriority(), utilMB.getLogin(), utilMB.getIp());
                 problemPriority.updatePriority();
             } catch (SystemParamException e) {
                 problemPriority.revert();
@@ -74,9 +67,5 @@ public class ProblemPriorityMB implements Serializable {
 
     public List<ProblemPriority> getProblemPriorityList() {
         return problemPriorityList;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 }

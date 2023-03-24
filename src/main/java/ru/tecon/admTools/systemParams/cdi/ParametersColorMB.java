@@ -10,7 +10,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,9 +29,8 @@ public class ParametersColorMB implements Serializable {
 
     private List<ParametersColor> parametersColorList;
 
-    private String login;
-    private String ip;
-    private boolean write = false;
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @EJB
     private ParametersColorSB parametersColorSB;
@@ -39,12 +38,6 @@ public class ParametersColorMB implements Serializable {
     @PostConstruct
     private void init() {
         parametersColorList = parametersColorSB.getParametersColor();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -52,7 +45,7 @@ public class ParametersColorMB implements Serializable {
      */
     public void update() {
         for (int i = 0; i < parametersColorList.size(); i++) {
-            if (write) {
+            if (utilMB.isWrite()) {
                 PrimeFaces.current().executeScript("changeValue(" + i + ");");
                 PrimeFaces.current().executeScript("changeColor(" + i + ");");
             } else {
@@ -71,10 +64,10 @@ public class ParametersColorMB implements Serializable {
         List<String> errorMessages = new ArrayList<>();
 
         parametersColorList.stream().filter(ParametersColor::isChanged).forEach(parametersColor -> {
-            LOGGER.info("update for login " + login + " and ip " + ip + " parameter color " + parametersColor);
+            LOGGER.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " parameter color " + parametersColor);
 
             try {
-                parametersColorSB.updateParameterColor(parametersColor.getId(), parametersColor.getColor(), login, ip);
+                parametersColorSB.updateParameterColor(parametersColor.getId(), parametersColor.getColor(), utilMB.getLogin(), utilMB.getIp());
                 parametersColor.updateColor();
             } catch (SystemParamException e) {
                 parametersColor.revert();
@@ -90,9 +83,5 @@ public class ParametersColorMB implements Serializable {
 
     public List<ParametersColor> getParametersColorList() {
         return parametersColorList;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 }

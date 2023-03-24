@@ -14,17 +14,17 @@
                                  disabled="#{objectLinks.disableRemoveBtn}" action="#{objectLinks.onRemoveLink}"
                                  onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                  update="objectLinksForm:objectLinksTable objectLinksForm:btnRemove growl"
-                                 rendered="#{objectLinks.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
                 <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                  action="#{objectLinks.onAddNew()}" update="objectLinksForm:objectLinksTable"
-                                 rendered="#{objectLinks.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
             </div>
         </div>
         <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
             <div style="height: 100%;">
                 <p:dataTable id="objectLinksTable" var="objectLinksData" widgetVar="linksTable" value="#{objectLinks.objectLinks}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{objectLinks.write}" selectionMode="single" selection="#{objectLinks.selectedLink}"
+                             editable="#{systemParamsUtil.write}" selectionMode="single" selection="#{objectLinks.selectedLink}"
                              rowKey="#{objectLinksData.id}">
 
                     <p:ajax event="rowEdit" listener="#{objectLinks.onRowEdit}"
@@ -33,7 +33,7 @@
                     <p:ajax event="rowSelect" listener="#{objectLinks.onRowSelect}" update="objectLinksForm:btnRemove" />
 
                     <p:column headerText="Название типа связи">
-                        <p:cellEditor disabled="#{!objectLinks.write}">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;" value="#{objectLinksData.name}" />
                             </f:facet>
@@ -43,7 +43,7 @@
                         </p:cellEditor>
                     </p:column>
                     <p:column headerText="Название типа объекта-источника" width="200" style="white-space: nowrap">
-                        <p:cellEditor disabled="#{!objectLinks.write}">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;"
                                               value="#{objectLinks.objectTypes.get(objectLinksData.objectTypeLink1)}" />
@@ -57,7 +57,7 @@
                         </p:cellEditor>
                     </p:column>
                     <p:column headerText="Название типа объекта-потребителя" width="200" style="white-space: nowrap">
-                        <p:cellEditor disabled="#{!objectLinks.write}">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;"
                                               value="#{objectLinks.objectTypes.get(objectLinksData.objectTypeLink2)}" />
@@ -70,7 +70,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{objectLinks.write}">
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
                         <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>

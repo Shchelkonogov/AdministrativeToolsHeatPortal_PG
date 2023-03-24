@@ -5,9 +5,9 @@
                 xmlns:p="http://primefaces.org/ui">
     <h:form>
         <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{bean.onCreateTemperature}" update="temperaturePanel growl" rendered="#{bean.write}" />
+                         action="#{bean.onCreateTemperature}" update="temperaturePanel growl" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{bean.onCreateTemperatureProp}" rendered="#{bean.write}"
+                         action="#{bean.onCreateTemperatureProp}" rendered="#{systemParamsUtil.write}"
                          update="temperaturePanel:temperatureProp temperaturePanel:temperatureRemoveProp growl" />
     </h:form>
 
@@ -21,9 +21,9 @@
                     <p:commandButton id="temperatureRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
                                      disabled="#{bean.disableRemoveTemperatureBtn}" update="temperaturePanel growl"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{bean.onRemoveTemperature()}" rendered="#{bean.write}" />
+                                     action="#{bean.onRemoveTemperature()}" rendered="#{systemParamsUtil.write}" />
                     <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     onclick="PF('addTypeDialog').show();" rendered="#{bean.write}" />
+                                     onclick="PF('addTypeDialog').show();" rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
@@ -62,10 +62,10 @@
                                      disabled="#{bean.disableRemovePropBtn}" action="#{bean.onRemoveProp}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="temperaturePanel:temperatureProp temperaturePanel:temperatureRemoveProp growl"
-                                     rendered="#{bean.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                     <p:commandButton id="temperatureAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      disabled="#{bean.disableRemoveTemperatureBtn}" onclick="PF('addPropDialog').show();"
-                                     rendered="#{bean.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
@@ -74,7 +74,7 @@
                                  scrollable="true" scrollHeight="100%" selectionMode="single"
                                  selection="#{bean.selectedTemperatureProp}" rowKey="#{temperatureProp.id}"
                                  emptyMessage="#{global['table.empty.value']}" scrollRows="100"
-                                 disabledSelection="#{!bean.write}">
+                                 disabledSelection="#{!systemParamsUtil.write}">
 
                         <p:ajax event="rowSelect" listener="#{bean.onTemperaturePropSelect}"
                                 update="temperaturePanel:temperatureRemoveProp" />
@@ -92,7 +92,7 @@
         </div>
     </h:form>
 
-    <p:dialog id="addTypeDialog" rendered="#{bean.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
+    <p:dialog id="addTypeDialog" rendered="#{systemParamsUtil.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
               width="800" height="325" modal="true" resizable="false">
 
         <p:ajax event="close" listener="#{bean.onAddTypeDialogClose()}" update="addForm"/>
@@ -168,7 +168,7 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialog" rendered="#{bean.write}" header="#{bean.headerAddDialog}"
+    <p:dialog id="addPropDialog" rendered="#{systemParamsUtil.write}" header="#{bean.headerAddDialog}"
               widgetVar="addPropDialog" width="550" modal="true" resizable="false">
 
         <p:ajax event="close" listener="#{bean.onAddPropDialogClose()}" update="addPropForm"/>

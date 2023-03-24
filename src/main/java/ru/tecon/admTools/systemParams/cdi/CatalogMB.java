@@ -14,7 +14,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,10 +31,6 @@ public class CatalogMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(CatalogMB.class.getName());
 
-    private String login;
-    private String ip;
-    private boolean write;
-
     private List<CatalogType> catalogTypes = new ArrayList<>();
     private LazyDataModel<CatalogProp> catalogProps = new LazyCustomDataModel();
     private CatalogType selectedCatalogType;
@@ -49,14 +45,11 @@ public class CatalogMB implements Serializable {
     @EJB
     private CatalogSB catalogBean;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
-
         loadData();
     }
 
@@ -80,7 +73,7 @@ public class CatalogMB implements Serializable {
         LOGGER.info("remove catalog: " + selectedCatalogType);
 
         try {
-            catalogBean.removeCatalog(selectedCatalogType, login, ip);
+            catalogBean.removeCatalog(selectedCatalogType, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
         } catch (SystemParamException e) {
@@ -114,7 +107,7 @@ public class CatalogMB implements Serializable {
         LOGGER.info("remove catalog property: " + selectedCatalogProp);
 
         try {
-            catalogBean.removeCatalogProp(selectedCatalogType.getId(), selectedCatalogProp, login, ip);
+            catalogBean.removeCatalogProp(selectedCatalogType.getId(), selectedCatalogProp, utilMB.getLogin(), utilMB.getIp());
 
             selectedCatalogProp = null;
             disableRemovePropBtn = true;
@@ -159,7 +152,7 @@ public class CatalogMB implements Serializable {
         LOGGER.info("create new prop property: " + newCatalogPropName + " for struct: " + selectedCatalogType);
 
         try {
-            catalogBean.addCatalogProp(selectedCatalogType.getId(), newCatalogPropName, login, ip);
+            catalogBean.addCatalogProp(selectedCatalogType.getId(), newCatalogPropName, utilMB.getLogin(), utilMB.getIp());
 
             catalogBean.loadCatalogProps(selectedCatalogType);
 
@@ -183,14 +176,14 @@ public class CatalogMB implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
 
         try {
-            int structID = catalogBean.createCatalogType(newCatalogType.getTypeName(), login, ip);
+            int structID = catalogBean.createCatalogType(newCatalogType.getTypeName(), utilMB.getLogin(), utilMB.getIp());
 
             if (!newCatalogType.getCatalogProps().isEmpty()) {
                 newCatalogType.getCatalogProps().removeIf(CatalogProp::check);
 
                 for (CatalogProp prop: newCatalogType.getCatalogProps()) {
                     try {
-                        catalogBean.addCatalogProp(structID, prop.getPropName(), login, ip);
+                        catalogBean.addCatalogProp(structID, prop.getPropName(), utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
@@ -231,10 +224,6 @@ public class CatalogMB implements Serializable {
 
     public void setSelectedCatalogProp(CatalogProp selectedCatalogProp) {
         this.selectedCatalogProp = selectedCatalogProp;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public boolean isDisableRemovePropBtn() {

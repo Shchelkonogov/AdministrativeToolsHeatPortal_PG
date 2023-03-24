@@ -7,6 +7,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
 import ru.tecon.admTools.systemParams.ejb.MeasureSB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
@@ -17,7 +18,7 @@ import ru.tecon.admTools.systemParams.model.struct.*;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,10 +33,6 @@ import java.util.logging.Logger;
 public class StructMB implements Serializable, MyConverter {
 
     private static final Logger LOGGER = Logger.getLogger(StructMB.class.getName());
-
-    private String login;
-    private String ip;
-    private boolean write;
 
     private TreeNode root;
 
@@ -68,13 +65,10 @@ public class StructMB implements Serializable, MyConverter {
     @EJB
     private MeasureSB measureSB;
 
-    void initForm() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
+    void initForm() {
         root = new DefaultTreeNode(new StructType(), null);
 
         loadData();
@@ -95,6 +89,8 @@ public class StructMB implements Serializable, MyConverter {
             DefaultTreeNode treeNode = new DefaultTreeNode(structType, parent);
             nodes.put((long) structType.getId(), treeNode);
         }
+
+        root.getChildren().forEach(treeNode -> treeNode.setExpanded(true));
 
         structTypeProps = null;
         selectedStruct = null;
@@ -183,7 +179,7 @@ public class StructMB implements Serializable, MyConverter {
         LOGGER.info("remove struct: " + selectedStruct);
 
         try {
-            structCurrentBean.removeStruct(selectedStruct, login, ip);
+            structCurrentBean.removeStruct(selectedStruct, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
         } catch (SystemParamException e) {
@@ -199,7 +195,7 @@ public class StructMB implements Serializable, MyConverter {
         LOGGER.info("remove struct property: " + selectedStructProp);
 
         try {
-            structCurrentBean.removeStructProp(selectedStruct.getId(), selectedStructProp, login, ip);
+            structCurrentBean.removeStructProp(selectedStruct.getId(), selectedStructProp, utilMB.getLogin(), utilMB.getIp());
 
             selectedStructProp = null;
             disableRemoveStructPropBtn = true;
@@ -226,14 +222,14 @@ public class StructMB implements Serializable, MyConverter {
                 }
                 newStructType.setParentID((long) selectedStruct.getId());
             }
-            int structID = structCurrentBean.addStruct(newStructType, login, ip);
+            int structID = structCurrentBean.addStruct(newStructType, utilMB.getLogin(), utilMB.getIp());
 
             if (newStructTypeProps != null) {
                 newStructTypeProps.removeIf(StructTypeProp::check);
 
                 for (StructTypeProp prop: newStructTypeProps) {
                     try {
-                        structCurrentBean.addStructProp(structID, prop, login, ip);
+                        structCurrentBean.addStructProp(structID, prop, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
@@ -255,7 +251,7 @@ public class StructMB implements Serializable, MyConverter {
         LOGGER.info("create new struct property: " + newStructTypeProp + " for struct: " + selectedStruct);
 
         try {
-            structCurrentBean.addStructProp(selectedStruct.getId(), newStructTypeProp, login, ip);
+            structCurrentBean.addStructProp(selectedStruct.getId(), newStructTypeProp, utilMB.getLogin(), utilMB.getIp());
 
             structTypeProps = structCurrentBean.getStructTypeProps(selectedStruct.getId());
             selectedStructProp = null;
@@ -326,10 +322,6 @@ public class StructMB implements Serializable, MyConverter {
 
     public List<Measure> getMeasures() {
         return measures;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public boolean isDisableRemoveStructBtn() {

@@ -5,9 +5,9 @@
                 xmlns:p="http://primefaces.org/ui">
     <h:form>
         <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{catalog.onCreateCatalogType}" update="catalogPanel growl" rendered="#{catalog.write}" />
+                         action="#{catalog.onCreateCatalogType}" update="catalogPanel growl" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{catalog.onCreateCatalogProp}" rendered="#{catalog.write}"
+                         action="#{catalog.onCreateCatalogProp}" rendered="#{systemParamsUtil.write}"
                          update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl" />
     </h:form>
 
@@ -21,9 +21,9 @@
                     <p:commandButton id="catalogRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
                                      disabled="#{catalog.disableRemoveCatalogBtn}" update="catalogPanel growl"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{catalog.onRemoveCatalog()}" rendered="#{catalog.write}" />
+                                     action="#{catalog.onRemoveCatalog()}" rendered="#{systemParamsUtil.write}" />
                     <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     onclick="PF('addTypeDialog').show();" rendered="#{catalog.write}" />
+                                     onclick="PF('addTypeDialog').show();" rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
@@ -54,10 +54,10 @@
                                      disabled="#{catalog.disableRemovePropBtn}" action="#{catalog.onRemoveProp}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl"
-                                     rendered="#{catalog.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                     <p:commandButton id="catalogAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      disabled="#{catalog.disableRemoveCatalogBtn}" onclick="PF('addPropDialog').show();"
-                                     rendered="#{catalog.write}" />
+                                     rendered="#{systemParamsUtil.write}" />
                 </div>
             </div>
             <h:panelGroup id="contentToBlock" layout="block" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
@@ -80,7 +80,7 @@
         <p:blockUI block="contentToBlock" widgetVar="buiTable"/>
     </h:form>
 
-    <p:dialog id="addTypeDialog" rendered="#{catalog.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
+    <p:dialog id="addTypeDialog" rendered="#{systemParamsUtil.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
               width="800" height="325" modal="true" resizable="false">
         <p:ajax event="close" listener="#{catalog.onAddTypeDialogClose()}" update="addForm"/>
         <h:form id="addForm">
@@ -117,7 +117,7 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialog" rendered="#{catalog.write}" header="Добавить новое значение справочника" widgetVar="addPropDialog"
+    <p:dialog id="addPropDialog" rendered="#{systemParamsUtil.write}" header="Добавить новое значение справочника" widgetVar="addPropDialog"
               width="450" modal="true" resizable="false">
 
         <p:ajax event="close" listener="#{catalog.onAddPropDialogClose()}" update="addPropForm"/>
@@ -127,10 +127,9 @@
                 <p:inputText required="true" value="#{catalog.newCatalogPropName}"
                              requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
             </div>
-            <div style="display: flex;">
+            <div style="display: flex; padding-bottom: 35px;">
                 <p:message style="margin: auto" for="@previous" />
             </div>
-            <div style="height: 35px;"></div>
             <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
                              validateClient="true" update="addPropForm" action="#{catalog.savePropWrapper}"/>
             <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"

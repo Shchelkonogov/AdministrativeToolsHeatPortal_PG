@@ -13,7 +13,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,23 +33,16 @@ public class GroundTempMB implements Serializable {
     private List<GroundTemp> groundTemps = new ArrayList<>();
     private List<ReferenceValue> referenceValues = new ArrayList<>();
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private GroundTempSB groundTempSB;
+
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
         groundTemps = groundTempSB.getGroundTemps();
         referenceValues = groundTempSB.getReferenceValues();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -62,7 +55,7 @@ public class GroundTempMB implements Serializable {
         GroundTemp groundTemp = event.getObject();
 
         try {
-            groundTempSB.addGroundTemp(groundTemp, login, ip);
+            groundTempSB.addGroundTemp(groundTemp, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
@@ -93,7 +86,7 @@ public class GroundTempMB implements Serializable {
             LOGGER.info("update reference value " + referenceValue);
 
             try {
-                groundTempSB.updateReferenceValue(referenceValue, login, ip);
+                groundTempSB.updateReferenceValue(referenceValue, utilMB.getLogin(), utilMB.getIp());
             } catch (SystemParamException e) {
                 errorMessages.add(e.getMessage());
                 LOGGER.warning(e.getMessage());
@@ -112,10 +105,6 @@ public class GroundTempMB implements Serializable {
      */
     public void onAddNew() {
         groundTemps.add(0, new GroundTemp());
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public List<GroundTemp> getGroundTemps() {

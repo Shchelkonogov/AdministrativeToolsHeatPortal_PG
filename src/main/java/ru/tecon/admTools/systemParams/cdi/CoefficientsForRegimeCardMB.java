@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,21 +30,14 @@ public class CoefficientsForRegimeCardMB implements Serializable {
 
     private List<CoefficientRC> coefficientRCList = new ArrayList<>();
 
-    private String login;
-    private String ip;
-    private boolean write = false;
-
     @EJB
     private CoefficientForRegimeCardSB coefficientBean;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
-
         loadData();
     }
 
@@ -70,7 +63,7 @@ public class CoefficientsForRegimeCardMB implements Serializable {
             LOGGER.info("update regime card coefficient " + coefficientRC);
 
             try {
-                coefficientBean.updateCoefficient(coefficientRC, login, ip);
+                coefficientBean.updateCoefficient(coefficientRC, utilMB.getLogin(), utilMB.getIp());
             } catch (SystemParamException e) {
                 errorMessages.add(coefficientRC.getName());
                 LOGGER.warning(e.getMessage());
@@ -86,10 +79,6 @@ public class CoefficientsForRegimeCardMB implements Serializable {
 
     public List<CoefficientRC> getCoefficientRCList() {
         return coefficientRCList;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     /**
