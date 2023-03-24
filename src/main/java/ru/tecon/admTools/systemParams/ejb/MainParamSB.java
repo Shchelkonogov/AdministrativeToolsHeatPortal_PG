@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.ejb;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.model.ObjectType;
 import ru.tecon.admTools.systemParams.model.mainParam.*;
 
 import javax.annotation.Resource;
@@ -24,42 +25,15 @@ import java.util.logging.Logger;
 @LocalBean
 public class MainParamSB {
     private static final Logger LOGGER = Logger.getLogger(MainParamSB.class.getName());
-    private static final String SQL_SELECT_ALL_PARAMS =
-            "select * from sys_0001t.sel_obj_type()";
-    private static final String SQL_SELECT_PARAMS_BY_ID =
-            "select * from sys_0001t.sel_obj_type_techproc(?)";
-    private static final String SQL_SELECT_SELECTED_PARAMS =
-            // "select * from dsp_0036t.list_basic_param(1, 2)";
-            "select * from dsp_0036t.list_basic_param(?, ?)";
-    private static final String FUN_DEL_PARAMS =
-            "select * from dsp_0036t.del_basic_param(?, ?, ?, ?, ?, ?)";
-    private static final String FUN_ADD_PARAMS=
-            "select * from dsp_0036t.add_basic_param(?, ?, ?, ?, ?, ?)";
+
+    private static final String SQL_SELECT_PARAMS_BY_ID = "select * from sys_0001t.sel_obj_type_techproc(?)";
+    private static final String SQL_SELECT_SELECTED_PARAMS = "select * from dsp_0036t.list_basic_param(?, ?)";
+    private static final String FUN_DEL_PARAMS = "select * from dsp_0036t.del_basic_param(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_ADD_PARAMS= "select * from dsp_0036t.add_basic_param(?, ?, ?, ?, ?, ?)";
     private static final String SQL_SELECT_BPARAMS_BY_ID = "select * from dsp_0036t.list_add_basic_param(?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
-
-    /**
-     * Обновление типа объекта
-     * @return список типов объектов
-     */
-
-    public List<ObjType> getLeftpartSelectOneMenuParam() {
-        List<ObjType> result = new ArrayList<>();
-        try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_ALL_PARAMS)) {
-            ResultSet res = stm.executeQuery();
-            while (res.next()) {
-                result.add(new ObjType(res.getInt("obj_type_id"),
-                        res.getString("obj_type_name"),
-                        res.getString("obj_type_char")));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "SQLException", e);
-        }
-        return result;
-    }
 
     /**
      * Обновление типа техпроцесса

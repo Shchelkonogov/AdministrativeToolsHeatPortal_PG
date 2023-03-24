@@ -26,12 +26,13 @@ public class SeasonChangeMB implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(SeasonChangeMB.class.getName());
 
     private List<SeasonChangeTable> seasonChangeTableList = new ArrayList<>();
-    private String seasonChangeTable = "LETO";
+    private String seasonChangeTable;
 
     private String login;
     private String ip;
 
-    private boolean disableSaveBtn = true;
+    private boolean disableSaveBtn = false;
+
     private boolean write=false;
 
     @EJB
@@ -47,15 +48,17 @@ public class SeasonChangeMB implements Serializable {
         login = (String) faceletContext.getAttribute("login");
         write = (boolean) faceletContext.getAttribute("write");
 
-        if(seasonChangeTableList.get(0).getSeason().equals("Зима")){
-            disableSaveBtn=false;
-        }
     }
 
     /**
      * Обработчик переключения сезона, нажатие на копку изменить
      */
     public void onSeasonChange(){
+        seasonChangeTable=seasonChangeTableList.get(0).getSeason();
+        if (seasonChangeTable.equals("Лето")){
+            seasonChangeTable="ZIMA";
+        }else seasonChangeTable="LETO";
+
         try {
             seasonChangeSB.changeSeason(seasonChangeTable, login, ip);
             LOGGER.info("Season changed to " + seasonChangeTable);
@@ -66,28 +69,12 @@ public class SeasonChangeMB implements Serializable {
         seasonChangeTableList=seasonChangeSB.getTableParams();
     }
 
-    /**
-     * Обработчик активности кнопки изменить в зависимости от выбранного в списке сезона
-     */
-    public void buttonChangeAfterSelect() {
-        disableSaveBtn = seasonChangeTable.equals("ZIMA") && seasonChangeTableList.get(0).getSeason().equals("Зима") ||
-                seasonChangeTable.equals("LETO") && seasonChangeTableList.get(0).getSeason().equals("Лето");
-    }
-
     public List<SeasonChangeTable> getSeasonChangeTableList() {
         return seasonChangeTableList;
     }
 
     public void setSeasonChangeTableList(List<SeasonChangeTable> seasonChangeTableList) {
         this.seasonChangeTableList = seasonChangeTableList;
-    }
-
-    public String getSeasonChangeTable() {
-        return seasonChangeTable;
-    }
-
-    public void setSeasonChangeTable(String seasonChangeTable) {
-        this.seasonChangeTable = seasonChangeTable;
     }
 
     public String getLogin() {

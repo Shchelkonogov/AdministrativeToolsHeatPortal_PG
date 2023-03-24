@@ -39,7 +39,7 @@ public class SeasonChangeTable implements Serializable {
 
     public String getEnd_timeAsString(){
         if (end_time==null){
-            return "Не окончено";
+            return "Текущий сезон продолжается";
         }
         return end_time.format(dtf);
     }

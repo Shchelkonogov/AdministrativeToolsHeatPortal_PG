@@ -2,7 +2,9 @@ package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.ejb.DefaultValuesSB;
 import ru.tecon.admTools.systemParams.ejb.MainParamSB;
+import ru.tecon.admTools.systemParams.model.ObjectType;
 import ru.tecon.admTools.systemParams.model.mainParam.*;
 
 import javax.annotation.PostConstruct;
@@ -15,6 +17,7 @@ import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -28,11 +31,14 @@ public class MainParamMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MainParamMB.class.getName());
 
-    private ObjType leftOneLine;
-    private List<ObjType> leftpartSelectOneMenuParam = new ArrayList<>();
+    private ObjectType leftOneLine;
+    private List<ObjectType> leftpartSelectOneMenuParam = new ArrayList<>();
 
     private TechProc adaptRightPartSelectOneMenu;
+    private TechProc all = new TechProc(0,0,"Все","Все");
+    private TechProc adaptDialogRightPartSelectOneMenu;
     private List<TechProc> rightPartSelectOneMenuParam = new ArrayList<>();
+    private List<TechProc> techProcInDialogList=new ArrayList<>();
 
     private List<MPTable> tableParam = new ArrayList<>();
     private MPTable selectedPartInTable;
@@ -40,34 +46,53 @@ public class MainParamMB implements Serializable {
     private List<TechProcParam> parametrsOfTechProcsList = new ArrayList<>();
     private TechProcParam adaptParametrsOfTechProc;
 
-    private TechProc noSelectItem = new TechProc("Отсутствуют связанные техпроцессы");
 
     private String login;
     private String ip;
 
-    private boolean disableAddBtn=true;
+
     private boolean disableRemoveBtn = true;
     private boolean write=false;
-
+    private boolean techProcParamSOM=true;
+    private boolean techProcParamString=false;
 
     @EJB
     MainParamSB allDao;
+    @EJB
+    DefaultValuesSB defaultValuesBean;
+
 
 
     @PostConstruct
     private void init() {
-        leftpartSelectOneMenuParam = allDao.getLeftpartSelectOneMenuParam();
 
-        if (!leftpartSelectOneMenuParam.isEmpty()) {
-            rightPartSelectOneMenuParam = allDao.getRightpartSelectOneMenuParam(leftpartSelectOneMenuParam.get(0).getId());
-            System.out.println(leftpartSelectOneMenuParam.get(0));
-            if (!rightPartSelectOneMenuParam.isEmpty()) {
-                tableParam = allDao.getTabeParam(leftpartSelectOneMenuParam.get(0).getId(), rightPartSelectOneMenuParam.get(0).getId());
-                if (!rightPartSelectOneMenuParam.isEmpty()) {
-                    parametrsOfTechProcsList = allDao.getParametrsOfTechProc(rightPartSelectOneMenuParam.get(0).getId());
-                }
-            }
+        leftpartSelectOneMenuParam = defaultValuesBean.getObjectTypes();
+
+        try {
+            int defaultObjectTypeID = defaultValuesBean.getDefaultObjectTypeID();
+
+            ObjectType defaultObjectType = leftpartSelectOneMenuParam.stream()
+                    .filter(objectType -> objectType.getId() == defaultObjectTypeID)
+                    .findFirst()
+                    .orElseThrow(SystemParamException::new);
+
+            leftpartSelectOneMenuParam.remove(defaultObjectType);
+            leftpartSelectOneMenuParam.add(0, defaultObjectType);
+        } catch (SystemParamException e) {
+            LOGGER.log(Level.WARNING, "error load default object type", e);
+
         }
+
+        leftOneLine=leftpartSelectOneMenuParam.get(0);
+        rightPartSelectOneMenuParam=allDao.getRightpartSelectOneMenuParam(leftOneLine.getId());
+        rightPartSelectOneMenuParam.add(0, all);
+        techProcInDialogList=allDao.getRightpartSelectOneMenuParam(leftOneLine.getId());
+        adaptDialogRightPartSelectOneMenu=techProcInDialogList.get(0);
+
+        adaptRightPartSelectOneMenu=rightPartSelectOneMenuParam.get(0);
+        tableParam = allDao.getTabeParam(leftpartSelectOneMenuParam.get(0).getId(),0);
+        parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptDialogRightPartSelectOneMenu.getId());
+
 
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
@@ -80,18 +105,34 @@ public class MainParamMB implements Serializable {
      * Обработчик изменения списка техпроцессов
      */
     public void rightPartListUpdateAfterEvent(){
-        rightPartSelectOneMenuParam.clear();
-        tableParam.clear();
-        disableAddBtn=true;
+
         disableRemoveBtn=true;
         rightPartSelectOneMenuParam=allDao.getRightpartSelectOneMenuParam(leftOneLine.getId());
-        if (!rightPartSelectOneMenuParam.isEmpty()) {
+        rightPartSelectOneMenuParam.add(0,all);
+        techProcInDialogList=allDao.getRightpartSelectOneMenuParam(leftOneLine.getId());
+        adaptRightPartSelectOneMenu=rightPartSelectOneMenuParam.get(0);
+        tableParam=allDao.getTabeParam(leftOneLine.getId(), rightPartSelectOneMenuParam.get(0).getId());
+        parametrsOfTechProcsList=allDao.getParametrsOfTechProc(techProcInDialogList.get(0).getId());
+        adaptDialogRightPartSelectOneMenu = adaptRightPartSelectOneMenu;
 
-            tableParam=allDao.getTabeParam(leftOneLine.getId(), rightPartSelectOneMenuParam.get(0).getId());
-            parametrsOfTechProcsList=allDao.getParametrsOfTechProc(rightPartSelectOneMenuParam.get(0).getId());
-            disableAddBtn=false;
+        if(adaptRightPartSelectOneMenu.getId() == 0){
+            techProcParamSOM=true;
+            techProcParamString=false;
+        } if (!(adaptRightPartSelectOneMenu.getId() == 0)) {
+            techProcParamSOM=false;
+            techProcParamString=true;
         }
+        System.out.println("adaptRightPartSelectOneMenu "+adaptRightPartSelectOneMenu);
+        System.out.println("parametrsOfTechProcsList "+parametrsOfTechProcsList);
+    }
 
+    /**
+     * Обработчик изменения списка параметров техпроцессов в диалоговом окне
+     */
+    public void techProcsUpdateAfterEventDialog(){
+        parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptDialogRightPartSelectOneMenu.getId());
+        write=true;
+        System.out.println("techProcsUpdateAfterEventDialog "+parametrsOfTechProcsList);
     }
 
     /**
@@ -100,6 +141,14 @@ public class MainParamMB implements Serializable {
     public void techProcsUpdateAfterEvent(){
         parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptRightPartSelectOneMenu.getId());
         write=true;
+
+        if(adaptRightPartSelectOneMenu.getId() == 0){
+            techProcParamSOM=true;
+            techProcParamString=false;
+        } if (!(adaptRightPartSelectOneMenu.getId() == 0)) {
+            techProcParamSOM=false;
+            techProcParamString=true;
+        }
     }
 
     /**
@@ -176,11 +225,22 @@ public class MainParamMB implements Serializable {
         tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
     }
 
-    public List<ObjType> getLeftpartSelectOneMenuParam() {
+    public void onSaveChangesDialog() {
+
+        try {
+            allDao.addParamAtTable(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
+        }
+        tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId());
+    }
+
+    public List<ObjectType> getLeftpartSelectOneMenuParam() {
         return leftpartSelectOneMenuParam;
     }
 
-    public void setLeftpartSelectOneMenuParam(List<ObjType> leftpartSelectOneMenuParam) {
+    public void setLeftpartSelectOneMenuParam(List<ObjectType> leftpartSelectOneMenuParam) {
         this.leftpartSelectOneMenuParam = leftpartSelectOneMenuParam;
     }
 
@@ -201,11 +261,11 @@ public class MainParamMB implements Serializable {
         this.tableParam = tableParam;
     }
 
-    public ObjType getLeftOneLine() {
+    public ObjectType getLeftOneLine() {
         return leftOneLine;
     }
 
-    public void setLeftOneLine(ObjType leftOneLine) {
+    public void setLeftOneLine(ObjectType leftOneLine) {
         this.leftOneLine = leftOneLine;
     }
 
@@ -253,12 +313,55 @@ public class MainParamMB implements Serializable {
         this.adaptParametrsOfTechProc = adaptParametrsOfTechProc;
     }
 
-    public boolean isDisableAddBtn() {
-        return disableAddBtn;
+    public String getLogin() {
+        return login;
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
-    public TechProc getNoSelectItem() {
-        return noSelectItem;
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setDisableRemoveBtn(boolean disableRemoveBtn) {
+        this.disableRemoveBtn = disableRemoveBtn;
+    }
+
+    public boolean isTechProcParamSOM() {
+        return techProcParamSOM;
+    }
+
+    public void setTechProcParamSOM(boolean techProcParamSOM) {
+        this.techProcParamSOM = techProcParamSOM;
+    }
+
+    public boolean isTechProcParamString() {
+        return techProcParamString;
+    }
+
+    public void setTechProcParamString(boolean techProcParamString) {
+        this.techProcParamString = techProcParamString;
+    }
+
+    public List<TechProc> getTechProcInDialogList() {
+        return techProcInDialogList;
+    }
+
+    public void setTechProcInDialogList(List<TechProc> techProcInDialogList) {
+        this.techProcInDialogList = techProcInDialogList;
+    }
+
+    public TechProc getAdaptDialogRightPartSelectOneMenu() {
+        return adaptDialogRightPartSelectOneMenu;
+    }
+
+    public void setAdaptDialogRightPartSelectOneMenu(TechProc adaptDialogRightPartSelectOneMenu) {
+        this.adaptDialogRightPartSelectOneMenu = adaptDialogRightPartSelectOneMenu;
     }
 }

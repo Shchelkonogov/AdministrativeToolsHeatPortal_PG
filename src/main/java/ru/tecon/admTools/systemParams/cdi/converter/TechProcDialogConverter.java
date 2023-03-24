@@ -1,9 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
 import ru.tecon.admTools.systemParams.cdi.MainParamMB;
-import ru.tecon.admTools.systemParams.ejb.MainParamSB;
-import ru.tecon.admTools.systemParams.model.ObjectType;
-import ru.tecon.admTools.systemParams.model.mainParam.ObjType;
+import ru.tecon.admTools.systemParams.model.mainParam.TechProc;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
@@ -12,11 +10,11 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Конвертер для выбора типа объекта
+ * Конвертер для выбора техпроцесса
  * @author Aleksey Sergeev
  */
-@FacesConverter("leftTypeConverter")
-public class ObjTypeConverter implements Converter {
+@FacesConverter("techProcDialogTypeConverter")
+public class TechProcDialogConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
@@ -24,14 +22,19 @@ public class ObjTypeConverter implements Converter {
 
         MainParamMB defaultValues = (MainParamMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getLeftpartSelectOneMenuParam().stream()
-                .filter(leftType -> leftType.getId() == Integer.parseInt(value))
+        return defaultValues.getTechProcInDialogList().stream()
+                .filter(rightType -> rightType.getId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((ObjectType) value).getId());
+        if (value==null){
+            return null;
+        }
+        else
+            return String.valueOf(((TechProc) value).getId());
     }
+
 }
