@@ -8,9 +8,9 @@
         <p:remoteCommand name="onLoad" action="#{paramTypeSetting.loadData}"
                          onsuccess="PF('typeTableWV').filter()" update="typeSettingForm"/>
         <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{paramTypeSetting.onCreateType}" update="typeSettingForm growl" rendered="#{paramTypeSetting.write}" />
+                         action="#{paramTypeSetting.onCreateType}" update="typeSettingForm growl" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{paramTypeSetting.onCreateProp(paramTypeSetting.selectedType.category)}" rendered="#{paramTypeSetting.write}"
+                         action="#{paramTypeSetting.onCreateProp(paramTypeSetting.selectedType.category)}" rendered="#{systemParamsUtil.write}"
                          update="typeSettingForm:propTable typeSettingForm:propRemove growl" />
     </h:form>
 
@@ -25,11 +25,11 @@
                                      disabled="#{paramTypeSetting.disableTypeRemoveBtn}" update="typeSettingForm growl"
                                      onclick="PF('statusDialog').show();"
                                      oncomplete="PF('typeTableWV').filter(); PF('statusDialog').hide();"
-                                     action="#{paramTypeSetting.onRemoveTypeAggregate}" rendered="#{paramTypeSetting.write}"/>
+                                     action="#{paramTypeSetting.onRemoveTypeAggregate}" rendered="#{systemParamsUtil.write}"/>
                     <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      oncomplete="PF('addTypeDialog').show();"
                                      action="#{paramTypeSetting.initAddType}" update="@(addTypeForm :not(editSelect))"
-                                     rendered="#{paramTypeSetting.write}"/>
+                                     rendered="#{systemParamsUtil.write}"/>
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
@@ -71,7 +71,7 @@
                         </p:column>
                     </p:dataTable>
 
-                    <p:contextMenu for="typeTable" style="width: 205px;" rendered="#{paramTypeSetting.write}">
+                    <p:contextMenu for="typeTable" style="width: 205px;" rendered="#{systemParamsUtil.write}">
                         <p:menuitem value="Удалить тип параметра" action="#{paramTypeSetting.removeType}" icon="pi pi-trash"
                                     oncomplete="PF('typeTableWV').filter(); PF('statusDialog').hide();" update="typeSettingForm growl">
                             <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить тип?" icon="pi pi-info-circle"/>
@@ -79,7 +79,7 @@
                     </p:contextMenu>
 
                     <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350"
-                                     rendered="#{paramTypeSetting.write}">
+                                     rendered="#{systemParamsUtil.write}">
                         <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no"/>
                         <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes"
                                          onclick="PF('statusDialog').show();"/>
@@ -99,11 +99,11 @@
                                      action="#{paramTypeSetting.onRemoveProp(paramTypeSetting.selectedType.category)}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="typeSettingForm:propTable typeSettingForm:propRemove growl"
-                                     rendered="#{paramTypeSetting.write}"/>
+                                     rendered="#{systemParamsUtil.write}"/>
                     <p:commandButton id="propAdd" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      disabled="#{paramTypeSetting.disablePropAddBtn}"
                                      action="#{paramTypeSetting.loadProperties(paramTypeSetting.selectedType.category)}"
-                                     rendered="#{paramTypeSetting.write}"/>
+                                     rendered="#{systemParamsUtil.write}"/>
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
@@ -158,7 +158,7 @@
         </div>
     </h:form>
 
-    <p:dialog id="addTypeDialog" rendered="#{paramTypeSetting.write}" header="Добавить новый тип параметра" widgetVar="addTypeDialog"
+    <p:dialog id="addTypeDialog" rendered="#{systemParamsUtil.write}" header="Добавить новый тип параметра" widgetVar="addTypeDialog"
               width="1012" height="325" modal="true" resizable="false"
               position="center center" onShow="PF('addTypeDialog').initPosition();">
         <p:ajax event="close" listener="#{paramTypeSetting.onAddTypeDialogClose()}" update="addTypeForm"/>
@@ -241,7 +241,7 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialogA" rendered="#{paramTypeSetting.write}" header="Добавить новое свойство" widgetVar="addPropDialogA"
+    <p:dialog id="addPropDialogA" rendered="#{systemParamsUtil.write}" header="Добавить новое свойство" widgetVar="addPropDialogA"
               width="450" height="185" modal="true" resizable="false">
         <p:ajax event="close" listener="#{paramTypeSetting.onAddPropDialogAClose()}" update="addPropFormA"/>
 
@@ -280,7 +280,7 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog id="addPropDialogP" rendered="#{paramTypeSetting.write}" header="Добавить новое свойство" widgetVar="addPropDialogP"
+    <p:dialog id="addPropDialogP" rendered="#{systemParamsUtil.write}" header="Добавить новое свойство" widgetVar="addPropDialogP"
               width="450" height="195" modal="true" resizable="false">
         <p:ajax event="close" listener="#{paramTypeSetting.onAddPropDialogPClose()}" update="addPropFormP"/>
 

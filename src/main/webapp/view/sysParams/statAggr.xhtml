@@ -15,18 +15,18 @@
                                  disabled="#{statAggrMB.disableRemoveBtn}" action="#{statAggrMB.onRemoveTableParam}"
                                  onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                  update="statAggrForm:statAggrTable statAggrForm:btnRemove"
-                                 rendered="#{statAggrMB.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
                 <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                  update="statAggrForm:statAggrTable "
                                  onclick="PF('addNewParam').show();"
-                                 rendered="#{statAggrMB.write}" />
+                                 rendered="#{systemParamsUtil.write}" />
             </div>
         </div>
         <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
             <div style="height: 100%;">
                 <p:dataTable id="statAggrTable" var="statAggrData" widgetVar="statAggrTable" value="#{statAggrMB.statsAggrTable}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{statAggrMB.write}"
+                             editable="#{systemParamsUtil.write}"
                              selectionMode="single" selection="#{statAggrMB.selectedPartInSATable}"
                              rowKey="#{statAggrData.id}">
 
@@ -52,7 +52,7 @@
         </div>
     </h:form>
 
-    <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true" width="798px" height="212px" resizable="false" rendered="#{statAggrMB.write}" >
+    <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true" width="798px" height="212px" resizable="false" rendered="#{systemParamsUtil.write}" >
         <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="statAGGrForm"/>
         <h:form id="statAGGrForm" >
             <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">

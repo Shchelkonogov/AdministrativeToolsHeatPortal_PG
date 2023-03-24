@@ -3,14 +3,17 @@ package ru.tecon.admTools.systemParams.cdi;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.MainParamSB;
-import ru.tecon.admTools.systemParams.model.mainParam.*;
+import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
+import ru.tecon.admTools.systemParams.model.mainParam.ObjType;
+import ru.tecon.admTools.systemParams.model.mainParam.TechProc;
+import ru.tecon.admTools.systemParams.model.mainParam.TechProcParam;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -40,19 +43,16 @@ public class MainParamMB implements Serializable {
     private List<TechProcParam> parametrsOfTechProcsList = new ArrayList<>();
     private TechProcParam adaptParametrsOfTechProc;
 
-    private TechProc noSelectItem = new TechProc("Отсутствуют связанные техпроцессы");
-
-    private String login;
-    private String ip;
+    private final TechProc noSelectItem = new TechProc("Отсутствуют связанные техпроцессы");
 
     private boolean disableAddBtn=true;
     private boolean disableRemoveBtn = true;
-    private boolean write=false;
-
 
     @EJB
     MainParamSB allDao;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
@@ -68,12 +68,6 @@ public class MainParamMB implements Serializable {
                 }
             }
         }
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -99,7 +93,6 @@ public class MainParamMB implements Serializable {
      */
     public void techProcsUpdateAfterEvent(){
         parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptRightPartSelectOneMenu.getId());
-        write=true;
     }
 
     /**
@@ -127,7 +120,8 @@ public class MainParamMB implements Serializable {
         LOGGER.info("remove param: " + selectedPartInTable);
 
         try {
-            allDao.removeParamFromTable(selectedPartInTable.getObjid(), selectedPartInTable.getTechprid(), selectedPartInTable.getPartypeid(), selectedPartInTable.getId(), login, ip);
+            allDao.removeParamFromTable(selectedPartInTable.getObjid(), selectedPartInTable.getTechprid(),
+                    selectedPartInTable.getPartypeid(), selectedPartInTable.getId(), utilMB.getLogin(), utilMB.getIp());
 
             selectedPartInTable = null;
             disableRemoveBtn = true;
@@ -168,7 +162,8 @@ public class MainParamMB implements Serializable {
     public void onSaveChanges() {
 
         try {
-            allDao.addParamAtTable(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
+            allDao.addParamAtTable(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId(),
+                    adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
@@ -227,14 +222,6 @@ public class MainParamMB implements Serializable {
 
     public void setSelectedPartInTable(MPTable selectedPartInTable) {
         this.selectedPartInTable = selectedPartInTable;
-    }
-
-    public boolean isWrite() {
-        return write;
-    }
-
-    public void setWrite(boolean write) {
-        this.write = write;
     }
 
     public List<TechProcParam> getParametrsOfTechProcsList() {

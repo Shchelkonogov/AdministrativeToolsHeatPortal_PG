@@ -13,7 +13,6 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
@@ -32,14 +31,10 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class ParamTypeSettingMB implements Serializable {
 
-    private String login;
-    private String ip;
-    private boolean write;
-
     private List<ParamTypeTable> types = new ArrayList<>();
     private List<ParamTypeTable> typesFilter = new ArrayList<>();
     private ParamTypeTable selectedType;
-    private List<ParamTypeTable> newTypes = new ArrayList<>();
+    private final List<ParamTypeTable> newTypes = new ArrayList<>();
     private ParamType newParamType;
 
     private List<ParamPropTableA> propTableA = new ArrayList<>();
@@ -65,6 +60,9 @@ public class ParamTypeSettingMB implements Serializable {
     @Inject
     private transient Logger logger;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @EJB
     private ParamTypeSettingSB bean;
 
@@ -73,12 +71,6 @@ public class ParamTypeSettingMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
-
         loadData();
 
         init = true;
@@ -139,7 +131,7 @@ public class ParamTypeSettingMB implements Serializable {
      */
     public void onChange(ParamTypeTable data, int rowIndex) {
         try {
-            bean.changeGenStat(data, login, ip);
+            bean.changeGenStat(data, utilMB.getLogin(), utilMB.getIp());
 
             int paramTypeID = data.getParamType().getId();
             List<String> updateItems = new ArrayList<>();
@@ -215,9 +207,9 @@ public class ParamTypeSettingMB implements Serializable {
 
         try {
             if (selectedType.getAggregate() == null) {
-                bean.removeType(selectedType, login, ip);
+                bean.removeType(selectedType, utilMB.getLogin(), utilMB.getIp());
             } else {
-                bean.removeTypeAggregate(selectedType, login, ip);
+                bean.removeTypeAggregate(selectedType, utilMB.getLogin(), utilMB.getIp());
             }
 
             loadData();
@@ -234,7 +226,7 @@ public class ParamTypeSettingMB implements Serializable {
         logger.log(Level.INFO, "remove type {0}", selectedType);
 
         try {
-            bean.removeType(selectedType, login, ip);
+            bean.removeType(selectedType, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
         } catch (SystemParamException e) {
@@ -268,7 +260,7 @@ public class ParamTypeSettingMB implements Serializable {
 
         try {
             if (newParamType.isCreate()) {
-                bean.addType(newParamType, login, ip);
+                bean.addType(newParamType, utilMB.getLogin(), utilMB.getIp());
             }
 
             if (!newTypes.isEmpty()) {
@@ -278,7 +270,7 @@ public class ParamTypeSettingMB implements Serializable {
                     newTypeElement.setParamType(newParamType);
 
                     try {
-                        bean.addAggregateToType(newTypeElement, login, ip);
+                        bean.addAggregateToType(newTypeElement, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
@@ -361,7 +353,7 @@ public class ParamTypeSettingMB implements Serializable {
                 case "A": {
                     logger.log(Level.INFO, "create new property {0} for type {1}", new Object[]{newPropA, selectedType});
 
-                    bean.addPropA(selectedType, newPropA, login, ip);
+                    bean.addPropA(selectedType, newPropA, utilMB.getLogin(), utilMB.getIp());
 
                     propTableA = bean.getTypePropsA(selectedType);
                     selectedPropA = null;
@@ -372,7 +364,7 @@ public class ParamTypeSettingMB implements Serializable {
                 case "P": {
                     logger.log(Level.INFO, "create new property {0} for type {1}", new Object[]{newPropP, selectedType});
 
-                    bean.addPropP(selectedType, newPropP, login, ip);
+                    bean.addPropP(selectedType, newPropP, utilMB.getLogin(), utilMB.getIp());
 
                     propTableP = bean.getTypePropsP(selectedType);
                     selectedPropP = null;
@@ -398,7 +390,7 @@ public class ParamTypeSettingMB implements Serializable {
                 case "A": {
                     logger.log(Level.INFO, "remove prop {0} for type {1}", new Object[]{selectedPropA, selectedType});
 
-                    bean.removePropA(selectedType, selectedPropA, login, ip);
+                    bean.removePropA(selectedType, selectedPropA, utilMB.getLogin(), utilMB.getIp());
 
                     propTableA = bean.getTypePropsA(selectedType);
                     selectedPropA = null;
@@ -407,7 +399,7 @@ public class ParamTypeSettingMB implements Serializable {
                 case "P": {
                     logger.log(Level.INFO, "remove prop {0} for type {1}", new Object[]{selectedPropP, selectedType});
 
-                    bean.removePropP(selectedType, selectedPropP, login, ip);
+                    bean.removePropP(selectedType, selectedPropP, utilMB.getLogin(), utilMB.getIp());
 
                     propTableP = bean.getTypePropsP(selectedType);
                     selectedPropP = null;
@@ -520,10 +512,6 @@ public class ParamTypeSettingMB implements Serializable {
 
     public boolean isDisablePropRemoveBtn() {
         return disablePropRemoveBtn;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public List<ParamPropTableA> getPropTableA() {

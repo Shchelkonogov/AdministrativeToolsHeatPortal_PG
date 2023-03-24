@@ -40,8 +40,6 @@ public class DefaultValuesMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        loadDefaultTypes();
-
         selectedObjectType = valuesSessionMB.getDefaultObjectType();
     }
 

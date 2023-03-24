@@ -9,7 +9,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,24 +28,17 @@ public class SeasonChangeMB implements Serializable {
     private List<SeasonChangeTable> seasonChangeTableList = new ArrayList<>();
     private String seasonChangeTable = "LETO";
 
-    private String login;
-    private String ip;
-
     private boolean disableSaveBtn = true;
-    private boolean write=false;
 
     @EJB
     SeasonChangeSB seasonChangeSB;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
         seasonChangeTableList = seasonChangeSB.getTableParams();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
 
         if(seasonChangeTableList.get(0).getSeason().equals("Зима")){
             disableSaveBtn=false;
@@ -57,7 +50,7 @@ public class SeasonChangeMB implements Serializable {
      */
     public void onSeasonChange(){
         try {
-            seasonChangeSB.changeSeason(seasonChangeTable, login, ip);
+            seasonChangeSB.changeSeason(seasonChangeTable, utilMB.getLogin(), utilMB.getIp());
             LOGGER.info("Season changed to " + seasonChangeTable);
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
@@ -90,35 +83,11 @@ public class SeasonChangeMB implements Serializable {
         this.seasonChangeTable = seasonChangeTable;
     }
 
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
     public boolean isDisableSaveBtn() {
         return disableSaveBtn;
     }
 
     public void setDisableSaveBtn(boolean disableSaveBtn) {
         this.disableSaveBtn = disableSaveBtn;
-    }
-
-    public boolean isWrite() {
-        return write;
-    }
-
-    public void setWrite(boolean write) {
-        this.write = write;
     }
 }

@@ -20,12 +20,12 @@
                                  disabled="#{mainParamMB.disableRemoveBtn}" action="#{mainParamMB.onRemoveTableParam}"
                                  onclick="PF('statusDialog').show();"
                                  actionListener="#{mainParamMB.showError}" oncomplete="PF('statusDialog').hide();"
-                                 update="mainPram:table mainPram:btnRemove growl" rendered="#{mainParamMB.write}"
+                                 update="mainPram:table mainPram:btnRemove growl" rendered="#{systemParamsUtil.write}"
                 />
                 <p:commandButton icon="btnAdd" id="btnAdd" styleClass="iconOnlyButton btnRight"
                                  disabled="#{mainParamMB.disableAddBtn}"
                                  update="dialog"
-                                 oncomplete="PF('addNewParam').show();" rendered="#{mainParamMB.write}"
+                                 oncomplete="PF('addNewParam').show();" rendered="#{systemParamsUtil.write}"
                 />
 
             </div>
@@ -81,7 +81,7 @@
         </div>
     </h:form>
 
-    <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true" width="450px" height="202px" resizable="false" rendered="#{mainParamMB.write}" >
+    <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true" width="450px" height="202px" resizable="false" rendered="#{systemParamsUtil.write}" >
 
         <h:form id="paramsForm">
 

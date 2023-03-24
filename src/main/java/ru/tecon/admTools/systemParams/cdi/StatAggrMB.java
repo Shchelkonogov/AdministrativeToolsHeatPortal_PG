@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.faces.view.facelets.FaceletContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,24 +32,17 @@ public class StatAggrMB implements Serializable {
     private StatAggrTable selectedPartInSATable;
     private StatAggrTable addStatAggrTable= new StatAggrTable();
 
-    private String login;
-    private String ip;
-
     private boolean disableRemoveBtn = true;
-    private boolean write=false;
 
     @EJB
     StatAggrSB statAggrSB;
 
+    @Inject
+    private SystemParamsUtilMB utilMB;
+
     @PostConstruct
     private void init() {
         statsAggrTable = statAggrSB.getSATabeParam();
-
-        FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
-                .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-        ip = (String) faceletContext.getAttribute("ip");
-        login = (String) faceletContext.getAttribute("login");
-        write = (boolean) faceletContext.getAttribute("write");
     }
 
     /**
@@ -68,7 +61,7 @@ public class StatAggrMB implements Serializable {
         LOGGER.info("remove param: " + selectedPartInSATable);
 
         try {
-            statAggrSB.removeParamFromTable(selectedPartInSATable, login, ip);
+            statAggrSB.removeParamFromTable(selectedPartInSATable, utilMB.getLogin(), utilMB.getIp());
 
             selectedPartInSATable = null;
             disableRemoveBtn = true;
@@ -93,7 +86,7 @@ public class StatAggrMB implements Serializable {
     public void onSaveChanges() {
 
         try {
-            statAggrSB.addStatAggr(addStatAggrTable, login, ip);
+            statAggrSB.addStatAggr(addStatAggrTable, utilMB.getLogin(), utilMB.getIp());
 
             PrimeFaces.current().executeScript("PF('addNewParam').hide();");
         } catch (SystemParamException e) {
@@ -135,14 +128,6 @@ public class StatAggrMB implements Serializable {
 
     public void setDisableRemoveBtn(boolean disableRemoveBtn) {
         this.disableRemoveBtn = disableRemoveBtn;
-    }
-
-    public boolean isWrite() {
-        return write;
-    }
-
-    public void setWrite(boolean write) {
-        this.write = write;
     }
 
     public StatAggrTable getAddStatAggrTable() {
