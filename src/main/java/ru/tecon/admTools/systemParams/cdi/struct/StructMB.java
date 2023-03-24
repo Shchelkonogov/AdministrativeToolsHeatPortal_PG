@@ -113,6 +113,8 @@ public class StructMB implements Serializable, MyConverter {
             nodes.put(structType.getId(), treeNode);
         }
 
+        root.getChildren().forEach(treeNode -> treeNode.setExpanded(true));
+
         structTypeProps = null;
         selectedStruct = null;
         selectedStructProp = null;
