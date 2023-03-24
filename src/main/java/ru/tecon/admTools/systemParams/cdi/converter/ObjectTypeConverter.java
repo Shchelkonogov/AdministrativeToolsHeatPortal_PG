@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.cdi.DefaultValuesMB;
+import ru.tecon.admTools.systemParams.cdi.DefaultValuesSessionMB;
 import ru.tecon.admTools.systemParams.model.ObjectType;
 
 import javax.el.ValueExpression;
@@ -19,9 +19,9 @@ public class ObjectTypeConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{defaultValues}", DefaultValuesMB.class);
+                .createValueExpression(context.getELContext(), "#{defaultValuesSession}", DefaultValuesSessionMB.class);
 
-        DefaultValuesMB defaultValues = (DefaultValuesMB) vex.getValue(context.getELContext());
+        DefaultValuesSessionMB defaultValues = (DefaultValuesSessionMB) vex.getValue(context.getELContext());
 
         return defaultValues.getObjectTypes().stream()
                 .filter(objectType -> objectType.getId() == Integer.parseInt(value))
