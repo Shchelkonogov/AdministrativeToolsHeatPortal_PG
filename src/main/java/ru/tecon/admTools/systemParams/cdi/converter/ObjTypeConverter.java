@@ -1,9 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
 import ru.tecon.admTools.systemParams.cdi.MainParamMB;
-import ru.tecon.admTools.systemParams.ejb.MainParamSB;
 import ru.tecon.admTools.systemParams.model.ObjectType;
-import ru.tecon.admTools.systemParams.model.mainParam.ObjType;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;

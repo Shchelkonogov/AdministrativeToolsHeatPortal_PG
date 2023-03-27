@@ -16,6 +16,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,13 +33,13 @@ public class MainParamMB implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(MainParamMB.class.getName());
 
     private ObjectType leftOneLine;
-    private List<ObjectType> leftpartSelectOneMenuParam = new ArrayList<>();
+    private List<ObjectType> leftpartSelectOneMenuParam = new LinkedList<>();
 
     private TechProc adaptRightPartSelectOneMenu;
     private TechProc all = new TechProc(0,0,"Все","Все");
     private TechProc adaptDialogRightPartSelectOneMenu;
-    private List<TechProc> rightPartSelectOneMenuParam = new ArrayList<>();
-    private List<TechProc> techProcInDialogList=new ArrayList<>();
+    private List<TechProc> rightPartSelectOneMenuParam = new LinkedList<>();
+    private List<TechProc> techProcInDialogList=new LinkedList<>();
 
     private List<MPTable> tableParam = new ArrayList<>();
     private MPTable selectedPartInTable;
@@ -113,7 +114,6 @@ public class MainParamMB implements Serializable {
         adaptRightPartSelectOneMenu=rightPartSelectOneMenuParam.get(0);
         tableParam=allDao.getTabeParam(leftOneLine.getId(), rightPartSelectOneMenuParam.get(0).getId());
         parametrsOfTechProcsList=allDao.getParametrsOfTechProc(techProcInDialogList.get(0).getId());
-        adaptDialogRightPartSelectOneMenu = adaptRightPartSelectOneMenu;
 
         if(adaptRightPartSelectOneMenu.getId() == 0){
             techProcParamSOM=true;
@@ -122,25 +122,18 @@ public class MainParamMB implements Serializable {
             techProcParamSOM=false;
             techProcParamString=true;
         }
-        System.out.println("adaptRightPartSelectOneMenu "+adaptRightPartSelectOneMenu);
-        System.out.println("parametrsOfTechProcsList "+parametrsOfTechProcsList);
-    }
-
-    /**
-     * Обработчик изменения списка параметров техпроцессов в диалоговом окне
-     */
-    public void techProcsUpdateAfterEventDialog(){
-        parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptDialogRightPartSelectOneMenu.getId());
-        write=true;
-        System.out.println("techProcsUpdateAfterEventDialog "+parametrsOfTechProcsList);
     }
 
     /**
      * Обработчик изменения списка параметров техпроцессов
      */
     public void techProcsUpdateAfterEvent(){
-        parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptRightPartSelectOneMenu.getId());
-        write=true;
+        if (adaptRightPartSelectOneMenu.getId()!=0) {
+            parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptRightPartSelectOneMenu.getId());
+        }else {
+            parametrsOfTechProcsList = allDao.getParametrsOfTechProc(adaptDialogRightPartSelectOneMenu.getId());
+        }
+        write = true;
 
         if(adaptRightPartSelectOneMenu.getId() == 0){
             techProcParamSOM=true;
@@ -216,24 +209,23 @@ public class MainParamMB implements Serializable {
 
     public void onSaveChanges() {
 
-        try {
-            allDao.addParamAtTable(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
-        } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
+        if (techProcParamString) {
+            try {
+                allDao.addParamAtTable(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
+            } catch (SystemParamException e) {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
+            }
+            tableParam = allDao.getTabeParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
+        }else {
+            try {
+                allDao.addParamAtTable(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
+            } catch (SystemParamException e) {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
+            }
+            tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId());
         }
-        tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
-    }
-
-    public void onSaveChangesDialog() {
-
-        try {
-            allDao.addParamAtTable(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId(), adaptParametrsOfTechProc.getPartypeid(), adaptParametrsOfTechProc.getTechprid(), login, ip);
-        } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
-        }
-        tableParam=allDao.getTabeParam(leftOneLine.getId(), adaptDialogRightPartSelectOneMenu.getId());
     }
 
     public List<ObjectType> getLeftpartSelectOneMenuParam() {
@@ -353,7 +345,7 @@ public class MainParamMB implements Serializable {
         return techProcInDialogList;
     }
 
-    public void setTechProcInDialogList(List<TechProc> techProcInDialogList) {
+    public void setTechProcInDialogList(LinkedList<TechProc> techProcInDialogList) {
         this.techProcInDialogList = techProcInDialogList;
     }
 

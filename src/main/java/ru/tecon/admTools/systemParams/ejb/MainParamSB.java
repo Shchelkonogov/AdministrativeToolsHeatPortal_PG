@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,8 +40,8 @@ public class MainParamSB {
      * Обновление типа техпроцесса
      * @return список техпроцессов
      */
-    public List<TechProc> getRightpartSelectOneMenuParam(int objid) {
-        List<TechProc> result = new ArrayList<>();
+    public LinkedList<TechProc> getRightpartSelectOneMenuParam(int objid) {
+        LinkedList<TechProc> result = new LinkedList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SQL_SELECT_PARAMS_BY_ID)) {
             stm.setInt(1, objid);
