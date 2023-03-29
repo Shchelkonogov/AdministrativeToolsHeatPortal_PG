@@ -22,7 +22,7 @@ public class ObjTypeConverter implements Converter {
 
         MainParamMB defaultValues = (MainParamMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getLeftpartSelectOneMenuParam().stream()
+        return defaultValues.getLeftPartSelectOneMenuParam().stream()
                 .filter(leftType -> leftType.getId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);

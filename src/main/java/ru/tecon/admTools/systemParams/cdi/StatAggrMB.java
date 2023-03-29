@@ -43,7 +43,7 @@ public class StatAggrMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        statsAggrTable = statAggrSB.getSATabeParam();
+        statsAggrTable = statAggrSB.getSATableParam();
 
         FaceletContext faceletContext = (FaceletContext) FacesContext.getCurrentInstance()
                 .getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
@@ -73,7 +73,7 @@ public class StatAggrMB implements Serializable {
             selectedPartInSATable = null;
             disableRemoveBtn = true;
 
-            statsAggrTable=statAggrSB.getSATabeParam();
+            statsAggrTable=statAggrSB.getSATableParam();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -101,8 +101,7 @@ public class StatAggrMB implements Serializable {
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
-        statsAggrTable = statAggrSB.getSATabeParam();
-
+        statsAggrTable = statAggrSB.getSATableParam();
     }
 
     /**

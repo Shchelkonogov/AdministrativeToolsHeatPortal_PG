@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class StatAggrSB {
     private static final Logger LOGGER = Logger.getLogger(StatAggrSB.class.getName());
 
-    private static final String SQL_SELECT_ALL_PARAMS = "select * from sys_0001t.sel_stat_agr();";
+    private static final String SQL_SELECT_ALL_PARAMS = "select * from sys_0001t.sel_stat_agr()";
     private static final String FUN_ADD_STAT_AGGR = "call sys_0001t.add_stat_agr(?, ?, ?, ?, ?, ?, ?)";
     private static final String FUN_DEL_STAT_AGGR = "call sys_0001t.del_stat_agr(?, ?, ?, ?, ?)";
 
@@ -35,7 +35,7 @@ public class StatAggrSB {
      * Обновление табличных значений
      * @return наименование параметра техпроцесса и обозначение
      */
-    public List<StatAggrTable> getSATabeParam() {
+    public List<StatAggrTable> getSATableParam() {
         List<StatAggrTable> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_ALL_PARAMS)) {

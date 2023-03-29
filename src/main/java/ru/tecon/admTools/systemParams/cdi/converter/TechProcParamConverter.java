@@ -22,12 +22,11 @@ public class TechProcParamConverter implements Converter {
 
         MainParamMB defaultValues = (MainParamMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getParametrsOfTechProcsList().stream()
+        return defaultValues.getParamsOfTechProcessList().stream()
                 .filter(paramType -> paramType.getTechprid() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
     }
-
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {

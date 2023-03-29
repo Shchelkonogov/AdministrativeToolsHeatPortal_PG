@@ -25,7 +25,7 @@ public class SeasonChangeSB {
     private static final Logger LOGGER = Logger.getLogger(MainParamSB.class.getName());
 
     private static final String SQL_SELECT_SEASONS_CHANGE = "select * from dsp_0037t.change_season(?, ?, ?)";
-    private static final String SQL_SELECT_SEASONTABLE = "select * from dsp_0037t.sel_season_log()";
+    private static final String SQL_SELECT_SEASON_TABLE = "select * from dsp_0037t.sel_season_log()";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -37,7 +37,7 @@ public class SeasonChangeSB {
     public List<SeasonChangeTable> getTableParams(){
         List <SeasonChangeTable> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_SEASONTABLE)) {
+             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_SEASON_TABLE)) {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 result.add(new SeasonChangeTable(res.getString("season"),
@@ -68,7 +68,7 @@ public class SeasonChangeSB {
 
             while (resultSet.next()) {
                 LOGGER.log(Level.INFO,"result: " + resultSet.getString(1));
-                if (resultSet.getInt(1) !=0) {
+                if (resultSet.getInt(1) != 0) {
                     LOGGER.warning("season change error ");
 
                     throw new SystemParamException("Не удалось осуществить смену сезона");
