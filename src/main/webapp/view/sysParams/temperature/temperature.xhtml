@@ -84,7 +84,9 @@
                             <h:outputText value="#{temperatureProp.tnv}" />
                         </p:column>
                         <p:column headerText="Значение" style="text-align: center;">
-                            <h:outputText value="#{temperatureProp.value}" />
+                            <h:outputText value="#{temperatureProp.value}">
+                                <f:convertNumber minFractionDigits="0"/>
+                            </h:outputText>
                         </p:column>
                     </p:dataTable>
                 </div>
@@ -146,7 +148,9 @@
                     <p:column headerText="Значение" style="text-align: center;">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{prop.value}" />
+                                <h:outputText value="#{prop.value}">
+                                    <f:convertNumber minFractionDigits="0"/>
+                                </h:outputText>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputNumber value="#{prop.value}" style="width: 100%;"/>
