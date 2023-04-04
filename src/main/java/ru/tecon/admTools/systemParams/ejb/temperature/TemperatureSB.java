@@ -61,7 +61,7 @@ public class TemperatureSB {
             ResultSet res = stm.executeQuery();
 
             while (res.next()) {
-                result.add(new TemperatureProp(res.getInt("x"), res.getInt("y")));
+                result.add(new TemperatureProp(res.getInt("x"), res.getDouble("y")));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error load temperature props", e);
@@ -125,7 +125,7 @@ public class TemperatureSB {
             cStm.registerOutParameter(1, Types.INTEGER);
             cStm.setInt(2, id);
             cStm.setInt(3, temperatureProp.getTnv());
-            cStm.setInt(4, temperatureProp.getValue());
+            cStm.setDouble(4, temperatureProp.getValue());
             cStm.setString(5, login);
             cStm.setString(6, ip);
 
