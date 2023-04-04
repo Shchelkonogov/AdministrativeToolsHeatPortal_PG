@@ -32,7 +32,7 @@
                             <p:column headerText="Тип объекта" >
                                 <h:outputText value="Источник"/>
                             </p:column>
-                            <p:column headerText="Кп_н [%]" style="text-align: center;">
+                            <p:column id="K" headerText="Кп_н [%]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;|#{tv.kpn}|%"/>
@@ -42,7 +42,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                            <p:column id="KzTv" headerText="Кз [тонн/Гкал]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{tv.kz}"/>
@@ -52,7 +52,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="Кп [%]" style="text-align: center;">
+                            <p:column id="KpTv" headerText="Кп [%]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{tv.kp}"/>
@@ -63,6 +63,16 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:indicatorTVTable:K" position="bottom">
+                            <p:graphicImage name="tooltip/K.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:indicatorTVTable:KzTv" position="bottom">
+                            <p:graphicImage name="tooltip/Kz tv.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:indicatorTVTable:KpTv" position="bottom">
+                            <p:graphicImage name="tooltip/Kp tv.jpg" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -88,7 +98,7 @@
                             <p:column headerText="Тип объекта">
                                 <h:outputText value="#{co.name}"/>
                             </p:column>
-                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                            <p:column id="KzCo" headerText="Кз [тонн/Гкал]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{co.kz}"/>
@@ -98,7 +108,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="Кп [%]" style="text-align: center;">
+                            <p:column id="KpCo" headerText="Кп [%]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{co.kp}"/>
@@ -109,6 +119,13 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:indicatorCOTable:KzCo" position="bottom">
+                            <p:graphicImage name="tooltip/Kz co.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:indicatorCOTable:KpCo" position="left">
+                            <p:graphicImage name="tooltip/Kp co.jpg" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -136,7 +153,7 @@
                             <p:column headerText="Тип объекта" >
                                 <h:outputText value="#{gvs.name}"/>
                             </p:column>
-                            <p:column headerText="Кц [%]" style="text-align: center;">
+                            <p:column id="KcGvs" headerText="Кц [%]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&gt;#{gvs.kc}%"/>
@@ -147,6 +164,10 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:indicatorGVSTable:KcGvs" position="bottom">
+                            <p:graphicImage name="tooltip/Kc gvs.jpg" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -172,7 +193,7 @@
                             <p:column headerText="Тип объекта">
                                 <h:outputText value="#{vent.name}"/>
                             </p:column>
-                            <p:column headerText="Кз [тонн/Гкал]" style="text-align: center;">
+                            <p:column id="KzVent" headerText="Кз [тонн/Гкал]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{vent.kz}"/>
@@ -182,7 +203,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="Кп [%]" style="text-align: center;">
+                            <p:column id="KpVent" headerText="Кп [%]" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="&lt;#{vent.kp}"/>
@@ -193,6 +214,13 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:indicatorVENTTable:KzVent" position="bottom">
+                            <p:graphicImage name="tooltip/Kz vent.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:indicatorVENTTable:KpVent" position="left">
+                            <p:graphicImage name="tooltip/Kp vent.jpg" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -219,27 +247,27 @@
                         <p:columnGroup type="header">
                             <p:row>
                                 <p:column rowspan="2" headerText="Тип объекта" width="150" />
-                                <p:column rowspan="2" headerText="Т7 [℃]" width="50" />
-                                <p:column rowspan="2" headerText="∆T7 (Т7 ТП - Т7потр.) [℃]" width="170" />
-                                <p:column rowspan="2" headerText="Кт [%]" width="50" />
-                                <p:column rowspan="2" headerText="Ктo [%]" width="50" />
-                                <p:column rowspan="2" headerText="КG [%]" width="50" />
-                                <p:column rowspan="2" headerText="КV [%]" width="50" />
+                                <p:column id="T7" rowspan="2" headerText="Т7 [℃]" width="50" />
+                                <p:column id="dT7" rowspan="2" headerText="∆T7 (Т7 ТП - Т7потр.) [℃]" width="170" />
+                                <p:column id="Kt" rowspan="2" headerText="Кт [%]" width="50" />
+                                <p:column id="Kto" rowspan="2" headerText="Ктo [%]" width="50" />
+                                <p:column id="Kg" rowspan="2" headerText="КG [%]" width="50" />
+                                <p:column id="Kv" rowspan="2" headerText="КV [%]" width="50" />
                                 <p:column colspan="3" headerText="КУ [тонн]" width="150" />
-                                <p:column rowspan="2" headerText="КР цо" width="50" />
-                                <p:column rowspan="2" headerText="К∆G цо" width="50" />
-                                <p:column rowspan="2" headerText="К1 недоотпуск [%]" width="130" />
-                                <p:column rowspan="2" headerText="К2 перетоп [%]" width="115" />
-                                <p:column rowspan="2" headerText="КР гвс" width="50" />
-                                <p:column rowspan="2" headerText="К∆G гвс" width="55" />
-                                <p:column rowspan="2" headerText="КQ гвс лето" width="85" />
-                                <p:column rowspan="2" headerText="∆Tгвс" width="50" />
-                                <p:column rowspan="2" headerText="Кгвс цирк" width="85" />
+                                <p:column id="KrCo" rowspan="2" headerText="КР цо" width="50" />
+                                <p:column id="KdgCo" rowspan="2" headerText="К∆G цо" width="50" />
+                                <p:column id="K1" rowspan="2" headerText="К1 недоотпуск [%]" width="130" />
+                                <p:column id="K2" rowspan="2" headerText="К2 перетоп [%]" width="115" />
+                                <p:column id="KrGvs" rowspan="2" headerText="КР гвс" width="50" />
+                                <p:column id="KdgGvs" rowspan="2" headerText="К∆G гвс" width="55" />
+                                <p:column id="kqgvsleto" rowspan="2" headerText="КQ гвс лето" width="85" />
+                                <p:column id="Tgvs" rowspan="2" headerText="∆Tгвс" width="50" />
+                                <p:column id="KgvsCirc" rowspan="2" headerText="Кгвс цирк" width="85" />
                             </p:row>
                             <p:row>
-                                <p:column headerText="ЦО" />
-                                <p:column headerText="В" />
-                                <p:column headerText="ГВС" />
+                                <p:column id="KyCo" headerText="ЦО" />
+                                <p:column id="KyV" headerText="В" />
+                                <p:column id="KyGvs" headerText="ГВС" />
                             </p:row>
                         </p:columnGroup>
                         <p:column>
@@ -427,6 +455,61 @@
                             </p:cellEditor>
                         </p:column>
                     </p:dataTable>
+
+                    <p:tooltip for="normIndicators:borderValues:KrCo" position="bottom">
+                        <p:graphicImage name="tooltip/Kr co.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KrGvs" position="bottom">
+                        <p:graphicImage name="tooltip/Kr gvs.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KdgCo" position="bottom">
+                        <p:graphicImage name="tooltip/Kdg co.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KdgGvs" position="bottom">
+                        <p:graphicImage name="tooltip/Kdg gvs.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:T7" position="bottom">
+                        <p:graphicImage name="tooltip/T7.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:Tgvs" position="left">
+                        <p:graphicImage name="tooltip/Tgvs.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:Kt" position="bottom">
+                        <p:graphicImage name="tooltip/Kt.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:Kto" position="bottom">
+                        <p:graphicImage name="tooltip/Kto.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:Kg" position="bottom">
+                        <p:graphicImage name="tooltip/Kg.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:Kv" position="bottom">
+                        <p:graphicImage name="tooltip/Kv.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KyGvs" position="bottom">
+                        <p:graphicImage name="tooltip/Ky gvs.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KyV" position="bottom">
+                        <p:graphicImage name="tooltip/Ky V.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KyCo" position="bottom">
+                        <p:graphicImage name="tooltip/Ky co.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:kqgvsleto" position="bottom">
+                        <p:graphicImage name="tooltip/Kq gvs summer.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:KgvsCirc" position="left">
+                        <p:graphicImage name="tooltip/Kgvs circ.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:dT7" position="bottom">
+                        <p:graphicImage name="tooltip/dT7.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:K1" position="bottom">
+                        <p:graphicImage name="tooltip/K1.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:borderValues:K2" position="bottom">
+                        <p:graphicImage name="tooltip/K2.jpg" library="normIndicators"/>
+                    </p:tooltip>
                 </div>
             </div>
         </div>
@@ -453,7 +536,7 @@
                             <p:column headerText="Тип объекта" >
                                 <h:outputText value="#{t7.name}"/>
                             </p:column>
-                            <p:column headerText="T7min Ж" style="text-align: center;">
+                            <p:column id="T7ming" headerText="T7min Ж" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.minG}"/>
@@ -463,7 +546,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="T7max Ж" style="text-align: center;">
+                            <p:column id="T7maxg" headerText="T7max Ж" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.maxG}"/>
@@ -473,7 +556,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="T7min П" style="text-align: center;">
+                            <p:column id="T7minp" headerText="T7min П" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.minP}"/>
@@ -483,7 +566,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="T7max П" style="text-align: center;">
+                            <p:column id="T7maxp" headerText="T7max П" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{t7.maxP}"/>
@@ -494,6 +577,19 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7ming" position="bottom">
+                            <p:graphicImage name="tooltip/T7min g.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxg" position="bottom">
+                            <p:graphicImage name="tooltip/T7max g.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7minp" position="bottom">
+                            <p:graphicImage name="tooltip/T7min p.jpg" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxp" position="bottom">
+                            <p:graphicImage name="tooltip/T7max p.jpg" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -516,7 +612,7 @@
 
                             <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
 
-                            <p:column headerText="ΔTmin" style="text-align: center;">
+                            <p:column id="Tmin" headerText="ΔTmin" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtMin}"/>
@@ -526,7 +622,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="ΔTmax" style="text-align: center;">
+                            <p:column id="Tmax" headerText="ΔTmax" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtMax}"/>
@@ -536,7 +632,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column headerText="ΔTнорм" style="text-align: center;">
+                            <p:column id="Tnorm" headerText="ΔTнорм" style="text-align: center;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
                                         <h:outputText value="#{dT7.dtNorm}"/>
@@ -547,6 +643,16 @@
                                 </p:cellEditor>
                             </p:column>
                         </p:dataTable>
+
+                        <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmin" position="bottom">
+                            <p:graphicImage name="tooltip/Tmin.png" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmax" position="bottom">
+                            <p:graphicImage name="tooltip/Tmax.png" library="normIndicators"/>
+                        </p:tooltip>
+                        <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tnorm" position="left">
+                            <p:graphicImage name="tooltip/Tnorm.png" library="normIndicators"/>
+                        </p:tooltip>
                     </div>
                 </div>
             </div>
@@ -572,8 +678,8 @@
 
                         <p:columnGroup type="header">
                             <p:row>
-                                <p:column colspan="3" headerText="Недоотпуск по Т3"/>
-                                <p:column colspan="3" headerText="Недоотпуск по Т4"/>
+                                <p:column id="T3" colspan="3" headerText="Недоотпуск по Т3"/>
+                                <p:column id="T4" colspan="3" headerText="Недоотпуск по Т4"/>
                             </p:row>
                             <p:row>
                                 <p:column headerText="k1" />
@@ -645,6 +751,13 @@
                             </p:cellEditor>
                         </p:column>
                     </p:dataTable>
+
+                    <p:tooltip for="normIndicators:underSupplyValues:T3" position="bottom">
+                        <p:graphicImage name="tooltip/T3UnderSupply.jpg" library="normIndicators"/>
+                    </p:tooltip>
+                    <p:tooltip for="normIndicators:underSupplyValues:T4" position="bottom">
+                        <p:graphicImage name="tooltip/T4UnderSupply.jpg" library="normIndicators"/>
+                    </p:tooltip>
                 </div>
             </div>
         </div>
