@@ -12,16 +12,16 @@ public class TemperatureProp implements Serializable {
 
     private static final AtomicInteger count = new AtomicInteger(0);
 
-    private int id;
+    private final int id;
     private int tnv;
-    private int value;
+    private double value;
     private boolean changed = false;
 
     public TemperatureProp() {
         id = count.addAndGet(1);
     }
 
-    public TemperatureProp(int tnv, int value) {
+    public TemperatureProp(int tnv, double value) {
         this();
         this.tnv = tnv;
         this.value = value;
@@ -35,7 +35,7 @@ public class TemperatureProp implements Serializable {
         return tnv;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
@@ -44,7 +44,7 @@ public class TemperatureProp implements Serializable {
         changed = true;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
         changed = true;
     }

@@ -8,6 +8,10 @@ html, body {
     user-select: none;
 }
 
+.ui-tooltip-text {
+    padding: 3px 3px 0 3px !important;
+}
+
 .ui-datatable-scrollable table {
     table-layout: unset !important;
 }
