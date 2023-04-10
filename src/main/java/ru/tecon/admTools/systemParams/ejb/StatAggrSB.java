@@ -17,11 +17,13 @@ import java.util.logging.Logger;
 
 /**
  * Stateless bean для получения данных из база для формы статистических агрегатов
+ *
  * @author Aleksey Sergeev
  */
 @Stateless
 @LocalBean
 public class StatAggrSB {
+
     private static final Logger LOGGER = Logger.getLogger(StatAggrSB.class.getName());
 
     private static final String SQL_SELECT_ALL_PARAMS = "select * from sys_0001t.sel_stat_agr()";
@@ -33,12 +35,13 @@ public class StatAggrSB {
 
     /**
      * Обновление табличных значений
+     *
      * @return наименование параметра техпроцесса и обозначение
      */
     public List<StatAggrTable> getSATableParam() {
         List<StatAggrTable> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
-            PreparedStatement stm = connect.prepareStatement(SQL_SELECT_ALL_PARAMS)) {
+             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_ALL_PARAMS)) {
 
             ResultSet res = stm.executeQuery();
 
@@ -56,9 +59,10 @@ public class StatAggrSB {
 
     /**
      * Создание нового статистического агрегата
+     *
      * @param addStatAggrTable статистический агрегат
-     * @param login имя пользователя
-     * @param ip адрес пользователя
+     * @param login            имя пользователя
+     * @param ip               адрес пользователя
      * @throws SystemParamException в случае ошибки создания новой единицы измерения
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -80,7 +84,6 @@ public class StatAggrSB {
             }
 
             LOGGER.info("add stat aggr " + addStatAggrTable.getStat_agr_name());
-
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error add stat aggr", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
@@ -89,16 +92,17 @@ public class StatAggrSB {
 
     /**
      * Удаление статистического агрегата
+     *
      * @param statAggrTable статистический агрегат
-     * @param login имя пользователя
-     * @param ip адрес пользователя
+     * @param login         имя пользователя
+     * @param ip            адрес пользователя
      * @throws SystemParamException в случае ошибки удаления единицы измерения
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void removeParamFromTable(StatAggrTable statAggrTable, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_DEL_STAT_AGGR)) {
-            cStm.setLong(1,statAggrTable.getId());
+            cStm.setLong(1, statAggrTable.getId());
             cStm.registerOutParameter(2, Types.VARCHAR);
             cStm.setString(3, login);
             cStm.setString(4, ip);

@@ -17,7 +17,7 @@
                                  update="statAggrForm:statAggrTable statAggrForm:btnRemove"
                                  rendered="#{systemParamsUtil.write}" />
                 <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 update="statAggrForm:statAggrTable "
+                                 update="statAggrForm:statAggrTable"
                                  onclick="PF('addNewParam').show();"
                                  rendered="#{systemParamsUtil.write}" />
             </div>
@@ -36,7 +36,6 @@
                         <h:outputText style="display: block; text-align: center;" value="#{statAggrData.id}" />
                     </p:column>
 
-
                     <p:column headerText="Код статистического агрегата" width="200" style="white-space: nowrap">
                               <h:outputText style="display: block; width: 200px;" value="#{statAggrData.stat_agr_code}" />
                     </p:column>
@@ -52,39 +51,34 @@
         </div>
     </h:form>
 
-    <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true" width="798px" height="212px" resizable="false" rendered="#{systemParamsUtil.write}" >
+    <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true"
+              resizable="false" rendered="#{systemParamsUtil.write}" >
+
         <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="statAGGrForm"/>
-        <h:form id="statAGGrForm" >
-            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="ID*" style="margin-right: 188px"/>
-                <p:inputNumber required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
-                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;
-                             "/>
-                <p:message style="margin-left: 5px;" for="@previous" />
-            </div>
 
-            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="Код статистического агрегата*" style="margin-right: 10px"/>
+        <h:form id="statAGGrForm">
+            <h:panelGrid columns="3" style="margin-bottom: 35px;">
+                <p:outputLabel value="ID" for="@next"/>
+                <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
+                               requiredMessage="#{global['validation.view.text']}"/>
+                <p:message for="@previous"/>
+
+                <p:outputLabel value="Код статистического агрегата" for="@next"/>
                 <p:inputText required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_code}"
-                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
-                <p:message style="margin-left: 5px;" for="@previous" />
-            </div>
+                             requiredMessage="#{global['validation.view.text']}" style="width: 200px;"/>
+                <p:message for="@previous" />
 
-            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="Имя статистического агрегата*" style="margin-right: 8px"/>
+                <p:outputLabel value="Имя статистического агрегата" for="@next"/>
                 <p:inputText required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_name}"
-                             requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
-                <p:message style="margin-left: 5px;" for="@previous" />
-            </div>
+                             requiredMessage="#{global['validation.view.text']}" style="width: 200px;"/>
+                <p:message for="@previous" />
 
-            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-
-                <h:outputLabel value="Интегратор/дифференциатор " style="margin-right: 10px"/>
-                <p:selectOneMenu id="params"  style="width: 300px; margin: 5px" value="#{statAggrMB.addStatAggrTable.dif_int}">
+                <p:outputLabel value="Интегратор/дифференциатор " for="@next"/>
+                <p:selectOneMenu id="params" style="width: 200px;" value="#{statAggrMB.addStatAggrTable.dif_int}">
                     <f:selectItem itemLabel="Интегратор" itemValue="I"/>
                     <f:selectItem itemLabel="Дифференциатор" itemValue="D"/>
                 </p:selectOneMenu>
-            </div>
+            </h:panelGrid>
 
             <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
                              action="#{statAggrMB.onSaveChanges()}" validateClient="true"

@@ -230,3 +230,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 #seasonChangePanel\:confirm > .ui-dialog-content > .ui-icon {
     display: none;
 }
+
+#statAGGrForm\:inputId_input {
+    width: 200px;
+}

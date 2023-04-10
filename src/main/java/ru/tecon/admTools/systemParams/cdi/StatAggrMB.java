@@ -36,7 +36,7 @@ public class StatAggrMB implements Serializable {
     private boolean disableRemoveBtn = true;
 
     @EJB
-    StatAggrSB statAggrSB;
+    private StatAggrSB statAggrSB;
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -76,19 +76,13 @@ public class StatAggrMB implements Serializable {
     }
 
     /**
-     * Обработчик добавления нового параметра в таблицу, нажатие на копку добавить статистический агрегат (+)
-     */
-    public void onAddNew() {
-        statsAggrTable.add(new StatAggrTable());
-    }
-
-    /**
      * Обработчик сохранения изменения нового параметра в таблицу, нажатие на копку сохранить
      */
     public void onSaveChanges() {
-
         try {
             statAggrSB.addStatAggr(addStatAggrTable, utilMB.getLogin(), utilMB.getIp());
+
+            statsAggrTable = statAggrSB.getSATableParam();
 
             PrimeFaces.current().executeScript("PF('addNewParam').hide();");
         } catch (SystemParamException e) {
@@ -96,13 +90,11 @@ public class StatAggrMB implements Serializable {
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
-        statsAggrTable = statAggrSB.getSATableParam();
     }
 
     /**
      * Обработчик обновления диалогового окна в случае его закрытия
      */
-
     public void onAddStatAggrDialogClose() {
         addStatAggrTable = new StatAggrTable();
     }
