@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 @Named("seasonChangeMB")
 @ViewScoped
 public class SeasonChangeMB implements Serializable {
+
     private static final Logger LOGGER = Logger.getLogger(SeasonChangeMB.class.getName());
 
     private List<SeasonChangeTable> seasonChangeTableList = new ArrayList<>();
@@ -48,7 +49,9 @@ public class SeasonChangeMB implements Serializable {
         String seasonChangeTable = seasonChangeTableList.get(0).getSeason();
         if (seasonChangeTable.equals("Лето")) {
             seasonChangeTable = "ZIMA";
-        } else seasonChangeTable = "LETO";
+        } else {
+            seasonChangeTable = "LETO";
+        }
 
         try {
             seasonChangeSB.changeSeason(seasonChangeTable, utilMB.getLogin(), utilMB.getIp());

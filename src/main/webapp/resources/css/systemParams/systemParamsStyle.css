@@ -226,3 +226,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 #addPropFormP\:inputNumberP_input {
     width: 30px;
 }
+
+#seasonChangePanel\:confirm > .ui-dialog-content > .ui-icon {
+    display: none;
+}

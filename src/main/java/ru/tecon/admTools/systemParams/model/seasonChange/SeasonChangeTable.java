@@ -7,6 +7,7 @@ import java.util.StringJoiner;
 
 /**
  * Класс описывающий структуру таблицы для формы переключение сезона
+ *
  * @author Aleksey Sergeev
  */
 public class SeasonChangeTable implements Serializable {
@@ -14,15 +15,15 @@ public class SeasonChangeTable implements Serializable {
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     private String season;
-    private LocalDateTime start_time;
-    private LocalDateTime end_time;
+    private final LocalDateTime start_time;
+    private final LocalDateTime end_time;
     private String name;
 
     public SeasonChangeTable(String season, LocalDateTime start_time, LocalDateTime end_time, String name) {
-    this.season = season;
-    this.start_time = start_time;
-    this.end_time = end_time;
-    this.name = name;
+        this.season = season;
+        this.start_time = start_time;
+        this.end_time = end_time;
+        this.name = name;
     }
 
     public String getSeason() {
@@ -33,12 +34,12 @@ public class SeasonChangeTable implements Serializable {
         this.season = season;
     }
 
-    public String getStart_timeAsString(){
+    public String getStart_timeAsString() {
         return start_time.format(dtf);
     }
 
-    public String getEnd_timeAsString(){
-        if (end_time==null){
+    public String getEnd_timeAsString() {
+        if (end_time == null) {
             return "Текущий сезон продолжается";
         }
         return end_time.format(dtf);

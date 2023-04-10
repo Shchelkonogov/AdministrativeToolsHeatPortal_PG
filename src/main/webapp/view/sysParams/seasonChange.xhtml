@@ -11,23 +11,27 @@
                     border-top-left-radius: 3px; height: 41px;">
                 <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Переключение сезона"/>
                 <div style="padding: 3px;">
-                    <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Сменить отопительный сезон" onclick="PF('cd').show();"/>
-                    <p:confirmDialog id="confirm" header="Внимание !" severity="alert" widgetVar="cd" >
+                    <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Сменить отопительный сезон"
+                                     onclick="PF('cd').show();"/>
+                    <p:confirmDialog id="confirm" header="Подтверждение" widgetVar="cd">
                         <f:facet name="message">
-                            Вы собираетесь сменить отопительный сезон в АС "Текон-Диспетчеризация"
-                            <br/><br/>
-                            При смене сезона будут безвозвратно закрыты все извещения, отключенные от
-                            <br/><br/>
-                            контроля в наступающем сезоне, не зависимо от их текущего состояния.
+                            <span class="ui-icon pi pi-info-circle" style="display: inline-block; font-size: 2em;"/>
+                            <span style="display: inline-block; vertical-align: middle;">
+                                Вы собираетесь сменить отопительный сезон в АС "Текон-Диспетчеризация"
+                                <br/><br/>
+                                При смене сезона будут безвозвратно закрыты все извещения, отключенные от
+                                <br/><br/>
+                                контроля в наступающем сезоне, не зависимо от их текущего состояния.
+                            </span>
                         </f:facet>
                         <p:selectBooleanCheckbox value="#{seasonChangeMB.disableSaveBtn}" itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
-                            <p:ajax update="confirm" event="valueChange" oncomplete="PF('cd').show();"/>
+                            <p:ajax event="valueChange" update="okButton"/>
                         </p:selectBooleanCheckbox>
                         <p:commandButton value="Нет" update="seasonChangeTable growl"
                                          oncomplete="PF('cd').hide();"/>
-                        <p:commandButton value="Да" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();" update=" seasonChangeTable growl"
-                                             oncomplete="PF('statusDialog').hide(); PF('cd').hide();" disabled="#{!seasonChangeMB.disableSaveBtn}" />
-
+                        <p:commandButton value="Да" id="okButton" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();"
+                                         update="seasonChangeTable growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
+                                         disabled="#{!seasonChangeMB.disableSaveBtn}" />
                     </p:confirmDialog>
 
                 </div>
@@ -35,9 +39,9 @@
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
 
                 <div style="height: calc(100% - 45px);">
-                    <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable" value="#{seasonChangeMB.seasonChangeTableList}"
-                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                 rowKey="#{seasonChangeData.season}">
+                    <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable"
+                                 value="#{seasonChangeMB.seasonChangeTableList}" scrollable="true" scrollHeight="100%"
+                                 emptyMessage="#{global['table.empty.value']}" rowKey="#{seasonChangeData.season}">
 
                         <p:column headerText="Сезон" style="width: 60px; white-space: nowrap">
                             <h:outputText style="display: block; text-align: center;" value="#{seasonChangeData.season}" />
