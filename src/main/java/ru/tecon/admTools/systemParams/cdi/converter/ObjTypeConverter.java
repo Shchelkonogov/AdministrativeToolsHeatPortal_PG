@@ -1,8 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
 import ru.tecon.admTools.systemParams.cdi.MainParamMB;
-import ru.tecon.admTools.systemParams.ejb.MainParamSB;
-import ru.tecon.admTools.systemParams.model.mainParam.ObjType;
+import ru.tecon.admTools.systemParams.model.ObjectType;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
@@ -23,7 +22,7 @@ public class ObjTypeConverter implements Converter {
 
         MainParamMB defaultValues = (MainParamMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getLeftpartSelectOneMenuParam().stream()
+        return defaultValues.getLeftPartSelectOneMenuParam().stream()
                 .filter(leftType -> leftType.getId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
@@ -31,6 +30,6 @@ public class ObjTypeConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((ObjType) value).getId());
+        return String.valueOf(((ObjectType) value).getId());
     }
 }

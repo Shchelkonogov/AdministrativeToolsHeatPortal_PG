@@ -1,12 +1,13 @@
 package ru.tecon.admTools.systemParams.model;
 
+import java.io.Serializable;
 import java.util.StringJoiner;
 
 /**
  * Класс описывающий типы объектов
  * @author Maksim Shchelkonogov
  */
-public class ObjectType {
+public class ObjectType implements Serializable {
 
     private int id;
     private String name;

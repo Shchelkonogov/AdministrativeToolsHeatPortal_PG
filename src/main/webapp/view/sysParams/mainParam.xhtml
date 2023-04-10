@@ -23,9 +23,9 @@
                                  update="mainPram:table mainPram:btnRemove growl" rendered="#{systemParamsUtil.write}"
                 />
                 <p:commandButton icon="btnAdd" id="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 disabled="#{mainParamMB.disableAddBtn}"
-                                 update="dialog"
+                                 update="dialog paramsForm"
                                  oncomplete="PF('addNewParam').show();" rendered="#{systemParamsUtil.write}"
+                                 actionListener="#{mainParamMB.techProcessUpdateAfterEvent()}"
                 />
 
             </div>
@@ -35,25 +35,23 @@
 
                 <p:outputLabel  value="Тип Объекта" style="margin-right: 10px; font-weight: 300; color: #333; font-size: 15px;" />
                 <p:selectOneMenu id="left" value="#{mainParamMB.leftOneLine}" style="width: 300px;" >
-                    <p:ajax listener="#{mainParamMB.rightPartListUpdateAfterEvent()}" update="right, table, btnAdd, btnRemove"/>
+                    <p:ajax event="change" update="right, table, btnAdd, btnRemove
+                    paramsForm:rightDialog paramsForm:params " listener="#{mainParamMB.rightPartListUpdateAfterEvent}"/>
+
                     <f:converter converterId="leftTypeConverter"/>
 
-                    <f:selectItems value="#{mainParamMB.leftpartSelectOneMenuParam}"
+                    <f:selectItems value="#{mainParamMB.leftPartSelectOneMenuParam}"
                                    var="objType"
                                    itemLabel="#{objType.name}" itemValue="#{objType}"/>
                 </p:selectOneMenu>
 
                 <p:outputLabel for="@next" value="Техпроцесс" style="margin-left: 20px; font-weight: 300; color: #333; font-size: 15px;"/>
                 <p:selectOneMenu id="right" value="#{mainParamMB.adaptRightPartSelectOneMenu}" style="width: 300px; margin-left: 15px;"  >
-                    <p:ajax listener="#{mainParamMB.tableUpdateAfterEvent()}" update="table"/>
-                    <p:ajax listener="#{mainParamMB.techProcsUpdateAfterEvent()}" update="paramsForm:params"/>
+                    <p:ajax event="itemSelect" update="table paramsForm:rightDialog" listener="#{mainParamMB.tableUpdateAfterEvent}"/>
+
                     <f:converter converterId="rightTypeConverter"/>
 
-
-                    <c:if test="#{mainParamMB.rightPartSelectOneMenuParam.isEmpty()}">
-                        <f:selectItem itemLabel="#{mainParamMB.noSelectItem.name}" itemValue="#{mainParamMB.noSelectItem}"/>
-                    </c:if>
-
+                    <f:selectItem itemLabel="#{mainParamMB.all.name}" itemValue="#{mainParamMB.all}"/>
                     <f:selectItems value="#{mainParamMB.rightPartSelectOneMenuParam}"
                                    var="objParam"
                                    itemLabel="#{objParam.name}" itemValue="#{objParam}"
@@ -86,18 +84,31 @@
         <h:form id="paramsForm">
 
             <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="#{'Тип объекта: '.concat(' ').concat(mainParamMB.leftOneLine.name)}" style="margin: 10px" />
+                <h:outputLabel value="Тип объекта: #{mainParamMB.leftOneLine.name}" style="margin: 10px" />
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                <h:outputLabel value="#{'Техпроцесс: '.concat(' ').concat(mainParamMB.adaptRightPartSelectOneMenu.name)}" style="margin: 10px"/>
-            </div>
+            <p:outputPanel style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;" rendered="#{mainParamMB.techProcParamString}">
+                <h:outputLabel value="Техпроцесс:  #{mainParamMB.adaptRightPartSelectOneMenu.name}" style="margin: 10px"/>
+            </p:outputPanel>
+
+            <p:outputPanel for="@next" rendered="#{!mainParamMB.techProcParamString}" style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
+                <p:outputLabel value="Техпроцесс" style="margin-right: 10px; margin-left: 10px"/>
+                <p:selectOneMenu id="rightDialog" value="#{mainParamMB.adaptRightPartSelectOneMenu}" style="width: 300px; "  >
+                    <p:ajax listener="#{mainParamMB.techProcsUpdateAfterEvent()}" update="paramsForm:params paramsForm"/>
+                    <f:converter converterId="rightTypeConverter"/>
+
+                    <f:selectItems value="#{mainParamMB.rightPartSelectOneMenuParam}"
+                                   var="objParam"
+                                   itemLabel="#{objParam.name}" itemValue="#{objParam}"
+                    />
+                </p:selectOneMenu>
+            </p:outputPanel>
 
             <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                 <h:outputLabel value="Параметр: " style="margin-right: 10px; margin-left: 10px"/>
-                <p:selectOneMenu id="params" value="#{mainParamMB.adaptParametrsOfTechProc}" style="width: 300px; margin: 5px">
+                <p:selectOneMenu id="params" value="#{mainParamMB.adaptParamsOfTechProc}" style="width: 300px; margin: 5px">
                     <f:converter converterId="parametrsTypeConverter"/>
-                    <f:selectItems value="#{mainParamMB.parametrsOfTechProcsList}"
+                    <f:selectItems value="#{mainParamMB.paramsOfTechProcessList}"
                                    var="paramType"
                                    itemLabel="#{paramType.name += ' (' += paramType.memo += ')'}" itemValue="#{paramType}"/>
                 </p:selectOneMenu>
@@ -105,7 +116,7 @@
 
                 <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
                                  action="#{mainParamMB.onSaveChanges()}"
-                                 oncomplete="PF('addNewParam').hide(); PF('statusDialog').hide();" update="mainPram:table" />
+                                 oncomplete="PF('addNewParam').hide(); PF('statusDialog').hide();" update="mainPram:table params " />
 
                 <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();"
                                  styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>

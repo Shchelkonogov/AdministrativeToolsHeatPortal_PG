@@ -1,7 +1,9 @@
 package ru.tecon.admTools.systemParams.ejb;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.model.mainParam.*;
+import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
+import ru.tecon.admTools.systemParams.model.mainParam.TechProc;
+import ru.tecon.admTools.systemParams.model.mainParam.TechProcParam;
 
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
@@ -12,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,49 +27,22 @@ import java.util.logging.Logger;
 @LocalBean
 public class MainParamSB {
     private static final Logger LOGGER = Logger.getLogger(MainParamSB.class.getName());
-    private static final String SQL_SELECT_ALL_PARAMS =
-            "select * from sys_0001t.sel_obj_type()";
-    private static final String SQL_SELECT_PARAMS_BY_ID =
-            "select * from sys_0001t.sel_obj_type_techproc(?)";
-    private static final String SQL_SELECT_SELECTED_PARAMS =
-            // "select * from dsp_0036t.list_basic_param(1, 2)";
-            "select * from dsp_0036t.list_basic_param(?, ?)";
-    private static final String FUN_DEL_PARAMS =
-            "select * from dsp_0036t.del_basic_param(?, ?, ?, ?, ?, ?)";
-    private static final String FUN_ADD_PARAMS=
-            "select * from dsp_0036t.add_basic_param(?, ?, ?, ?, ?, ?)";
-    private static final String SQL_SELECT_BPARAMS_BY_ID = "select * from dsp_0036t.list_add_basic_param(?)";
+
+    private static final String SQL_SELECT_PARAMS_BY_ID = "select * from sys_0001t.sel_obj_type_techproc(?)";
+    private static final String SQL_SELECT_SELECTED_PARAMS = "select * from dsp_0036t.list_basic_param(?, ?)";
+    private static final String FUN_DEL_PARAMS = "select * from dsp_0036t.del_basic_param(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_ADD_PARAMS= "select * from dsp_0036t.add_basic_param(?, ?, ?, ?, ?, ?)";
+    private static final String SQL_SELECT_BASIC_PARAMS_BY_ID = "select * from dsp_0036t.list_add_basic_param(?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
     /**
-     * Обновление типа объекта
-     * @return список типов объектов
-     */
-
-    public List<ObjType> getLeftpartSelectOneMenuParam() {
-        List<ObjType> result = new ArrayList<>();
-        try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_ALL_PARAMS)) {
-            ResultSet res = stm.executeQuery();
-            while (res.next()) {
-                result.add(new ObjType(res.getInt("obj_type_id"),
-                        res.getString("obj_type_name"),
-                        res.getString("obj_type_char")));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "SQLException", e);
-        }
-        return result;
-    }
-
-    /**
      * Обновление типа техпроцесса
      * @return список техпроцессов
      */
-    public List<TechProc> getRightpartSelectOneMenuParam(int objid) {
-        List<TechProc> result = new ArrayList<>();
+    public LinkedList<TechProc> getRightPartSelectOneMenuParam(int objid) {
+        LinkedList<TechProc> result = new LinkedList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SQL_SELECT_PARAMS_BY_ID)) {
             stm.setInt(1, objid);
@@ -90,7 +66,7 @@ public class MainParamSB {
      * Обновление табличных значений
      * @return наименование параметра техпроцесса и обозначение
      */
-    public List<MPTable> getTabeParam(int objid, int techprid) {
+    public List<MPTable> getTableParam(int objid, int techprid) {
         List<MPTable> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SQL_SELECT_SELECTED_PARAMS)) {
@@ -115,10 +91,10 @@ public class MainParamSB {
      * Обновление параметров техпроцесса
      * @return список параметров техпроцессов
      */
-    public List<TechProcParam> getParametrsOfTechProc(int techprid) {
+    public List<TechProcParam> getParamsOfTechProc(int techprid) {
         List<TechProcParam> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_BPARAMS_BY_ID)) {
+             PreparedStatement stm = connect.prepareStatement(SQL_SELECT_BASIC_PARAMS_BY_ID)) {
             stm.setInt(1, techprid);
             ResultSet res = stm.executeQuery();
 

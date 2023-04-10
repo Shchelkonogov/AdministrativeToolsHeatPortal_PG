@@ -11,21 +11,29 @@
                     border-top-left-radius: 3px; height: 41px;">
                 <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Переключение сезона"/>
                 <div style="padding: 3px;">
-                    <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Изменить" onclick="PF('statusDialog').show();"
-                                     action="#{seasonChangeMB.onSeasonChange}" update="seasonChangeSelector seasonChangeTable growl"
-                                     oncomplete="PF('statusDialog').hide();" disabled="#{seasonChangeMB.disableSaveBtn}" />
+                    <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Сменить отопительный сезон" onclick="PF('cd').show();"/>
+                    <p:confirmDialog id="confirm" header="Внимание !" severity="alert" widgetVar="cd" >
+                        <f:facet name="message">
+                            Вы собираетесь сменить отопительный сезон в АС "Текон-Диспетчеризация"
+                            <br/><br/>
+                            При смене сезона будут безвозвратно закрыты все извещения, отключенные от
+                            <br/><br/>
+                            контроля в наступающем сезоне, не зависимо от их текущего состояния.
+                        </f:facet>
+                        <p:selectBooleanCheckbox value="#{seasonChangeMB.disableSaveBtn}" itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
+                            <p:ajax update="confirm" event="valueChange" oncomplete="PF('cd').show();"/>
+                        </p:selectBooleanCheckbox>
+                        <p:commandButton value="Нет" update="seasonChangeTable growl"
+                                         oncomplete="PF('cd').hide();"/>
+                        <p:commandButton value="Да" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();" update=" seasonChangeTable growl"
+                                             oncomplete="PF('statusDialog').hide(); PF('cd').hide();" disabled="#{!seasonChangeMB.disableSaveBtn}" />
+
+                    </p:confirmDialog>
+
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <p:outputPanel style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px; margin-top: 2px;" rendered="#{systemParamsUtil.write}">
-                    <h:outputLabel value="Сезон " style="margin-right: 10px"/>
-                    <p:selectOneMenu id="seasonChangeSelector" value="#{seasonChangeMB.seasonChangeTable}"
-                                     style="width: 300px; margin-top: 5px;">
-                        <p:ajax listener="#{seasonChangeMB.buttonChangeAfterSelect}" update="btnChange"/>
-                        <f:selectItem itemLabel="Лето" itemValue="LETO"/>
-                        <f:selectItem itemLabel="Зима" itemValue="ZIMA"/>
-                    </p:selectOneMenu>
-                </p:outputPanel>
+
                 <div style="height: calc(100% - 45px);">
                     <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable" value="#{seasonChangeMB.seasonChangeTableList}"
                                  scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"

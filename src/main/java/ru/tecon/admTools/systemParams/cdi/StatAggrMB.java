@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 /**
  * Контроллер для формы статистические агрегаты
+ *
  * @author Aleksey Sergeev
  */
 @Named("statAggrMB")
@@ -30,7 +31,7 @@ public class StatAggrMB implements Serializable {
 
     private List<StatAggrTable> statsAggrTable = new ArrayList<>();
     private StatAggrTable selectedPartInSATable;
-    private StatAggrTable addStatAggrTable= new StatAggrTable();
+    private StatAggrTable addStatAggrTable = new StatAggrTable();
 
     private boolean disableRemoveBtn = true;
 
@@ -42,13 +43,14 @@ public class StatAggrMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        statsAggrTable = statAggrSB.getSATabeParam();
+        statsAggrTable = statAggrSB.getSATableParam();
     }
 
     /**
-    * Обработчик события выделения строки
-    * @param event событие
-    */
+     * Обработчик события выделения строки
+     *
+     * @param event событие
+     */
     public void onRowSelect(SelectEvent<StatAggrTable> event) {
         LOGGER.info("select link: " + event.getObject());
         disableRemoveBtn = false;
@@ -66,7 +68,7 @@ public class StatAggrMB implements Serializable {
             selectedPartInSATable = null;
             disableRemoveBtn = true;
 
-            statsAggrTable=statAggrSB.getSATabeParam();
+            statsAggrTable = statAggrSB.getSATableParam();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -76,7 +78,7 @@ public class StatAggrMB implements Serializable {
     /**
      * Обработчик добавления нового параметра в таблицу, нажатие на копку добавить статистический агрегат (+)
      */
-    public void onAddNew(){
+    public void onAddNew() {
         statsAggrTable.add(new StatAggrTable());
     }
 
@@ -94,16 +96,15 @@ public class StatAggrMB implements Serializable {
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
-        statsAggrTable = statAggrSB.getSATabeParam();
-
+        statsAggrTable = statAggrSB.getSATableParam();
     }
 
     /**
      * Обработчик обновления диалогового окна в случае его закрытия
      */
 
-    public void onAddStatAggrDialogClose(){
-        addStatAggrTable=new StatAggrTable();
+    public void onAddStatAggrDialogClose() {
+        addStatAggrTable = new StatAggrTable();
     }
 
     public List<StatAggrTable> getStatsAggrTable() {
