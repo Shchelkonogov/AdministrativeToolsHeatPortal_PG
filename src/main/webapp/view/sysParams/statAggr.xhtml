@@ -4,7 +4,12 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-<h:body>
+    <h:form>
+        <p:remoteCommand name="saveStatAggregateWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{statAggrMB.onSaveChanges}" rendered="#{systemParamsUtil.write}"
+                         update="statAggrForm:statAggrTable" />
+    </h:form>
+
     <h:form id="statAggrForm" style="height: 100%;">
         <div style="display: flex; align-items: center; justify-content: space-between;
                 border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
@@ -54,9 +59,9 @@
     <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true"
               resizable="false" rendered="#{systemParamsUtil.write}" >
 
-        <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="statAGGrForm"/>
+        <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="addStatAggrForm"/>
 
-        <h:form id="statAGGrForm">
+        <h:form id="addStatAggrForm">
             <h:panelGrid columns="3" style="margin-bottom: 35px;">
                 <p:outputLabel value="ID" for="@next"/>
                 <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
@@ -80,13 +85,10 @@
                 </p:selectOneMenu>
             </h:panelGrid>
 
-            <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
-                             action="#{statAggrMB.onSaveChanges()}" validateClient="true"
-                             oncomplete="PF('statusDialog').hide();" update="statAggrForm:statAggrTable statAGGrForm"/>
-
+            <p:commandButton value="Сохранить" id="btnSave" style="position: absolute; bottom: 5px; right: 95px;" action="#{statAggrMB.onSaveChangesWrapper}"
+                             validateClient="true" update="@form"/>
             <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();"
                              styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>
         </h:form>
     </p:dialog>
-</h:body>
 </ui:composition>

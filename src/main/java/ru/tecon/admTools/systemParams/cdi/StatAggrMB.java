@@ -75,6 +75,10 @@ public class StatAggrMB implements Serializable {
         }
     }
 
+    public void onSaveChangesWrapper() {
+        PrimeFaces.current().executeScript("saveStatAggregateWrapper()");
+    }
+
     /**
      * Обработчик сохранения изменения нового параметра в таблицу, нажатие на копку сохранить
      */
