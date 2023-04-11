@@ -13,7 +13,7 @@
                 <div style="padding: 3px;">
                     <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Сменить отопительный сезон"
                                      onclick="PF('cd').show();"/>
-                    <p:confirmDialog id="confirm" header="Подтверждение" widgetVar="cd">
+                    <p:confirmDialog id="confirm" header="Подтверждение" widgetVar="cd" closable="false">
                         <f:facet name="message">
                             <span class="ui-icon pi pi-info-circle" style="display: inline-block; font-size: 2em;"/>
                             <span style="display: inline-block; vertical-align: middle;">
@@ -24,13 +24,14 @@
                                 контроля в наступающем сезоне, не зависимо от их текущего состояния.
                             </span>
                         </f:facet>
-                        <p:selectBooleanCheckbox value="#{seasonChangeMB.disableSaveBtn}" itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
+                        <p:selectBooleanCheckbox id="confirmCheckBox" value="#{seasonChangeMB.disableSaveBtn}"
+                                                 itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
                             <p:ajax event="valueChange" update="okButton"/>
                         </p:selectBooleanCheckbox>
-                        <p:commandButton value="Нет" update="seasonChangeTable growl"
+                        <p:commandButton value="Нет" update="seasonChangeTable confirmCheckBox okButton" action="#{seasonChangeMB.setDisableSaveBtn(false)}"
                                          oncomplete="PF('cd').hide();"/>
                         <p:commandButton value="Да" id="okButton" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();"
-                                         update="seasonChangeTable growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
+                                         update="seasonChangeTable confirmCheckBox okButton growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
                                          disabled="#{!seasonChangeMB.disableSaveBtn}" />
                     </p:confirmDialog>
 
