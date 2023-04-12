@@ -54,11 +54,12 @@ public class SeasonChangeMB implements Serializable {
         }
 
         try {
+            setDisableSaveBtn(false);
+
             seasonChangeSB.changeSeason(seasonChangeTable, utilMB.getLogin(), utilMB.getIp());
             LOGGER.info("Season changed to " + seasonChangeTable);
 
             seasonChangeTableList = seasonChangeSB.getTableParams();
-            setDisableSaveBtn(false);
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
