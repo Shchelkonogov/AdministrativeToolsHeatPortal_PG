@@ -1,8 +1,8 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.ejb.DefaultValuesSB;
 import ru.tecon.admTools.systemParams.ejb.MainParamSB;
 import ru.tecon.admTools.systemParams.model.ObjectType;
 import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -37,8 +36,8 @@ public class MainParamMB implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(MainParamMB.class.getName());
 
     private ObjectType leftOneLine;
-    private List<ObjectType> leftPartSelectOneMenuParam = new LinkedList<>();
 
+    private TechProc selectedTechProcOnAddDialog;
     private TechProc adaptRightPartSelectOneMenu;
     private final TechProc all = new TechProc(0, 0, "Все", "Все");
     private List<TechProc> rightPartSelectOneMenuParam = new LinkedList<>();
@@ -54,82 +53,60 @@ public class MainParamMB implements Serializable {
 
     @EJB
     MainParamSB allDao;
-    @EJB
-    DefaultValuesSB defaultValuesBean;
 
     @Inject
     private SystemParamsUtilMB utilMB;
 
+    @Inject
+    private DefaultValuesSessionMB defaultValuesSession;
+
     @PostConstruct
     private void init() {
-        leftPartSelectOneMenuParam = defaultValuesBean.getObjectTypes();
-
-        try {
-            int defaultObjectTypeID = defaultValuesBean.getDefaultObjectTypeID();
-
-            ObjectType defaultObjectType = leftPartSelectOneMenuParam.stream()
-                    .filter(objectType -> objectType.getId() == defaultObjectTypeID)
-                    .findFirst()
-                    .orElseThrow(SystemParamException::new);
-
-            leftPartSelectOneMenuParam.remove(defaultObjectType);
-            leftPartSelectOneMenuParam.add(0, defaultObjectType);
-        } catch (SystemParamException e) {
-            LOGGER.log(Level.WARNING, "error load object type", e);
-
-        }
-
-        leftOneLine = leftPartSelectOneMenuParam.get(0);
+        leftOneLine = defaultValuesSession.getDefaultObjectType();
         rightPartSelectOneMenuParam = allDao.getRightPartSelectOneMenuParam(leftOneLine.getId());
         adaptRightPartSelectOneMenu = all;
-        tableParam = allDao.getTableParam(leftOneLine.getId(), 0);
+        tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
     }
 
     /**
      * Обработчик изменения списка техпроцессов
      */
     public void rightPartListUpdateAfterEvent(final AjaxBehaviorEvent event) {
-        LOGGER.info("rightPartListUpdateAfterEvent " + event);
+        LOGGER.info("rightPartListUpdateAfterEvent " + ((SelectOneMenu) event.getSource()).getValue());
 
-        tableParam = allDao.getTableParam(leftOneLine.getId(), 0);
         rightPartSelectOneMenuParam = allDao.getRightPartSelectOneMenuParam(leftOneLine.getId());
         adaptRightPartSelectOneMenu = all;
 
-        if (adaptRightPartSelectOneMenu.getId() == 0) {
-            techProcParamString = false;
-        }
-        if (adaptRightPartSelectOneMenu != null && adaptRightPartSelectOneMenu.getId() != 0) {
-            techProcParamString = true;
-        }
+        tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
+
+        techProcParamString = ((adaptRightPartSelectOneMenu != null) && (adaptRightPartSelectOneMenu.getId() != 0));
     }
 
     /**
      * Обработчик изменения списка параметров техпроцессов отображаемых в таблице
      */
     public void tableUpdateAfterEvent(final AjaxBehaviorEvent event) {
-        LOGGER.info("tableUpdateAfterEvent: " + event);
+        LOGGER.info("tableUpdateAfterEvent: " + ((SelectOneMenu) event.getSource()).getValue());
 
-        if (adaptRightPartSelectOneMenu != null && adaptRightPartSelectOneMenu.getId() != 0) {
-            tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
-            techProcParamString = true;
-        } else {
-            tableParam = allDao.getTableParam(leftOneLine.getId(), 0);
-            adaptRightPartSelectOneMenu = all;
-            techProcParamString = false;
-        }
+        tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
+
+        techProcParamString = ((adaptRightPartSelectOneMenu != null) && (adaptRightPartSelectOneMenu.getId() != 0));
     }
 
     /**
      * Обработчик изменения списка параметров техпроцессов
      */
     public void techProcessUpdateAfterEvent() {
-        if (adaptRightPartSelectOneMenu == null) {
-            adaptRightPartSelectOneMenu = rightPartSelectOneMenuParam.get(0);
-            paramsOfTechProcessList = allDao.getParamsOfTechProc(adaptRightPartSelectOneMenu.getId());
-            adaptParamsOfTechProc = paramsOfTechProcessList.get(0);
+        if ((adaptRightPartSelectOneMenu == all) && (!rightPartSelectOneMenuParam.isEmpty())) {
+            selectedTechProcOnAddDialog = rightPartSelectOneMenuParam.get(0);
         } else {
-            paramsOfTechProcessList = allDao.getParamsOfTechProc(adaptRightPartSelectOneMenu.getId());
+            selectedTechProcOnAddDialog = adaptRightPartSelectOneMenu;
         }
+        onChangeTechProcOnAddDialog();
+    }
+
+    public void onChangeTechProcOnAddDialog() {
+        paramsOfTechProcessList = allDao.getParamsOfTechProc(selectedTechProcOnAddDialog.getId());
     }
 
     /**
@@ -155,12 +132,10 @@ public class MainParamMB implements Serializable {
             selectedPartInTable = null;
             disableRemoveBtn = true;
 
-            if (adaptRightPartSelectOneMenu != null) {
-                tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
-            } else {
-                tableParam = allDao.getTableParam(leftOneLine.getId(), 0);
-            }
+            tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
 
+            FacesContext.getCurrentInstance().
+                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Удалено", "Успешное удаление"));
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -168,53 +143,18 @@ public class MainParamMB implements Serializable {
     }
 
     /**
-     * Обработчик появления уведомления об успешном удалении, возникает при нажатии на кнопку удалить (-) после завершения ее работы
-     */
-    public void addDelMessage(FacesMessage.Severity severity, String summary, String detail) {
-        FacesContext.getCurrentInstance().
-                addMessage(null, new FacesMessage(severity, summary, detail));
-    }
-
-    /**
-     * Обработчик вида и содержимого появленяющегося уведомления об успешном удалении,
-     * возникает при нажатии на кнопку удалить (-) после завершения ее работы
-     */
-    public void showError() {
-        addDelMessage(FacesMessage.SEVERITY_INFO, "Удалено", "Успешное удаление");
-    }
-
-    /**
-     * Обработчик добавления нового параметра в таблицу, нажатие на копку добавить параметр техпроцесса (+)
-     */
-    public void onAddNew() {
-        tableParam.add(new MPTable());
-    }
-
-    /**
      * Обработчик сохранения изменения нового параметра в таблицу, нажатие на копку сохранить
      */
-
     public void onSaveChanges() {
         try {
-            allDao.addParamAtTable(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId(),
+            allDao.addParamAtTable(leftOneLine.getId(), selectedTechProcOnAddDialog.getId(),
                     adaptParamsOfTechProc.getPartypeid(), adaptParamsOfTechProc.getTechprid(), utilMB.getLogin(), utilMB.getIp());
+
+            tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
         }
-        if (techProcParamString) {
-            tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
-        } else {
-            tableParam = allDao.getTableParam(leftOneLine.getId(), 0);
-        }
-    }
-
-    public List<ObjectType> getLeftPartSelectOneMenuParam() {
-        return leftPartSelectOneMenuParam;
-    }
-
-    public void setLeftPartSelectOneMenuParam(List<ObjectType> leftPartSelectOneMenuParam) {
-        this.leftPartSelectOneMenuParam = leftPartSelectOneMenuParam;
     }
 
     public List<TechProc> getRightPartSelectOneMenuParam() {
@@ -291,5 +231,13 @@ public class MainParamMB implements Serializable {
 
     public TechProc getAll() {
         return all;
+    }
+
+    public TechProc getSelectedTechProcOnAddDialog() {
+        return selectedTechProcOnAddDialog;
+    }
+
+    public void setSelectedTechProcOnAddDialog(TechProc selectedTechProcOnAddDialog) {
+        this.selectedTechProcOnAddDialog = selectedTechProcOnAddDialog;
     }
 }
