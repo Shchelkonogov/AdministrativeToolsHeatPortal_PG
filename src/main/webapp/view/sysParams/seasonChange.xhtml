@@ -34,30 +34,28 @@
                                          update="seasonChangeTable confirmCheckBox okButton growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
                                          disabled="#{!seasonChangeMB.disableSaveBtn}" />
                     </p:confirmDialog>
-
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-
                 <div style="height: calc(100% - 45px);">
                     <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable"
                                  value="#{seasonChangeMB.seasonChangeTableList}" scrollable="true" scrollHeight="100%"
                                  emptyMessage="#{global['table.empty.value']}" rowKey="#{seasonChangeData.season}">
 
-                        <p:column headerText="Сезон" style="width: 60px; white-space: nowrap">
-                            <h:outputText style="display: block; text-align: center;" value="#{seasonChangeData.season}" />
+                        <p:column headerText="Сезон" width="100" styleClass="center">
+                            <h:outputText value="#{seasonChangeData.season}" />
                         </p:column>
 
-                        <p:column headerText="Начало" style="white-space: nowrap">
-                            <h:outputText style="display: block; width: 200px;" value="#{seasonChangeData.start_timeAsString}" />
+                        <p:column headerText="Начало" styleClass="center">
+                            <h:outputText value="#{seasonChangeData.start_timeAsString}" />
                         </p:column>
 
-                        <p:column headerText="Окончание" >
-                            <h:outputText style="display: block;" value="#{seasonChangeData.end_timeAsString}" />
+                        <p:column headerText="Окончание" styleClass="center">
+                            <h:outputText value="#{seasonChangeData.end_timeAsString}" />
 
                         </p:column>
-                        <p:column headerText="Переключил" style="width: 10px;">
-                            <h:outputText style="display: block; text-align: center;" value="#{seasonChangeData.name}" />
+                        <p:column headerText="Переключил" width="150" styleClass="center">
+                            <h:outputText value="#{seasonChangeData.name}" />
                         </p:column>
                     </p:dataTable>
                 </div>
