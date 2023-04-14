@@ -231,6 +231,6 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     display: none;
 }
 
-#statAGGrForm\:inputId_input {
+#addStatAggrForm\:inputId_input {
     width: 200px;
 }
