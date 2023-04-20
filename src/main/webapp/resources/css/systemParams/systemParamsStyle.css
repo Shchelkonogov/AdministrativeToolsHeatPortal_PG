@@ -216,5 +216,5 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 }
 
 #divisionPanel\:structType > .ui-treetable-scrollable-body {
-    height: calc(100% - 37px);
+    height: calc(100% - 70px);
 }

@@ -37,7 +37,7 @@ public class Servlet extends HttpServlet {
                 if (bean.checkSession(req.getParameter("sessionID"))) {
                     req.getRequestDispatcher("/view/sysParams/systemParams.xhtml").forward(req, resp);
                 } else {
-                    // Авторизайтесь в системе
+                    // Авторизуйтесь в системе
                     logger.log(Level.WARNING, "authorization error");
                     req.getRequestDispatcher("/error.html").forward(req, resp);
                 }

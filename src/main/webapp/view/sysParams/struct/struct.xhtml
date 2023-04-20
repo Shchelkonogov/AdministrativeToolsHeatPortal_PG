@@ -40,7 +40,11 @@
                         <p:ajax event="select" listener="#{bean.onRowSelect}"
                                 update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp" />
 
-                        <p:column headerText="Название">
+<!--                        без этих тегов не криво работает раскрытие/закрытие дерева-->
+                        <p:ajax event="expand" />
+                        <p:ajax event="collapse" />
+
+                        <p:column headerText="Название" filterBy="#{structType.name}" filterMatchMode="contains">
                             <h:outputText value="#{structType.name}" />
                         </p:column>
                         <p:column headerText="Код" width="50" style="text-align: center;">
