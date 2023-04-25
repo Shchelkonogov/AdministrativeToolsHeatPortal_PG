@@ -38,7 +38,8 @@
                                  sortBy="#{structType.name}">
 
                         <p:ajax event="select" listener="#{bean.onRowSelect}"
-                                update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp" />
+                                update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp"
+                                onstart="PF('buiTable').show();" oncomplete="PF('buiTable').hide();"/>
 
 <!--                        без этих тегов не криво работает раскрытие/закрытие дерева-->
                         <p:ajax event="expand" />
@@ -64,15 +65,24 @@
                                      disabled="#{bean.disableRemoveStructPropBtn}" action="#{bean.onRemoveStructProp}"
                                      onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                                      update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl"
-                                     rendered="#{systemParamsUtil.write}" />
+                                     rendered="#{systemParamsUtil.write}">
+                        <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить свойство? #{bean.confirmRemoveText}" icon="pi pi-info-circle"/>
+                    </p:commandButton>
                     <p:commandButton id="divisionAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                      disabled="#{bean.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
                                      action="#{bean.loadProperties()}" update="addPropDialog"
                                      rendered="#{systemParamsUtil.write}" />
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true"
+                                     rendered="#{systemParamsUtil.write}">
+                        <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no"/>
+                        <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes"
+                                         onclick="PF('statusDialog').show();"/>
+                    </p:confirmDialog>
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 3px); padding: 3px;">
-                <div style="height: 100%;">
+                <p:outputPanel id="contentToBlock" style="height: 100%;">
                     <p:dataTable id="divisionPropTable" value="#{bean.structTypeProps}" var="prop" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{bean.selectedStructProp}" rowKey="#{prop.id}"
                                  draggableRows="#{systemParamsUtil.write}" emptyMessage="#{global['table.empty.value']}">
@@ -99,7 +109,9 @@
                             <h:outputText value="#{prop.spHeader.name}" />
                         </p:column>
                     </p:dataTable>
-                </div>
+                </p:outputPanel>
+
+                <p:blockUI block="contentToBlock" widgetVar="buiTable"/>
             </div>
         </div>
     </h:form>

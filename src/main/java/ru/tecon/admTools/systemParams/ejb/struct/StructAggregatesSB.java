@@ -20,7 +20,7 @@ public class StructAggregatesSB implements StructCurrentRemote {
     private static final String SELECT_STRUCT_TYPE_PROPS = "select * from ( " +
             "select a.agr_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
                 "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, c.prop_cat_name, " +
-                "d.measure_name, d.short_name, a.display_id " +
+                "d.measure_name, d.short_name, a.display_id, sys_0001t.sel_agr_prop_count(?, a.agr_prop_id) as prop_count " +
                     "from table(sys_0001t.sel_agr_type_props(?)) a, " +
                             "table(sys_0001t.sel_type_props_type()) b, " +
                             "table(sys_0001t.sel_type_props_cat()) c, " +
@@ -29,7 +29,7 @@ public class StructAggregatesSB implements StructCurrentRemote {
                 "union all " +
                 "select a.agr_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +
                 "a.prop_def, a.prop_measure, a.sp_header_id, a.sp_header_name, b.prop_val_type_name, null, " +
-                "d.measure_name, d.short_name, a.display_id " +
+                "d.measure_name, d.short_name, a.display_id, sys_0001t.sel_agr_prop_count(?, a.agr_prop_id) as prop_count " +
                     "from table(sys_0001t.sel_agr_type_props(?)) a, " +
                             "table(sys_0001t.sel_type_props_type()) b, " +
                             "table(sys_0001t.sel_measure()) d " +

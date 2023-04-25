@@ -18,6 +18,7 @@ public class StructTypeProp implements Serializable {
     private String def;
     private Measure measure;
     private SpHeader spHeader;
+    private int count;
 
     public StructTypeProp() {
     }
@@ -35,6 +36,11 @@ public class StructTypeProp implements Serializable {
         this.def = def;
         this.measure = measure;
         this.spHeader = spHeader;
+    }
+
+    public StructTypeProp(int id, String name, PropValType type, PropCat cat, String def, Measure measure, SpHeader spHeader, int count) {
+        this(id, name, type, cat, def, measure, spHeader);
+        this.count = count;
     }
 
     public boolean check() {
@@ -69,6 +75,10 @@ public class StructTypeProp implements Serializable {
         return spHeader;
     }
 
+    public int getCount() {
+        return count;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -98,11 +108,12 @@ public class StructTypeProp implements Serializable {
         return new StringJoiner(", ", StructTypeProp.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
                 .add("name='" + name + "'")
-                .add("type='" + type + "'")
-                .add("cat='" + cat + "'")
+                .add("type=" + type)
+                .add("cat=" + cat)
                 .add("def='" + def + "'")
-                .add("measure='" + measure + "'")
+                .add("measure=" + measure)
                 .add("spHeader=" + spHeader)
+                .add("count=" + count)
                 .toString();
     }
 }
