@@ -9,16 +9,16 @@ import java.util.StringJoiner;
  */
 public class ParamList implements Serializable {
     private Long id;
-    private String par_memo;
-    private String par_name;
+    private String parMemo;
+    private String parName;
 
     public ParamList() {
     }
 
-    public ParamList(Long id, String par_memo, String par_name) {
+    public ParamList(Long id, String parMemo, String parName) {
         this.id = id;
-        this.par_memo = par_memo;
-        this.par_name = par_name;
+        this.parMemo = parMemo;
+        this.parName = parName;
     }
 
     public Long getId() {
@@ -29,28 +29,28 @@ public class ParamList implements Serializable {
         this.id = id;
     }
 
-    public String getPar_memo() {
-        return par_memo;
+    public String getParMemo() {
+        return parMemo;
     }
 
-    public void setPar_memo(String par_memo) {
-        this.par_memo = par_memo;
+    public void setParMemo(String parMemo) {
+        this.parMemo = parMemo;
     }
 
-    public String getPar_name() {
-        return par_name;
+    public String getParName() {
+        return parName;
     }
 
-    public void setPar_name(String par_name) {
-        this.par_name = par_name;
+    public void setParName(String parName) {
+        this.parName = parName;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", ParamList.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
-                .add("par_memo='" + par_memo + "'")
-                .add("par_name='" + par_name + "'")
+                .add("parMemo='" + parMemo + "'")
+                .add("parName='" + parName + "'")
                 .toString();
     }
 }

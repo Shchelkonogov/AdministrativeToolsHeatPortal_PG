@@ -11,27 +11,27 @@ public class GMTree implements Serializable {
     private String id;
     private String name;
     private String parent;
-    private long my_id;
-    private String my_type;
+    private long myId;
+    private String myType;
     private String categ;
-    private short measure_id;
-    private String measure_name;
-    private boolean vis_stat;
+    private short measureId;
+    private String measureName;
+    private boolean visStat;
     private String icon;
 
     public GMTree() {
     }
 
-    public GMTree(String id, String name, String parent, long my_id, String my_type, String categ, short measure_id, String measure_name, boolean vis_stat) {
+    public GMTree(String id, String name, String parent, long myId, String myType, String categ, short measureId, String measureName, boolean visStat) {
         this.id = id;
         this.name = name;
         this.parent = parent;
-        this.my_id = my_id;
-        this.my_type = my_type;
+        this.myId = myId;
+        this.myType = myType;
         this.categ = categ;
-        this.measure_id = measure_id;
-        this.measure_name = measure_name;
-        this.vis_stat = vis_stat;
+        this.measureId = measureId;
+        this.measureName = measureName;
+        this.visStat = visStat;
     }
 
     public String getId() {
@@ -54,40 +54,40 @@ public class GMTree implements Serializable {
         return parent;
     }
 
-    public long getMy_id() {
-        return my_id;
+    public long getMyId() {
+        return myId;
     }
 
-    public String getMy_type() {
-        return my_type;
+    public String getMyType() {
+        return myType;
     }
 
     public String getCateg() {
         return categ;
     }
 
-    public short getMeasure_id() {
-        return measure_id;
+    public short getMeasureId() {
+        return measureId;
     }
 
-    public String getMeasure_name() {
-        return measure_name;
+    public String getMeasureName() {
+        return measureName;
     }
 
-    public void setMeasure_name(String measure_name) {
-        this.measure_name = measure_name;
+    public void setMeasureName(String measureName) {
+        this.measureName = measureName;
     }
 
-    public boolean isVis_stat() {
-        return vis_stat;
+    public boolean isVisStat() {
+        return visStat;
     }
 
-    public void setVis_stat(boolean vis_stat) {
-        this.vis_stat = vis_stat;
+    public void setVisStat(boolean visStat) {
+        this.visStat = visStat;
     }
 
-    public Short getVis_statShort(){
-        if (vis_stat){
+    public Short getVisStatShort(){
+        if (visStat){
             return 1;
         } else {
             return 0;
@@ -108,12 +108,12 @@ public class GMTree implements Serializable {
                 .add("id='" + id + "'")
                 .add("name='" + name + "'")
                 .add("parent='" + parent + "'")
-                .add("my_id=" + my_id)
-                .add("my_type='" + my_type + "'")
+                .add("myId=" + myId)
+                .add("myType='" + myType + "'")
                 .add("categ='" + categ + "'")
-                .add("measure_id=" + measure_id)
-                .add("measure_name='" + measure_name + "'")
-                .add("vis_stat=" + vis_stat)
+                .add("measureId=" + measureId)
+                .add("measureName='" + measureName + "'")
+                .add("visStat=" + visStat)
                 .add("icon='" + icon + "'")
                 .toString();
     }

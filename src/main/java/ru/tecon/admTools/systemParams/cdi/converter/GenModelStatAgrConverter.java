@@ -24,13 +24,13 @@ public class GenModelStatAgrConverter implements Converter {
         GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
 
         return defaultValues.getStatAgrListList().stream()
-                .filter(leftType -> leftType.getStat_agr_id() == Integer.parseInt(value))
+                .filter(leftType -> leftType.getStatAgrId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((StatAgrList) value).getStat_agr_id());
+        return String.valueOf(((StatAgrList) value).getStatAgrId());
     }
 }

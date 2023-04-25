@@ -5,17 +5,17 @@ import java.io.Serializable;
 public class CalcAgrFormula implements Serializable{
     private String variable;
 
-    private Long par_id;
-    private Long stat_agr_id;
+    private Long parId;
+    private Long statAgrId;
 
-    public CalcAgrFormula(String variable, Long par_id, Long stat_agr_id) {
+    public CalcAgrFormula(String variable, Long parId, Long statAgrId) {
         this.variable = variable;
-        this.par_id = par_id;
-        this.stat_agr_id = stat_agr_id;
+        this.parId = parId;
+        this.statAgrId = statAgrId;
     }
 
     @Override
     public String toString() {
-        return "(" + variable+", " + par_id + ", " + stat_agr_id + ')';
+        return "(" + variable+", " + parId + ", " + statAgrId + ')';
     }
 }

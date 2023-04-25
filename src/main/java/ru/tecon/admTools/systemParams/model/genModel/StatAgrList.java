@@ -8,40 +8,40 @@ import java.util.StringJoiner;
  * @author Aleksey Sergeev
  */
 public class StatAgrList implements Serializable {
-    private Long stat_agr_id;
-    private String stat_agr_code;
-    private String stat_agr_name;
+    private Long statAgrId;
+    private String statAgrCode;
+    private String statAgrName;
 
     public StatAgrList() {
     }
 
-    public StatAgrList(Long stat_agr_id, String stat_agr_code) {
-        this.stat_agr_id = stat_agr_id;
-        this.stat_agr_code = stat_agr_code;
+    public StatAgrList(Long statAgrId, String statAgrCode) {
+        this.statAgrId = statAgrId;
+        this.statAgrCode = statAgrCode;
     }
 
-    public Long getStat_agr_id() {
-        return stat_agr_id;
+    public Long getStatAgrId() {
+        return statAgrId;
     }
 
-    public void setStat_agr_id(Long stat_agr_id) {
-        this.stat_agr_id = stat_agr_id;
+    public void setStatAgrId(Long statAgrId) {
+        this.statAgrId = statAgrId;
     }
 
-    public String getStat_agr_code() {
-        return stat_agr_code;
+    public String getStatAgrCode() {
+        return statAgrCode;
     }
 
-    public void setStat_agr_code(String stat_agr_code) {
-        this.stat_agr_code = stat_agr_code;
+    public void setStatAgrCode(String statAgrCode) {
+        this.statAgrCode = statAgrCode;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", StatAgrList.class.getSimpleName() + "[", "]")
-                .add("stat_agr_id=" + stat_agr_id)
-                .add("stat_agr_code='" + stat_agr_code + "'")
-                .add("stat_agr_name='" + stat_agr_name + "'")
+                .add("statAgrId=" + statAgrId)
+                .add("statAgrCode='" + statAgrCode + "'")
+                .add("statAgrName='" + statAgrName + "'")
                 .toString();
     }
 }

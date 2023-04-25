@@ -10,36 +10,36 @@ import java.util.StringJoiner;
 public class Param implements Serializable {
 
     private long id;
-    private long param_type_id;
-    private String par_code;
-    private String par_memo;
-    private String par_name;
-    private long techproc_type_id;
+    private long paramTypeId;
+    private String parCode;
+    private String parMemo;
+    private String parName;
+    private long techprocTypeId;
     private short zone;
-    private Long is_graph;
+    private Long isGraph;
     private long visible;
     private String calc;
-    private Long is_decrease;
-    private boolean edit_enable;
-    private boolean leto_control;
+    private Long isDecrease;
+    private boolean editEnable;
+    private boolean letoControl;
 
     public Param() {
     }
 
-    public Param(long id, long param_type_id, String par_code, String par_memo, String par_name, long techproc_type_id, short zone, Long is_graph, long visible, String calc, Long is_decrease, boolean edit_enable, boolean leto_control) {
+    public Param(long id, long paramTypeId, String parCode, String parMemo, String parName, long techprocTypeId, short zone, Long isGraph, long visible, String calc, Long isDecrease, boolean editEnable, boolean letoControl) {
         this.id = id;
-        this.param_type_id = param_type_id;
-        this.par_code = par_code;
-        this.par_memo = par_memo;
-        this.par_name = par_name;
-        this.techproc_type_id = techproc_type_id;
+        this.paramTypeId = paramTypeId;
+        this.parCode = parCode;
+        this.parMemo = parMemo;
+        this.parName = parName;
+        this.techprocTypeId = techprocTypeId;
         this.zone = zone;
-        this.is_graph = is_graph;
+        this.isGraph = isGraph;
         this.visible = visible;
         this.calc = calc;
-        this.is_decrease = is_decrease;
-        this.edit_enable = edit_enable;
-        this.leto_control = leto_control;
+        this.isDecrease = isDecrease;
+        this.editEnable = editEnable;
+        this.letoControl = letoControl;
     }
 
     public long getId() {
@@ -50,28 +50,28 @@ public class Param implements Serializable {
         this.id = id;
     }
 
-    public String getPar_code() {
-        return par_code;
+    public String getParCode() {
+        return parCode;
     }
 
-    public void setPar_code(String par_code) {
-        this.par_code = par_code;
+    public void setParCode(String parCode) {
+        this.parCode = parCode;
     }
 
-    public String getPar_memo() {
-        return par_memo;
+    public String getParMemo() {
+        return parMemo;
     }
 
-    public void setPar_memo(String par_memo) {
-        this.par_memo = par_memo;
+    public void setParMemo(String parMemo) {
+        this.parMemo = parMemo;
     }
 
-    public String getPar_name() {
-        return par_name;
+    public String getParName() {
+        return parName;
     }
 
-    public void setPar_name(String par_name) {
-        this.par_name = par_name;
+    public void setParName(String parName) {
+        this.parName = parName;
     }
 
     public short getZone() {
@@ -82,12 +82,12 @@ public class Param implements Serializable {
         this.zone = zone;
     }
 
-    public Long getIs_graph() {
-        return is_graph;
+    public Long getIsGraph() {
+        return isGraph;
     }
 
-    public void setIs_graph(Long is_graph) {
-        this.is_graph = is_graph;
+    public void setIsGraph(Long isGraph) {
+        this.isGraph = isGraph;
     }
 
     public long getVisible() {
@@ -106,63 +106,63 @@ public class Param implements Serializable {
         this.calc = calc;
     }
 
-    public Long getIs_decrease() {
-        return is_decrease;
+    public Long getIsDecrease() {
+        return isDecrease;
     }
 
-    public void setIs_decrease(Long is_decrease) {
-        this.is_decrease = is_decrease;
+    public void setIsDecrease(Long isDecrease) {
+        this.isDecrease = isDecrease;
     }
 
-    public boolean getEdit_enable() {
-        return edit_enable;
+    public boolean getEditEnable() {
+        return editEnable;
     }
 
-    public short getEdit_enableShort() {
+    public short getEditEnableShort() {
 
-        if (edit_enable){
+        if (editEnable){
             return 1;
         } else {
             return 0;
         }
     }
 
-    public void setEdit_enable(boolean edit_enable) {
-        this.edit_enable = edit_enable;
+    public void setEditEnable(boolean editEnable) {
+        this.editEnable = editEnable;
     }
 
-    public boolean getLeto_control() {
-        return leto_control;
+    public boolean getLetoControl() {
+        return letoControl;
     }
 
-    public short getLeto_controlShort(){
-        if (leto_control){
+    public short getLetoControlShort(){
+        if (letoControl){
             return 1;
         } else {
             return 0;
         }
     }
 
-    public void setLeto_control(boolean leto_control) {
-        this.leto_control = leto_control;
+    public void setLetoControl(boolean letoControl) {
+        this.letoControl = letoControl;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", Param.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
-                .add("param_type_id=" + param_type_id)
-                .add("par_code='" + par_code + "'")
-                .add("par_memo='" + par_memo + "'")
-                .add("par_name='" + par_name + "'")
-                .add("techproc_type_id=" + techproc_type_id)
+                .add("paramTypeId=" + paramTypeId)
+                .add("parCode='" + parCode + "'")
+                .add("parMemo='" + parMemo + "'")
+                .add("parName='" + parName + "'")
+                .add("techprocTypeId=" + techprocTypeId)
                 .add("zone=" + zone)
-                .add("is_graph=" + is_graph)
+                .add("isGraph=" + isGraph)
                 .add("visible=" + visible)
                 .add("calc='" + calc + "'")
-                .add("is_decrease=" + is_decrease)
-                .add("edit_enable=" + edit_enable)
-                .add("leto_control=" + leto_control)
+                .add("isDecrease=" + isDecrease)
+                .add("editEnable=" + editEnable)
+                .add("letoControl=" + letoControl)
                 .toString();
     }
 }

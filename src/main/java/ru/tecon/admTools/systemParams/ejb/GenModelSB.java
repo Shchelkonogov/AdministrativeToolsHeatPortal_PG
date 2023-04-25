@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.ejb;
 
 import org.postgresql.util.PGobject;
+import org.postgresql.util.PSQLException;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.genModel.*;
@@ -222,22 +223,22 @@ public class GenModelSB {
              CallableStatement cStm = connect.prepareCall(FUN_ADD_PARAM)) {
             cStm.setLong(1, grandparentId);
             cStm.setLong(2, parentId);
-            cStm.setString(3, addParam.getPar_code());
-            cStm.setString(4, addParam.getPar_memo());
-            cStm.setString(5, addParam.getPar_name());
+            cStm.setString(3, addParam.getParCode());
+            cStm.setString(4, addParam.getParMemo());
+            cStm.setString(5, addParam.getParName());
             cStm.setShort(6, addParam.getZone());
-            cStm.setObject(7, addParam.getIs_graph());
+            cStm.setObject(7, addParam.getIsGraph());
             cStm.setLong(8, addParam.getVisible());
-            cStm.setObject(9, addParam.getIs_decrease());
-            cStm.setShort(10, addParam.getEdit_enableShort());
-            cStm.setShort(11, addParam.getLeto_controlShort());
+            cStm.setObject(9, addParam.getIsDecrease());
+            cStm.setShort(10, addParam.getEditEnableShort());
+            cStm.setShort(11, addParam.getLetoControlShort());
             cStm.registerOutParameter(12, Types.BIGINT);
             cStm.setString(13, login);
             cStm.setString(14, ip);
 
             cStm.executeUpdate();
 
-            LOGGER.info("add param " + addParam.getPar_name());
+            LOGGER.info("add param " + addParam.getParName());
             return cStm.getLong(12);
 
         } catch (SQLException e) {
@@ -280,7 +281,13 @@ public class GenModelSB {
 
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error add CalcAgrFormula", e);
-            throw new SystemParamException("Проверьте корректность заполнения");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -308,7 +315,13 @@ public class GenModelSB {
                     " Stat_agr_id " + stat_agr_id);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error remove calcAgrFormula", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -332,7 +345,13 @@ public class GenModelSB {
             LOGGER.info("remove param " + selectedRowID);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error remove Param", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -349,15 +368,15 @@ public class GenModelSB {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM)) {
             cStm.setLong(1, param.getId());
-            cStm.setString(2, param.getPar_code());
-            cStm.setString(3, param.getPar_memo());
-            cStm.setString(4, param.getPar_name());
+            cStm.setString(2, param.getParCode());
+            cStm.setString(3, param.getParMemo());
+            cStm.setString(4, param.getParName());
             cStm.setShort(5, param.getZone());
-            cStm.setObject(6, param.getIs_graph());
+            cStm.setObject(6, param.getIsGraph());
             cStm.setLong(7, param.getVisible());
-            cStm.setObject(8, param.getIs_decrease());
-            cStm.setShort(9, param.getEdit_enableShort());
-            cStm.setShort(10, param.getLeto_controlShort());
+            cStm.setObject(8, param.getIsDecrease());
+            cStm.setShort(9, param.getEditEnableShort());
+            cStm.setShort(10, param.getLetoControlShort());
             cStm.setString(11, login);
             cStm.setString(12, ip);
 
@@ -366,7 +385,13 @@ public class GenModelSB {
             LOGGER.info("update param " + param.getId());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error update Param", e);
-            throw new SystemParamException("Параметр не был обновлен");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -382,19 +407,25 @@ public class GenModelSB {
     public void updParamProp(ParamProp paramProp, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM_PROP)) {
-            cStm.setLong(1, paramProp.getPar_id());
-            cStm.setLong(2, paramProp.getStat_agr_id());
-            cStm.setLong(3, paramProp.getProp_id());
-            cStm.setString(4, paramProp.getProp_val_def());
+            cStm.setLong(1, paramProp.getParId());
+            cStm.setLong(2, paramProp.getStatAgrId());
+            cStm.setLong(3, paramProp.getPropId());
+            cStm.setString(4, paramProp.getPropValDef());
             cStm.setString(5, login);
             cStm.setString(6, ip);
 
             cStm.executeUpdate();
 
-            LOGGER.info("update param prop " + paramProp.getPar_id());
+            LOGGER.info("update param prop " + paramProp.getParId());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error update Param prop ", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -410,20 +441,26 @@ public class GenModelSB {
     public void updParamPropPer(ParamPropPer paramPropPer, String login, String ip) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM_PROP_PER)) {
-            cStm.setLong(1, paramPropPer.getPar_id());
-            cStm.setLong(2, paramPropPer.getStat_agr_id());
-            cStm.setLong(3, paramPropPer.getEnum_code());
-            cStm.setString(4, paramPropPer.getProp_val());
-            cStm.setLong(5, paramPropPer.getProp_cond());
+            cStm.setLong(1, paramPropPer.getParId());
+            cStm.setLong(2, paramPropPer.getStatAgrId());
+            cStm.setLong(3, paramPropPer.getEnumCode());
+            cStm.setString(4, paramPropPer.getPropVal());
+            cStm.setLong(5, paramPropPer.getPropCond());
             cStm.setString(6, login);
             cStm.setString(7, ip);
 
             cStm.executeUpdate();
 
-            LOGGER.info("update param prop per" + paramPropPer.getPar_id());
+            LOGGER.info("update param prop per" + paramPropPer.getParId());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error update Param prop per", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -442,17 +479,23 @@ public class GenModelSB {
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM_STAT)) {
             cStm.setLong(1, parentId);
             cStm.setLong(2, selectedRowID);
-            cStm.setShort(3, selectedRow.getMeasure_id());
-            cStm.setShort(4, selectedRow.getVis_statShort());
+            cStm.setShort(3, selectedRow.getMeasureId());
+            cStm.setShort(4, selectedRow.getVisStatShort());
             cStm.setString(5, login);
             cStm.setString(6, ip);
 
             cStm.executeUpdate();
 
-            LOGGER.info("update param stat " + selectedRow.getMeasure_id());
+            LOGGER.info("update param stat " + selectedRow.getMeasureId());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error update Param stat ", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -488,7 +531,7 @@ public class GenModelSB {
     /**
      * Проверка правильности ввода формулы
      */
-    public List<String> checkNewFormula(String formula) throws SystemParamException{
+    public List<String> checkNewFormula(String formula) throws SystemParamException {
         List<String> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_CHECK_NEW_FORMULA)) {
@@ -501,7 +544,13 @@ public class GenModelSB {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
-            throw new SystemParamException("Проверьте правильность ввода!");
+            if (e.getSQLState().equals("11111")){
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
         return result;
     }

@@ -8,8 +8,8 @@ import java.util.StringJoiner;
  * @author Aleksey Sergeev
  */
 public class CalcAgrVars implements Serializable {
-    private Long calc_par_id;
-    private Long calc_stat_agr_id;
+    private Long calcParId;
+    private Long calcStatAgrId;
     private String variable;
     private ParamList paramList;
     private StatAgrList statAgrList;
@@ -17,9 +17,9 @@ public class CalcAgrVars implements Serializable {
     public CalcAgrVars() {
     }
 
-    public CalcAgrVars(Long calc_par_id, Long calc_stat_agr_id, String variable, ParamList paramList, StatAgrList statAgrList) {
-        this.calc_par_id = calc_par_id;
-        this.calc_stat_agr_id = calc_stat_agr_id;
+    public CalcAgrVars(Long calcParId, Long calcStatAgrId, String variable, ParamList paramList, StatAgrList statAgrList) {
+        this.calcParId = calcParId;
+        this.calcStatAgrId = calcStatAgrId;
         this.variable = variable;
         this.paramList = paramList;
         this.statAgrList = statAgrList;
@@ -52,8 +52,8 @@ public class CalcAgrVars implements Serializable {
     @Override
     public String toString() {
         return new StringJoiner(", ", CalcAgrVars.class.getSimpleName() + "[", "]")
-                .add("calc_par_id=" + calc_par_id)
-                .add("calc_stat_agr_id=" + calc_stat_agr_id)
+                .add("calcParId=" + calcParId)
+                .add("calcStatAgrId=" + calcStatAgrId)
                 .add("variable='" + variable + "'")
                 .add("paramList=" + paramList)
                 .add("statAgrList=" + statAgrList)

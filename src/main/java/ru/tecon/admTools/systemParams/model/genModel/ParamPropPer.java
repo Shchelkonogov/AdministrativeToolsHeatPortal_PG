@@ -8,62 +8,63 @@ import java.util.StringJoiner;
  * @author Aleksey Sergeev
  */
 public class ParamPropPer implements Serializable {
-    private long par_id;
-    private long param_type_id;
-    private long stat_agr_id;
-    private long enum_code;
-    private String prop_val;
-    private long prop_cond;
+    private long parId;
+    private long paramTypeId;
+    private long statAgrId;
+    private long enumCode;
+    private String propVal;
+    private long propCond;
 
     public ParamPropPer() {
     }
 
-    public ParamPropPer(long par_id, long param_type_id, long stat_agr_id, long enum_code, String prop_val, long prop_cond) {
-        this.par_id = par_id;
-        this.param_type_id = param_type_id;
-        this.stat_agr_id = stat_agr_id;
-        this.enum_code = enum_code;
-        this.prop_val = prop_val;
-        this.prop_cond = prop_cond;
+    public ParamPropPer(long parId, long paramTypeId, long statAgrId, long enumCode, String propVal, long propCond) {
+        this.parId = parId;
+        this.paramTypeId = paramTypeId;
+        this.statAgrId = statAgrId;
+        this.enumCode = enumCode;
+        this.propVal = propVal;
+        this.propCond = propCond;
     }
 
-    public long getPar_id() {
-        return par_id;
+    public long getParId() {
+        return parId;
     }
 
-    public long getStat_agr_id() {
-        return stat_agr_id;
+    public long getStatAgrId() {
+        return statAgrId;
     }
 
-    public long getEnum_code() {
-        return enum_code;
+    public long getEnumCode() {
+        return enumCode;
     }
 
-    public void setEnum_code(long enum_code) {
-        this.enum_code = enum_code;
+    public void setEnumCode(long enumCode) {
+        this.enumCode = enumCode;
     }
 
-    public String getProp_val() {
-        return prop_val;
+    public String getPropVal() {
+        return propVal;
     }
 
-    public void setProp_val(String prop_val) {
-        this.prop_val = prop_val;
+    public void setPropVal(String propVal) {
+        this.propVal = propVal;
     }
 
-    public long getProp_cond() {
-        return prop_cond;
+    public long getPropCond() {
+        return propCond;
     }
+
 
     @Override
     public String toString() {
         return new StringJoiner(", ", ParamPropPer.class.getSimpleName() + "[", "]")
-                .add("par_id=" + par_id)
-                .add("param_type_id=" + param_type_id)
-                .add("stat_agr_id=" + stat_agr_id)
-                .add("enum_code=" + enum_code)
-                .add("prop_val='" + prop_val + "'")
-                .add("prop_cond=" + prop_cond)
+                .add("parId=" + parId)
+                .add("paramTypeId=" + paramTypeId)
+                .add("statAgrId=" + statAgrId)
+                .add("enumCode=" + enumCode)
+                .add("propVal='" + propVal + "'")
+                .add("propCond=" + propCond)
                 .toString();
     }
 }

@@ -34,19 +34,19 @@
 
                         <p:ajax event="select" listener="#{genModelMB.onRowSelect}" update="genModelTableForm genModelForm:btnRemove genModelForm:btnAdd"/>
 
-                        <p:column headerText="Название" >
+                        <p:column headerText="Название">
                             <i class="#{genModel.icon}"></i>
                             <h:outputText value="#{genModel.name}" />
                         </p:column>
 
                         <p:column headerText="Единицы измерения" width="50" style="text-align: center;">
-                            <h:outputText value="#{genModel.measure_name}" width="50" style="text-align: center;"/>
+                            <h:outputText value="#{genModel.measureName}" width="50" style="text-align: center;"/>
                         </p:column>
 
                         <p:column headerText="Визуализация" width="50" style="text-align: center;" >
 
-                            <p:selectBooleanCheckbox value="#{genModel.vis_stat}" width="50" style="text-align: center;"
-                                                     rendered="#{genModel.my_type == 'SA'}">
+                            <p:selectBooleanCheckbox value="#{genModel.visStat}" width="50" style="text-align: center;"
+                                                     rendered="#{genModel.myType == 'SA'}">
                                 <p:ajax event="valueChange" listener="#{genModelMB.changeVisualization(genModel)}"
                                         onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
                             </p:selectBooleanCheckbox>
@@ -75,16 +75,16 @@
                             </f:facet>
 
                             <p:column headerText="Параметр" style="white-space: nowrap">
-                                <h:outputText style="display: block; text-align: center;" value="#{paramData.par_code}" />
+                                <h:outputText style="display: block; text-align: center;" value="#{paramData.parCode}" />
                             </p:column>
 
                             <p:column headerText="Обозн" style="white-space: nowrap">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center;" value="#{paramData.par_memo}" />
+                                        <h:outputText style="display: block; text-align: center;" value="#{paramData.parMemo}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramData.par_memo}" />
+                                        <p:inputText value="#{paramData.parMemo}" />
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -96,10 +96,10 @@
                             <p:column headerText="График" style="width: 60px;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.is_graph}" />
+                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isGraph}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramData.is_graph}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramData.isGraph}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -107,10 +107,10 @@
                             <p:column headerText="Суточное снижение" style="width: 60px;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.is_decrease}" />
+                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isDecrease}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramData.is_decrease}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramData.isDecrease}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -129,11 +129,11 @@
                             <p:column headerText="Редактирование границ" style="width: 10px;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <p:selectBooleanCheckbox value="#{paramData.edit_enable}" style=" display: block;
+                                        <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
                                         text-align: center;" disabled="true"/>
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:selectBooleanCheckbox value="#{paramData.edit_enable}" style=" display: block;
+                                        <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
                                         text-align: center;" disabled="#{!systemParamsUtil.write}"/>
                                     </f:facet>
                                 </p:cellEditor>
@@ -142,11 +142,11 @@
                             <p:column headerText="Лето" style="width: 10px;">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <p:selectBooleanCheckbox value="#{paramData.leto_control}" style="display: block;
+                                        <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
                                         text-align: center;" disabled="true"/>
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:selectBooleanCheckbox value="#{paramData.leto_control}" style="display: block;
+                                        <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
                                 text-align: center;" disabled="#{!systemParamsUtil.write}"/>
                                     </f:facet>
                                 </p:cellEditor>
@@ -166,7 +166,7 @@
                                      scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                                      editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropTable}"
                                      selectionMode="single" selection="#{genModelMB.paramProp}"
-                                     rowKey="#{paramPropData.par_id}">
+                                     rowKey="#{paramPropData.parId}">
 
                             <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
                                     onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
@@ -187,20 +187,20 @@
                             </p:columnGroup>
 
                             <p:column>
-                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.prop_id}" />
+                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
                             </p:column>
 
                             <p:column>
-                                <h:outputText style="display: block;" value="#{paramPropData.prop_name}" />
+                                <h:outputText style="display: block;" value="#{paramPropData.propName}" />
                             </p:column>
 
                             <p:column >
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.prop_val_def}"  />
+                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_val_def}" style="width: 200px;"/>
+                                        <p:inputText value="#{paramPropData.propValDef}" style="width: 200px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -208,10 +208,10 @@
                             <p:column>
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.prop_cond_less_name} " />
+                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondLessName} " />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_cond_less_name}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramPropData.propCondLessName}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -219,10 +219,10 @@
                             <p:column>
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.prop_cond_great_name}" />
+                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondGreatName}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_cond_great_name}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramPropData.propCondGreatName}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -239,7 +239,7 @@
                                      scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                                      editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropPerTable}"
                                      selectionMode="single" selection="#{genModelMB.paramPropPer}"
-                                     rowKey="#{paramPropPerData.par_id}">
+                                     rowKey="#{paramPropPerData.parId}">
 
                             <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamPropPer}"
                                     onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
@@ -248,10 +248,10 @@
                             <p:column headerText="Код" style="width: 60px; white-space: nowrap">
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{paramPropPerData.enum_code}" />
+                                        <h:outputText style="display: block;" value="#{paramPropPerData.enumCode}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropPerData.enum_code}" style="width: 60px; white-space: nowrap"/>
+                                        <p:inputText value="#{paramPropPerData.enumCode}" style="width: 60px; white-space: nowrap"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -259,10 +259,10 @@
                             <p:column headerText="Значение" >
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{paramPropPerData.prop_val}" />
+                                        <h:outputText style="display: block;" value="#{paramPropPerData.propVal}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropPerData.prop_val}"/>
+                                        <p:inputText value="#{paramPropPerData.propVal}"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -284,7 +284,7 @@
                                      scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                                      editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableCalcAgrVars}"
                                      selectionMode="single" selection="#{genModelMB.paramProp}"
-                                     rowKey="#{paramPropData.par_id}">
+                                     rowKey="#{paramPropData.parId}">
 
                             <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
                                     onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
@@ -305,20 +305,20 @@
                             </p:columnGroup>
 
                             <p:column>
-                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.prop_id}" />
+                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
                             </p:column>
 
                             <p:column>
-                                <h:outputText style="display: block;" value="#{paramPropData.prop_name}" />
+                                <h:outputText style="display: block;" value="#{paramPropData.propName}" />
                             </p:column>
 
                             <p:column >
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.prop_val_def}"  />
+                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_val_def}" style="width: 200px;"/>
+                                        <p:inputText value="#{paramPropData.propValDef}" style="width: 200px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -326,10 +326,10 @@
                             <p:column>
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.prop_cond_less_name} " />
+                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondLessName} " />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_cond_less_name}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramPropData.propCondLessName}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -337,10 +337,10 @@
                             <p:column>
                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.prop_cond_great_name}" />
+                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondGreatName}" />
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.prop_cond_great_name}" style="width: 60px;"/>
+                                        <p:inputText value="#{paramPropData.propCondGreatName}" style="width: 60px;"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -392,13 +392,13 @@
 
 
                             <p:column headerText="Параметр" >
-                                <h:outputText style="display: block; width: 200px;" value="#{calcAgrVarsData.paramList.par_memo}" />
+                                <h:outputText style="display: block; width: 200px;" value="#{calcAgrVarsData.paramList.parMemo}" />
                             </p:column>
 
                             <p:column headerText="Название"  >
                                 <p:cellEditor disabled="#{!genModelMB.saveCalcAgr}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.paramList.par_name}" />
+                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.paramList.parName}" />
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:selectOneMenu id="param" value="#{genModelMB.selectedParamList}" style="width: 450px;">
@@ -409,7 +409,7 @@
 
                                             <f:selectItems value="#{genModelMB.paramListList}"
                                                            var="objType"
-                                                           itemLabel="#{objType.par_name}" itemValue="#{objType}"/>
+                                                           itemLabel="#{objType.parName}" itemValue="#{objType}"/>
                                         </p:selectOneMenu>
                                     </f:facet>
                                 </p:cellEditor>
@@ -418,7 +418,7 @@
                             <p:column headerText="Стат. агрегат" >
                                 <p:cellEditor disabled="#{!genModelMB.saveCalcAgr}">
                                     <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.statAgrList.stat_agr_code}" />
+                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.statAgrList.statAgrCode}" />
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:selectOneMenu id="statAgr" value="#{genModelMB.selectedStatAgrList}" style="width: 450px;" dynamic="true" >
@@ -428,7 +428,7 @@
 
                                             <f:selectItems value="#{genModelMB.statAgrListList}"
                                                            var="statAgr"
-                                                           itemLabel="#{statAgr.stat_agr_code}" itemValue="#{statAgr}"/>
+                                                           itemLabel="#{statAgr.statAgrCode}" itemValue="#{statAgr}"/>
                                         </p:selectOneMenu>
                                     </f:facet>
                                 </p:cellEditor>
@@ -445,21 +445,21 @@
             <h:form id="addParamForm" >
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Параметр*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.par_code}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parCode}"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 94px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Обозн*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.par_memo}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parMemo}"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 118px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Название*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.par_name}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parName}"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 96px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
@@ -474,7 +474,7 @@
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="График" style="margin-right: 10px"/>
-                    <p:inputNumber value="#{genModelMB.addParam.is_graph}" minValue="-999999" maxValue="999999"
+                    <p:inputNumber value="#{genModelMB.addParam.isGraph}" minValue="-999999" maxValue="999999"
                                    style="width: 180px; margin-left: 120px;"/>
                 </div>
 
@@ -488,13 +488,13 @@
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Суточное снижение" style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;"/>
-                    <p:inputNumber value="#{genModelMB.addParam.is_decrease}" minValue="-999999" maxValue="999999"
+                    <p:inputNumber value="#{genModelMB.addParam.isDecrease}" minValue="-999999" maxValue="999999"
                                    style="width: 180px; margin-left: 48px;"/>
                 </div>
 
-                <p:selectBooleanCheckbox value="#{genModelMB.addParam.edit_enable}" itemLabel="Редактирование границ." style="margin-top: 10px"/>
+                <p:selectBooleanCheckbox value="#{genModelMB.addParam.editEnable}" itemLabel="Редактирование границ." style="margin-top: 10px"/>
 
-                <p:selectBooleanCheckbox value="#{genModelMB.addParam.leto_control}" itemLabel="Лето." style="margin-top: 10px"/>
+                <p:selectBooleanCheckbox value="#{genModelMB.addParam.letoControl}" itemLabel="Лето." style="margin-top: 10px"/>
 
                 <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
                                  action="#{genModelMB.onSaveChanges()}" validateClient="true"
