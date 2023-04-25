@@ -211,15 +211,15 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     height: 100%;
 }
 
-#divisionPanel\:structType {
+#divisionPanel\:structType, #genModelForm\:genModel {
     height: 100%;
 }
 
-#divisionPanel\:structType > .ui-treetable-scrollable-body {
+#divisionPanel\:structType > .ui-treetable-scrollable-body, #genModelForm\:genModel > .ui-treetable-scrollable-body {
     height: calc(100% - 37px);
 }
 
-#typeSettingForm\:typeTable_data .ui-helper-hidden-accessible {
+#typeSettingForm\:typeTable_data .ui-helper-hidden-accessible, #genModelForm\:genModel .ui-helper-hidden-accessible {
     position: unset;
 }
 
