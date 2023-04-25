@@ -30,6 +30,8 @@
                     <p:ajax event="rowEdit" listener="#{objectLinks.onRowEdit}"
                             onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide(); PF('linksTable').unselectAllRows();"
                             update="objectLinksForm:btnRemove growl" />
+                    <p:ajax event="rowEditCancel" listener="#{objectLinks.onRowEditCancel}" update="objectLinksForm:btnRemove"
+                            onsuccess="PF('linksTable').unselectAllRows();"/>
                     <p:ajax event="rowSelect" listener="#{objectLinks.onRowSelect}" update="objectLinksForm:btnRemove" />
 
                     <p:column headerText="Название типа связи">
@@ -71,7 +73,8 @@
                         </p:cellEditor>
                     </p:column>
                     <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                        <p:rowEditor rendered="#{objectLinksData.allowChange}" editTitle="Изменить строку"
+                                     cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>
             </div>

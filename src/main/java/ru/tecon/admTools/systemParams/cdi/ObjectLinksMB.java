@@ -60,6 +60,8 @@ public class ObjectLinksMB implements Serializable {
             } else {
                 objectLinksSB.updateObjectLink(link, utilMB.getLogin(), utilMB.getIp());
             }
+
+            link.setAllowChange(false);
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -103,7 +105,14 @@ public class ObjectLinksMB implements Serializable {
      * Обработчик добавления новой связи, нажатие на копку добавить связь (-)
      */
     public void onAddNew() {
-        objectLinks.add(new ObjectLink("Новая связь"));
+        ObjectLink newLink = new ObjectLink("Новая связь");
+        newLink.setAllowChange(true);
+        objectLinks.add(newLink);
+    }
+
+    public void onRowEditCancel() {
+        objectLinks.remove(selectedLink);
+        disableRemoveBtn = true;
     }
 
     public List<ObjectLink> getObjectLinks() {
