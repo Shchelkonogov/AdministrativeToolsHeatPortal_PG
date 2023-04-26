@@ -6,7 +6,7 @@ import ru.tecon.admTools.systemParams.model.ObjectType;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -15,12 +15,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Сессионный котроллер с данными о типах объектов
+ * Сессионный контроллер с данными о типах объектов
  * @author Maksim Shchelkonogov
  * 23.03.2023
  */
 @Named("defaultValuesSession")
-@SessionScoped
+@ApplicationScoped
 public class DefaultValuesSessionMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(DefaultValuesSessionMB.class.getName());

@@ -30,20 +30,19 @@ import java.util.logging.Logger;
  * Класс родитель для группы контроллеров категории структура
  * @author Maksim Shchelkonogov
  */
-public class StructMB implements Serializable, MyConverter {
+public abstract class StructMB implements Serializable, MyConverter {
 
     private static final Logger LOGGER = Logger.getLogger(StructMB.class.getName());
 
     private TreeNode root;
 
-    private List<StructType> structTypes;
     private TreeNode selectedStructNode;
     private StructType selectedStruct;
     private List<StructTypeProp> structTypeProps;
     private StructTypeProp selectedStructProp;
 
     private StructType newStructType = new StructType();
-    private List<StructTypeProp> newStructTypeProps = new ArrayList<>();
+    private final List<StructTypeProp> newStructTypeProps = new ArrayList<>();
 
     private StructTypeProp newStructTypeProp = new StructTypeProp();
 
@@ -74,13 +73,17 @@ public class StructMB implements Serializable, MyConverter {
         loadData();
     }
 
+    List<StructType> getStructTypes() {
+        return structCurrentBean.getStructTypes();
+    }
+
     /**
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
         root.getChildren().clear();
 
-        structTypes = structCurrentBean.getStructTypes();
+        List<StructType> structTypes = getStructTypes();
 
         Map<Long, TreeNode> nodes = new HashMap<>();
         nodes.put(null, root);
@@ -172,6 +175,10 @@ public class StructMB implements Serializable, MyConverter {
         PrimeFaces.current().executeScript("savePropWrapper()");
     }
 
+    void removeStruct(StructType structType, String login, String ip) throws SystemParamException {
+        structCurrentBean.removeStruct(structType, login, ip);
+    }
+
     /**
      * Обработка нажатие на удаление структуры
      */
@@ -179,7 +186,7 @@ public class StructMB implements Serializable, MyConverter {
         LOGGER.info("remove struct: " + selectedStruct);
 
         try {
-            structCurrentBean.removeStruct(selectedStruct, utilMB.getLogin(), utilMB.getIp());
+            removeStruct(selectedStruct, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
         } catch (SystemParamException e) {
@@ -207,6 +214,10 @@ public class StructMB implements Serializable, MyConverter {
         }
     }
 
+    int addStruct(StructType structType, String login, String ip) throws SystemParamException {
+        return structCurrentBean.addStruct(structType, login, ip);
+    }
+
     /**
      * Обработка нажатия на добавление новой структуры
      */
@@ -222,9 +233,9 @@ public class StructMB implements Serializable, MyConverter {
                 }
                 newStructType.setParentID((long) selectedStruct.getId());
             }
-            int structID = structCurrentBean.addStruct(newStructType, utilMB.getLogin(), utilMB.getIp());
+            int structID = addStruct(newStructType, utilMB.getLogin(), utilMB.getIp());
 
-            if (newStructTypeProps != null) {
+            if (!newStructTypeProps.isEmpty()) {
                 newStructTypeProps.removeIf(StructTypeProp::check);
 
                 for (StructTypeProp prop: newStructTypeProps) {
@@ -285,10 +296,6 @@ public class StructMB implements Serializable, MyConverter {
 
     public List<StructTypeProp> getStructTypeProps() {
         return structTypeProps;
-    }
-
-    public List<StructType> getStructTypes() {
-        return structTypes;
     }
 
     public TreeNode getSelectedStructNode() {
@@ -363,5 +370,12 @@ public class StructMB implements Serializable, MyConverter {
      */
     public void setAddToRoot(boolean addToRoot) {
         this.addToRoot = addToRoot;
+    }
+
+    public String getConfirmRemoveText() {
+        if ((selectedStructProp != null) && (selectedStructProp.getCount() != 0)) {
+            return "У " + selectedStructProp.getCount() + " типов есть данное свойство.";
+        }
+        return "";
     }
 }

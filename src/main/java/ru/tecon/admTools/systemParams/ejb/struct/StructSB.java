@@ -272,6 +272,8 @@ public class StructSB {
              PreparedStatement stm = connect.prepareStatement(select)) {
             stm.setInt(1, id);
             stm.setInt(2, id);
+            stm.setInt(3, id);
+            stm.setInt(4, id);
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 result.add(new StructTypeProp(res.getInt("prop_id"), res.getString("prop_name"),
@@ -279,7 +281,7 @@ public class StructSB {
                         new PropCat(res.getString("prop_cat"), res.getString("prop_cat_name")),
                         res.getString("prop_def"),
                         new Measure(res.getInt("prop_measure"), res.getString("measure_name"), res.getString("short_name")),
-                        new SpHeader(res.getInt("sp_header_id"), res.getString("sp_header_name"))));
+                        new SpHeader(res.getInt("sp_header_id"), res.getString("sp_header_name")), res.getInt("prop_count")));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);

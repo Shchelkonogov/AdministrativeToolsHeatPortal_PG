@@ -1,13 +1,19 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
+import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.DefaultValuesSessionMB;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
+import ru.tecon.admTools.systemParams.model.struct.StructType;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Контроллер для формы объекты группы структур
@@ -15,7 +21,7 @@ import java.io.Serializable;
  */
 @Named("structObjects")
 @ViewScoped
-public class StructObjectsMB extends StructMB implements Serializable {
+public final class StructObjectsMB extends StructMB implements Serializable {
 
     private static final String HEADER = "Типы объектов";
     private static final String DIALOG_HEADER = "Создать новый объект";
@@ -44,5 +50,28 @@ public class StructObjectsMB extends StructMB implements Serializable {
 
     public String getPropHeader() {
         return PROP_HEADER;
+    }
+
+    @Inject
+    private DefaultValuesSessionMB defaultValuesSession;
+
+    @Override
+    List<StructType> getStructTypes() {
+        List<StructType> result = new ArrayList<>();
+        defaultValuesSession.getObjectTypes().forEach(objectType -> result.add(new StructType(objectType.getId(), objectType.getName(), objectType.getCode())));
+        return result;
+    }
+
+    @Override
+    int addStruct(StructType structType, String login, String ip) throws SystemParamException {
+        int result = super.addStruct(structType, login, ip);
+        defaultValuesSession.loadDefaultTypes();
+        return result;
+    }
+
+    @Override
+    void removeStruct(StructType structType, String login, String ip) throws SystemParamException {
+        super.removeStruct(structType, login, ip);
+        defaultValuesSession.loadDefaultTypes();
     }
 }

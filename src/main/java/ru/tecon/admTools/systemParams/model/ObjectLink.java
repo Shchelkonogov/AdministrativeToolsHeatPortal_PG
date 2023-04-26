@@ -13,6 +13,7 @@ public class ObjectLink implements Serializable {
     private String name;
     private int objectTypeLink1;
     private int objectTypeLink2;
+    private boolean allowChange;
 
     public ObjectLink(String name) {
         this.name = name;
@@ -57,6 +58,14 @@ public class ObjectLink implements Serializable {
         this.objectTypeLink2 = objectTypeLink2;
     }
 
+    public boolean isAllowChange() {
+        return allowChange;
+    }
+
+    public void setAllowChange(boolean allowChange) {
+        this.allowChange = allowChange;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", ObjectLink.class.getSimpleName() + "[", "]")
@@ -64,6 +73,7 @@ public class ObjectLink implements Serializable {
                 .add("name='" + name + "'")
                 .add("objectTypeLink1=" + objectTypeLink1)
                 .add("objectTypeLink2=" + objectTypeLink2)
+                .add("allowChange=" + allowChange)
                 .toString();
     }
 }

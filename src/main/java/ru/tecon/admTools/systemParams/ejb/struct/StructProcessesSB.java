@@ -1,11 +1,21 @@
 package ru.tecon.admTools.systemParams.ejb.struct;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.model.struct.StructType;
-import ru.tecon.admTools.systemParams.model.struct.StructTypeProp;
+import ru.tecon.admTools.systemParams.model.Measure;
+import ru.tecon.admTools.systemParams.model.struct.*;
 
+import javax.annotation.Resource;
 import javax.ejb.*;
+import javax.inject.Inject;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Stateless bean для работы с формой агрегаты из подкласса структур
@@ -44,8 +54,14 @@ public class StructProcessesSB implements StructCurrentRemote {
     private static final String MOVE_PROP_UP = "call sys_0001t.set_techproc_type_prop_up(?, ?, ?)";
     private static final String MOVE_PROP_DOWN = "call sys_0001t.set_techproc_type_prop_down(?, ?, ?)";
 
+    @Resource(name = "jdbc/DataSource")
+    private DataSource ds;
+
     @EJB
     private StructSB wrapperDivisions;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void removeStruct(StructType structType, String login, String ip) throws SystemParamException {
@@ -74,7 +90,24 @@ public class StructProcessesSB implements StructCurrentRemote {
 
     @Override
     public List<StructTypeProp> getStructTypeProps(int id) {
-        return wrapperDivisions.getStructTypeProps(id, SELECT_STRUCT_TYPE_PROPS);
+        List<StructTypeProp> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_STRUCT_TYPE_PROPS)) {
+            stm.setInt(1, id);
+            stm.setInt(2, id);
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new StructTypeProp(res.getInt("prop_id"), res.getString("prop_name"),
+                        new PropValType(res.getString("prop_type"), res.getString("prop_val_type_name")),
+                        new PropCat(res.getString("prop_cat"), res.getString("prop_cat_name")),
+                        res.getString("prop_def"),
+                        new Measure(res.getInt("prop_measure"), res.getString("measure_name"), res.getString("short_name")),
+                        new SpHeader(res.getInt("sp_header_id"), res.getString("sp_header_name"))));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "SQLException", e);
+        }
+        return result;
     }
 
     @Override
