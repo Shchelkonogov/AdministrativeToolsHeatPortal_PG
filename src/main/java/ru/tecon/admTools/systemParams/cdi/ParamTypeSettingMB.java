@@ -194,7 +194,7 @@ public class ParamTypeSettingMB implements Serializable {
     public String getPropHeader() {
         return "Свойства" +
                 ((selectedType != null) && (selectedType.getAggregate() != null) ?
-                        " параметра \"" + selectedType.getParamType().getName() + "\" агрегата \"" + selectedType.getAggregate().getName() + "\"" :
+                        " типа параметра \"" + selectedType.getParamType().getName() + "\" агрегата \"" + selectedType.getAggregate().getName() + "\"" :
                         "");
     }
 
