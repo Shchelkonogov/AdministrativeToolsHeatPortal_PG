@@ -123,8 +123,8 @@ public class TemperatureSB {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(select)) {
             cStm.setInt(1, id);
-            cStm.setInt(2, temperatureProp.getTnv());
-            cStm.setDouble(3, temperatureProp.getValue());
+            cStm.setObject(2, temperatureProp.getTnv(), Types.NUMERIC);
+            cStm.setObject(3, temperatureProp.getValue(), Types.NUMERIC);
             cStm.setString(4, login);
             cStm.setString(5, ip);
             cStm.registerOutParameter(6, Types.SMALLINT);
