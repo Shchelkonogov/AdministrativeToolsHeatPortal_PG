@@ -81,6 +81,8 @@ public abstract class StructMB implements Serializable, MyConverter {
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
+        List<StructType> expandedNodes = getExpandedNodes();
+
         root.getChildren().clear();
 
         List<StructType> structTypes = getStructTypes();
@@ -90,16 +92,50 @@ public abstract class StructMB implements Serializable, MyConverter {
         for (StructType structType: structTypes) {
             TreeNode parent = nodes.get(structType.getParentID());
             DefaultTreeNode treeNode = new DefaultTreeNode(structType, parent);
+            if (expandedNodes.contains(structType)) {
+                treeNode.setExpanded(true);
+            }
             nodes.put((long) structType.getId(), treeNode);
         }
 
-        root.getChildren().forEach(treeNode -> treeNode.setExpanded(true));
+        root.getChildren().forEach(treeNode -> {
+            if (!treeNode.isLeaf()) {
+                treeNode.setExpanded(true);
+            }
+        });
 
         structTypeProps = null;
         selectedStruct = null;
         selectedStructProp = null;
         disableRemoveStructBtn = true;
         disableRemoveStructPropBtn = true;
+    }
+
+    /**
+     * Получение списка раскрытых элементов дерева начиная с корневого
+     * @return список элементов
+     */
+    private List<StructType> getExpandedNodes() {
+        return getExpandedNodes(root);
+    }
+
+    /**
+     * Получение списка раскрытых элементов дерева начиная с переданного в параметре
+     * @param startFrom начинать с этого узла
+     * @return список элементов
+     */
+    private List<StructType> getExpandedNodes(TreeNode startFrom){
+        List<StructType> result = new ArrayList<>();
+        List<TreeNode> subChild = startFrom.getChildren();
+        for (TreeNode treeNode: subChild) {
+            if (treeNode.isExpanded()) {
+                result.add((StructType) treeNode.getData());
+            }
+            if (!treeNode.isLeaf()) {
+                result.addAll(getExpandedNodes(treeNode));
+            }
+        }
+        return result;
     }
 
     /**
