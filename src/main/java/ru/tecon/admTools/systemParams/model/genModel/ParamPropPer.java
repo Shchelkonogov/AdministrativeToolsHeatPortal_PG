@@ -1,5 +1,7 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
+import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 
@@ -12,18 +14,13 @@ public class ParamPropPer implements Serializable {
     private long paramTypeId;
     private long statAgrId;
     private long enumCode;
-    private String propVal;
-    private long propCond;
+    private Condition propCond;
 
-    public ParamPropPer() {
-    }
-
-    public ParamPropPer(long parId, long paramTypeId, long statAgrId, long enumCode, String propVal, long propCond) {
+    public ParamPropPer(long parId, long paramTypeId, long statAgrId, long enumCode, Condition propCond) {
         this.parId = parId;
         this.paramTypeId = paramTypeId;
         this.statAgrId = statAgrId;
         this.enumCode = enumCode;
-        this.propVal = propVal;
         this.propCond = propCond;
     }
 
@@ -43,18 +40,13 @@ public class ParamPropPer implements Serializable {
         this.enumCode = enumCode;
     }
 
-    public String getPropVal() {
-        return propVal;
-    }
-
-    public void setPropVal(String propVal) {
-        this.propVal = propVal;
-    }
-
-    public long getPropCond() {
+    public Condition getPropCond() {
         return propCond;
     }
 
+    public void setPropCond(Condition propCond) {
+        this.propCond = propCond;
+    }
 
     @Override
     public String toString() {
@@ -63,7 +55,6 @@ public class ParamPropPer implements Serializable {
                 .add("paramTypeId=" + paramTypeId)
                 .add("statAgrId=" + statAgrId)
                 .add("enumCode=" + enumCode)
-                .add("propVal='" + propVal + "'")
                 .add("propCond=" + propCond)
                 .toString();
     }

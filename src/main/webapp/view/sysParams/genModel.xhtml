@@ -11,7 +11,7 @@
             genModelTableForm:calcAgrVarsTable "/>
         </h:form>
 
-        <h:form id="genModelForm" style="height: 50%;">
+        <h:form id="genModelForm" style="height: 55%;">
             <p:outputPanel style="height: 100%;">
                 <div style="display: flex; align-items: center; justify-content: space-between;
                 border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                <div style="height: calc(100% - 45px);">
+                <div style="height: calc(100% - 45px); border: 1px solid #c8c8c8; padding: 3px;">
                     <p:treeTable value="#{genModelMB.root}" var="genModel" id="genModel" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{genModelMB.selectedObjNode}" rowKey="#{genModel.id}" >
 
@@ -37,6 +37,16 @@
                         <p:column headerText="Название">
                             <i class="#{genModel.icon}"></i>
                             <h:outputText value="#{genModel.name}" />
+                        </p:column>
+
+                        <p:column headerText="Тип" width="50" style="text-align: center;">
+                            <h:outputText value="#{genModel.myType}"  width="50" style="text-align: center;"/>
+                        </p:column>
+                        <p:column headerText="ID" width="60" style="text-align: center;">
+                            <h:outputText value="#{genModel.id}"  width="60" style="text-align: center;"/>
+                        </p:column>
+                        <p:column headerText="Категория" width="50" style="text-align: center;">
+                            <h:outputText value="#{genModel.categ}" width="50" style="text-align: center;"/>
                         </p:column>
 
                         <p:column headerText="Единицы измерения" width="50" style="text-align: center;">
@@ -56,386 +66,392 @@
                 </div>
             </p:outputPanel>
         </h:form>
-        <h:form id="genModelTableForm" style="height: 50%;">
-            <p:outputPanel id="paramTablePanel" style="height: calc(110% - 4px);" rendered="#{genModelMB.tableRender}">
-                <p:outputPanel style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;" rendered="#{genModelMB.disableParamTable}">
-                    <div style="height: 100%;">
-                        <p:dataTable id="paramTable" var="paramData" widgetVar="paramTable" value="#{genModelMB.paramList}"
-                                     scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                     editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamTable}"
-                                     selectionMode="single" selection="#{genModelMB.param}"
-                                     rowKey="#{paramData.id}">
 
-                            <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParam}"
-                                    onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                                    update="growl" />
+        <h:form id="genModelTableForm" style="height: 45%;">
 
-                            <f:facet name="header">
-                                <h:outputText value="#{genModelMB.selectedRow.name}" />
-                            </f:facet>
-
-                            <p:column headerText="Параметр" style="white-space: nowrap">
-                                <h:outputText style="display: block; text-align: center;" value="#{paramData.parCode}" />
-                            </p:column>
-
-                            <p:column headerText="Обозн" style="white-space: nowrap">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center;" value="#{paramData.parMemo}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramData.parMemo}" />
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Зона" >
-                                <h:outputText style="display: block; text-align: center;" value="#{paramData.zone}" />
-                            </p:column>
-
-                            <p:column headerText="График" style="width: 60px;">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isGraph}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramData.isGraph}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Суточное снижение" style="width: 60px;">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isDecrease}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramData.isDecrease}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Номер для визуализации" style="width: 90px;">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; text-align: center; width: 90px;" value="#{paramData.visible}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramData.visible}" style="width: 90px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Редактирование границ" style="width: 10px;">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
-                                        text-align: center;" disabled="true"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
-                                        text-align: center;" disabled="#{!systemParamsUtil.write}"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Лето" style="width: 10px;">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
-                                        text-align: center;" disabled="true"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
-                                text-align: center;" disabled="#{!systemParamsUtil.write}"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                                <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                            </p:column>
-                        </p:dataTable>
-                    </div>
-                </p:outputPanel>
-
-
-                <p:outputPanel id="paramPropTablePanel" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;" rendered="#{genModelMB.disableParamPropTable}">
-                    <div style="height: 100%;">
-                        <p:dataTable id="paramPropTable" var="paramPropData" widgetVar="paramPropTable" value="#{genModelMB.paramPropList}"
-                                     scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                     editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropTable}"
-                                     selectionMode="single" selection="#{genModelMB.paramProp}"
-                                     rowKey="#{paramPropData.parId}">
-
-                            <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
-                                    onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                                    update="growl" />
-
-                            <p:columnGroup type="header">
-                                <p:row>
-                                    <p:column headerText="Код" style="width: 60px; white-space: nowrap" rowspan="2"/>
-                                    <p:column headerText="Название свойства агрегата" rowspan="2"/>
-                                    <p:column headerText="Значение по умолчанию" rowspan="2" style="width: 200px;"/>
-                                    <p:column colspan="2" headerText="Граничные состояния свойства агрегата" style="width: 120px;"/>
-                                    <p:column headerText=" " rowspan="2" style="width: 30px"/>
-                                </p:row>
-                                <p:row>
-                                    <p:column headerText="Нижнее" style="width: 50px;"/>
-                                    <p:column headerText="Верхнее" style="width: 50px;"/>
-                                </p:row>
-                            </p:columnGroup>
-
-                            <p:column>
-                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
-                            </p:column>
-
-                            <p:column>
-                                <h:outputText style="display: block;" value="#{paramPropData.propName}" />
-                            </p:column>
-
-                            <p:column >
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propValDef}" style="width: 200px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column>
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondLessName} " />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propCondLessName}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column>
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondGreatName}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propCondGreatName}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                            <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                                <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                            </p:column>
-                        </p:dataTable>
-                    </div>
-                </p:outputPanel>
-
-                <p:outputPanel id="paramPropPerTablePanel" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;" rendered="#{genModelMB.disableParamPropPerTable}">
-                    <div style="height: 100%;">
-                        <p:dataTable id="paramPropPerTable" var="paramPropPerData" widgetVar="paramPropPerTable" value="#{genModelMB.paramPropPerList}"
-                                     scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                     editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropPerTable}"
-                                     selectionMode="single" selection="#{genModelMB.paramPropPer}"
-                                     rowKey="#{paramPropPerData.parId}">
-
-                            <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamPropPer}"
-                                    onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                                    update="growl" />
-
-                            <p:column headerText="Код" style="width: 60px; white-space: nowrap">
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{paramPropPerData.enumCode}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropPerData.enumCode}" style="width: 60px; white-space: nowrap"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column headerText="Значение" >
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{paramPropPerData.propVal}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropPerData.propVal}"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-
-                            <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                                <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                            </p:column>
-
-                        </p:dataTable>
-                    </div>
-                </p:outputPanel>
+            <p:outputPanel id="paramTableHeader" style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px;" rendered="#{!genModelMB.disableCalcAgrVars}">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;"
+                              value="#{genModelMB.tableHeader}"/>
             </p:outputPanel>
 
-            <p:outputPanel id="paramPropForFPanel" style="height: calc(56% - 25px);" rendered="#{!genModelMB.tableRender}">
+            <p:outputPanel id="paramTablePanel" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;"
+                           rendered="#{!genModelMB.disableCalcAgrVars}">
+                <p:dataTable id="paramTable" var="paramData" widgetVar="paramTable" value="#{genModelMB.paramList}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamTable}"
+                             rowKey="#{paramData.id}">
 
-                <p:outputPanel id="paramPropTableForFPanel" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;" rendered="#{genModelMB.disableCalcAgrVars}">
-                    <div style="height: 100%;">
-                        <p:dataTable id="paramPropTableForF" var="paramPropData" widgetVar="paramPropTable" value="#{genModelMB.paramPropList}"
-                                     scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                     editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableCalcAgrVars}"
-                                     selectionMode="single" selection="#{genModelMB.paramProp}"
-                                     rowKey="#{paramPropData.parId}">
+                    <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParam}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update="growl" />
 
-                            <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
-                                    onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                                    update="growl" />
+                    <p:column headerText="Параметр" style="white-space: nowrap">
+                        <h:outputText style="display: block; text-align: center;" value="#{paramData.parCode}" />
+                    </p:column>
 
-                            <p:columnGroup type="header">
-                                <p:row>
-                                    <p:column headerText="Код" style="width: 60px; white-space: nowrap" rowspan="2"/>
-                                    <p:column headerText="Название свойства агрегата" rowspan="2"/>
-                                    <p:column headerText="Значение по умолчанию" rowspan="2" style="width: 200px;"/>
-                                    <p:column colspan="2" headerText="Граничные состояния свойства агрегата" style="width: 120px;"/>
-                                    <p:column headerText=" " rowspan="2" style="width: 30px"/>
-                                </p:row>
-                                <p:row>
-                                    <p:column headerText="Нижнее" style="width: 50px;"/>
-                                    <p:column headerText="Верхнее" style="width: 50px;"/>
-                                </p:row>
-                            </p:columnGroup>
+                    <p:column headerText="Обозн" style="white-space: nowrap">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; text-align: center;" value="#{paramData.parMemo}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramData.parMemo}" style="width: 324px" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column>
-                                <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
-                            </p:column>
+                    <p:column headerText="Зона" >
+                        <h:outputText style="display: block; text-align: center;" value="#{paramData.zone}" />
+                    </p:column>
 
-                            <p:column>
-                                <h:outputText style="display: block;" value="#{paramPropData.propName}" />
-                            </p:column>
+                    <p:column headerText="График" style="width: 60px;">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isGraph}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramData.isGraph}" style="width: 84px;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column >
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propValDef}" style="width: 200px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
+                    <p:column headerText="Суточное снижение" style="width: 60px;">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; text-align: center; width: 60px;" value="#{paramData.isDecrease}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramData.isDecrease}" style="width: 91px;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column>
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondLessName} " />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propCondLessName}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
+                    <p:column headerText="Номер для визуализации" style="width: 90px;">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; text-align: center; width: 90px;" value="#{paramData.visible}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramData.visible}" style="width: 121px;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column>
-                                <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block; width: 60px;" value="#{paramPropData.propCondGreatName}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{paramPropData.propCondGreatName}" style="width: 60px;"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
+                    <p:column headerText="Редактирование границ" style="width: 10px;">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
+                                       text-align: center;" disabled="true"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectBooleanCheckbox value="#{paramData.editEnable}" style=" display: block;
+                                       text-align: center;" disabled="#{!systemParamsUtil.write}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                                <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                            </p:column>
-                        </p:dataTable>
-                    </div>
-                </p:outputPanel>
+                    <p:column headerText="Лето" style="width: 10px;">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
+                                       text-align: center;" disabled="true"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectBooleanCheckbox value="#{paramData.letoControl}" style="display: block;
+                               text-align: center;" disabled="#{!systemParamsUtil.write}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                <p:outputPanel id="calcAgrVarsTableHeader" style="display: flex; align-items: center; justify-content: space-between;
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+
+                <p:dataTable id="paramPropTable" var="paramPropData" widgetVar="paramPropTable" value="#{genModelMB.paramPropList}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropTable}"
+                             rowKey="#{paramPropData.parId}">
+
+                    <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update="growl" />
+
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column headerText="Код" style="width: 60px; white-space: nowrap" rowspan="2"/>
+                            <p:column headerText="Название свойства агрегата" rowspan="2"/>
+                            <p:column headerText="Значение по умолчанию" rowspan="2" style="width: 200px;"/>
+                            <p:column colspan="2" headerText="Граничные состояния свойства агрегата" style="width: 400px;"/>
+                            <p:column headerText=" " rowspan="2" style="width: 200px"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="Нижнее" style="width: 200px;"/>
+                            <p:column headerText="Верхнее" style="width: 200px;"/>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column>
+                        <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText style="display: block;" value="#{paramPropData.propName}" />
+                    </p:column>
+
+                    <p:column >
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramPropData.propValDef}" style="width: 223px;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column>
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 200px; text-align: center" value="#{paramPropData.lessCond.name} " />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{paramPropData.lessCond}" style="width: 223px;">
+                                    <f:converter converterId="conditionConverter"/>
+                                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                                   itemLabel="#{cond.name}" itemValue="#{cond}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column>
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 200px; text-align: center" value="#{paramPropData.greatCond.name}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{paramPropData.greatCond}" style="width: 223px;">
+                                    <f:converter converterId="conditionConverter"/>
+                                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                                   itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+
+                <p:dataTable id="paramPropPerTable" var="paramPropPerData" widgetVar="paramPropPerTable" value="#{genModelMB.paramPropPerList}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableParamPropPerTable}"
+                             rowKey="#{paramPropPerData.parId}">
+
+                    <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamPropPer}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update="growl" />
+
+                    <p:column headerText="Код" style="width: 60px; white-space: nowrap">
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{paramPropPerData.enumCode}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramPropPerData.enumCode}" style="width: 85px; white-space: nowrap"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Значение" >
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{paramPropPerData.propCond.name}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{paramPropPerData.propCond}" style="width: 1453px; ">
+                                    <f:converter converterId="conditionConverter"/>
+                                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                                   itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+
+            <p:outputPanel id="paramPropTableForFHeader" style="display: flex; align-items: center; justify-content: space-between;
                 border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                 border-top-left-radius: 3px; height: 41px;" rendered="#{genModelMB.disableCalcAgrVars}">
-                    <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;"
-                                  value="Вычисление параметра #{genModelMB.calcAgrFormulaString}"/>
-                    <div style="padding: 3px;">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;"
+                              value="Свойства агрегата"/>
+            </p:outputPanel>
 
-                        <p:commandButton id="btnRemoveF" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                         rendered="#{genModelMB.delCalcAgr}" onclick="PF('statusDialog').show();"
-                                         action="#{genModelMB.onRemoveCalcAgrFormula}" onsuccess="PF('statusDialog').hide();"
-                                         />
+            <p:outputPanel id="paramPropTableForFPanel" style="border: 1px solid #c8c8c8; height: calc(46% - 6px); padding: 3px;" rendered="#{genModelMB.disableCalcAgrVars}">
+                <p:dataTable id="paramPropTableForF" var="paramPropData" widgetVar="paramPropTable" value="#{genModelMB.paramPropList}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}" rendered="#{genModelMB.disableCalcAgrVars}"
+                             rowKey="#{paramPropData.parId}">
 
-                        <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight" rendered="#{genModelMB.addCalcAgr}"
-                                         onclick="PF('addNewParamF').show();" />
+                    <p:ajax event="rowEdit" listener="#{genModelMB.onRowEditParamProp}"
+                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
+                            update="growl" />
 
-                        <p:commandButton id="btnSaveFTable" rendered="#{genModelMB.saveCalcAgr}" value="Сохранить"
-                                         onclick="PF('statusDialog').show();" action="#{genModelMB.onSaveChangesFormula}"
-                                         onsuccess="PF('statusDialog').hide();"
-                                         update="calcAgrVarsTable calcAgrVarsTableHeader genModelTableForm"/>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column headerText="Код" style="width: 60px; white-space: nowrap" rowspan="2"/>
+                            <p:column headerText="Название свойства агрегата" rowspan="2"/>
+                            <p:column headerText="Значение по умолчанию" rowspan="2" style="width: 200px;"/>
+                            <p:column colspan="2" headerText="Граничные состояния свойства агрегата" style="width: 400px;"/>
+                            <p:column headerText=" " rowspan="1" style="width: 30px"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="Нижнее" style="width: 200px;"/>
+                            <p:column headerText="Верхнее" style="width: 200px;"/>
+                        </p:row>
+                    </p:columnGroup>
 
-                    </div>
-                </p:outputPanel>
+                    <p:column>
+                        <h:outputText style="display: block; text-align: center;" value="#{paramPropData.propId}" />
+                    </p:column>
 
-                <p:outputPanel id="calcAgrVarsTablePanel" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;" rendered="#{genModelMB.disableCalcAgrVars}">
-                    <div style="height: 100%;">
+                    <p:column>
+                        <h:outputText style="display: block;" value="#{paramPropData.propName}" />
+                    </p:column>
 
-                        <p:dataTable id="calcAgrVarsTable" var="calcAgrVarsData" widgetVar="calcAgrVarsTable" value="#{genModelMB.calcAgrVarsList}"
-                                     scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                     editable="#{systemParamsUtil.write}" editMode="cell" rendered="#{genModelMB.disableCalcAgrVars}"
-                                     selectionMode="single" selection="#{genModelMB.calcAgrVars}"
-                                     rowKey="#{calcAgrVarsData.variable}">
+                    <p:column >
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 200px;" value="#{paramPropData.propValDef}"  />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramPropData.propValDef}" style="width: 223px;"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:ajax event="rowSelect" listener="#{genModelMB.onRowSelectCalcAgrVarsTable}" />
+                    <p:column>
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 60px; text-align: center;" value="#{paramPropData.lessCond.name} " />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{paramPropData.lessCond}" style="width: 223px;">
+                                    <f:converter converterId="conditionConverter"/>
+                                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                                   itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column headerText="Переменная" style="width: 60px; white-space: nowrap">
-                                <h:outputText style="display: block; text-align: center;" value="#{calcAgrVarsData.variable}" />
-                            </p:column>
+                    <p:column>
+                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block; width: 60px; text-align: center;" value="#{paramPropData.greatCond.name}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{paramPropData.greatCond}" style="width: 223px;">
+                                    <f:converter converterId="conditionConverter"/>
+                                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                                                   itemLabel="#{cond.name}" itemValue="#{cond}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 30px" rendered="#{systemParamsUtil.write}">
+                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+
+            <p:outputPanel id="calcAgrVarsTableHeader" style="display: flex; align-items: center; justify-content: space-between;
+                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
+                border-top-left-radius: 3px; height: 41px; padding: 3px;" rendered="#{genModelMB.disableCalcAgrVars}">
+                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;"
+                              value="Вычисление параметра #{genModelMB.calcAgrFormulaString}"/>
+
+                <p:commandButton id="btnRemoveF" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
+                                 rendered="#{genModelMB.delCalcAgr}" onclick="PF('statusDialog').show();"
+                                 action="#{genModelMB.onRemoveCalcAgrFormula}" onsuccess="PF('statusDialog').hide();"
+                />
+
+                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight" rendered="#{genModelMB.addCalcAgr}"
+                                 onclick="PF('addNewParamF').show();" />
+
+                <p:commandButton id="btnSaveFTable" rendered="#{genModelMB.saveCalcAgr}" value="Сохранить"
+                                 onclick="PF('statusDialog').show();" action="#{genModelMB.onSaveChangesFormula}"
+                                 onsuccess="PF('statusDialog').hide();"
+                                 update="calcAgrVarsTable calcAgrVarsTableHeader genModelTableForm"/>
+            </p:outputPanel>
+
+            <p:outputPanel id="calcAgrVarsTablePanel" style="border: 1px solid #c8c8c8; height: calc(46% - 7px); padding: 3px;" rendered="#{genModelMB.disableCalcAgrVars}">
+
+                <p:dataTable id="calcAgrVarsTable" var="calcAgrVarsData" widgetVar="calcAgrVarsTable" value="#{genModelMB.calcAgrVarsList}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}" editMode="cell" rendered="#{genModelMB.disableCalcAgrVars}"
+                             rowIndexVar="rowIndex" rowKey="#{calcAgrVarsData.variable}">
+
+                    <p:ajax event="rowSelect" listener="#{genModelMB.onRowSelectCalcAgrVarsTable}" />
+
+                    <p:column headerText="Переменная" style="width: 60px; white-space: nowrap">
+                        <h:outputText style="display: block; text-align: center;" value="#{calcAgrVarsData.variable}"  />
+                    </p:column>
 
 
-                            <p:column headerText="Параметр" >
-                                <h:outputText style="display: block; width: 200px;" value="#{calcAgrVarsData.paramList.parMemo}" />
-                            </p:column>
+                    <p:column headerText="Параметр" >
+                        <h:outputText style="display: block; width: 200px;" value="#{calcAgrVarsData.paramList.parMemo}" id="Memo"/>
+                    </p:column>
 
-                            <p:column headerText="Название"  >
-                                <p:cellEditor disabled="#{!genModelMB.saveCalcAgr}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.paramList.parName}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:selectOneMenu id="param" value="#{genModelMB.selectedParamList}" style="width: 450px;">
-                                            <p:ajax event="change" update="calcAgrVarsTable" listener="#{genModelMB.selectParamList}"/>
+                    <p:column headerText="Название"  >
+                        <p:cellEditor disabled="#{calcAgrVarsData.paramDisable}">
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{calcAgrVarsData.paramList.parName}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu id="param" value="#{calcAgrVarsData.paramList}" style="width: 450px;">
 
+                                    <p:ajax event="itemSelect" listener="#{genModelMB.paramSelected(calcAgrVarsData)}"/>
 
-                                            <f:converter converterId="genModelParamConverter"/>
+                                    <f:converter converterId="genModelParamConverter"/>
 
-                                            <f:selectItems value="#{genModelMB.paramListList}"
-                                                           var="objType"
-                                                           itemLabel="#{objType.parName}" itemValue="#{objType}"/>
-                                        </p:selectOneMenu>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
+                                    <f:selectItems value="#{genModelMB.paramListForCalc}"
+                                                   var="objType"
+                                                   itemLabel="#{objType.parName} (#{objType.parMemo})"
+                                                   itemValue="#{objType}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                            <p:column headerText="Стат. агрегат" >
-                                <p:cellEditor disabled="#{!genModelMB.saveCalcAgr}">
-                                    <f:facet name="output">
-                                        <h:outputText style="display: block;" value="#{calcAgrVarsData.statAgrList.statAgrCode}" />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:selectOneMenu id="statAgr" value="#{genModelMB.selectedStatAgrList}" style="width: 450px;" dynamic="true" >
-                                            <p:ajax event="itemSelect" listener="#{genModelMB.selectStatAgrList}" update="calcAgrVarsTable"/>
+                    <p:column headerText="Стат. агрегат" >
+                        <p:cellEditor disabled="#{calcAgrVarsData.statAgrDisable}" id="statAgrR" >
+                            <f:facet name="output">
+                                <h:outputText style="display: block;" value="#{calcAgrVarsData.statAgrList.statAgrCode}" />
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu id="statAgr" value="#{calcAgrVarsData.statAgrList}" style="width: 450px;" dynamic="true" >
 
-                                            <f:converter converterId="genModelStatAgrConverter"/>
+                                    <p:ajax event="itemSelect" listener="#{genModelMB.statAgrSelect(rowIndex)}"/>
 
-                                            <f:selectItems value="#{genModelMB.statAgrListList}"
-                                                           var="statAgr"
-                                                           itemLabel="#{statAgr.statAgrCode}" itemValue="#{statAgr}"/>
-                                        </p:selectOneMenu>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                        </p:dataTable>
-                    </div>
-                </p:outputPanel>
+                                    <f:converter converterId="genModelStatAgrConverter"/>
+
+                                    <f:selectItems value="#{genModelMB.statAgrListForCalc}"
+                                                   var="statAgr"
+                                                   itemLabel="#{statAgr.statAgrCode}" itemValue="#{statAgr}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                </p:dataTable>
             </p:outputPanel>
         </h:form>
 
@@ -445,21 +461,21 @@
             <h:form id="addParamForm" >
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Параметр*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.parCode}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parCode}" maxlength="10"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 94px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Обозн*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.parMemo}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parMemo}" maxlength="10"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 118px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Название*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.addParam.parName}"
+                    <p:inputText required="true" value="#{genModelMB.addParam.parName}" maxlength="10"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 96px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
@@ -506,14 +522,11 @@
         </p:dialog>
 
         <p:dialog id="dialogF" header="Добавление нового параметра" widgetVar="addNewParamF" modal="true"
-                  width="380px" height="90px" resizable="false" rendered="#{systemParamsUtil.write}" >
-            <p:ajax event="close" listener="#{genModelMB.onAddParamDialogCloseF}"/>
+                  width="380px" height="90px" resizable="false" rendered="#{systemParamsUtil.write}" closable="false">
             <h:form id="addFormula" >
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Формула*" style="margin-right: 10px"/>
-                    <p:inputText required="true" value="#{genModelMB.calcAgrFormulaString}"
-                                 requiredMessage="#{global['validation.view.text']}" style="width: 250px; margin-left: 10px;"/>
-                    <p:message style="margin-left: 5px;" for="@previous" />
+                    <p:inputText  value="#{genModelMB.calcAgrFormulaString}" style="width: 250px; margin-left: 10px;"/>
                 </div>
 
                 <p:commandButton value="Сохранить" id="btnSaveF" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
@@ -521,7 +534,7 @@
                                  oncomplete="PF('statusDialog').hide(); PF('addNewParamF').hide();" update="genModelTableForm:calcAgrVarsTable
                                  genModelTableForm:calcAgrVarsTableHeader"/>
 
-                <p:commandButton value="Отмена" id="btnCancF" oncomplete="PF('addNewParamF').hide();"
+                <p:commandButton value="Отмена" id="btnCancF" action="#{genModelMB.onAddParamDialogCloseF}" oncomplete="PF('addNewParamF').hide();"
                                  styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;" update="addFormula"/>
             </h:form>
         </p:dialog>

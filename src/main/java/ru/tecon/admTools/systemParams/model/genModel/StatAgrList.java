@@ -10,7 +10,6 @@ import java.util.StringJoiner;
 public class StatAgrList implements Serializable {
     private Long statAgrId;
     private String statAgrCode;
-    private String statAgrName;
 
     public StatAgrList() {
     }
@@ -22,10 +21,6 @@ public class StatAgrList implements Serializable {
 
     public Long getStatAgrId() {
         return statAgrId;
-    }
-
-    public void setStatAgrId(Long statAgrId) {
-        this.statAgrId = statAgrId;
     }
 
     public String getStatAgrCode() {
@@ -41,7 +36,6 @@ public class StatAgrList implements Serializable {
         return new StringJoiner(", ", StatAgrList.class.getSimpleName() + "[", "]")
                 .add("statAgrId=" + statAgrId)
                 .add("statAgrCode='" + statAgrCode + "'")
-                .add("statAgrName='" + statAgrName + "'")
                 .toString();
     }
 }

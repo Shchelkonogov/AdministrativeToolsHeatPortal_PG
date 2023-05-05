@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
@@ -116,5 +117,18 @@ public class GMTree implements Serializable {
                 .add("visStat=" + visStat)
                 .add("icon='" + icon + "'")
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GMTree gmTree = (GMTree) o;
+        return myId == gmTree.myId && measureId == gmTree.measureId && visStat == gmTree.visStat && Objects.equals(id, gmTree.id) && Objects.equals(name, gmTree.name) && Objects.equals(parent, gmTree.parent) && Objects.equals(myType, gmTree.myType) && Objects.equals(categ, gmTree.categ) && Objects.equals(measureName, gmTree.measureName) && Objects.equals(icon, gmTree.icon);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, parent, myId, myType, categ, measureId, measureName, visStat, icon);
     }
 }

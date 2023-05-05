@@ -1,5 +1,7 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
+import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 
@@ -15,25 +17,18 @@ public class ParamProp implements Serializable {
     private long propId;
     private String propName;
     private String propValDef;
-    private long propCondGreat;
-    private String propCondGreatName;
-    private long propCondLess;
-    private String propCondLessName;
+    private Condition greatCond;
+    private Condition lessCond;
 
-    public ParamProp() {
-    }
-
-    public ParamProp(long parId, long paramTypeId, long statAgrId, long propId, String propName, String propValDef, long propCondGreat, String propCondGreatName, long propCondLess, String propCondLessName) {
+    public ParamProp(long parId, long paramTypeId, long statAgrId, long propId, String propName, String propValDef, Condition greatCond, Condition lessCond) {
         this.parId = parId;
         this.paramTypeId = paramTypeId;
         this.statAgrId = statAgrId;
         this.propId = propId;
         this.propName = propName;
         this.propValDef = propValDef;
-        this.propCondGreat = propCondGreat;
-        this.propCondGreatName = propCondGreatName;
-        this.propCondLess = propCondLess;
-        this.propCondLessName = propCondLessName;
+        this.greatCond = greatCond;
+        this.lessCond = lessCond;
     }
 
     public long getParId() {
@@ -72,20 +67,20 @@ public class ParamProp implements Serializable {
         this.propValDef = propValDef;
     }
 
-    public String getPropCondGreatName() {
-        return propCondGreatName;
+    public Condition getGreatCond() {
+        return greatCond;
     }
 
-    public void setPropCondGreatName(String propCondGreatName) {
-        this.propCondGreatName = propCondGreatName;
+    public void setGreatCond(Condition greatCond) {
+        this.greatCond = greatCond;
     }
 
-    public String getPropCondLessName() {
-        return propCondLessName;
+    public Condition getLessCond() {
+        return lessCond;
     }
 
-    public void setPropCondLessName(String propCondLessName) {
-        this.propCondLessName = propCondLessName;
+    public void setLessCond(Condition lessCond) {
+        this.lessCond = lessCond;
     }
 
     @Override
@@ -97,10 +92,8 @@ public class ParamProp implements Serializable {
                 .add("propId=" + propId)
                 .add("propName='" + propName + "'")
                 .add("propValDef='" + propValDef + "'")
-                .add("propCondGreat=" + propCondGreat)
-                .add("propCondGreatName='" + propCondGreatName + "'")
-                .add("propCondLess=" + propCondLess)
-                .add("propCondLessName='" + propCondLessName + "'")
+                .add("greatCond=" + greatCond)
+                .add("lessCond=" + lessCond)
                 .toString();
     }
 }

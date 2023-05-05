@@ -1,10 +1,8 @@
 package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
-import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -15,12 +13,10 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,44 +41,38 @@ public class GenModelMB implements Serializable {
     private GMTree parent;
 
     private List<Param> paramList;
-    private Param param = new Param();
     private Param addParam = new Param();
     private boolean disableParamTable = false;
 
     private List<ParamProp> paramPropList;
-    private ParamProp paramProp = new ParamProp();
     private boolean disableParamPropTable = false;
 
     private List<ParamPropPer> paramPropPerList;
-    private ParamPropPer paramPropPer = new ParamPropPer();
     private boolean disableParamPropPerTable = false;
 
     private List<CalcAgrVars> calcAgrVarsList;
     private String calcAgrFormulaString;
-    private CalcAgrVars calcAgrVars = new CalcAgrVars();
 
     private List<CalcAgrFormula> calcAgrFormulaList = new ArrayList<>();
-    private List<String> calcAgrFormulaListString;
 
-    private List<ParamList> paramListList;
-    private ParamList selectedParamList;
+    private List<ParamList> paramListForCalc;
 
-    private List<StatAgrList> statAgrListList = new ArrayList<>();
-    private StatAgrList selectedStatAgrList;
+    private List<StatAgrList> statAgrListForCalc = new ArrayList<>();
+
 
     private boolean disableCalcAgrVars = false;
     private boolean disableRemoveBtn = true;
     private boolean disableAddBtn = true;
-    private boolean tableRender;
     private boolean addCalcAgr;
     private boolean saveCalcAgr;
     private boolean delCalcAgr;
-    private String rowKeyParent;
-    private String rowKey;
+
+    private String tableHeader = "Свойства агрегата";
 
 
     @EJB
     GenModelSB genModelSB;
+
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -90,13 +80,17 @@ public class GenModelMB implements Serializable {
     @PostConstruct
     private void init() {
         root = new DefaultTreeNode(new GMTree(), null);
+
         loadData();
+        paramListForCalc = genModelSB.getParamList();
     }
 
     /**
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
+        List<GMTree> expandedList = new ArrayList<>();
+        expandedList.addAll(getRowDown(root, expandedList));
         root.getChildren().clear();
 
         objTypesList = genModelSB.getTreeParam();
@@ -116,6 +110,10 @@ public class GenModelMB implements Serializable {
             }
             TreeNode parent = nodes.get(genTree.getParent());
             DefaultTreeNode treeNode = new DefaultTreeNode(genTree, parent);
+
+            if (expandedList.contains(genTree)) {
+                treeNode.setExpanded(true);
+            }
             nodes.put(genTree.getId(), treeNode);
         }
     }
@@ -126,8 +124,6 @@ public class GenModelMB implements Serializable {
      */
     public void onRowSelect(NodeSelectEvent event) throws SystemParamException {
         selectedRow = (GMTree) event.getTreeNode().getData();
-        rowKeyParent = event.getTreeNode().getParent().getRowKey();
-        rowKey = event.getTreeNode().getRowKey();
 
         if(selectedRow.getParent()!= null) {
             parent = (GMTree) event.getTreeNode().getParent().getData();
@@ -140,48 +136,51 @@ public class GenModelMB implements Serializable {
 
         switch (selectedRow.getMyType()) {
             case"PT":
-            disableAddBtn = false;
-            break;
+                disableAddBtn = false;
+                tableHeader = "Свойства агрегата";
+                break;
 
-        /**
-         * Для параметра (шестеренка)
-         */
+            /**
+             * Для параметра (шестеренка)
+             */
             case "PP":
-            paramList = genModelSB.getParam(selectedRow.getMyId());
-            disableParamTable = true;
-            disableRemoveBtn = false;
-            break;
+                paramList = genModelSB.getParam(selectedRow.getMyId());
+                disableParamTable = true;
+                disableRemoveBtn = false;
+                tableHeader = selectedRow.getName();
+                break;
         }
 
         switch (selectedRow.getCateg()) {
-        /**
-         * Для аналоговых значений
-         */
+            /**
+             * Для аналоговых значений
+             */
             case"A":
-            paramPropList = genModelSB.getParamProp(parent.getMyId(), selectedRow.getMyId());
-            disableParamPropTable = true;
-            break;
+                paramPropList = genModelSB.getParamProp(parent.getMyId(), selectedRow.getMyId());
+                disableParamPropTable = true;
+                tableHeader = "Свойства агрегата";
+                break;
 
-        /**
-         * Для перечислимых значений
-         */
+            /**
+             * Для перечислимых значений
+             */
             case"P":
-            paramPropPerList = genModelSB.getParamPropPer(parent.getMyId(), selectedRow.getMyId());
-            disableParamPropPerTable = true;
-            break;
+                paramPropPerList = genModelSB.getParamPropPer(parent.getMyId(), selectedRow.getMyId());
+                disableParamPropPerTable = true;
+                tableHeader = "Свойства агрегата";
+                break;
 
-        /**
-         * Для вычислимых значений
-         */
+            /**
+             * Для вычислимых значений
+             */
             case"F":
-            updCalcAgrTable();
+                updCalcAgrTable();
 
-            disableCalcAgrVars = true;
-            tableRender = false;
-            delCalcAgr = !calcAgrVarsList.isEmpty();
-            addCalcAgr = calcAgrVarsList.isEmpty();
-            saveCalcAgr = false;
-            break;
+                disableCalcAgrVars = true;
+                delCalcAgr = !calcAgrVarsList.isEmpty();
+                addCalcAgr = calcAgrVarsList.isEmpty();
+                saveCalcAgr = false;
+                break;
         }
     }
     /**
@@ -192,9 +191,11 @@ public class GenModelMB implements Serializable {
         disableParamPropTable = false;
         disableParamPropPerTable = false;
         disableCalcAgrVars = false;
-        tableRender = true;
     }
 
+    /**
+     * Метод для загрузки данных в таблицу для вычислимых
+     */
     public void updCalcAgrTable() throws SystemParamException {
         paramPropList = genModelSB.getParamProp(parent.getMyId(), selectedRow.getMyId());
         calcAgrVarsList = genModelSB.getCalcAgrVars(parent.getMyId(), selectedRow.getMyId());
@@ -210,22 +211,14 @@ public class GenModelMB implements Serializable {
 
             String Id = "P"+ addedParamID;
             List<GMTree> addedObjList = genModelSB.getTreeParamPP(Id);
+            objTypesList.addAll(addedObjList);
 
-            String[] array = rowKey.split("\\D+");
-            int rowAtTree = Integer.parseInt(String.join("", array))%10;
-
-            TreeNode treeNode = root.getChildren().get(Integer.parseInt(rowKeyParent)).getChildren().get(rowAtTree);
-            GMTree parentGMTree = addedObjList.get(0);
-            parentGMTree.setIcon("pi pi-cog");
-            DefaultTreeNode parent = new DefaultTreeNode(parentGMTree, treeNode);
-            addedObjList.remove(parentGMTree);
-            for (GMTree gmTree : addedObjList) {
-                gmTree.setIcon("pi pi-check");
-                new DefaultTreeNode(gmTree, parent);
-            }
+            loadData();
+            tablesHide();
 
             PrimeFaces.current().executeScript("PF('addNewParam').hide();");
             PrimeFaces.current().ajax().update("genModelForm:genModel");
+            PrimeFaces.current().ajax().update("genModelTableForm");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
@@ -233,6 +226,23 @@ public class GenModelMB implements Serializable {
         }
         tablesHide();
         disableParamPropPerTable = true;
+    }
+
+    /**
+     * Функция составляет список ранее раскрытых объектов в дереве
+     * @return - возвращает список открытых объектов
+     */
+    private List <GMTree> getRowDown(TreeNode treeNode, List <GMTree> expandedList) {
+
+        if (treeNode.getChildCount() > 0) {
+            for (int i = 0; i < treeNode.getChildCount(); i++) {
+                if (treeNode.getChildren().get(i).isExpanded()) {
+                    expandedList.add((GMTree) treeNode.getChildren().get(i).getData());
+                    getRowDown(treeNode.getChildren().get(i), expandedList);
+                }
+            }
+        }
+        return expandedList;
     }
 
     /**
@@ -255,13 +265,13 @@ public class GenModelMB implements Serializable {
             disableRemoveBtn = true;
 
             PrimeFaces.current().ajax().update("genModelForm:genModel");
+            PrimeFaces.current().ajax().update("genModelTableForm");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
         }
         tablesHide();
         disableParamPropPerTable = true;
-        tableRender = false;
     }
 
     /**
@@ -292,7 +302,7 @@ public class GenModelMB implements Serializable {
         Param param = event.getObject();
 
         try {
-                genModelSB.updParam(param, utilMB.getLogin(), utilMB.getIp());
+            genModelSB.updParam(param, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -304,10 +314,9 @@ public class GenModelMB implements Serializable {
      * @param event событие
      */
     public void onRowEditParamProp(RowEditEvent<ParamProp> event) {
-        LOGGER.info("update row " + event.getObject());
+        LOGGER.info("логируем обновление аналогового " + event.getObject());
 
         ParamProp paramProp = event.getObject();
-
         try {
             genModelSB.updParamProp(paramProp, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
@@ -341,7 +350,7 @@ public class GenModelMB implements Serializable {
 
         try {
             Short linked = genModelSB.checkLinkedCalcAgr(parent.getMyId(), selectedRow.getMyId());
-            if(linked == 0) {
+            if (linked == 0) {
                 try {
                     genModelSB.removeCalcAgrFormula(parent.getMyId(), selectedRow.getMyId(), utilMB.getLogin(), utilMB.getIp());
                     delCalcAgr = false;
@@ -366,19 +375,21 @@ public class GenModelMB implements Serializable {
      */
     public void checkNewFormula() {
         try {
-            calcAgrFormulaListString = genModelSB.checkNewFormula(calcAgrFormulaString);
+            List<String> calcAgrFormulaListString = genModelSB.checkNewFormula(calcAgrFormulaString);
             calcAgrFormulaList.clear();
             calcAgrVarsList.clear();
-            for (int i = 0; i<calcAgrFormulaListString.size(); i++) {
+            for (int i = 0; i< calcAgrFormulaListString.size(); i++) {
                 ParamList paramList = new ParamList();
                 StatAgrList statAgrList = new StatAgrList();
                 calcAgrVarsList.add(i, new CalcAgrVars(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaListString.get(i),
-                        paramList, statAgrList));
+                        paramList, statAgrList, true, true));
             }
 
-            paramListTable();
-            addCalcAgr = false;
-            saveCalcAgr = true;
+            if (!calcAgrFormulaString.equals("")) {
+                addCalcAgr = false;
+                saveCalcAgr = true;
+            }
+            calcAgrVarsList.get(0).setParamDisable(false);
         } catch (SystemParamException e ) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -391,7 +402,7 @@ public class GenModelMB implements Serializable {
      * Обработчик сохранения добавления новой формулы в вычислимые параметры, нажатие на копку сохранить
      */
     public void onSaveChangesFormula() {
-        for(CalcAgrVars i: calcAgrVarsList) {
+        for (CalcAgrVars i: calcAgrVarsList) {
             calcAgrFormulaList.add(new CalcAgrFormula(i.getVariable(), i.getParamList().getId(), i.getStatAgrList().getStatAgrId()));
         }
         try {
@@ -401,6 +412,10 @@ public class GenModelMB implements Serializable {
             delCalcAgr = true;
             saveCalcAgr = false;
 
+            for (CalcAgrVars i: calcAgrVarsList){
+                i.setStatAgrDisable(true);
+                i.setParamDisable(true);
+            }
 
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
@@ -414,57 +429,34 @@ public class GenModelMB implements Serializable {
      * Обработчик обновления диалогового окна ввода формулы в случае его закрытия
      */
     public void onAddParamDialogCloseF() {
-        if(calcAgrFormulaListString.isEmpty()) {
-            calcAgrFormulaString = "";
+        calcAgrFormulaString = "";
+    }
+
+    /**
+     * Обработчик выбора значения в выпадающем меню параметров для таблицы вычислимых
+     */
+    public void paramSelected(CalcAgrVars item) {
+        StatAgrList undo = new StatAgrList(null,"");
+        item.setStatAgrList(undo);
+        for (CalcAgrVars i: calcAgrVarsList) {
+            i.setStatAgrDisable(true);
         }
+
+        item.setStatAgrDisable(false);
+        statAgrListForCalc = genModelSB.getStatAgrList(item.getParamList().getId());
+
+        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable");
+
+        LOGGER.info("Select param "+ item.getParamList().getParName());
     }
 
     /**
-     * Обработчик загрузки параметров в выпадающее меню для таблицы вычислимых
+     * Обработчик выбора значения в выпадающем меню статистических агрегатов для таблицы вычислимых
      */
-    public void paramListTable() {
-        paramListList = genModelSB.getParamList();
-    }
-
-    /**
-     * Обработчик события выделения значения в выпадающем меню параметров для таблицы вычислимых
-     * @param event событие
-     */
-    public void selectParamList(final AjaxBehaviorEvent event) {
-        LOGGER.info("select link: onRowSelectParamList" + ((SelectOneMenu) event.getSource()).getValue());
-        selectedParamList = (ParamList) ((SelectOneMenu) event.getSource()).getValue();
-        calcAgrVars.setParamList((ParamList) ((SelectOneMenu) event.getSource()).getValue());
-    }
-
-    /**
-     * Обработчик загрузки стат.агрегат для выбранного параметра в выпадающем меню для таблицы вычислимых
-     */
-
-    public void statAgrListTable() {
-        if (calcAgrVars.getParamList().getId()!= null) {
-            statAgrListList = genModelSB.getStatAgrList(calcAgrVars.getParamList().getId());
-        }
-    }
-
-    /**
-     * Обработчик события выделения строки в таблице параметров в выпадающем меню для таблицы вычислимых
-     * @param event событие
-     */
-    public void selectStatAgrList(final AjaxBehaviorEvent event) {
-        LOGGER.info("select link: onRowSelectStatAgrList" + ((SelectOneMenu) event.getSource()).getValue());
-        calcAgrVars.setStatAgrList((StatAgrList) ((SelectOneMenu) event.getSource()).getValue());
-    }
-
-    /**
-     * Обработчик события выделения строки в таблице Вычисление параметра
-     * @param event событие
-     */
-    public void onRowSelectCalcAgrVarsTable(SelectEvent<CalcAgrVars> event) {
-        LOGGER.info("select link: onRowSelectCalcAgrVarsTable " + event.getObject());
-        calcAgrVars = event.getObject();
-        statAgrListTable();
-        if (calcAgrVars.getParamList().getId() == null && !statAgrListList.isEmpty()) {
-            statAgrListList.clear();
+    public void statAgrSelect (int rowIndex) {
+        if (rowIndex < calcAgrVarsList.size()-1){
+            calcAgrVarsList.get(rowIndex+1).setParamDisable(false);
+            PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable");
         }
     }
 
@@ -524,38 +516,6 @@ public class GenModelMB implements Serializable {
         this.calcAgrVarsList = calcAgrVarsList;
     }
 
-    public Param getParam() {
-        return param;
-    }
-
-    public void setParam(Param param) {
-        this.param = param;
-    }
-
-    public ParamProp getParamProp() {
-        return paramProp;
-    }
-
-    public void setParamProp(ParamProp paramProp) {
-        this.paramProp = paramProp;
-    }
-
-    public ParamPropPer getParamPropPer() {
-        return paramPropPer;
-    }
-
-    public void setParamPropPer(ParamPropPer paramPropPer) {
-        this.paramPropPer = paramPropPer;
-    }
-
-    public CalcAgrVars getCalcAgrVars() {
-        return calcAgrVars;
-    }
-
-    public void setCalcAgrVars(CalcAgrVars calcAgrVars) {
-        this.calcAgrVars = calcAgrVars;
-    }
-
     public boolean isDisableParamTable() {
         return disableParamTable;
     }
@@ -596,14 +556,6 @@ public class GenModelMB implements Serializable {
         this.calcAgrFormulaString = calcAgrFormulaString;
     }
 
-    public boolean isTableRender() {
-        return tableRender;
-    }
-
-    public void setTableRender(boolean tableRender) {
-        this.tableRender = tableRender;
-    }
-
     public Param getAddParam() {
         return addParam;
     }
@@ -612,44 +564,20 @@ public class GenModelMB implements Serializable {
         this.addParam = addParam;
     }
 
-    public GMTree getSelectedRow() {
-        return selectedRow;
+    public List<ParamList> getParamListForCalc() {
+        return paramListForCalc;
     }
 
-    public void setSelectedRow(GMTree selectedRow) {
-        this.selectedRow = selectedRow;
+    public void setParamListForCalc(List<ParamList> paramListForCalc) {
+        this.paramListForCalc = paramListForCalc;
     }
 
-    public List<ParamList> getParamListList() {
-        return paramListList;
+    public List<StatAgrList> getStatAgrListForCalc() {
+        return statAgrListForCalc;
     }
 
-    public void setParamListList(List<ParamList> paramListList) {
-        this.paramListList = paramListList;
-    }
-
-    public ParamList getSelectedParamList() {
-        return selectedParamList;
-    }
-
-    public void setSelectedParamList(ParamList selectedParamList) {
-        this.selectedParamList = selectedParamList;
-    }
-
-    public List<StatAgrList> getStatAgrListList() {
-        return statAgrListList;
-    }
-
-    public void setStatAgrListList(List<StatAgrList> statAgrListList) {
-        this.statAgrListList = statAgrListList;
-    }
-
-    public StatAgrList getSelectedStatAgrList() {
-        return selectedStatAgrList;
-    }
-
-    public void setSelectedStatAgrList(StatAgrList selectedStatAgrList) {
-        this.selectedStatAgrList = selectedStatAgrList;
+    public void setStatAgrListForCalc(List<StatAgrList> statAgrListForCalc) {
+        this.statAgrListForCalc = statAgrListForCalc;
     }
 
     public boolean isAddCalcAgr() {
@@ -658,14 +586,6 @@ public class GenModelMB implements Serializable {
 
     public void setAddCalcAgr(boolean addCalcAgr) {
         this.addCalcAgr = addCalcAgr;
-    }
-
-    public boolean isSaveCalcAgr() {
-        return saveCalcAgr;
-    }
-
-    public void setSaveCalcAgr(boolean saveCalcAgr) {
-        this.saveCalcAgr = saveCalcAgr;
     }
 
     public boolean isDelCalcAgr() {
@@ -683,4 +603,21 @@ public class GenModelMB implements Serializable {
     public void setDisableAddBtn(boolean disableAddBtn) {
         this.disableAddBtn = disableAddBtn;
     }
+
+    public String getTableHeader() {
+        return tableHeader;
+    }
+
+    public void setTableHeader(String tableHeader) {
+        this.tableHeader = tableHeader;
+    }
+
+    public boolean isSaveCalcAgr() {
+        return saveCalcAgr;
+    }
+
+    public void setSaveCalcAgr(boolean saveCalcAgr) {
+        this.saveCalcAgr = saveCalcAgr;
+    }
+
 }

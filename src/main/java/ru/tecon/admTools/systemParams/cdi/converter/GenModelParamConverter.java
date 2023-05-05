@@ -22,14 +22,14 @@ public class GenModelParamConverter implements Converter {
 
         GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getParamListList().stream()
-                .filter(leftType -> leftType.getId() == Integer.parseInt(value))
+        return defaultValues.getParamListForCalc().stream()
+                .filter(leftType -> leftType.getParName().equals(value))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((ParamList) value).getId());
+        return String.valueOf(((ParamList) value).getParName());
     }
 }

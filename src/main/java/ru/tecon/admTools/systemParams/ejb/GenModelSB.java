@@ -5,6 +5,7 @@ import org.postgresql.util.PSQLException;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.genModel.*;
+import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
 
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
@@ -114,16 +115,14 @@ public class GenModelSB {
             ResultSet res = stm.executeQuery();
 
             while (res.next()) {
+                Condition greatCond = new Condition(res.getInt("prop_cond_great"), res.getString("prop_cond_great_name"));
+                Condition lessCond = new Condition(res.getInt("prop_cond_less"),res.getString("prop_cond_less_name"));
                 result.add(new ParamProp(res.getLong("par_id"),
                         res.getLong("param_type_id"),
                         res.getLong("stat_agr_id"),
                         res.getLong("prop_id"),
                         res.getString("prop_name"),
-                        res.getString("prop_val_def"),
-                        res.getLong("prop_cond_great"),
-                        res.getString("prop_cond_great_name"),
-                        res.getLong("prop_cond_less"),
-                        res.getString("prop_cond_less_name")));
+                        res.getString("prop_val_def"), greatCond, lessCond));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -148,10 +147,12 @@ public class GenModelSB {
                 ParamList paramList = new ParamList(res.getLong("par_id"),
                         res.getString("par_memo"), res.getString("par_name"));
                 StatAgrList statAgrList = new StatAgrList(res.getLong("stat_agr_id"), res.getString("stat_agr_code"));
+                boolean statAgrDisable = true;
+                boolean paramDisable = true;
                 result.add(new CalcAgrVars(res.getLong("calc_par_id"),
                         res.getLong("calc_stat_agr_id"),
                         res.getString("variable"),
-                        paramList, statAgrList));
+                        paramList, statAgrList, statAgrDisable, paramDisable));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -173,12 +174,12 @@ public class GenModelSB {
             ResultSet res = stm.executeQuery();
 
             while (res.next()) {
+                Condition propCond = new Condition(res.getInt("prop_cond"), res.getString("prop_val"));
                 result.add(new ParamPropPer(res.getLong("par_id"),
                         res.getLong("param_type_id"),
                         res.getLong("stat_agr_id"),
                         res.getLong("enum_code"),
-                        res.getString("prop_val"),
-                        res.getLong("prop_cond")));
+                        propCond));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -405,6 +406,7 @@ public class GenModelSB {
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void updParamProp(ParamProp paramProp, String login, String ip) throws SystemParamException {
+        System.out.println("Что приходит " + paramProp);
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM_PROP)) {
             cStm.setLong(1, paramProp.getParId());
@@ -416,7 +418,7 @@ public class GenModelSB {
 
             cStm.executeUpdate();
 
-            LOGGER.info("update param prop " + paramProp.getParId());
+            LOGGER.info("update param prop id " + paramProp.getParId());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error update Param prop ", e);
             if (e.getSQLState().equals("11111")){
@@ -444,8 +446,8 @@ public class GenModelSB {
             cStm.setLong(1, paramPropPer.getParId());
             cStm.setLong(2, paramPropPer.getStatAgrId());
             cStm.setLong(3, paramPropPer.getEnumCode());
-            cStm.setString(4, paramPropPer.getPropVal());
-            cStm.setLong(5, paramPropPer.getPropCond());
+            cStm.setString(4, paramPropPer.getPropCond().getName());
+            cStm.setLong(5, paramPropPer.getPropCond().getId());
             cStm.setString(6, login);
             cStm.setString(7, ip);
 

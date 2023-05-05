@@ -23,7 +23,7 @@ public class GenModelStatAgrConverter implements Converter {
 
         GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getStatAgrListList().stream()
+        return defaultValues.getStatAgrListForCalc().stream()
                 .filter(leftType -> leftType.getStatAgrId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
