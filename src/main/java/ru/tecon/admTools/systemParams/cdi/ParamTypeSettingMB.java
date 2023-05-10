@@ -3,9 +3,7 @@ package ru.tecon.admTools.systemParams.cdi;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.ejb.MeasureSB;
 import ru.tecon.admTools.systemParams.ejb.ParamTypeSettingSB;
-import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.*;
 
 import javax.annotation.PostConstruct;
@@ -52,7 +50,6 @@ public class ParamTypeSettingMB implements Serializable {
     private boolean disablePropRemoveBtn = true;
     private boolean disablePropAddBtn = true;
 
-    private List<Measure> measures;
     private List<StatisticalAggregate> statAggregates;
 
     boolean init = false;
@@ -65,9 +62,6 @@ public class ParamTypeSettingMB implements Serializable {
 
     @EJB
     private ParamTypeSettingSB bean;
-
-    @EJB
-    private MeasureSB measureBean;
 
     @PostConstruct
     private void init() {
@@ -92,7 +86,7 @@ public class ParamTypeSettingMB implements Serializable {
         newParamType = null;
 
         paramConditions = bean.getParamConditions();
-        measures = measureBean.getMeasures();
+//        measures = measureBean.getMeasures();
 
         selectedType = null;
 
@@ -126,7 +120,8 @@ public class ParamTypeSettingMB implements Serializable {
 
     /**
      * Обработчик выбора checkBox в колонке визуализация
-     * @param data строка в которой нажали кнопку
+     *
+     * @param data     строка в которой нажали кнопку
      * @param rowIndex индекс строки
      */
     public void onChange(ParamTypeTable data, int rowIndex) {
@@ -155,6 +150,7 @@ public class ParamTypeSettingMB implements Serializable {
 
     /**
      * Обработик выбора типа параметра. Загружает данные для свойств.
+     *
      * @param event событие выделения строки
      */
     public void onTypeSelect(SelectEvent<ParamTypeTable> event) {
@@ -254,7 +250,7 @@ public class ParamTypeSettingMB implements Serializable {
      * Создает тип, если его нет и добавляет все агрегаты
      */
     public void onCreateType() {
-        logger.log(Level.INFO, "create new type {0} {1}", new Object[] {newParamType, newTypes});
+        logger.log(Level.INFO, "create new type {0} {1}", new Object[]{newParamType, newTypes});
 
         FacesContext context = FacesContext.getCurrentInstance();
 
@@ -266,7 +262,7 @@ public class ParamTypeSettingMB implements Serializable {
             if (!newTypes.isEmpty()) {
                 newTypes.removeIf(ParamTypeTable::check);
 
-                for (ParamTypeTable newTypeElement: newTypes) {
+                for (ParamTypeTable newTypeElement : newTypes) {
                     newTypeElement.setParamType(newParamType);
 
                     try {
@@ -303,7 +299,7 @@ public class ParamTypeSettingMB implements Serializable {
         newParamType = null;
     }
 
-    public void onPropSelect(SelectEvent event) {
+    public void onPropSelect(SelectEvent<?> event) {
         logger.log(Level.INFO, "select prop {0}", event.getObject());
 
         disablePropRemoveBtn = false;
@@ -320,6 +316,7 @@ public class ParamTypeSettingMB implements Serializable {
     /**
      * Обработчик нажатия + на таблице свойств параметра.
      * Открывает соответствующее окно в зависимости от категории (аналоговый / перечислимый)
+     *
      * @param type категория параметра
      */
     public void loadProperties(String type) {
@@ -345,6 +342,7 @@ public class ParamTypeSettingMB implements Serializable {
 
     /**
      * Обработчик создания нового свойства типа параметра в окне добавить новое свойство
+     *
      * @param type категория параметра
      */
     public void onCreateProp(String type) {
@@ -382,6 +380,7 @@ public class ParamTypeSettingMB implements Serializable {
 
     /**
      * Обработчик нажатия - на таблице свойства параметра. Удаляет выбранное свойство
+     *
      * @param type категория параметра
      */
     public void onRemoveProp(String type) {
@@ -472,10 +471,6 @@ public class ParamTypeSettingMB implements Serializable {
 
     public List<ParamType> getTypesList() {
         return types.stream().map(ParamTypeTable::getParamType).distinct().sorted().collect(Collectors.toList());
-    }
-
-    public List<Measure> getMeasures() {
-        return measures;
     }
 
     public List<StatisticalAggregate> getStatAggregates() {

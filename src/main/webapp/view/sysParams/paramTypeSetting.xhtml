@@ -205,9 +205,9 @@
                         </f:facet>
                         <f:facet name="input">
                             <h:selectOneMenu value="#{newAggr.measure}" style="width: 100%;">
-                                <f:converter converterId="measureConverterParamTypeSettings"/>
-                                <f:selectItems value="#{paramTypeSetting.measures}" var="measure"
-                                               itemLabel="#{measure.name} (#{measure.shortName})" itemValue="#{measure}"/>
+                                <f:converter converterId="measureConverter"/>
+                                <f:selectItems value="#{measureControllerApplication.measures}" var="measureItem"
+                                               itemLabel="#{measureItem.name} (#{measureItem.shortName})" itemValue="#{measureItem}"/>
                             </h:selectOneMenu>
                         </f:facet>
                     </p:cellEditor>
