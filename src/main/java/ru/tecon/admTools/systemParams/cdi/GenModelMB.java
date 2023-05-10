@@ -89,8 +89,8 @@ public class GenModelMB implements Serializable {
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
-        List<GMTree> expandedList = new ArrayList<>();
-        expandedList.addAll(getRowDown(root, expandedList));
+        List<GMTree> expandedList1 = new ArrayList<>();
+        List<GMTree> expandedList = new ArrayList<>(getRowDown(root, expandedList1));
         root.getChildren().clear();
 
         objTypesList = genModelSB.getTreeParam();
@@ -232,17 +232,16 @@ public class GenModelMB implements Serializable {
      * Функция составляет список ранее раскрытых объектов в дереве
      * @return - возвращает список открытых объектов
      */
-    private List <GMTree> getRowDown(TreeNode treeNode, List <GMTree> expandedList) {
-
-        if (treeNode.getChildCount() > 0) {
-            for (int i = 0; i < treeNode.getChildCount(); i++) {
+    private List <GMTree> getRowDown(TreeNode treeNode, List <GMTree> expandedList1) {
+        for (int i = 0; i < treeNode.getChildCount(); i++) {
+            if (!treeNode.getChildren().get(i).isLeaf()) {
                 if (treeNode.getChildren().get(i).isExpanded()) {
-                    expandedList.add((GMTree) treeNode.getChildren().get(i).getData());
-                    getRowDown(treeNode.getChildren().get(i), expandedList);
+                    expandedList1.add((GMTree) treeNode.getChildren().get(i).getData());
+                    getRowDown(treeNode.getChildren().get(i), expandedList1);
                 }
             }
         }
-        return expandedList;
+        return expandedList1;
     }
 
     /**
@@ -263,6 +262,7 @@ public class GenModelMB implements Serializable {
             loadData();
             selectedRow = null;
             disableRemoveBtn = true;
+            tableHeader = "Свойства агрегата";
 
             PrimeFaces.current().ajax().update("genModelForm:genModel");
             PrimeFaces.current().ajax().update("genModelTableForm");
