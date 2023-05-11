@@ -89,8 +89,9 @@ public class GenModelMB implements Serializable {
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
-        List<GMTree> expandedList = new ArrayList<>();
-        expandedList.addAll(getRowDown(root, expandedList));
+
+        List<GMTree> expandedList = new ArrayList<>(getRowDown(root));
+
         root.getChildren().clear();
 
         objTypesList = genModelSB.getTreeParam();
@@ -232,16 +233,15 @@ public class GenModelMB implements Serializable {
      * Функция составляет список ранее раскрытых объектов в дереве
      * @return - возвращает список открытых объектов
      */
-    private List <GMTree> getRowDown(TreeNode treeNode, List <GMTree> expandedList) {
+    private List <GMTree> getRowDown(TreeNode treeNode) {
             List<GMTree> expandedList1 = new ArrayList<>();
-            expandedList1.addAll(expandedList);
 
         for (int i = 0; i < treeNode.getChildCount(); i++) {
             if (!treeNode.getChildren().get(i).isLeaf()) {
                 if (treeNode.getChildren().get(i).isExpanded()) {
-                    expandedList.add((GMTree) treeNode.getChildren().get(i).getData());
-                    getRowDown(treeNode.getChildren().get(i), expandedList);
+                    expandedList1.add((GMTree) treeNode.getChildren().get(i).getData());
                 }
+                expandedList1.addAll(getRowDown(treeNode.getChildren().get(i)));
             }
         }
         return expandedList1;
