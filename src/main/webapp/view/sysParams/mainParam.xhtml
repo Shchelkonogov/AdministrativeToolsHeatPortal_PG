@@ -27,7 +27,7 @@
                     <p:ajax event="change" update="right table" listener="#{mainParamMB.rightPartListUpdateAfterEvent}"/>
                     <f:converter converterId="objectTypeConverter"/>
 
-                    <f:selectItems value="#{defaultValuesSession.objectTypes}" var="objType"
+                    <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
                                    itemLabel="#{objType.name}" itemValue="#{objType}"/>
                 </p:selectOneMenu>
 

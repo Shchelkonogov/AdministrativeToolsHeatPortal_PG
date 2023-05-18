@@ -3,6 +3,7 @@ package ru.tecon.admTools.systemParams.cdi;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController;
 import ru.tecon.admTools.systemParams.ejb.MainParamSB;
 import ru.tecon.admTools.systemParams.model.ObjectType;
 import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
@@ -52,17 +53,17 @@ public class MainParamMB implements Serializable {
     private boolean techProcParamString = false;
 
     @EJB
-    MainParamSB allDao;
+    private MainParamSB allDao;
 
     @Inject
     private SystemParamsUtilMB utilMB;
 
     @Inject
-    private DefaultValuesSessionMB defaultValuesSession;
+    private ObjectTypeController objectTypeController;
 
     @PostConstruct
     private void init() {
-        leftOneLine = defaultValuesSession.getDefaultObjectType();
+        leftOneLine = objectTypeController.getDefaultObjectType();
         rightPartSelectOneMenuParam = allDao.getRightPartSelectOneMenuParam(leftOneLine.getId());
         adaptRightPartSelectOneMenu = all;
         tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
