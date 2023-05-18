@@ -7,7 +7,9 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.GenModelSB;
+import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
 import ru.tecon.admTools.systemParams.model.genModel.*;
+import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -17,10 +19,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -40,9 +39,13 @@ public class GenModelMB implements Serializable {
     private GMTree selectedRow;
     private GMTree parent;
 
-    private List<Param> paramList;
+    private Param paramList;
     private Param addParam = new Param();
     private boolean disableParamTable = false;
+    private List<Temperature> isGraphList;
+    private boolean graphRender;
+    private List<Temperature> isDecreaseList;
+    private boolean decreaseRender;
 
     private List<ParamProp> paramPropList;
     private boolean disableParamPropTable = false;
@@ -52,12 +55,12 @@ public class GenModelMB implements Serializable {
 
     private List<CalcAgrVars> calcAgrVarsList;
     private String calcAgrFormulaString;
-
+    private String calcAgrFormulaStringForSave;
     private List<CalcAgrFormula> calcAgrFormulaList = new ArrayList<>();
 
     private List<ParamList> paramListForCalc;
 
-    private List<StatAgrList> statAgrListForCalc = new ArrayList<>();
+    private List<StatAgrList> statAgrListForCalc;
 
 
     private boolean disableCalcAgrVars = false;
@@ -71,8 +74,11 @@ public class GenModelMB implements Serializable {
 
 
     @EJB
-    GenModelSB genModelSB;
-
+    private GenModelSB genModelSB;
+    @EJB(beanName = "tempGraphSB")
+    private TemperatureLocal temperatureBean;
+    @EJB(beanName = "dailyReductionSB")
+    private TemperatureLocal temperatureBean1;
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -82,6 +88,8 @@ public class GenModelMB implements Serializable {
         root = new DefaultTreeNode(new GMTree(), null);
 
         loadData();
+        getGraphList();
+        getDecreaseList();
         paramListForCalc = genModelSB.getParamList();
     }
 
@@ -146,6 +154,34 @@ public class GenModelMB implements Serializable {
              */
             case "PP":
                 paramList = genModelSB.getParam(selectedRow.getMyId());
+                if (paramList.getIsGraph().getId() != 0) {
+                    for (Temperature i: isGraphList) {
+                        if (i.getId() == paramList.getIsGraph().getId()) {
+                            paramList.setIsGraph(i);
+                        }
+                    }
+                } else {
+                    paramList.getIsGraph().setName("нет графика");
+                }
+                if (paramList.getIsDecrease().getId() != 0) {
+                    for (Temperature i: isDecreaseList) {
+                        if (i.getId() == paramList.getIsDecrease().getId()) {
+                            paramList.setIsDecrease(i);
+                        }
+                    }
+                } else {
+                    paramList.getIsDecrease().setName("нет суточного снижения");
+                }
+                if (paramList.getParamTypeId()!=1) {
+                    graphRender = false;
+                    decreaseRender = false;
+                } else if (paramList.getTechprocTypeId() == 3){
+                    graphRender = false;
+                    decreaseRender = true;
+                } else {
+                    graphRender = true;
+                    decreaseRender = false;
+                }
                 disableParamTable = true;
                 disableRemoveBtn = false;
                 tableHeader = selectedRow.getName();
@@ -215,7 +251,6 @@ public class GenModelMB implements Serializable {
             objTypesList.addAll(addedObjList);
 
             loadData();
-            tablesHide();
 
             PrimeFaces.current().executeScript("PF('addNewParam').hide();");
             PrimeFaces.current().ajax().update("genModelForm:genModel");
@@ -301,9 +336,7 @@ public class GenModelMB implements Serializable {
      */
     public void onRowEditParam(RowEditEvent<Param> event) {
         LOGGER.info("update row " + event.getObject());
-
         Param param = event.getObject();
-
         try {
             genModelSB.updParam(param, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
@@ -317,7 +350,7 @@ public class GenModelMB implements Serializable {
      * @param event событие
      */
     public void onRowEditParamProp(RowEditEvent<ParamProp> event) {
-        LOGGER.info("логируем обновление аналогового " + event.getObject());
+        LOGGER.info("update row " + event.getObject());
 
         ParamProp paramProp = event.getObject();
         try {
@@ -385,20 +418,20 @@ public class GenModelMB implements Serializable {
                 ParamList paramList = new ParamList();
                 StatAgrList statAgrList = new StatAgrList();
                 calcAgrVarsList.add(i, new CalcAgrVars(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaListString.get(i),
-                        paramList, statAgrList, true, true));
+                        paramList, statAgrList));
             }
 
             if (!calcAgrFormulaString.equals("")) {
                 addCalcAgr = false;
                 saveCalcAgr = true;
             }
-            calcAgrVarsList.get(0).setParamDisable(false);
         } catch (SystemParamException e ) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Ошибка", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
+        calcAgrFormulaStringForSave = calcAgrFormulaString;
     }
 
     /**
@@ -409,23 +442,17 @@ public class GenModelMB implements Serializable {
             calcAgrFormulaList.add(new CalcAgrFormula(i.getVariable(), i.getParamList().getId(), i.getStatAgrList().getStatAgrId()));
         }
         try {
-            genModelSB.addCalcAgrFormula(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaString,
+            genModelSB.addCalcAgrFormula(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaStringForSave,
                     calcAgrFormulaList, utilMB.getLogin(), utilMB.getIp());
             PrimeFaces.current().executeScript("PF('addNewParamF').hide();");
             delCalcAgr = true;
             saveCalcAgr = false;
-
-            for (CalcAgrVars i: calcAgrVarsList){
-                i.setStatAgrDisable(true);
-                i.setParamDisable(true);
-            }
 
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
-        loadData();
     }
 
     /**
@@ -438,29 +465,37 @@ public class GenModelMB implements Serializable {
     /**
      * Обработчик выбора значения в выпадающем меню параметров для таблицы вычислимых
      */
-    public void paramSelected(CalcAgrVars item) {
-        StatAgrList undo = new StatAgrList(null,"");
-        item.setStatAgrList(undo);
-        for (CalcAgrVars i: calcAgrVarsList) {
-            i.setStatAgrDisable(true);
-        }
-
-        item.setStatAgrDisable(false);
+    public void paramSelected(CalcAgrVars item, int rowIndex) {
         statAgrListForCalc = genModelSB.getStatAgrList(item.getParamList().getId());
+        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable:".concat(String.valueOf(rowIndex)).concat(":Memo"));
+        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable:".concat(String.valueOf(rowIndex)).concat(":paramR"));
+        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable:".concat(String.valueOf(rowIndex)).concat(":statAgrR"));
 
-        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable");
-
-        LOGGER.info("Select param "+ item.getParamList().getParName());
+        LOGGER.info("Select param "+ item.getParamList().getParName() + " at row " + rowIndex);
     }
 
     /**
      * Обработчик выбора значения в выпадающем меню статистических агрегатов для таблицы вычислимых
      */
-    public void statAgrSelect (int rowIndex) {
-        if (rowIndex < calcAgrVarsList.size()-1){
-            calcAgrVarsList.get(rowIndex+1).setParamDisable(false);
-            PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable");
-        }
+    public void statAgrSelect (CalcAgrVars item, int rowIndex) {
+        PrimeFaces.current().ajax().update("genModelTableForm:calcAgrVarsTable:".concat(String.valueOf(rowIndex)).concat(":statAgrR"));
+        LOGGER.info("Select statAgr " + item.getStatAgrList().getStatAgrCode() + " at row " + rowIndex);
+    }
+
+    /**
+     * Метод возвращает список температурных графиков
+     */
+    public void getGraphList() {
+        isGraphList = temperatureBean.getTemperatures();
+        isGraphList.add(0, new Temperature(0, "нет графика", ""));
+    }
+
+    /**
+     * Метод возвращает список суточных снижений
+     */
+    public void getDecreaseList() {
+        isDecreaseList = temperatureBean1.getTemperatures();
+        isDecreaseList.add(0, new Temperature(0, "нет суточного снижения",""));
     }
 
     public TreeNode getRoot() {
@@ -487,11 +522,11 @@ public class GenModelMB implements Serializable {
         this.disableRemoveBtn = disableRemoveBtn;
     }
 
-    public List<Param> getParamList() {
+    public Param getParamList() {
         return paramList;
     }
 
-    public void setParamList(List<Param> paramList) {
+    public void setParamList(Param paramList) {
         this.paramList = paramList;
     }
 
@@ -623,4 +658,35 @@ public class GenModelMB implements Serializable {
         this.saveCalcAgr = saveCalcAgr;
     }
 
+    public List<Temperature> getIsGraphList() {
+        return isGraphList;
+    }
+
+    public void setIsGraphList(List<Temperature> isGraphList) {
+        this.isGraphList = isGraphList;
+    }
+
+    public boolean isGraphRender() {
+        return graphRender;
+    }
+
+    public void setGraphRender(boolean graphRender) {
+        this.graphRender = graphRender;
+    }
+
+    public List<Temperature> getIsDecreaseList() {
+        return isDecreaseList;
+    }
+
+    public void setIsDecreaseList(List<Temperature> isDecreaseList) {
+        this.isDecreaseList = isDecreaseList;
+    }
+
+    public boolean isDecreaseRender() {
+        return decreaseRender;
+    }
+
+    public void setDecreaseRender(boolean decreaseRender) {
+        this.decreaseRender = decreaseRender;
+    }
 }

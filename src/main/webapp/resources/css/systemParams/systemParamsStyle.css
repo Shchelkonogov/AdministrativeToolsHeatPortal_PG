@@ -234,3 +234,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 #addStatAggrForm\:inputId_input {
     width: 200px;
 }
+
+#genModelTableForm\:paramTable_data .ui-helper-hidden-accessible {
+    position: unset;
+}

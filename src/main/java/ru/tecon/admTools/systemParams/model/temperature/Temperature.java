@@ -21,6 +21,10 @@ public class Temperature implements Serializable {
     public Temperature() {
     }
 
+    public Temperature(int id) {
+        this.id = id;
+    }
+
     public Temperature(int id, String name, String description) {
         this.id = id;
         this.name = name;
@@ -36,6 +40,12 @@ public class Temperature implements Serializable {
     }
 
     public int getId() {
+        return id;
+    }
+    public Integer getIDInteger(){
+        if (id == 0) {
+            return null;
+        }
         return id;
     }
 
