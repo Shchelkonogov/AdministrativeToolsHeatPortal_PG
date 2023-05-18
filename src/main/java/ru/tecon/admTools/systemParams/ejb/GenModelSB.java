@@ -6,6 +6,7 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.genModel.*;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
+import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
@@ -40,7 +41,7 @@ public class GenModelSB {
     private static final String FUN_DEL_CALC_AGR_FORMULA = "call dsp_0029t.del_calc_agr_formula(?, ?, ?, ?)";
     private static final String FUN_DEL_PARAM = "call dsp_0029t.del_param(?, ?, ?)";
     private static final String FUN_UPD_PARAM = "call dsp_0029t.upd_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String FUN_UPD_PARAM_PROP = "call dsp_0029t.upd_param_prop(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_UPD_PARAM_PROP = "call dsp_0029t.upd_param_prop(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String FUN_UPD_PARAM_PROP_PER = "call dsp_0029t.upd_param_prop_per(?, ?, ?, ?, ?, ?, ?)";
     private static final String FUN_UPD_PARAM_STAT = "call dsp_0029t.upd_param_stat(?, ?, ?, ?, ?, ?)";
     private static final String SELECT_CHECK_LINKED_CALC_AGR = "select * from dsp_0029t.check_linked_calc_agr(?, ?)";
@@ -48,7 +49,6 @@ public class GenModelSB {
     private static final String SELECT_PARAM_LIST = "select * from dsp_0029t.sel_param_list()";
     private static final String SELECT_STAT_AGR_LIST = "select * from dsp_0029t.sel_stat_agr_list(?)";
     private static final String SELECT_OM_TREE_PARAM = "select * from dsp_0029t.sel_om_tree_param(?)";
-
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -72,29 +72,31 @@ public class GenModelSB {
      * Запрос данных о параметре ОМ
      * @return список параметров ОМ
      */
-    public List<Param> getParam(long my_id) {
-        List<Param> result = new ArrayList<>();
+    public Param getParam(long my_id) {
+        Param result = new Param();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_PARAM)) {
             stm.setLong(1, my_id);
 
             ResultSet res = stm.executeQuery();
 
-            while (res.next()) {
-                result.add(new Param(res.getLong("id"),
-                        res.getLong("param_type_id"),
-                        res.getString("par_code"),
-                        res.getString("par_memo"),
-                        res.getString("par_name"),
-                        res.getLong("techproc_type_id"),
-                        res.getShort("zone"),
-                        res.getObject("is_graph", Long.class),
-                        res.getLong("visible"),
-                        res.getString("calc"),
-                        res.getObject("is_decrease", Long.class),
-                        res.getBoolean("edit_enable"),
-                        res.getBoolean("leto_control")));
-            }
+            res.next();
+            Temperature isGraph = new Temperature(res.getInt("is_graph"));
+            Temperature isDecrease = new Temperature(res.getInt("is_decrease"));
+            result = new Param(res.getLong("id"),
+                    res.getLong("param_type_id"),
+                    res.getString("par_code"),
+                    res.getString("par_memo"),
+                    res.getString("par_name"),
+                    res.getLong("techproc_type_id"),
+                    res.getShort("zone"),
+                    isGraph,
+                    res.getLong("visible"),
+                    res.getString("calc"),
+                    isDecrease,
+                    res.getBoolean("edit_enable"),
+                    res.getBoolean("leto_control"));
+
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
         }
@@ -147,12 +149,10 @@ public class GenModelSB {
                 ParamList paramList = new ParamList(res.getLong("par_id"),
                         res.getString("par_memo"), res.getString("par_name"));
                 StatAgrList statAgrList = new StatAgrList(res.getLong("stat_agr_id"), res.getString("stat_agr_code"));
-                boolean statAgrDisable = true;
-                boolean paramDisable = true;
                 result.add(new CalcAgrVars(res.getLong("calc_par_id"),
                         res.getLong("calc_stat_agr_id"),
                         res.getString("variable"),
-                        paramList, statAgrList, statAgrDisable, paramDisable));
+                        paramList, statAgrList));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -373,9 +373,9 @@ public class GenModelSB {
             cStm.setString(3, param.getParMemo());
             cStm.setString(4, param.getParName());
             cStm.setShort(5, param.getZone());
-            cStm.setObject(6, param.getIsGraph());
+            cStm.setObject(6, param.getIsGraph().getIDInteger());
             cStm.setLong(7, param.getVisible());
-            cStm.setObject(8, param.getIsDecrease());
+            cStm.setObject(8, param.getIsDecrease().getIDInteger());
             cStm.setShort(9, param.getEditEnableShort());
             cStm.setShort(10, param.getLetoControlShort());
             cStm.setString(11, login);
@@ -406,15 +406,16 @@ public class GenModelSB {
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void updParamProp(ParamProp paramProp, String login, String ip) throws SystemParamException {
-        System.out.println("Что приходит " + paramProp);
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(FUN_UPD_PARAM_PROP)) {
             cStm.setLong(1, paramProp.getParId());
             cStm.setLong(2, paramProp.getStatAgrId());
             cStm.setLong(3, paramProp.getPropId());
             cStm.setString(4, paramProp.getPropValDef());
-            cStm.setString(5, login);
-            cStm.setString(6, ip);
+            cStm.setLong(5, paramProp.getGreatCond().getId());
+            cStm.setLong(6, paramProp.getLessCond().getId());
+            cStm.setString(7, login);
+            cStm.setString(8, ip);
 
             cStm.executeUpdate();
 
@@ -602,6 +603,7 @@ public class GenModelSB {
     }
 
     /**
+     * Метод для выгрузки добавленного параметра для дозаполнения дерева после добавления
      * @return дерево для ОМ
      */
     public List<GMTree> getTreeParamPP(String id) {
@@ -617,6 +619,9 @@ public class GenModelSB {
         return result;
     }
 
+    /**
+     * Метод для выгрузки значений для методов, работающих с деревьями
+     */
     private void resForOmTree(List<GMTree> result, PreparedStatement stm) throws SQLException {
         ResultSet res = stm.executeQuery();
 

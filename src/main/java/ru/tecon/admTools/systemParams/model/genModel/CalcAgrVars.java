@@ -13,17 +13,15 @@ public class CalcAgrVars implements Serializable {
     private String variable;
     private ParamList paramList;
     private StatAgrList statAgrList;
-    private boolean statAgrDisable;
-    private boolean paramDisable;
 
-    public CalcAgrVars(Long calcParId, Long calcStatAgrId, String variable, ParamList paramList, StatAgrList statAgrList, boolean statAgrDisable, boolean paramDisable) {
+
+    public CalcAgrVars(Long calcParId, Long calcStatAgrId, String variable, ParamList paramList, StatAgrList statAgrList) {
         this.calcParId = calcParId;
         this.calcStatAgrId = calcStatAgrId;
         this.variable = variable;
         this.paramList = paramList;
         this.statAgrList = statAgrList;
-        this.statAgrDisable = statAgrDisable;
-        this.paramDisable = paramDisable;
+
     }
 
     public String getVariable() {
@@ -50,22 +48,6 @@ public class CalcAgrVars implements Serializable {
         this.statAgrList = statAgrList;
     }
 
-    public boolean isStatAgrDisable() {
-        return statAgrDisable;
-    }
-
-    public void setStatAgrDisable(boolean statAgrDisable) {
-        this.statAgrDisable = statAgrDisable;
-    }
-
-    public boolean isParamDisable() {
-        return paramDisable;
-    }
-
-    public void setParamDisable(boolean paramDisable) {
-        this.paramDisable = paramDisable;
-    }
-
     @Override
     public String toString() {
         return new StringJoiner(", ", CalcAgrVars.class.getSimpleName() + "[", "]")
@@ -74,8 +56,6 @@ public class CalcAgrVars implements Serializable {
                 .add("variable='" + variable + "'")
                 .add("paramList=" + paramList)
                 .add("statAgrList=" + statAgrList)
-                .add("statAgrDisable=" + statAgrDisable)
-                .add("paramDisable=" + paramDisable)
                 .toString();
     }
 }

@@ -1,5 +1,7 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
+import ru.tecon.admTools.systemParams.model.temperature.Temperature;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 
@@ -16,17 +18,18 @@ public class Param implements Serializable {
     private String parName;
     private long techprocTypeId;
     private short zone;
-    private Long isGraph;
+    private Temperature isGraph;
     private long visible;
     private String calc;
-    private Long isDecrease;
+    private Temperature isDecrease;
     private boolean editEnable;
     private boolean letoControl;
 
     public Param() {
     }
 
-    public Param(long id, long paramTypeId, String parCode, String parMemo, String parName, long techprocTypeId, short zone, Long isGraph, long visible, String calc, Long isDecrease, boolean editEnable, boolean letoControl) {
+    public Param(long id, long paramTypeId, String parCode, String parMemo, String parName, long techprocTypeId, short zone,
+                 Temperature isGraph, long visible, String calc, Temperature isDecrease, boolean editEnable, boolean letoControl) {
         this.id = id;
         this.paramTypeId = paramTypeId;
         this.parCode = parCode;
@@ -82,11 +85,11 @@ public class Param implements Serializable {
         this.zone = zone;
     }
 
-    public Long getIsGraph() {
+    public Temperature getIsGraph() {
         return isGraph;
     }
 
-    public void setIsGraph(Long isGraph) {
+    public void setIsGraph(Temperature isGraph) {
         this.isGraph = isGraph;
     }
 
@@ -106,11 +109,11 @@ public class Param implements Serializable {
         this.calc = calc;
     }
 
-    public Long getIsDecrease() {
+    public Temperature getIsDecrease() {
         return isDecrease;
     }
 
-    public void setIsDecrease(Long isDecrease) {
+    public void setIsDecrease(Temperature isDecrease) {
         this.isDecrease = isDecrease;
     }
 
@@ -145,6 +148,14 @@ public class Param implements Serializable {
 
     public void setLetoControl(boolean letoControl) {
         this.letoControl = letoControl;
+    }
+
+    public long getParamTypeId() {
+        return paramTypeId;
+    }
+
+    public long getTechprocTypeId() {
+        return techprocTypeId;
     }
 
     @Override
