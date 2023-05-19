@@ -11,15 +11,3 @@ function changeValue(index) {
 function changeColor2(index, color) {
     $('#colorForm\\:colorTable\\:' + index + '\\:colorColumn').css('background-color', color).css('height', '31px');
 }
-
-function init() {
-    if (typeof onLoad === 'function') {
-        delete onLoad;
-    }
-}
-
-function load() {
-    if (typeof onLoad === 'function') {
-        onLoad();
-    }
-}

@@ -2,6 +2,8 @@ package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
+import ru.tecon.admTools.systemParams.model.SystemParamsCategories;
+import ru.tecon.admTools.utils.AdmTools;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 /**
  * Контроллер формы системные параметры левая часть меню и правая меняется
  * в зависимости от выбранного элемента
+ *
  * @author Maksim Shchelkonogov
  */
 @Named("systemParams")
@@ -28,30 +31,30 @@ public class SystemParamsMB implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(SystemParamsMB.class.getName());
 
-    private static final Map<String, String> SYSTEM_PARAMS_MAP = Stream.of(new String[][] {
-            {"Подразделения", "/view/sysParams/struct/structDivisions.xhtml"},
-            {"Объекты", "/view/sysParams/struct/structObjects.xhtml"},
-            {"Связи", "/view/sysParams/objectLinks.xhtml"},
-            {"Агрегаты", "/view/sysParams/struct/structAggregates.xhtml"},
-            {"Техпроцессы", "/view/sysParams/struct/structProcesses.xhtml"},
-            {"Устройства", "/view/sysParams/struct/structDevices.xhtml"},
-            {"Единицы измерения", "/view/sysParams/measure.xhtml"},
-            {"Справочники", "/view/sysParams/catalog.xhtml"},
-            {"Тип объекта по умолчанию", "/view/sysParams/defaultValues.xhtml"},
-            {"Температурные графики", "/view/sysParams/temperature/tempGraphs.xhtml"},
-            {"Суточные снижения", "/view/sysParams/temperature/dailyReduction.xhtml"},
-            {"Коэффициенты для режимной карты", "/view/sysParams/coefficientsForRegimeCard.xhtml"},
-            {"Расцветка параметров", "/view/sysParams/paramColor.xhtml"},
-            {"Приоритет проблем", "/view/sysParams/problemPriority.xhtml"},
-            {"Температура грунта", "/view/sysParams/groundTemp.xhtml"},
-            {"Нормативные показатели", "/view/sysParams/normIndicators.xhtml"},
-            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"},
-            {"Основные параметры", "/view/sysParams/mainParam.xhtml"},
-            {"Статистические агрегаты", "/view/sysParams/statAggr.xhtml"},
-            {"Переключение сезона", "/view/sysParams/seasonChange.xhtml"},
-            {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"},
-            {"Настройка типа параметра", "/view/sysParams/paramTypeSetting.xhtml"}
-    }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+    private static final Map<String, SystemParamsCategories> SYSTEM_PARAMS_MAP = Stream.of(new Object[][]{
+            {"Подразделения", new SystemParamsCategories("/view/sysParams/struct/structDivisions.xhtml", "")},
+            {"Объекты", new SystemParamsCategories("/view/sysParams/struct/structObjects.xhtml", "")},
+            {"Связи", new SystemParamsCategories("/view/sysParams/objectLinks.xhtml", "")},
+            {"Агрегаты", new SystemParamsCategories("/view/sysParams/struct/structAggregates.xhtml", "")},
+            {"Техпроцессы", new SystemParamsCategories("/view/sysParams/struct/structProcesses.xhtml", "")},
+            {"Устройства", new SystemParamsCategories("/view/sysParams/struct/structDevices.xhtml", "")},
+            {"Единицы измерения", new SystemParamsCategories("/view/sysParams/measure.xhtml", "")},
+            {"Справочники", new SystemParamsCategories("/view/sysParams/catalog.xhtml", "")},
+            {"Тип объекта по умолчанию", new SystemParamsCategories("/view/sysParams/defaultValues.xhtml", "")},
+            {"Температурные графики", new SystemParamsCategories("/view/sysParams/temperature/tempGraphs.xhtml", "")},
+            {"Суточные снижения", new SystemParamsCategories("/view/sysParams/temperature/dailyReduction.xhtml", "")},
+            {"Коэффициенты для режимной карты", new SystemParamsCategories("/view/sysParams/coefficientsForRegimeCard.xhtml", "")},
+            {"Расцветка параметров", new SystemParamsCategories("/view/sysParams/paramColor.xhtml", "")},
+            {"Приоритет проблем", new SystemParamsCategories("/view/sysParams/problemPriority.xhtml", "")},
+            {"Температура грунта", new SystemParamsCategories("/view/sysParams/groundTemp.xhtml", "")},
+            {"Нормативные показатели", new SystemParamsCategories("/view/sysParams/normIndicators.xhtml", "")},
+            {"Тнв по многолетним наблюдениям", new SystemParamsCategories("/view/sysParams/multiYearTemp.xhtml", "")},
+            {"Основные параметры", new SystemParamsCategories("/view/sysParams/mainParam.xhtml", "")},
+            {"Статистические агрегаты", new SystemParamsCategories("/view/sysParams/statAggr.xhtml", "")},
+            {"Переключение сезона", new SystemParamsCategories("/view/sysParams/seasonChange.xhtml", "")},
+            {"Тнв по многолетним наблюдениям", new SystemParamsCategories("/view/sysParams/multiYearTemp.xhtml", "")},
+            {"Настройка типа параметра", new SystemParamsCategories("/view/sysParams/paramTypeSetting.xhtml", "paramTypeSetting")}
+    }).collect(Collectors.toMap(k -> (String) k[0], v -> (SystemParamsCategories) v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String content = "";
 
@@ -76,12 +79,13 @@ public class SystemParamsMB implements Serializable {
     }
 
     private void updateContent(String parameter) {
-        content = SYSTEM_PARAMS_MAP.get(parameter);
+        content = SYSTEM_PARAMS_MAP.get(parameter).getPath();
         LOGGER.info("update content: " + content);
     }
 
     /**
      * Проверка выбран ли элемент меню
+     *
      * @param item элемент меню
      * @return стиль для кнопки
      */
@@ -94,11 +98,20 @@ public class SystemParamsMB implements Serializable {
     }
 
     /**
-     * Обработка нажития кнопки
-     * @param item имя меню
+     * Обработка нажатия кнопки
+     *
+     * @param item  имя меню
      * @param index индекс меню
      */
     public void selectButton(String item, int index) {
+        String beanName = SYSTEM_PARAMS_MAP.get(item).getBeanName();
+        if (!beanName.isEmpty()) {
+            Object bean = AdmTools.findBean(SYSTEM_PARAMS_MAP.get(item).getBeanName());
+            if (bean instanceof AutoUpdate) {
+                ((AutoUpdate) bean).update();
+            }
+        }
+
         updateContent(item);
         selectedButton = item;
         if (oldSelectedButtonIndex != null) {

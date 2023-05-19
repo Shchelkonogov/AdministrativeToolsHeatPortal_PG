@@ -6,7 +6,6 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ParamTypeSettingSB;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.*;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -22,12 +21,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
+ * ViewScope контроллер для формы "Настройка типа параметра"
+ *
  * @author Maksim Shchelkonogov
  * 16.02.2023
  */
 @Named("paramTypeSetting")
 @ViewScoped
-public class ParamTypeSettingMB implements Serializable {
+public class ParamTypeSettingMB implements Serializable, AutoUpdate {
 
     private List<ParamTypeTable> types = new ArrayList<>();
     private List<ParamTypeTable> typesFilter = new ArrayList<>();
@@ -52,8 +53,6 @@ public class ParamTypeSettingMB implements Serializable {
 
     private List<StatisticalAggregate> statAggregates;
 
-    boolean init = false;
-
     @Inject
     private transient Logger logger;
 
@@ -63,22 +62,8 @@ public class ParamTypeSettingMB implements Serializable {
     @EJB
     private ParamTypeSettingSB bean;
 
-    @PostConstruct
-    private void init() {
-        loadData();
-
-        init = true;
-    }
-
-    /**
-     * Первоначальная загрузка
-     */
-    public void loadData() {
-        if (init) {
-            init = false;
-            return;
-        }
-
+    @Override
+    public void update() {
         logger.info("update data for form paramTypeSetting");
         typesFilter = types = bean.getParamTypes();
 
@@ -86,7 +71,6 @@ public class ParamTypeSettingMB implements Serializable {
         newParamType = null;
 
         paramConditions = bean.getParamConditions();
-//        measures = measureBean.getMeasures();
 
         selectedType = null;
 
@@ -102,10 +86,13 @@ public class ParamTypeSettingMB implements Serializable {
         disableTypeRemoveBtn = true;
         disablePropRemoveBtn = true;
         disablePropAddBtn = true;
+
+        PrimeFaces.current().executeScript("PF('filterWidget').selectValue('')");
+        PrimeFaces.current().executeScript("PF('typeTableWV').filter()");
     }
 
     /**
-     * Обработчик нажатия кнопки Добавить свойство в всплывающем окне добавить новый тип параметра
+     * Обработчик нажатия кнопки "Добавить свойство" во всплывающем окне "Добавить новый тип параметра"
      */
     public void onAddNewRow() {
         newTypes.add(new ParamTypeTable(new StatisticalAggregate("Новый агрегат")));
@@ -149,7 +136,7 @@ public class ParamTypeSettingMB implements Serializable {
     }
 
     /**
-     * Обработик выбора типа параметра. Загружает данные для свойств.
+     * Обработчик выбора типа параметра. Загружает данные для свойств.
      *
      * @param event событие выделения строки
      */
@@ -208,7 +195,7 @@ public class ParamTypeSettingMB implements Serializable {
                 bean.removeTypeAggregate(selectedType, utilMB.getLogin(), utilMB.getIp());
             }
 
-            loadData();
+            update();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -224,7 +211,7 @@ public class ParamTypeSettingMB implements Serializable {
         try {
             bean.removeType(selectedType, utilMB.getLogin(), utilMB.getIp());
 
-            loadData();
+            update();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -246,7 +233,7 @@ public class ParamTypeSettingMB implements Serializable {
     }
 
     /**
-     * Обработчик кнопки сохранить в окне дабавить новый тип параметра.
+     * Обработчик кнопки сохранить в окне добавить новый тип параметра.
      * Создает тип, если его нет и добавляет все агрегаты
      */
     public void onCreateType() {
@@ -275,7 +262,7 @@ public class ParamTypeSettingMB implements Serializable {
                 newTypes.forEach(System.out::println);
             }
 
-            loadData();
+            update();
 
             PrimeFaces.current().executeScript("PF('typeTableWV').filter(); PF('addTypeDialog').hide();");
         } catch (SystemParamException e) {
@@ -284,7 +271,7 @@ public class ParamTypeSettingMB implements Serializable {
     }
 
     /**
-     * При выборе типа параметра в выпадающем меню акна добавить новы тип параметра загружает список доступных агрегатов
+     * При выборе типа параметра в выпадающем меню окна добавить новы тип параметра загружает список доступных агрегатов
      */
     public void loadPropertiesForNewType() {
         statAggregates = bean.getListStatAggregateForParamType(newParamType.getId());

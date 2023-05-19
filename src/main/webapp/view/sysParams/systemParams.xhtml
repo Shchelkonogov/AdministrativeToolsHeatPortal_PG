@@ -21,8 +21,7 @@
                     <c:forEach var="menu" items="#{systemParams.parameters}" varStatus="loop">
                         <p:commandButton id="button_#{loop.index}" value="#{menu}" style="width: 100%; text-align: initial;"
                                          styleClass="#{systemParams.checkSelected(menu)}"
-                                         action="#{systemParams.selectButton(menu, loop.index)}"
-                                         onstart="init()" oncomplete="load()" />
+                                         action="#{systemParams.selectButton(menu, loop.index)}"/>
                     </c:forEach>
                 </h:form>
             </p:panel>

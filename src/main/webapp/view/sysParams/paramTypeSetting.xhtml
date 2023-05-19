@@ -5,8 +5,6 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <h:form>
-        <p:remoteCommand name="onLoad" action="#{paramTypeSetting.loadData}"
-                         onsuccess="PF('typeTableWV').filter()" update="typeSettingForm"/>
         <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
                          action="#{paramTypeSetting.onCreateType}" update="typeSettingForm growl" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
@@ -47,7 +45,7 @@
                         <p:column headerText="Тип параметра" groupRow="true" filterBy="#{type.paramType.name}" filterMatchMode="exact"
                                   styleClass="center" width="250">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('typeTableWV').filter()">
+                                <p:selectOneMenu widgetVar="filterWidget" onchange="PF('typeTableWV').filter()">
                                     <f:selectItem itemLabel="Выберите" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{paramTypeSetting.typeFilterValues}"/>
                                 </p:selectOneMenu>
