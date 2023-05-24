@@ -215,7 +215,7 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
     height: 100%;
 }
 
-#divisionPanel\:structType > .ui-treetable-scrollable-body, #genModelForm\:genModel > .ui-treetable-scrollable-body {
+#divisionPanel\:structType > .ui-treetable-scrollable-body {
     height: calc(100% - 37px);
 }
 
@@ -237,4 +237,8 @@ body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-spli
 
 #genModelTableForm\:paramTable_data .ui-helper-hidden-accessible {
     position: unset;
+}
+
+#genModelForm\:genModel > .ui-treetable-scrollable-body {
+    height: calc(100% - 71px);
 }

@@ -64,7 +64,7 @@
         <h:form id="addStatAggrForm">
             <h:panelGrid columns="3" style="margin-bottom: 35px;">
                 <p:outputLabel value="ID" for="@next"/>
-                <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
+                <p:inputNumber id="inputId" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999" emptyValue="zero"
                                requiredMessage="#{global['validation.view.text']}"/>
                 <p:message for="@previous"/>
 
@@ -87,7 +87,7 @@
 
             <p:commandButton value="Сохранить" id="btnSave" style="position: absolute; bottom: 5px; right: 95px;" action="#{statAggrMB.onSaveChangesWrapper}"
                              validateClient="true" update="@form"/>
-            <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();"
+            <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();" process="@this"
                              styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>
         </h:form>
     </p:dialog>

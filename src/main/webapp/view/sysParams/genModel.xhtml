@@ -21,7 +21,7 @@
                         <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
                                          disabled="#{genModelMB.disableRemoveBtn}" action="#{genModelMB.onRemoveParam()}"
                                          onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                         rendered="#{systemParamsUtil.write}" update="genModelTableForm"/>
+                                         rendered="#{systemParamsUtil.write}" update="btnRemove"/>
                         <p:commandButton id="btnAdd" icon="btnAdd" styleClass="iconOnlyButton btnRight"
                                          onclick="PF('addNewParam').show();" disabled="#{genModelMB.disableAddBtn}"
                                          rendered="#{systemParamsUtil.write}" />
@@ -32,10 +32,10 @@
                     <p:treeTable value="#{genModelMB.root}" var="genModel" id="genModel" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{genModelMB.selectedObjNode}" rowKey="#{genModel.id}" sortBy="#{genModel.name}">
 
-                        <p:ajax event="select" listener="#{genModelMB.onRowSelect}" update="genModelTableForm genModelForm:btnRemove genModelForm:btnAdd"/>
+                        <p:ajax event="select" listener="#{genModelMB.onRowSelect}" update="genModelTableForm genModelForm:btnRemove genModelForm:btnAdd dialog"/>
 
-                        <p:column headerText="Название" width="70%">
-                            <i class="#{genModel.icon}"></i>
+                        <p:column headerText="Название" width="70%" filterBy="#{genModel.name}" filterMatchMode="contains" style="align-items: center;">
+                            <i class="#{genModel.icon}" id="icon" style="vertical-align: middle;"></i>
                             <h:outputText value="#{genModel.name}"/>
                         </p:column>
 
@@ -389,7 +389,7 @@
 
                 <p:commandButton id="btnSaveFTable" rendered="#{genModelMB.saveCalcAgr}" value="Сохранить"
                                  onclick="PF('statusDialog').show();" action="#{genModelMB.onSaveChangesFormula}"
-                                 onsuccess="PF('statusDialog').hide();"
+                                 onsuccess="PF('statusDialog').hide();" disabled="#{genModelMB.disableSave}"
                                  update="calcAgrVarsTable calcAgrVarsTableHeader genModelTableForm"/>
             </p:outputPanel>
 
@@ -410,14 +410,15 @@
                     </p:column>
 
                     <p:column headerText="Название" style="width: 700px" >
-                        <p:cellEditor id="paramR">
+                        <p:cellEditor id="paramR" disabled="#{genModelMB.disableSelect}">
                             <f:facet name="output">
                                 <h:outputText style="display: block; text-align: center;" value="#{calcAgrVarsData.paramList.parName}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:selectOneMenu id="param" value="#{calcAgrVarsData.paramList}" style="width: calc(100%)">
 
-                                    <p:ajax event="itemSelect" listener="#{genModelMB.paramSelected(calcAgrVarsData, rowIndex)}"/>
+                                    <p:ajax event="itemSelect" listener="#{genModelMB.paramSelected(calcAgrVarsData, rowIndex)}"
+                                            update="calcAgrVarsTable"/>
 
                                     <f:converter converterId="genModelParamConverter"/>
 
@@ -431,18 +432,18 @@
                     </p:column>
 
                     <p:column headerText="Стат. агрегат" >
-                        <p:cellEditor  id="statAgrR" >
+                        <p:cellEditor  id="statAgrR" disabled="#{calcAgrVarsData.disableStatAgr}" >
                             <f:facet name="output">
                                 <h:outputText style="display: block; text-align: center;" value="#{calcAgrVarsData.statAgrList.statAgrCode}" />
                             </f:facet>
                             <f:facet name="input">
                                 <p:selectOneMenu id="statAgr" value="#{calcAgrVarsData.statAgrList}" style="width: calc(100%)">
 
-                                    <p:ajax event="itemSelect" listener="#{genModelMB.statAgrSelect(calcAgrVarsData, rowIndex)}"/>
+                                    <p:ajax event="itemSelect" listener="#{genModelMB.statAgrSelect(calcAgrVarsData, rowIndex)}" update="calcAgrVarsTable"/>
 
                                     <f:converter converterId="genModelStatAgrConverter"/>
 
-                                    <f:selectItems value="#{genModelMB.statAgrListForCalc}"
+                                    <f:selectItems value="#{calcAgrVarsData.rowList}"
                                                    var="statAgr"
                                                    itemLabel="#{statAgr.statAgrCode}" itemValue="#{statAgr}"/>
                                 </p:selectOneMenu>
@@ -454,11 +455,13 @@
         </h:form>
 
         <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true"
-                  width="641px" height="330px" resizable="false" rendered="#{systemParamsUtil.write}" >
-            <p:ajax event="close" listener="#{genModelMB.onAddParamDialogClose}" update="dialog"/>
+                  width="637px" height="300px" resizable="false" rendered="#{systemParamsUtil.write}" >
+
+            <p:ajax event="close" listener="#{genModelMB.onAddParamDialogClose}" update="addParamForm"/>
+
             <h:form id="addParamForm" >
-                <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                    <h:outputLabel value="Параметр*" style="margin-right: 10px"/>
+                <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;" >
+                    <h:outputLabel value="Параметр*" style="margin-right: 10px" />
                     <p:inputText required="true" value="#{genModelMB.addParam.parCode}" maxlength="10"
                                  requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 94px;"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
@@ -480,30 +483,45 @@
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
                     <h:outputLabel value="Зона*" style="margin-right: 10px"/>
-                    <p:inputNumber required="true" value="#{genModelMB.addParam.zone}" minValue="-32768" maxValue="32767"
+                    <p:inputNumber value="#{genModelMB.addParam.zone}" minValue="0" maxValue="32767" emptyValue="zero"
                                    requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 127px;
                              "/>
                     <p:message style="margin-left: 5px;" for="@previous" />
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                    <h:outputLabel value="График" style="margin-right: 10px"/>
-                    <p:inputNumber value="#{genModelMB.addParam.isGraph}" minValue="-999999" maxValue="999999"
-                                   style="width: 180px; margin-left: 120px;"/>
+                    <h:outputLabel value="График" style="margin-right: 10px" rendered="#{genModelMB.graphRender}"/>
+                    <p:selectOneMenu id="isGraphD" value="#{genModelMB.addParam.isGraph}" style="width: 180px; margin-left: 120px;" rendered="#{genModelMB.graphRender}">
+
+                        <f:converter converterId="genModelIsGraphConverter"/>
+
+                        <f:selectItems value="#{genModelMB.isGraphList}"
+                                       var="isGraph"
+                                       itemLabel="#{isGraph.name}" itemValue="#{isGraph}"/>
+                    </p:selectOneMenu>
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                    <h:outputLabel value="Номер для визуализации*" style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;"/>
-                    <p:inputNumber required="true" value="#{genModelMB.addParam.visible}" minValue="-999999" maxValue="999999"
-                                   requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 5px;
-                             "/>
+                    <h:outputLabel value="Номер для визуализации*" style="display: flex; align-items: center;
+                    justify-content: start; margin-bottom: 3px; margin-top: 5px;"/>
+                    <p:inputNumber value="#{genModelMB.addParam.visible}" minValue="0" maxValue="999999"
+                                   requiredMessage="#{global['validation.view.text']}" style="width: 180px; margin-left: 5px;"
+                                   emptyValue="zero"/>
                     <p:message style="margin-left: 5px;" for="@previous" />
+
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;">
-                    <h:outputLabel value="Суточное снижение" style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;"/>
-                    <p:inputNumber value="#{genModelMB.addParam.isDecrease}" minValue="-999999" maxValue="999999"
-                                   style="width: 180px; margin-left: 48px;"/>
+                <div style="display: flex; align-items: center; justify-content: start; margin-bottom: 3px; margin-top: 5px;" >
+                    <h:outputLabel value="Суточное снижение" style="display: flex; align-items: center; justify-content: start;
+                    margin-bottom: 3px; margin-top: 5px;" rendered="#{genModelMB.decreaseRender}"/>
+                    <p:selectOneMenu id="isDecreaseD" value="#{genModelMB.addParam.isDecrease}" style="width: 180px; margin-left: 50px;" rendered="#{genModelMB.decreaseRender}">
+
+                        <f:converter converterId="genModelIsDecreaseConverter"/>
+
+                        <f:selectItems value="#{genModelMB.isDecreaseList}"
+                                       var="isDecrease"
+                                       itemLabel="#{isDecrease.name}" itemValue="#{isDecrease}"/>
+                    </p:selectOneMenu>
                 </div>
 
                 <p:selectBooleanCheckbox value="#{genModelMB.addParam.editEnable}" itemLabel="Редактирование границ." style="margin-top: 10px"/>
@@ -512,10 +530,10 @@
 
                 <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
                                  action="#{genModelMB.onSaveChanges()}" validateClient="true"
-                                 oncomplete="PF('statusDialog').hide();" update="addParamForm genModelTableForm"/>
+                                 oncomplete="PF('statusDialog').hide();" update="@form"/>
 
-                <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();" action="#{genModelMB.onAddParamDialogClose}"
-                                 styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;" update="addParamForm dialog"/>
+                <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();" process="@this"
+                                 styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>
             </h:form>
         </p:dialog>
 

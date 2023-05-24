@@ -152,7 +152,7 @@ public class GenModelSB {
                 result.add(new CalcAgrVars(res.getLong("calc_par_id"),
                         res.getLong("calc_stat_agr_id"),
                         res.getString("variable"),
-                        paramList, statAgrList));
+                        paramList, statAgrList, true, new ArrayList<>()));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
@@ -228,9 +228,17 @@ public class GenModelSB {
             cStm.setString(4, addParam.getParMemo());
             cStm.setString(5, addParam.getParName());
             cStm.setShort(6, addParam.getZone());
-            cStm.setObject(7, addParam.getIsGraph());
+            if (addParam.getIsGraph()== null) {
+                cStm.setObject(7, addParam.getIsGraph());
+            } else {
+                cStm.setLong(7, addParam.getIsGraph().getIDInteger());
+            }
             cStm.setLong(8, addParam.getVisible());
-            cStm.setObject(9, addParam.getIsDecrease());
+            if (addParam.getIsDecrease() == null) {
+                cStm.setObject(9, addParam.getIsDecrease());
+            } else {
+                cStm.setLong(9, addParam.getIsDecrease().getIDInteger());
+            }
             cStm.setShort(10, addParam.getEditEnableShort());
             cStm.setShort(11, addParam.getLetoControlShort());
             cStm.registerOutParameter(12, Types.BIGINT);

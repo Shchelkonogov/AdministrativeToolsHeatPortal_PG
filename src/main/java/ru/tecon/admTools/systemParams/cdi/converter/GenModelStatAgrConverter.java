@@ -1,7 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
 import ru.tecon.admTools.systemParams.cdi.GenModelMB;
-import ru.tecon.admTools.systemParams.model.genModel.ParamList;
+import ru.tecon.admTools.systemParams.model.genModel.CalcAgrVars;
 import ru.tecon.admTools.systemParams.model.genModel.StatAgrList;
 
 import javax.el.ValueExpression;
@@ -18,19 +18,25 @@ import javax.faces.convert.FacesConverter;
 public class GenModelStatAgrConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
+
         ValueExpression vex = context.getApplication().getExpressionFactory()
                 .createValueExpression(context.getELContext(), "#{genModelMB}", GenModelMB.class);
 
         GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
-
-        return defaultValues.getStatAgrListForCalc().stream()
-                .filter(leftType -> leftType.getStatAgrId() == Integer.parseInt(value))
-                .findFirst()
-                .orElse(null);
+        String val = String.valueOf(value.charAt(0));
+        for (CalcAgrVars i: defaultValues.getCalcAgrVarsList()) {
+            if (i.getVariable().equals(val)) {
+                return i.getRowList().stream()
+                        .filter(leftType -> leftType.getVariable().equals(value))
+                        .findFirst()
+                        .orElse(null);
+            }
+        }
+        return null;
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((StatAgrList) value).getStatAgrId());
+        return String.valueOf(((StatAgrList) value).getVariable());
     }
 }
