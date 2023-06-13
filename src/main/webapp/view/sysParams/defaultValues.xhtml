@@ -4,7 +4,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
     <h:form id="defaultValuesPanel" style="height: 100%; display: flex;">
-        <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
+        <div style="height: 100%; flex: 1 1 0; ">
             <div style="display: flex; align-items: center; justify-content: space-between;
                     border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
                     border-top-left-radius: 3px; height: 41px;">
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: 100%; text-align: center;">
+                <div style="height: 100%; text-align: center; display: flex; justify-content: center; align-items: center">
                     <p:selectOneMenu id="objectTypeSelector" value="#{defaultValues.selectedObjectType}"
                                      style="width: 300px; margin-top: 5px;" rendered="#{systemParamsUtil.write}">
                         <f:converter converterId="objectTypeConverter" />

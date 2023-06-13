@@ -52,7 +52,8 @@ public class SystemParamsMB implements Serializable {
             {"Тнв по многолетним наблюдениям", "/view/sysParams/multiYearTemp.xhtml"},
             {"Настройка типа параметра", "/view/sysParams/paramTypeSetting.xhtml"},
             {"Обобщенная модель", "/view/sysParams/genModel.xhtml"},
-            {"Плановые отключения", "/view/sysParams/plannedOutages.xhtml"}
+            {"Плановые отключения", "/view/sysParams/plannedOutages.xhtml"},
+            {"Прочие", "/view/sysParams/other.xhtml"}
     }).collect(Collectors.toMap(k -> k[0], v -> v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String content = "";

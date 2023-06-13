@@ -18,7 +18,8 @@
 
       </div>
 
-      <h:panelGrid columns="4" style="margin-top: 50px; display: flex; justify-content: center;">
+      <h:panelGrid columns="4" style="display: flex; justify-content: center; border: 1px solid #c8c8c8;
+      height: calc(100% - 5px); padding: 3px; align-items: center">
 
          <h:outputLabel value="Максимальный период до начала отключения" style="margin-right: 10px;"/>
          <h:outputLabel value="#{plannedOutagesMB.begShutdownRange.shutdownRange}" rendered="#{!systemParamsUtil.write}"/>
