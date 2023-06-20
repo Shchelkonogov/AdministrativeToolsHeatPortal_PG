@@ -25,7 +25,6 @@ public class DailyReductionMB extends TemperatureMB {
     @PostConstruct
     protected void init() {
         super.setTemperatureBean(temperatureBean);
-        super.init();
     }
 
     @Override

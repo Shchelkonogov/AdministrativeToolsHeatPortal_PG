@@ -22,11 +22,9 @@ public class TempGraphsMB extends TemperatureMB {
     @EJB(beanName = "tempGraphSB")
     private TemperatureLocal temperatureBean;
 
-    @Override
     @PostConstruct
     protected void init() {
         super.setTemperatureBean(temperatureBean);
-        super.init();
     }
 
     @Override

@@ -6,7 +6,6 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.CoefficientForRegimeCardSB;
 import ru.tecon.admTools.systemParams.model.CoefficientRC;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -19,12 +18,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Контроллер для формы коеффициенты для режимной карты
+ * Контроллер для формы коэффициенты для режимной карты
  * @author Maksim Shchelkonogov
  */
 @Named("coefficientsRC")
 @ViewScoped
-public class CoefficientsForRegimeCardMB implements Serializable {
+public class CoefficientsForRegimeCardMB implements Serializable, AutoUpdate {
 
     private static final Logger LOGGER = Logger.getLogger(CoefficientsForRegimeCardMB.class.getName());
 
@@ -36,14 +35,8 @@ public class CoefficientsForRegimeCardMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
-        loadData();
-    }
-
-    public void onFormLoad() {
-        LOGGER.info("load form data");
-
+    @Override
+    public void update() {
         loadData();
     }
 
@@ -90,15 +83,15 @@ public class CoefficientsForRegimeCardMB implements Serializable {
         data.setChange(true);
         int index = coefficientRCList.indexOf(data);
         PrimeFaces.current().executeScript("document.getElementById('regimeCardForm\\:regimeCardTable\\:" + index +
-                "\\:" + columnID + "').style.backgroundColor = 'lightgrey'");
+                "\\:" + columnID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     /**
      * Обработик изменения ячейки таблицы
      * @param event событие изменения
      */
-    public void onCellEdit(CellEditEvent event) {
+    public void onCellEdit(CellEditEvent<?> event) {
         String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
-        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').style.backgroundColor = 'lightgrey'");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 }

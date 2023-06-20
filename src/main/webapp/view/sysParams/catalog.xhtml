@@ -4,86 +4,103 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
     <h:form>
-        <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+        <p:remoteCommand name="saveTypeWrapper" onstart="PF('statusDialog').show();"
+                         oncomplete="PF('catalogTypeWidget').filter(); PF('statusDialog').hide();"
                          action="#{catalog.onCreateCatalogType}" update="catalogPanel growl" rendered="#{systemParamsUtil.write}" />
-        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('catalogPropWidget').filter(); PF('statusDialog').hide();"
                          action="#{catalog.onCreateCatalogProp}" rendered="#{systemParamsUtil.write}"
                          update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl" />
+        <p:remoteCommand name="showRowEdit" oncomplete="switchToRowEdit('newPropTable');"/>
     </h:form>
 
     <h:form id="catalogPanel" style="height: 100%; display: flex;">
         <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Справочники"/>
-                <div style="padding: 3px;">
-                    <p:commandButton id="catalogRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{catalog.disableRemoveCatalogBtn}" update="catalogPanel growl"
-                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{catalog.onRemoveCatalog()}" rendered="#{systemParamsUtil.write}" />
-                    <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     onclick="PF('addTypeDialog').show();" rendered="#{systemParamsUtil.write}" />
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: 100%;">
+            <p:panel styleClass="tc-panel" header="Справочники">
+                <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="catalogType" value="#{catalog.catalogTypes}" var="catalogType" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{catalog.selectedCatalogType}" rowKey="#{catalogType.id}"
-                                 emptyMessage="#{global['table.empty.value']}">
+                                 emptyMessage="#{global['table.empty.value']}" widgetVar="catalogTypeWidget">
 
                         <p:ajax event="rowSelect" listener="#{catalog.onCatalogTypeSelect}"
                                 update="catalogPanel:catalogProp catalogPanel:catalogRemove
                                     catalogPanel:catalogAddProp catalogPanel:catalogRemoveProp"
-                                onstart="PF('buiTable').show();" oncomplete="PF('buiTable').hide();"/>
+                                onstart="PF('buiTable').show();"
+                                oncomplete="PF('buiTable').hide(); PF('catalogPropWidget').clearFilters(); PF('catalogPropWidget').filter();"/>
 
                         <p:column headerText="Название" id="typeValue" filterBy="#{catalogType.typeName}" filterMatchMode="contains">
                             <h:outputText value="#{catalogType.typeName}" />
+
+                            <f:facet name="filter">
+                                <p:inputText placeholder="Поиск..." style="width: 100%;" onkeyup="PF('catalogTypeWidget').filter();"/>
+                            </f:facet>
                         </p:column>
                     </p:dataTable>
+
+                    <f:facet name="actions">
+                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                       onclick="PF('addTypeDialog').show();" rendered="#{systemParamsUtil.write}">
+                            <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                        </p:commandLink>
+                        <p:commandLink id="catalogRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                                       disabled="#{catalog.disableRemoveCatalogBtn}" update="catalogPanel growl"
+                                       onclick="PF('statusDialog').show();"
+                                       oncomplete="PF('catalogTypeWidget').filter(); PF('catalogPropWidget').clearFilters(); PF('catalogPropWidget').filter(); PF('statusDialog').hide();"
+                                       action="#{catalog.onRemoveCatalog()}" rendered="#{systemParamsUtil.write}">
+                            <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                        </p:commandLink>
+                    </f:facet>
                 </div>
-            </div>
+            </p:panel>
         </div>
         <div style="height: 100%; flex: 1 1 0;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Значения справочника"/>
-                <div style="padding: 3px;">
-                    <p:commandButton id="catalogRemoveProp" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{catalog.disableRemovePropBtn}" action="#{catalog.onRemoveProp}"
-                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl"
-                                     rendered="#{systemParamsUtil.write}" />
-                    <p:commandButton id="catalogAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     disabled="#{catalog.disableRemoveCatalogBtn}" onclick="PF('addPropDialog').show();"
-                                     rendered="#{systemParamsUtil.write}" />
-                </div>
-            </div>
-            <h:panelGroup id="contentToBlock" layout="block" style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: 100%;">
+            <p:panel id="catalogPropPanel" styleClass="tc-panel" header="Значения справочника">
+                <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="catalogProp" value="#{catalog.catalogProps}" var="catalogProp"
                                  scrollable="true" scrollHeight="100%" selectionMode="single"
                                  selection="#{catalog.selectedCatalogProp}" rowKey="#{catalogProp.id}"
-                                 emptyMessage="#{global['table.empty.value']}" scrollRows="100" virtualScroll="true" lazy="true">
+                                 emptyMessage="#{global['table.empty.value']}" scrollRows="100" virtualScroll="true" lazy="true"
+                                 widgetVar="catalogPropWidget" disabledSelection="#{!systemParamsUtil.write}">
 
                         <p:ajax event="rowSelect" listener="#{catalog.onCatalogPropSelect}" update="catalogPanel:catalogRemoveProp" />
+                        <p:ajax event="virtualScroll"/>
 
-                        <p:column headerText="Значение" id="propValue" filterBy="#{catalogProp.propName}">
+                        <p:column headerText="Значение" id="propValue" filterBy="#{catalogProp.propName}" filterMatchMode="contains">
                             <h:outputText value="#{catalogProp.propName}" />
+
+                            <f:facet name="filter">
+                                <p:inputText placeholder="Поиск..." style="width: 100%;" onkeyup="PF('catalogPropWidget').filter();"/>
+                            </f:facet>
                         </p:column>
                     </p:dataTable>
-                </div>
-            </h:panelGroup>
-        </div>
 
-        <p:blockUI block="contentToBlock" widgetVar="buiTable"/>
+                    <f:facet name="actions">
+                        <p:commandLink id="catalogAddProp" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                       disabled="#{catalog.disableRemoveCatalogBtn}" onclick="PF('addPropDialog').show();"
+                                       rendered="#{systemParamsUtil.write}">
+                            <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                        </p:commandLink>
+                        <p:commandLink id="catalogRemoveProp" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                                       disabled="#{catalog.disableRemovePropBtn}" action="#{catalog.onRemoveProp}"
+                                       onclick="PF('statusDialog').show();" oncomplete="PF('catalogPropWidget').filter(); PF('statusDialog').hide();"
+                                       update="catalogPanel:catalogProp catalogPanel:catalogRemoveProp growl"
+                                       rendered="#{systemParamsUtil.write}">
+                            <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                        </p:commandLink>
+                    </f:facet>
+                </div>
+            </p:panel>
+
+            <p:blockUI block="catalogPropPanel" widgetVar="buiTable"/>
+        </div>
     </h:form>
 
     <p:dialog id="addTypeDialog" rendered="#{systemParamsUtil.write}" header="Создать новый справочник" widgetVar="addTypeDialog"
-              width="800" height="325" modal="true" resizable="false">
-        <p:ajax event="close" listener="#{catalog.onAddTypeDialogClose()}" update="addForm"/>
-        <h:form id="addForm">
+              width="800" height="325" modal="true" resizable="false" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <p:ajax event="close" listener="#{catalog.onAddTypeDialogClose()}" update="addForm"
+                oncomplete="PF('newPropTable').filter();" resetValues="true"/>
+
+        <h:form id="addForm" style="padding: 3px 0 3px 3px;">
             <div style="text-align: center; margin-bottom: 5px;">
                 <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
                 <p:inputText required="true" value="#{catalog.newCatalogType.typeName}"
@@ -91,8 +108,11 @@
                 <p:message style="margin-left: 5px;" for="@previous" />
             </div>
             <p:dataTable id="newPropTable" value="#{catalog.newCatalogType.catalogProps}" var="prop" widgetVar="newPropTable"
-                         scrollable="true" scrollHeight="200" emptyMessage="#{global['table.empty.value']}"
+                         scrollable="true" scrollHeight="195" emptyMessage="#{global['table.empty.value']}"
                          editable="true">
+
+                <p:ajax event="rowEditCancel" listener="#{catalog.onRowEditCancel}" oncomplete="PF('newPropTable').filter();"/>
+
                 <p:column headerText="Название">
                     <p:cellEditor>
                         <f:facet name="output">
@@ -103,37 +123,38 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column width="30" style="text-align: center;">
+                <p:column width="40" style="text-align: center;">
                     <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
                 </p:column>
             </p:dataTable>
 
-            <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
-                             update=":addForm:newPropTable" action="#{catalog.onAddNew()}" />
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Добавить значение" process="@this" style="position: absolute; bottom: 5px;" styleClass="tc-no-loading"
+                             oncomplete="PF('newPropTable').filter(); showRowEdit();" action="#{catalog.onAddNew()}" />
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              validateClient="true" update="addForm" action="#{catalog.saveStructWrapper()}" />
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addTypeDialog').hide();"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addTypeDialog').hide();" process="@this"/>
         </h:form>
     </p:dialog>
 
     <p:dialog id="addPropDialog" rendered="#{systemParamsUtil.write}" header="Добавить новое значение справочника" widgetVar="addPropDialog"
-              width="450" modal="true" resizable="false">
+              width="450" modal="true" resizable="false" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
-        <p:ajax event="close" listener="#{catalog.onAddPropDialogClose()}" update="addPropForm"/>
-        <h:form id="addPropForm">
-            <div style="text-align: center; margin-bottom: 5px;">
+        <p:ajax event="close" listener="#{catalog.onAddPropDialogClose()}" update="addPropForm" resetValues="true"/>
+
+        <h:form id="addPropForm" style="margin-bottom: 45px;">
+            <div style="text-align: center; margin-top: 3px; margin-bottom: 3px;">
                 <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
                 <p:inputText required="true" value="#{catalog.newCatalogPropName}"
                              requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
             </div>
-            <div style="display: flex; padding-bottom: 35px;">
-                <p:message style="margin: auto" for="@previous" />
+            <div style="display: flex;">
+                <p:message style="margin: auto" for="@previous" styleClass="tc-show-on-active" />
             </div>
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              validateClient="true" update="addPropForm" action="#{catalog.savePropWrapper}"/>
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addPropDialog').hide();"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addPropDialog').hide();" process="@this"/>
         </h:form>
     </p:dialog>
 </ui:composition>

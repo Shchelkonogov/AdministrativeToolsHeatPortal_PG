@@ -4,7 +4,6 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.SeasonChangeSB;
 import ru.tecon.admTools.systemParams.model.seasonChange.SeasonChangeTable;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -23,13 +22,14 @@ import java.util.logging.Logger;
  */
 @Named("seasonChangeMB")
 @ViewScoped
-public class SeasonChangeMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(SeasonChangeMB.class.getName());
+public class SeasonChangeMB implements Serializable, AutoUpdate {
 
     private List<SeasonChangeTable> seasonChangeTableList = new ArrayList<>();
 
     private boolean disableSaveBtn = false;
+
+    @Inject
+    private transient Logger logger;
 
     @EJB
     SeasonChangeSB seasonChangeSB;
@@ -37,8 +37,8 @@ public class SeasonChangeMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
         seasonChangeTableList = seasonChangeSB.getTableParams();
     }
 
@@ -57,7 +57,7 @@ public class SeasonChangeMB implements Serializable {
             setDisableSaveBtn(false);
 
             seasonChangeSB.changeSeason(seasonChangeTable, utilMB.getLogin(), utilMB.getIp());
-            LOGGER.info("Season changed to " + seasonChangeTable);
+            logger.info("Season changed to " + seasonChangeTable);
 
             seasonChangeTableList = seasonChangeSB.getTableParams();
         } catch (SystemParamException e) {

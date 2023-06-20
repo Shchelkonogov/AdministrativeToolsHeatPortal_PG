@@ -1,10 +1,12 @@
 package ru.tecon.admTools.systemParams.cdi.temerature;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
-import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
+import ru.tecon.admTools.systemParams.cdi.AutoUpdate;
 import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
+import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
  * Суперкласс для контроллеров форм температурные графики и суточные снижения
  * @author Maksim Shchelkonogov
  */
-public abstract class TemperatureMB implements Serializable {
+public abstract class TemperatureMB implements Serializable, AutoUpdate {
 
     private static final Logger LOGGER = Logger.getLogger(TemperatureMB.class.getName());
 
@@ -43,7 +45,8 @@ public abstract class TemperatureMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    protected void init() {
+    @Override
+    public void update() {
         loadData();
     }
 
@@ -186,6 +189,10 @@ public abstract class TemperatureMB implements Serializable {
         } catch (SystemParamException e) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
         }
+    }
+
+    public void onRowEditCancel(RowEditEvent<TemperatureProp> event) {
+        newTemperature.getTemperatureProps().remove(event.getObject());
     }
 
     public void onAddTypeDialogClose() {

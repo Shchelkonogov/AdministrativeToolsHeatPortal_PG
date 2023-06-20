@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class StructProcessesMB extends StructMB implements Serializable {
 
     private static final String HEADER = "Типы технологических процессов";
-    private static final String DIALOG_HEADER = "Создать новый технлогический процесс";
+    private static final String DIALOG_HEADER = "Создать новый тип технологического процесса";
     private static final String PROP_HEADER = "Свойства технологического процесса";
 
     @EJB(name = "structProcessesSB", mappedName = "ejb/structProcessesSB")
@@ -31,7 +31,6 @@ public class StructProcessesMB extends StructMB implements Serializable {
     public void init() {
         super.setStructCurrentBean(structCurrentBean);
         super.setStructBean(structBean);
-        super.initForm();
     }
 
     public String getHeader() {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.StringJoiner;
 
 /**
- * Класс описывающий данные для приоритет проблем
+ * Класс описывающий данные для формы "Приоритет проблем"
  * @author Maksim Shchelkonogov
  */
 public class ProblemPriority implements Serializable {
@@ -14,7 +14,11 @@ public class ProblemPriority implements Serializable {
     private int oldPriority;
     private int newPriority;
 
+    public ProblemPriority() {
+    }
+
     public ProblemPriority(int id, String name, int priority) {
+        this();
         this.id = id;
         this.name = name;
         this.newPriority = priority;

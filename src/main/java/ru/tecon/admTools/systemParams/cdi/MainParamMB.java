@@ -1,5 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -10,7 +11,6 @@ import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
 import ru.tecon.admTools.systemParams.model.mainParam.TechProc;
 import ru.tecon.admTools.systemParams.model.mainParam.TechProcParam;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-
 /**
  * Контроллер для формы основные параметры
  *
@@ -32,9 +31,7 @@ import java.util.logging.Logger;
  */
 @Named("mainParamMB")
 @ViewScoped
-public class MainParamMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(MainParamMB.class.getName());
+public class MainParamMB implements Serializable, AutoUpdate {
 
     private ObjectType leftOneLine;
 
@@ -52,6 +49,9 @@ public class MainParamMB implements Serializable {
     private boolean disableRemoveBtn = true;
     private boolean techProcParamString = false;
 
+    @Inject
+    private transient Logger logger;
+
     @EJB
     private MainParamSB allDao;
 
@@ -61,19 +61,29 @@ public class MainParamMB implements Serializable {
     @Inject
     private ObjectTypeController objectTypeController;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
+        loadData();
+
+        PrimeFaces.current().executeScript("PF('mainParamWidget').unselectAllRows()");
+    }
+
+    public void loadData() {
         leftOneLine = objectTypeController.getDefaultObjectType();
         rightPartSelectOneMenuParam = allDao.getRightPartSelectOneMenuParam(leftOneLine.getId());
         adaptRightPartSelectOneMenu = all;
         tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
+
+        selectedPartInTable = null;
+        disableRemoveBtn = true;
+        techProcParamString = false;
     }
 
     /**
      * Обработчик изменения списка техпроцессов
      */
     public void rightPartListUpdateAfterEvent(final AjaxBehaviorEvent event) {
-        LOGGER.info("rightPartListUpdateAfterEvent " + ((SelectOneMenu) event.getSource()).getValue());
+        logger.info("rightPartListUpdateAfterEvent " + ((SelectOneMenu) event.getSource()).getValue());
 
         rightPartSelectOneMenuParam = allDao.getRightPartSelectOneMenuParam(leftOneLine.getId());
         adaptRightPartSelectOneMenu = all;
@@ -81,17 +91,23 @@ public class MainParamMB implements Serializable {
         tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
 
         techProcParamString = ((adaptRightPartSelectOneMenu != null) && (adaptRightPartSelectOneMenu.getId() != 0));
+
+        selectedPartInTable = null;
+        disableRemoveBtn = true;
     }
 
     /**
      * Обработчик изменения списка параметров техпроцессов отображаемых в таблице
      */
     public void tableUpdateAfterEvent(final AjaxBehaviorEvent event) {
-        LOGGER.info("tableUpdateAfterEvent: " + ((SelectOneMenu) event.getSource()).getValue());
+        logger.info("tableUpdateAfterEvent: " + ((SelectOneMenu) event.getSource()).getValue());
 
         tableParam = allDao.getTableParam(leftOneLine.getId(), adaptRightPartSelectOneMenu.getId());
 
         techProcParamString = ((adaptRightPartSelectOneMenu != null) && (adaptRightPartSelectOneMenu.getId() != 0));
+
+        selectedPartInTable = null;
+        disableRemoveBtn = true;
     }
 
     /**
@@ -116,7 +132,7 @@ public class MainParamMB implements Serializable {
      * @param event событие
      */
     public void onRowSelect(SelectEvent<MPTable> event) {
-        LOGGER.info("select link: " + event.getObject());
+        logger.info("select link: " + event.getObject());
         disableRemoveBtn = false;
     }
 
@@ -124,7 +140,7 @@ public class MainParamMB implements Serializable {
      * Обработчик удаления параметра техпроцесса из таблицы, возникает при нажатии на кнопку удалить (-)
      */
     public void onRemoveTableParam() {
-        LOGGER.info("remove param: " + selectedPartInTable);
+        logger.info("remove param: " + selectedPartInTable);
 
         try {
             allDao.removeParamFromTable(selectedPartInTable.getObjid(), selectedPartInTable.getTechprid(),

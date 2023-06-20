@@ -5,7 +5,6 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ParametersColorSB;
 import ru.tecon.admTools.systemParams.model.ParametersColor;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -23,11 +22,12 @@ import java.util.logging.Logger;
  */
 @Named("paramColor")
 @ViewScoped
-public class ParametersColorMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(ParametersColorMB.class.getName());
+public class ParametersColorMB implements Serializable, AutoUpdate {
 
     private List<ParametersColor> parametersColorList;
+
+    @Inject
+    private transient Logger logger;
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -35,21 +35,18 @@ public class ParametersColorMB implements Serializable {
     @EJB
     private ParametersColorSB parametersColorSB;
 
-    @PostConstruct
-    private void init() {
-        parametersColorList = parametersColorSB.getParametersColor();
-    }
-
     /**
      * Метод обновляет расцветку ячеек цвет таблицы
      */
+    @Override
     public void update() {
+        parametersColorList = parametersColorSB.getParametersColor();
+
         for (int i = 0; i < parametersColorList.size(); i++) {
             if (utilMB.isWrite()) {
-                PrimeFaces.current().executeScript("changeValue(" + i + ");");
-                PrimeFaces.current().executeScript("changeColor(" + i + ");");
+                PrimeFaces.current().executeScript("initColorPicker(" + i + ");");
             } else {
-                PrimeFaces.current().executeScript("changeColor2(" + i + ", '#" + parametersColorList.get(i).getColor() + "');");
+                PrimeFaces.current().executeScript("initColorPickerRead(" + i + ", '#" + parametersColorList.get(i).getColor() + "');");
             }
         }
     }
@@ -64,7 +61,7 @@ public class ParametersColorMB implements Serializable {
         List<String> errorMessages = new ArrayList<>();
 
         parametersColorList.stream().filter(ParametersColor::isChanged).forEach(parametersColor -> {
-            LOGGER.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " parameter color " + parametersColor);
+            logger.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " parameter color " + parametersColor);
 
             try {
                 parametersColorSB.updateParameterColor(parametersColor.getId(), parametersColor.getColor(), utilMB.getLogin(), utilMB.getIp());
@@ -72,9 +69,11 @@ public class ParametersColorMB implements Serializable {
             } catch (SystemParamException e) {
                 parametersColor.revert();
                 errorMessages.add(parametersColor.getName());
-                LOGGER.warning(e.getMessage());
+                logger.warning(e.getMessage());
             }
         });
+
+        update();
 
         if (!errorMessages.isEmpty()) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", String.join(", ", errorMessages)));

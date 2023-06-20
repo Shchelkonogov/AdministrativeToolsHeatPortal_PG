@@ -6,7 +6,6 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.NormIndicatorsSB;
 import ru.tecon.admTools.systemParams.model.normIndicators.*;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -24,9 +23,7 @@ import java.util.logging.Logger;
  */
 @Named("normIndicators")
 @ViewScoped
-public class NormIndicatorsMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(NormIndicatorsMB.class.getName());
+public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
     private List<IndicatorTV> indicatorTVList = new ArrayList<>();
     private List<IndicatorCO> indicatorCOList = new ArrayList<>();
@@ -37,22 +34,18 @@ public class NormIndicatorsMB implements Serializable {
     private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
     private List<IndicatorUnderSupply> indicatorUnderSupplyList = new ArrayList<>();
 
+    @Inject
+    private transient Logger logger;
+
     @EJB
     private NormIndicatorsSB normIndicatorsBean;
 
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
-        loadData();
-    }
-
-    /**
-     * Метод выполняется при загрузки формы
-     */
-    public void onFormLoad() {
-        LOGGER.info("load form data");
+    @Override
+    public void update() {
+        logger.info("load form data");
 
         loadData();
     }
@@ -82,13 +75,13 @@ public class NormIndicatorsMB implements Serializable {
         switch (type) {
             case "TV": {
                 indicatorTVList.stream().filter(IndicatorTV::isChange).forEach(indicatorTV -> {
-                    LOGGER.info("update norm indicator TV " + indicatorTV);
+                    logger.info("update norm indicator TV " + indicatorTV);
 
                     try {
                         normIndicatorsBean.updateTV(indicatorTV, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Тепловой ввод");
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -97,13 +90,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "CO": {
                 indicatorCOList.stream().filter(IndicatorCO::isChange).forEach(indicatorCO -> {
-                    LOGGER.info("update norm indicator CO " + indicatorCO);
+                    logger.info("update norm indicator CO " + indicatorCO);
 
                     try {
                         normIndicatorsBean.updateCO(indicatorCO, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorCO.getName());
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -112,13 +105,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "GVS": {
                 indicatorGVSList.stream().filter(IndicatorGVS::isChange).forEach(indicatorGVS -> {
-                    LOGGER.info("update norm indicator GVS " + indicatorGVS);
+                    logger.info("update norm indicator GVS " + indicatorGVS);
 
                     try {
                         normIndicatorsBean.updateGVS(indicatorGVS, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorGVS.getName());
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -127,13 +120,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "VENT": {
                 indicatorVENTList.stream().filter(IndicatorVENT::isChange).forEach(indicatorVENT -> {
-                    LOGGER.info("update norm indicator VENT " + indicatorVENT);
+                    logger.info("update norm indicator VENT " + indicatorVENT);
 
                     try {
                         normIndicatorsBean.updateVENT(indicatorVENT, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(indicatorVENT.getName());
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -142,13 +135,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "Other": {
                 indicatorOtherList.stream().filter(IndicatorOther::isChange).forEach(indicatorOther -> {
-                    LOGGER.info("update norm indicator other " + indicatorOther);
+                    logger.info("update norm indicator other " + indicatorOther);
 
                     try {
                         normIndicatorsBean.updateOther(indicatorOther, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Источник - Потребитель");
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -157,13 +150,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "T7": {
                 indicatorT7List.stream().filter(IndicatorT7::isChange).forEach(indicatorT7 -> {
-                    LOGGER.info("update T7 indicator " + indicatorT7);
+                    logger.info("update T7 indicator " + indicatorT7);
 
                     try {
                         normIndicatorsBean.updateT7(indicatorT7, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Анализ потребителей T7");
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -172,13 +165,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "dT7": {
                 indicatorDT7List.stream().filter(IndicatorDT7::isChange).forEach(indicatorDT7 -> {
-                    LOGGER.info("update dT7 indicator " + indicatorDT7);
+                    logger.info("update dT7 indicator " + indicatorDT7);
 
                     try {
                         normIndicatorsBean.updateDT7(indicatorDT7, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add("Анализ потребителей ΔT7");
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -187,13 +180,13 @@ public class NormIndicatorsMB implements Serializable {
             }
             case "underSupply": {
                 indicatorUnderSupplyList.stream().filter(IndicatorUnderSupply::isChange).forEach(indicatorUnderSupply -> {
-                    LOGGER.info("update underSupply indicator " + indicatorUnderSupply);
+                    logger.info("update underSupply indicator " + indicatorUnderSupply);
 
                     try {
                         normIndicatorsBean.updateUnderSupply(indicatorUnderSupply, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
                         errorMessages.add(e.getMessage());
-                        LOGGER.warning(e.getMessage());
+                        logger.warning(e.getMessage());
                     }
                 });
 
@@ -208,12 +201,12 @@ public class NormIndicatorsMB implements Serializable {
     }
 
     /**
-     * Обработик изменения ячейки таблицы
+     * Обработчик изменения ячейки таблицы
      * @param event событие изменения
      */
-    public void onCellEdit(CellEditEvent event) {
+    public void onCellEdit(CellEditEvent<?> event) {
         String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
-        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').style.backgroundColor = 'lightgrey'");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
 

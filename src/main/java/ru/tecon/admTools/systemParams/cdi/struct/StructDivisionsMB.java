@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class StructDivisionsMB extends StructMB implements Serializable {
 
     private static final String HEADER = "Типы подразделений";
-    private static final String DIALOG_HEADER = "Создать новое подразделение";
+    private static final String DIALOG_HEADER = "Создать новый тип подразделения";
     private static final String PROP_HEADER = "Свойства подразделения";
 
     @EJB(name = "structDivisionSB", mappedName = "ejb/structDivisionsSB")
@@ -31,7 +31,6 @@ public class StructDivisionsMB extends StructMB implements Serializable {
     public void init() {
         super.setStructCurrentBean(structCurrentBean);
         super.setStructBean(structBean);
-        super.initForm();
     }
 
     public String getHeader() {

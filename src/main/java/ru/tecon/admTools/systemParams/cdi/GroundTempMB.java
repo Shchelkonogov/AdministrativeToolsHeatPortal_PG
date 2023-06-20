@@ -8,7 +8,6 @@ import ru.tecon.admTools.systemParams.ejb.GroundTempSB;
 import ru.tecon.admTools.systemParams.model.groundTemp.GroundTemp;
 import ru.tecon.admTools.systemParams.model.groundTemp.ReferenceValue;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -26,12 +25,13 @@ import java.util.logging.Logger;
  */
 @Named("groundTempMB")
 @ViewScoped
-public class GroundTempMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(GroundTempMB.class.getName());
+public class GroundTempMB implements Serializable, AutoUpdate {
 
     private List<GroundTemp> groundTemps = new ArrayList<>();
     private List<ReferenceValue> referenceValues = new ArrayList<>();
+
+    @Inject
+    private transient Logger logger;
 
     @EJB
     private GroundTempSB groundTempSB;
@@ -39,10 +39,12 @@ public class GroundTempMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
         groundTemps = groundTempSB.getGroundTemps();
         referenceValues = groundTempSB.getReferenceValues();
+
+        PrimeFaces.current().executeScript("PF('groundTempTableWidget').filter();");
     }
 
     /**
@@ -50,11 +52,15 @@ public class GroundTempMB implements Serializable {
      * @param event событие
      */
     public void onRowEdit(RowEditEvent<GroundTemp> event) {
-        LOGGER.info("update row " + event.getObject());
+        logger.info("update row " + event.getObject());
 
         GroundTemp groundTemp = event.getObject();
 
         try {
+            if (groundTemp.getDate() == null) {
+                throw new SystemParamException("Дата не может быть пустой");
+            }
+
             groundTempSB.addGroundTemp(groundTemp, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
@@ -68,9 +74,9 @@ public class GroundTempMB implements Serializable {
      * Обрабочик изменения значения эталонной температуры (изменение цвета ячейки)
      * @param event событие изменения значения
      */
-    public void onCellEdit(CellEditEvent event) {
+    public void onCellEdit(CellEditEvent<?> event) {
         String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
-        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').style.backgroundColor = 'lightgrey'");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     /**
@@ -83,13 +89,13 @@ public class GroundTempMB implements Serializable {
         List<String> errorMessages = new ArrayList<>();
 
         referenceValues.stream().filter(ReferenceValue::isChange).forEach(referenceValue -> {
-            LOGGER.info("update reference value " + referenceValue);
+            logger.info("update reference value " + referenceValue);
 
             try {
                 groundTempSB.updateReferenceValue(referenceValue, utilMB.getLogin(), utilMB.getIp());
             } catch (SystemParamException e) {
                 errorMessages.add(e.getMessage());
-                LOGGER.warning(e.getMessage());
+                logger.warning(e.getMessage());
             }
         });
 
@@ -105,6 +111,10 @@ public class GroundTempMB implements Serializable {
      */
     public void onAddNew() {
         groundTemps.add(0, new GroundTemp());
+    }
+
+    public void onRowEditCancel(RowEditEvent<GroundTemp> event) {
+        groundTemps.remove(event.getObject());
     }
 
     public List<GroundTemp> getGroundTemps() {

@@ -1,12 +1,12 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ObjectLinksSB;
 import ru.tecon.admTools.systemParams.model.ObjectLink;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 @Named("objectLinks")
 @ViewScoped
-public class ObjectLinksMB implements Serializable {
+public class ObjectLinksMB implements Serializable, AutoUpdate {
 
     private List<ObjectLink> objectLinks = new ArrayList<>();
     private ObjectLink selectedLink;
@@ -41,9 +41,12 @@ public class ObjectLinksMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
         objectLinks = objectLinksSB.getObjectLinks();
+
+        PrimeFaces.current().executeScript("PF('linksTable').filter()");
+        PrimeFaces.current().executeScript("PF('linksTable').unselectAllRows()");
     }
 
     /**
@@ -82,7 +85,7 @@ public class ObjectLinksMB implements Serializable {
     public void onRowSelect(SelectEvent<ObjectLink> event) {
         logger.info("select link: " + event.getObject());
 
-        disableRemoveBtn = false;
+        disableRemoveBtn = event.getObject().getId() == 0;
     }
 
     /**
@@ -113,8 +116,8 @@ public class ObjectLinksMB implements Serializable {
         objectLinks.add(newLink);
     }
 
-    public void onRowEditCancel() {
-        objectLinks.remove(selectedLink);
+    public void onRowEditCancel(RowEditEvent<ObjectLink> event) {
+        objectLinks.remove(event.getObject());
         disableRemoveBtn = true;
     }
 

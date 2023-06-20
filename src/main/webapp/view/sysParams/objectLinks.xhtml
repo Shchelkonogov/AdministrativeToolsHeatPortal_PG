@@ -3,35 +3,24 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
+    <h:form>
+        <p:remoteCommand name="showRowEdit" oncomplete="switchToRowEdit('linksTable');"/>
+    </h:form>
+
 
     <h:form id="objectLinksForm" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Типы связи объектов"/>
-            <div style="padding: 3px;">
-                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                 disabled="#{objectLinks.disableRemoveBtn}" action="#{objectLinks.onRemoveLink}"
-                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                 update="objectLinksForm:objectLinksTable objectLinksForm:btnRemove growl"
-                                 rendered="#{systemParamsUtil.write}" />
-                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 action="#{objectLinks.onAddNew()}" update="objectLinksForm:objectLinksTable"
-                                 rendered="#{systemParamsUtil.write}" />
-            </div>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
+        <p:panel id="objectLinksPanel" styleClass="tc-panel" header="Типы связи объектов">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                 <p:dataTable id="objectLinksTable" var="objectLinksData" widgetVar="linksTable" value="#{objectLinks.objectLinks}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                              editable="#{systemParamsUtil.write}" selectionMode="single" selection="#{objectLinks.selectedLink}"
-                             rowKey="#{objectLinksData.id}">
+                             rowKey="#{objectLinksData.rowId}" disabledSelection="#{!systemParamsUtil.write}">
 
                     <p:ajax event="rowEdit" listener="#{objectLinks.onRowEdit}"
                             onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide(); PF('linksTable').unselectAllRows();"
                             update="objectLinksForm:btnRemove growl" />
                     <p:ajax event="rowEditCancel" listener="#{objectLinks.onRowEditCancel}" update="objectLinksForm:btnRemove"
-                            onsuccess="PF('linksTable').unselectAllRows();"/>
+                            onsuccess="PF('linksTable').filter();"/>
                     <p:ajax event="rowSelect" listener="#{objectLinks.onRowSelect}" update="objectLinksForm:btnRemove" />
 
                     <p:column headerText="Название типа связи">
@@ -44,40 +33,55 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="Название типа объекта-источника" width="200" style="white-space: nowrap">
+                    <p:column headerText="Название типа объекта-источника" width="250" style="white-space: nowrap">
                         <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;"
                                               value="#{objectTypeControllerApplication.getObjectNameById(objectLinksData.objectTypeLink1)}" />
                             </f:facet>
                             <f:facet name="input">
-                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink1}" style="width: 100%;">
+                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink1}">
                                     <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="type"
                                                    itemValue="#{type.id}" itemLabel="#{type.name}"/>
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="Название типа объекта-потребителя" width="200" style="white-space: nowrap">
+                    <p:column headerText="Название типа объекта-потребителя" width="250" style="white-space: nowrap">
                         <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
                                 <h:outputText style="display: block;"
                                               value="#{objectTypeControllerApplication.getObjectNameById(objectLinksData.objectTypeLink2)}" />
                             </f:facet>
                             <f:facet name="input">
-                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink2}" style="width: 100%;">
+                                <h:selectOneMenu value="#{objectLinksData.objectTypeLink2}">
                                     <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="type"
                                                    itemValue="#{type.id}" itemLabel="#{type.name}"/>
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                    <p:column width="40" style="text-align: center" rendered="#{systemParamsUtil.write}">
                         <p:rowEditor rendered="#{objectLinksData.allowChange}" editTitle="Изменить строку"
                                      cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>
             </div>
-        </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                               action="#{objectLinks.onAddNew()}" onsuccess="PF('linksTable').filter(); showRowEdit();"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                </p:commandLink>
+                <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                               disabled="#{objectLinks.disableRemoveBtn}" action="#{objectLinks.onRemoveLink}"
+                               onclick="PF('statusDialog').show();" oncomplete="PF('linksTable').filter(); PF('statusDialog').hide();"
+                               update="objectLinksForm:btnRemove growl"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
     </h:form>
 </ui:composition>

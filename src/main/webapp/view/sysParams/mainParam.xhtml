@@ -3,68 +3,72 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-
     <h:form id="mainParam" style="height: 100%">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Основные параметры"/>
-            <div style="padding: 3px;">
-                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                 disabled="#{mainParamMB.disableRemoveBtn}" action="#{mainParamMB.onRemoveTableParam}"
-                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                 update="mainParam:table mainParam:btnRemove growl" rendered="#{systemParamsUtil.write}"/>
-                <p:commandButton icon="btnAdd" id="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 update="dialog paramsForm"
-                                 oncomplete="PF('addNewParam').show();" rendered="#{systemParamsUtil.write}"
-                                 actionListener="#{mainParamMB.techProcessUpdateAfterEvent()}"/>
+        <p:panel styleClass="tc-panel" header="Основные параметры">
+            <div style="height: calc(100% - 6px);">
+                <div style="display: flex; align-items: center; justify-content: center; padding: 3px;">
+                    <p:outputLabel value="Тип Объекта" style="margin-right: 10px; font-weight: bold;"/>
+                    <p:selectOneMenu id="left" value="#{mainParamMB.leftOneLine}" style="width: 280px;">
+                        <p:ajax event="change" update="right table mainParam:btnRemove"
+                                listener="#{mainParamMB.rightPartListUpdateAfterEvent}"/>
+                        <f:converter converterId="objectTypeConverter"/>
+
+                        <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
+                                       itemLabel="#{objType.name}" itemValue="#{objType}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Техпроцесс" style="margin-right: 10px; margin-left: 20px; font-weight: bold;"/>
+                    <p:selectOneMenu id="right" value="#{mainParamMB.adaptRightPartSelectOneMenu}" style="width: 280px;">
+                        <p:ajax event="itemSelect" update="table mainParam:btnRemove"
+                                listener="#{mainParamMB.tableUpdateAfterEvent}"/>
+                        <f:converter converterId="rightTypeConverter"/>
+
+                        <f:selectItem itemLabel="#{mainParamMB.all.name}" itemValue="#{mainParamMB.all}"/>
+                        <f:selectItems value="#{mainParamMB.rightPartSelectOneMenuParam}" var="objParam"
+                                       itemLabel="#{objParam.name}" itemValue="#{objParam}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div style="height: calc(100% - 40px); padding: 0 0 3px 3px;">
+                    <p:dataTable id="table" var="mainParam" value="#{mainParamMB.tableParam}" selectionMode="single"
+                                 selection="#{mainParamMB.selectedPartInTable}" rowKey="#{mainParam.id}" scrollable="true"
+                                 scrollHeight="100%" emptyMessage="#{global['table.empty.value']}" widgetVar="mainParamWidget"
+                                 disabledSelection="#{!systemParamsUtil.write}">
+
+                        <p:ajax event="rowSelect" listener="#{mainParamMB.onRowSelect}" update="mainParam:btnRemove" />
+
+                        <p:column headerText="Наименование параметра">
+                            <h:outputText value="#{mainParam.name}" />
+                        </p:column>
+
+                        <p:column headerText="Обозначение" styleClass="center" width="150">
+                            <h:outputText value="#{mainParam.memo}" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
             </div>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px);">
-            <div style="display: flex; align-items: center; justify-content: center; margin: 5px;">
-                <p:outputLabel value="Тип Объекта" style="margin-right: 10px; font-weight: bold;"/>
-                <p:selectOneMenu id="left" value="#{mainParamMB.leftOneLine}" style="width: 250px;">
-                    <p:ajax event="change" update="right table" listener="#{mainParamMB.rightPartListUpdateAfterEvent}"/>
-                    <f:converter converterId="objectTypeConverter"/>
 
-                    <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
-                                   itemLabel="#{objType.name}" itemValue="#{objType}"/>
-                </p:selectOneMenu>
-
-                <p:outputLabel value="Техпроцесс" style="margin-right: 10px; margin-left: 20px; font-weight: bold;"/>
-                <p:selectOneMenu id="right" value="#{mainParamMB.adaptRightPartSelectOneMenu}" style="width: 250px;">
-                    <p:ajax event="itemSelect" update="table" listener="#{mainParamMB.tableUpdateAfterEvent}"/>
-                    <f:converter converterId="rightTypeConverter"/>
-
-                    <f:selectItem itemLabel="#{mainParamMB.all.name}" itemValue="#{mainParamMB.all}"/>
-                    <f:selectItems value="#{mainParamMB.rightPartSelectOneMenuParam}" var="objParam"
-                                   itemLabel="#{objParam.name}" itemValue="#{objParam}"/>
-                </p:selectOneMenu>
-            </div>
-
-            <div style="height: calc(100% - 47px); padding: 3px;">
-                <p:dataTable id="table" var="mainParam" value="#{mainParamMB.tableParam}" selectionMode="single"
-                             selection="#{mainParamMB.selectedPartInTable}" rowKey="#{mainParam.id}" scrollable="true"
-                             scrollHeight="100%" emptyMessage="#{global['table.empty.value']}">
-
-                    <p:ajax event="rowSelect" listener="#{mainParamMB.onRowSelect}" update="mainParam:btnRemove" />
-
-                    <p:column headerText="Наименование параметра">
-                        <h:outputText value="#{mainParam.name}" />
-                    </p:column>
-
-                    <p:column headerText="Обозначение" styleClass="center">
-                        <h:outputText value="#{mainParam.memo}" />
-                    </p:column>
-                </p:dataTable>
-            </div>
-        </div>
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                               update="paramsForm"
+                               oncomplete="PF('addNewParam').show();" rendered="#{systemParamsUtil.write}"
+                               actionListener="#{mainParamMB.techProcessUpdateAfterEvent()}">
+                    <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                </p:commandLink>
+                <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                               disabled="#{mainParamMB.disableRemoveBtn}" action="#{mainParamMB.onRemoveTableParam}"
+                               onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                               update="mainParam:table mainParam:btnRemove growl" rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
     </h:form>
 
     <p:dialog id="dialog" header="Добавление нового параметра" widgetVar="addNewParam" modal="true"
-              resizable="false" rendered="#{systemParamsUtil.write}">
+              resizable="false" rendered="#{systemParamsUtil.write}" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
         <h:form id="paramsForm">
-            <h:panelGrid columns="2" style="margin-bottom: 35px;">
+            <h:panelGrid columns="2" style="margin-bottom: 45px;">
                 <h:outputLabel value="Тип объекта" style="margin-right: 10px;"/>
                 <h:outputLabel value="#{mainParamMB.leftOneLine.name}"/>
 
@@ -88,12 +92,13 @@
                 </p:selectOneMenu>
             </h:panelGrid>
 
-            <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Сохранить" id="btnSave" onclick="PF('statusDialog').show();"
+                             style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              action="#{mainParamMB.onSaveChanges()}"
                              oncomplete="PF('addNewParam').hide(); PF('statusDialog').hide();" update="mainParam:table growl"/>
 
             <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();"
-                             styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>
+                             styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"/>
         </h:form>
     </p:dialog>
 </ui:composition>

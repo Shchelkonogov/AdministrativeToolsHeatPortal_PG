@@ -3,38 +3,33 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <f:metadata>
-        <f:event type="preRenderView" listener="#{paramColor.update}" />
-    </f:metadata>
-
     <h:form id="colorForm" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Расцветка состояния параметров"/>
-            <div style="padding: 3px;">
-                <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
-                                 action="#{paramColor.onSaveChanges}" update="colorTable growl"
-                                 oncomplete="PF('statusDialog').hide();" />
-            </div>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
-                <p:dataTable id="colorTable" value="#{paramColor.parametersColorList}" var="colorData" scrollable="true" scrollHeight="100%"
-                             rowIndexVar="index" >
+        <p:panel styleClass="tc-panel" header="Расцветка состояния параметров">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
+                <p:dataTable id="colorTable" value="#{paramColor.parametersColorList}" var="colorData" scrollable="true"
+                             scrollHeight="100%" rowIndexVar="index" >
                     <p:column headerText="Наименования состояния">
-                        <h:outputText value="#{colorData.name}" />
+                        <h:outputText id="descColumn" value="#{colorData.name}" />
                     </p:column>
-                    <p:column headerText="Цвет" width="70" style="text-align: center;">
+                    <p:column headerText="Цвет" width="100" style="text-align: center;">
                         <p:outputPanel id="colorColumn">
                             <h:outputText rendered="#{!systemParamsUtil.write}" style="color: white; vertical-align: -webkit-baseline-middle;"
                                           value="##{colorData.color}"/>
                             <p:colorPicker rendered="#{systemParamsUtil.write}" id="colorPicker" value="#{colorData.color}"
-                                           onchange="changeColor(#{index}); changeValue(#{index});"/>
+                                           onchange="changeColor(#{index});"/>
                         </p:outputPanel>
                     </p:column>
                 </p:dataTable>
             </div>
-        </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
+                               onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
+                               action="#{paramColor.onSaveChanges}" update="colorTable growl"
+                               oncomplete="PF('statusDialog').hide();">
+                    <h:outputText styleClass="ui-icon pi pi-save"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
     </h:form>
 </ui:composition>

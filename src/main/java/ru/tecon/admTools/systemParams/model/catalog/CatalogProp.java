@@ -1,12 +1,13 @@
 package ru.tecon.admTools.systemParams.model.catalog;
 
+import java.io.Serializable;
 import java.util.StringJoiner;
 
 /**
  * Класс описывающий значение справочника
  * @author Maksim Shchelkonogov
  */
-public class CatalogProp {
+public class CatalogProp implements Serializable {
 
     private static final String DEFAULT_NAME = "Новое значение справочника";
 

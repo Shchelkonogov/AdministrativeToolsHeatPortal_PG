@@ -3,57 +3,23 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-
-    <script type="application/javascript">
-        PrimeFaces.locales ['ru'] = {
-            closeText: 'Закрыть',
-            prevText: 'Назад',
-            nextText: 'Вперёд',
-            monthNames: ['Январь', 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь','Октябрь','Ноябрь','Декабрь' ],
-            monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек' ],
-            dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-            dayNamesShort: ['Воск','Пон' , 'Вт' , 'Ср' , 'Четв' , 'Пят' , 'Суб'],
-            dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-            weekHeader: 'Неделя',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix:'',
-            timeOnlyTitle: 'Только время',
-            timeText: 'Время',
-            hourText: 'Час',
-            minuteText: 'Минута',
-            secondText: 'Секунда',
-            currentText: 'Сегодня',
-            ampm: false,
-            month: 'Месяц',
-            week: 'неделя',
-            day: 'День',
-            allDayText: 'Весь день'
-        };
-    </script>
+    <h:form>
+        <p:remoteCommand name="showRowEdit" oncomplete="switchToRowEdit('groundTempTableWidget', 0);"/>
+    </h:form>
 
     <h:form id="groundTempForm" style="height: 100%;">
-        <div style="height: 85%">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Температура грунта"/>
-                <div style="padding: 3px;">
-                    <p:commandButton icon="btnAdd" style="border-radius: 3px !important;" styleClass="iconOnlyButton btnRight"
-                                     action="#{groundTempMB.onAddNew()}" update="groundTempForm:groundTempTable"
-                                     rendered="#{systemParamsUtil.write}" />
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
-                <div style="height: 100%;">
+        <div style="height: calc(100% - 109px);">
+            <p:panel styleClass="tc-panel" header="Температура грунта" style="padding-bottom: 5px;">
+                <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="groundTempTable" var="groundTempData" value="#{groundTempMB.groundTemps}"
                                  scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                                 editable="#{systemParamsUtil.write}">
+                                 editable="#{systemParamsUtil.write}" widgetVar="groundTempTableWidget">
 
                         <p:ajax event="rowEdit" listener="#{groundTempMB.onRowEdit}"
                                 onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                                update="groundTempForm:groundTempTable growl" />
+                                update="growl" oncomplete="PF('groundTempTableWidget').filter();" />
+                        <p:ajax event="rowEditCancel" listener="#{groundTempMB.onRowEditCancel}"
+                                oncomplete="PF('groundTempTableWidget').filter();"/>
 
                         <p:column headerText="Дата" style="text-align: center;">
                             <p:cellEditor disabled="#{!groundTempData.editable}">
@@ -71,31 +37,29 @@
                                     <h:outputText style="display: block;" value="#{groundTempData.value}" />
                                 </f:facet>
                                 <f:facet name="input">
-                                    <p:inputNumber value="#{groundTempData.value}" />
+                                    <p:inputNumber value="#{groundTempData.value}" emptyValue="0" />
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                        <p:column width="40" style="text-align: center" rendered="#{systemParamsUtil.write}">
                             <p:rowEditor rendered="#{groundTempData.editable}" editTitle="Изменить строку"
                                          cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                         </p:column>
                     </p:dataTable>
                 </div>
-            </div>
+
+                <f:facet name="actions">
+                    <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                   action="#{groundTempMB.onAddNew()}" oncomplete="PF('groundTempTableWidget').filter(); showRowEdit();"
+                                   rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                    </p:commandLink>
+                </f:facet>
+            </p:panel>
         </div>
-        <div style="height: 15%">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Эталонные значения температур"/>
-                <div style="padding: 3px;">
-                    <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
-                                     action="#{groundTempMB.onSaveChanges()}" update="referenceValueTable growl"
-                                     oncomplete="PF('statusDialog').hide();" />
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: 100%;">
+        <div style="height: 109px;">
+            <p:panel styleClass="tc-panel" header="Эталонные значения температур">
+                <div style="height: calc(100% - 6px); padding: 3px;">
                     <p:dataTable id="referenceValueTable" value="#{groundTempMB.referenceValues}" var="ref"
                                  editable="#{systemParamsUtil.write}" editMode="cell"
                                  emptyMessage="#{global['table.empty.value']}">
@@ -154,7 +118,16 @@
                         </p:column>
                     </p:dataTable>
                 </div>
-            </div>
+
+                <f:facet name="actions">
+                    <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
+                                   onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
+                                   action="#{groundTempMB.onSaveChanges()}" update="referenceValueTable growl"
+                                   oncomplete="PF('statusDialog').hide();">
+                        <h:outputText styleClass="ui-icon pi pi-save"/>
+                    </p:commandLink>
+                </f:facet>
+            </p:panel>
         </div>
     </h:form>
 </ui:composition>

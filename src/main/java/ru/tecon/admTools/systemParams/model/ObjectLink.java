@@ -2,6 +2,7 @@ package ru.tecon.admTools.systemParams.model;
 
 import java.io.Serializable;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 /**
  * Класс описывающий свзяь объектов
@@ -9,17 +10,25 @@ import java.util.StringJoiner;
  */
 public class ObjectLink implements Serializable {
 
+    private UUID rowId;
+
     private int id;
     private String name;
     private int objectTypeLink1;
     private int objectTypeLink2;
     private boolean allowChange;
 
+    private ObjectLink() {
+        rowId = UUID.randomUUID();
+    }
+
     public ObjectLink(String name) {
+        this();
         this.name = name;
     }
 
     public ObjectLink(int id, String name, int objectTypeLink1, int objectTypeLink2) {
+        this();
         this.id = id;
         this.name = name;
         this.objectTypeLink1 = objectTypeLink1;
@@ -66,9 +75,14 @@ public class ObjectLink implements Serializable {
         this.allowChange = allowChange;
     }
 
+    public UUID getRowId() {
+        return rowId;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", ObjectLink.class.getSimpleName() + "[", "]")
+                .add("rowId=" + rowId)
                 .add("id=" + id)
                 .add("name='" + name + "'")
                 .add("objectTypeLink1=" + objectTypeLink1)

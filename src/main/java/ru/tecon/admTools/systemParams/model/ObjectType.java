@@ -13,7 +13,11 @@ public class ObjectType implements Serializable {
     private String name;
     private String code;
 
+    public ObjectType() {
+    }
+
     public ObjectType(int id, String name, String code) {
+        this();
         this.id = id;
         this.name = name;
         this.code = code;

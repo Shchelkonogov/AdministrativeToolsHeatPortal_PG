@@ -1,53 +1,28 @@
+/*Стили для всей страницы*/
+
 html, body {
-    height: calc(100% - 20px);
-    margin: 4px;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    overflow: hidden;
 }
 
-.ui-tooltip-text {
-    padding: 3px 3px 0 3px !important;
+/*Стиль для отображения элемента по центру*/
+
+.center {
+    text-align: center;
 }
 
-.ui-datatable-scrollable table {
-    table-layout: unset !important;
-}
+/*Стиль для dialog показывающий статус загрузки*/
 
-body .ui-datatable .ui-datatable-data>tr>td {
-    padding: 2px 1px;
-}
-
-.ui-treetable table {
-    table-layout: unset !important;
-}
-
-body .ui-treetable .ui-treetable-data>tr>td {
-    padding: 2px 1px;
-}
-
-.ui-panel, .ui-panel-content {
-    height: 100%;
-}
-
-.ui-panel .ui-panel-content {
-    padding: unset !important;
-}
-
-.ui-colorpicker>button {
-    border: none !important;
-    outline: none !important;
-    background-color: unset !important;
-    width: 100%;
-}
-
-.ui-colorpicker>button>span>span {
-    border: none !important;
-    width: unset !important;
-    height: unset !important;
-    text-indent: unset !important;
+#statusDialog {
+    border: none;
 }
 
 #statusDialog .ui-dialog-titlebar {
@@ -60,185 +35,509 @@ body .ui-treetable .ui-treetable-data>tr>td {
     overflow: hidden;
 }
 
-.iconOnlyButton {
-    background: transparent !important;
-    border: none !important;
-    margin: 0;
+/*custom стиль шестеренки (статус выполнения ajax) на кнопке*/
+
+html body .custom.ui-button.ui-button-text-only .ui-icon-loading {
+    opacity: 0;
+}
+html body .custom.ui-button.ui-button-text-only .ui-icon-loading:before {
+    content: "\e94a";
+}
+html body .custom.ui-button, html body .custom.ui-button * {
+    transition-property: all;
+    transition-duration: .2s;
+}
+html body .custom.ui-button.ui-state-loading {
+    opacity: 1;
+    background: #888;
+    border-color: #888;
+}
+html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-button-text {
+    opacity: 1;
+    padding-left: 2rem;
+}
+html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loading {
+    opacity: 1;
+    left: 0;
+    margin-left: 0.5rem;
 }
 
-.iconOnlyButton:enabled:hover {
-    background: rgba(96, 125, 139, 0.04) !important;
+/*Стиль кнопок для выбора категорий настроек*/
+
+#menuForm .custom.ui-button-flat {
+    background-color: transparent;
+    color: #000000;
+    border-color: transparent;
 }
 
-.iconOnlyButton:enabled:active {
-    background: rgba(96, 125, 139, 0.16) !important;
+#menuForm .custom.ui-button-flat:hover {
+    background-color: #eaeaea;
+    color: #000000;
+    border-color: #eaeaea;
 }
 
-.iconOnlyButton:enabled:focus {
-    outline: unset !important;
-    box-shadow: 0 0 0 0.2rem #beccd2;
+#menuForm .custom.ui-button-flat:focus {
+    outline: none;
 }
 
-.btnAdd {
-    background-image: url("#{resource['images/add small.png']}") !important;
-    width: 26px !important;
-    height: 26px !important;
-    top: 47% !important;
-    left: 47% !important;
-    background-position: 0 0;
-}
-
-.btnRemove {
-    background-image: url("#{resource['images/minus small.png']}") !important;
-    width: 26px !important;
-    height: 26px !important;
-    top: 47% !important;
-    left: 47% !important;
-    background-position: 0 0;
-}
-
-.btnLeft {
-    margin-right: -1px !important;
-    border: 1px solid rgb(118, 118, 118) !important;
-    border-radius: 3px 0 0 3px !important;
-}
-
-.btnRight {
-    border: 1px solid rgb(118, 118, 118) !important;
-    border-radius: 0 3px 3px 0 !important;
-}
-
-#problemForm\:problemTable .ui-inputfield, #objectLinksForm\:objectLinksTable .ui-inputfield,
-#measureForm\:measureTable .ui-inputfield {
-    width: 100%;
-    height: 24px;
-}
-
-body .ui-button.ui-button-secondary, body .ui-splitbutton.ui-button-secondary > .ui-button {
-    background: #607D8B;
+#menuForm .custom.ui-button-selected {
+    background-color: #007ad9;
     color: #ffffff;
-    border: 1px solid #607D8B; }
-body .ui-button.ui-button-secondary.ui-state-hover, body .ui-button.ui-button-secondary:not(:disabled):hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-hover, body .ui-splitbutton.ui-button-secondary > .ui-button:not(:disabled):hover {
-    background: #56717d;
-    border-color: #56717d;
-    color: #ffffff; }
-body .ui-button.ui-button-secondary.ui-state-focus, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-focus {
-    box-shadow: 0 0 0 0.2rem #beccd2; }
-body .ui-button.ui-button-secondary.ui-state-active, body .ui-button.ui-button-secondary:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-state-active, body .ui-splitbutton.ui-button-secondary > .ui-button:active {
-    background: #4d646f;
-    border-color: #4d646f;
-    color: #ffffff; }
-body .ui-button.ui-button-secondary.ui-button-outlined, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined {
-    background-color: transparent;
-    color: #607D8B;
-    border: 1px solid; }
-body .ui-button.ui-button-secondary.ui-button-outlined:enabled:hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined:enabled:hover {
-    background: rgba(96, 125, 139, 0.04);
-    color: #607D8B;
-    border: 1px solid; }
-body .ui-button.ui-button-secondary.ui-button-outlined:enabled:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-outlined:enabled:active {
-    background: rgba(96, 125, 139, 0.16);
-    color: #607D8B;
-    border: 1px solid; }
-body .ui-button.ui-button-secondary.ui-button-flat, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat {
-    background-color: transparent;
-    color: #607D8B;
-    border-color: transparent; }
-body .ui-button.ui-button-secondary.ui-button-flat:enabled:hover, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat:enabled:hover {
-    background: rgba(96, 125, 139, 0.04);
-    border-color: transparent;
-    color: #607D8B; }
-body .ui-button.ui-button-secondary.ui-button-flat:enabled:active, body .ui-splitbutton.ui-button-secondary > .ui-button.ui-button-flat:enabled:active {
-    background: rgba(96, 125, 139, 0.16);
-    border-color: transparent;
-    color: #607D8B; }
-
-.ui-button-flat {
-    background-color: transparent !important;
-    color: #000000 !important;
-    border-color: transparent !important;
+    border-color: #007ad9;
 }
 
-.ui-button-flat:hover {
-    background-color: #eaeaea !important;
-    color: #000000 !important;
-    border-color: #eaeaea !important;
+#menuForm .custom.ui-button-selected:focus {
+    outline: none;
 }
 
-.ui-button-flat:focus {
-    outline: none !important;
+/*Отступы для формы Нормативные показатели*/
+
+#normIndicators\:rootPanel_content {
+    padding: 3px;
 }
 
-.ui-button-selected {
-    background-color: #007ad9 !important;
-    color: #ffffff !important;
-    border-color: #007ad9 !important;
-}
-
-.ui-button-selected:focus {
-    outline: none !important;
-}
-
-#menuPanel_content {
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-#catalogPanel\:catalogProp .ui-datatable-scrollable-body {
-    overflow-y: scroll;
-}
-
-#catalogPanel\:catalogProp\:propValue\:filter, #catalogPanel\:catalogType\:typeValue\:filter {
-    width: unset;
-    display: unset;
-    margin-left: 5px;
-}
-
-#addForm\:newTemperaturePropTable input, #regimeCardForm\:regimeCardTable input,
-#normIndicators input, #groundTempForm\:referenceValueTable input, #multiYearTemp\:tempTable input {
-    width: 100%;
-}
+/*Если требудется два вводимых поля в форме Нормативные показатели*/
 
 #normIndicators .double input {
     width: 50%;
 }
 
-.center {
-    text-align: center;
+/*Устанавливаем свойства scrollbar для категорий настроечных параметров и нормативных показателей*/
+
+#normIndicators\:rootPanel_content,
+#menuPanel_content {
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-#normIndicators\:borderValues > .ui-datatable-tablewrapper {
+#normIndicators\:borderValues .ui-datatable-tablewrapper {
+    padding-bottom: 2px;
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar,
+#normIndicators\:rootPanel_content::-webkit-scrollbar,
+#menuPanel_content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    display: none
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-thumb,
+#normIndicators\:rootPanel_content::-webkit-scrollbar-thumb,
+#menuPanel_content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.2);
+    transition: background 250ms ease;
+    border-radius: 2px;
+    -moz-transition: background 250ms;
+    -webkit-transition: background 250ms
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-thumb:hover,
+#normIndicators\:rootPanel_content::-webkit-scrollbar-thumb:hover,
+#menuPanel_content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,.35)
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-track,
+#normIndicators\:rootPanel_content::-webkit-scrollbar-track,
+#menuPanel_content::-webkit-scrollbar-track {
+    background: rgba(0,0,0,.1);
+    border-width: 0
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar,
+#normIndicators\:rootPanel_content::-webkit-scrollbar,
+#menuPanel_content:hover::-webkit-scrollbar {
+    display: initial
+}
+
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-button,
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-corner,
+#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-resizer,
+#normIndicators\:rootPanel_content::-webkit-scrollbar-button,
+#normIndicators\:rootPanel_content::-webkit-scrollbar-corner,
+#normIndicators\:rootPanel_content::-webkit-resizer,
+#menuPanel_content::-webkit-scrollbar-button,
+#menuPanel_content::-webkit-scrollbar-corner,
+#menuPanel_content::-webkit-resizer {
+    display: none
+}
+
+/*Устанавливаем стиль для панели с категориями настроечных параметров*/
+
+body .tc-panel .ui-panel-content {
+    height: calc(100% - 35.8px);
+    padding: unset;
+}
+
+
+/*Подкорректировал отступы outputPanel и dialogPanel*/
+
+body .tc-panel .ui-panel-titlebar,
+body .tc-panel .ui-dialog-titlebar {
+    padding: 0.5em 0.6em 0.3em 0.7em;
+}
+
+body .tc-panel .ui-dialog-titlebar .ui-dialog-titlebar-icon {
+    height: 1.375rem;
+    line-height: 1.375rem;
+}
+
+body .ui-dialog .ui-dialog-content {
+    padding: unset;
+}
+
+/*Подкорректировал отступы кнопок в outputPanel*/
+
+body .tc-button.ui-button-text-only .ui-button-text {
+    padding: 0.3em 1em;
+}
+
+/*Стили для кнопки скрыть панель с категориями настроечных параметров*/
+
+.collapseButton {
+    top: 10px;
+    width: 16px;
+    padding: 0;
+    margin: 0 0 0 -1.3rem;
+    border-radius: 25px 0 0 25px;
+    background-color: #fff;
+    transition: all .4s ease;
+    cursor: pointer;
+    position: absolute;
+    border: 0;
+    box-shadow: -7px 0 7px -4px rgba(0,0,0,.5);
+    outline: none;
+    z-index: 999;
+}
+
+.collapsed {
+    width: 5px;
+    height: 20px;
+    margin-left: initial;
+    border: 0;
+    border-radius: 0 25px 25px 0;
+    background-color: #000;
+}
+
+.collapseButton:hover, .collapseButtonHidden:hover {
+    scale: 1.1;
+}
+
+#leftMenuPanel {
+    transition: margin 250ms cubic-bezier(.5,.3,.7,.5);
+}
+
+/*Задаю размер панели*/
+
+.ui-panel {
     height: 100%;
 }
 
-#divisionPanel\:structType {
+/*Убрал расстояние между кнопками в шапке панелей*/
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon {
+    margin-left: 0;
+}
+
+/*Стиль для кнопок добавить "+" и удалить "-" в шапке панелей*/
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success.tc-small {
+    scale: 1.3;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success,
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-danger {
+    color: #6c757d;
+    scale: 1.5;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success:hover {
+    color: #689f38;
+    scale: 1.7;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success.tc-small:hover {
+    scale: 1.5;
+}
+
+body .ui-datatable .ui-datatable-data>tr .ui-row-editor .ui-icon-check:hover {
+    color: #689f38;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-danger:hover {
+    color: #d32f2f;
+    scale: 1.7;
+}
+
+body .ui-datatable .ui-datatable-data>tr .ui-row-editor .ui-icon-close:hover {
+    color: #d32f2f;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success:focus,
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-danger:focus,
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon:focus,
+body .ui-datatable .ui-datatable-data>tr .ui-row-editor>a:focus {
+    box-shadow: none;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-success:before,
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon.tc-danger:before,
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon:before,
+body .ui-datatable .ui-datatable-data>tr .ui-row-editor>a:before {
+    content: unset;
+}
+
+/*Не отображаю шестеренку при ожидании ajax после нажатия на кнопку*/
+
+html .tc-no-loading.ui-state-loading.ui-button-text-only .ui-icon-loading + .ui-button-text {
+    opacity: inherit;
+}
+html .tc-no-loading.ui-state-loading .ui-icon-loading {
+    display: none;
+}
+html .tc-no-loading.ui-state-loading .ui-icon:not(.ui-icon-loading) {
+    display: inline-block;
+}
+
+/*Задал размеры панелей в форме "Настройка типа параметра"*/
+
+#typeSettingForm\:typeTable {
+    height: 100%;
+}
+
+#typeSettingForm\:typeTable > .ui-datatable-scrollable-body {
+    height: calc(100% - 80px) !important;
+}
+
+/*Задал размеры панелей в форме "Структура"*/
+
+#divisionPanel\:structType,
+#divisionPanel\:divisionPropTable {
     height: 100%;
 }
 
 #divisionPanel\:structType > .ui-treetable-scrollable-body {
-    height: calc(100% - 70px);
+    height: calc(100% - 80px);
 }
 
-#typeSettingForm\:typeTable_data .ui-helper-hidden-accessible {
-    position: unset;
-}
+/*Что бы не разбегалась ширина колонок шапки и значений в таблице, относится к treeTable в форме "Cтруктура"*/
 
-#addPropFormP\:inputNumberP_input {
-    width: 30px;
-}
-
-#seasonChangePanel\:confirm > .ui-dialog-content > .ui-icon {
-    display: none;
-}
-
-#addStatAggrForm\:inputId_input {
-    width: 200px;
-}
-
-/* Что бы не разбегалась ширина колонок шапки и значений в таблице, относится к treeTable в форме "Cтруктура" */
 #divisionPanel\:structType .ui-treetable-scrollable-body .ui-treetable-scrollable-theadclone tr th>* {
     display: block;
     height: 0;
     padding: 0;
     border: 0;
+}
+
+/*Задаю настройки для отображения dataTable и treeTable*/
+
+body .ui-datatable thead th,
+body .ui-treetable thead th {
+    padding: 0.3rem;
+    text-align: center;
+}
+
+.ui-datatable-scrollable table,
+.ui-treetable table {
+    table-layout: unset !important;
+}
+
+body .ui-datatable .ui-datatable-data>tr>td,
+body .ui-treetable .ui-treetable-data>tr>td {
+    padding: 0.3rem;
+}
+
+/*Стили для элементов при изменении строки dataTable*/
+
+.ui-cell-editor-input .ui-inputfield,
+.ui-cell-editor-input select {
+    width: 100%;
+    height: 24px;
+}
+
+.ui-cell-editor-input select {
+    border-radius: 3px;
+}
+
+/*размеры для иконок изменения строки в dataTable*/
+
+body .ui-datatable .ui-datatable-data>tr .ui-row-editor>a {
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+}
+
+/*Задаю настройки размеров для иконок раскрытия дерева в treeTable*/
+
+body .ui-treetable .ui-treetable-data>tr>td .ui-treetable-toggler {
+    margin-right: 0.3rem;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+}
+
+/*Задал стили для scroll в treeTable и dataTable*/
+
+.ui-treetable-scrollable-body,
+.ui-datatable-scrollable-body {
+    overflow-y: scroll !important;
+}
+
+.ui-treetable-scrollable-header,
+.ui-datatable-scrollable-header {
+    margin-right: 3px;
+}
+
+.ui-treetable-scrollable-header-box,
+.ui-datatable-scrollable-header-box {
+    margin-right: 0 !important;
+}
+
+.ui-treetable-scrollable-body,
+.ui-datatable-scrollable-body {
+    padding-right: 0 !important;
+}
+
+.ui-treetable-scrollable-body::-webkit-scrollbar,
+.ui-datatable-scrollable-body::-webkit-scrollbar {
+    width: 3px;
+    height: 8px;
+}
+
+.ui-treetable-scrollable-body::-webkit-scrollbar-thumb,
+.ui-datatable-scrollable-body::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.2);
+    transition: background 250ms ease;
+    border-radius: 2px;
+    -moz-transition: background 250ms;
+    -webkit-transition: background 250ms
+}
+
+.ui-treetable-scrollable-body::-webkit-scrollbar-thumb:hover,
+.ui-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,.35)
+}
+
+.ui-treetable-scrollable-body::-webkit-scrollbar-track,
+.ui-datatable-scrollable-body::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0);
+    border-width: 0
+}
+
+.ui-treetable-scrollable-body::-webkit-scrollbar-button,
+.ui-treetable-scrollable-body::-webkit-scrollbar-corner,
+.ui-treetable-scrollable-body::-webkit-resizer,
+.ui-datatable-scrollable-body::-webkit-scrollbar-button,
+.ui-datatable-scrollable-body::-webkit-scrollbar-corner,
+.ui-datatable-scrollable-body::-webkit-resizer {
+    display: none
+}
+
+/*Стиль для отображения сообщений только если есть ошибка*/
+
+.tc-show-on-active.ui-message {
+    padding: unset;
+    display: unset;
+}
+
+.tc-show-on-active.ui-message.ui-message-error {
+    padding: 0.429rem 0.429rem;
+    display: inline-block;
+}
+
+/*Стиль для установки ширины inputNumber*/
+
+.tc-width-280 .ui-inputtext {
+    width: 280px;
+}
+
+.tc-width-290 .ui-inputtext {
+    width: 290px;
+}
+
+.tc-width-200 .ui-inputtext {
+    width: 200px;
+}
+
+.tc-width-30 .ui-inputtext {
+    width: 30px;
+}
+
+/*Стили для отображения colorPicker в настроечной форме Расцветка параметров*/
+
+#colorForm\:colorTable .ui-colorpicker>button {
+    border: none;
+    width: 100%;
+}
+
+#colorForm\:colorTable .ui-colorpicker>button>span>span {
+    border: none !important;
+    width: unset !important;
+    height: unset !important;
+    text-indent: unset !important;
+}
+
+#colorForm\:colorTable .ui-colorpicker>button>span {
+    padding: 0;
+}
+
+#colorForm\:colorTable .ui-colorpicker .ui-button.ui-state-focus {
+    box-shadow: unset;
+}
+
+.ui-colorpicker-container {
+    display: none;
+}
+
+/*Стиль для всплывающих подсказок*/
+
+body .ui-tooltip .ui-tooltip-text {
+    background: white;
+    padding: 3px 3px 0 3px;
+}
+
+/*Стиль курсора для изменяемых ячеек*/
+
+#multiYearTemp\:tempTable .ui-editable-column,
+#normIndicators .ui-editable-column,
+#groundTempForm\:referenceValueTable .ui-editable-column,
+#problemForm .ui-editable-column,
+#regimeCardForm .ui-editable-column {
+    cursor: pointer;
+}
+
+/*Стиль для отображения текста в selectOneMenu*/
+
+.ui-selectonemenu label.ui-selectonemenu-label {
+    text-overflow: ellipsis;
+}
+
+/*Стиль для положения окна оповещений*/
+
+body .ui-growl {
+    top: 10px;
+    right: 10px;
+}
+
+/*Стиль для custom confirmDialog*/
+
+#seasonChangePanel\:confirm .ui-dialog-content .ui-icon {
+    display: none;
+}
+
+/*Стиль для confirmDialog*/
+
+body .ui-dialog.ui-confirm-dialog .ui-dialog-content {
+    padding: 0.5rem;
+}
+
+body .ui-dialog.ui-confirm-dialog .ui-dialog-buttonpane {
+    padding: 0.3rem;
+}
+
+/*Стиль второй колонки в h:panelGrid*/
+
+.column2Class {
+    text-align: center;
 }

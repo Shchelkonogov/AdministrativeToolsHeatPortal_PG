@@ -1,91 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
-<ui:composition>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
     <h:form>
-        <p:remoteCommand name="saveStructWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                         action="#{bean.onCreateStruct}" update="divisionPanel growl" rendered="#{systemParamsUtil.write}" />
-        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+        <p:remoteCommand name="saveStructWrapper" onstart="PF('statusDialog').show();" update="divisionPanel growl"
+                         oncomplete="PF('statusDialog').hide(); PF('structTableWidget').filter();"
+                         action="#{bean.onCreateStruct}" rendered="#{systemParamsUtil.write}" />
+        <p:remoteCommand name="savePropWrapper" onstart="PF('statusDialog').show();"
+                         oncomplete="PF('statusDialog').hide();"
                          action="#{bean.onCreateDivisionProp}" rendered="#{systemParamsUtil.write}"
                          update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl" />
+        <p:remoteCommand name="showRowEdit" oncomplete="switchToRowEdit('newPropTable');"/>
     </h:form>
 
     <h:form id="divisionPanel" style="height: 100%;">
         <div style="height: 50%;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{bean.header}"/>
-                <div style="padding: 3px;">
-                    <p:commandButton id="divisionRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{bean.disableRemoveStructBtn}" update="divisionPanel growl"
-                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     action="#{bean.onRemoveStruct()}" rendered="#{systemParamsUtil.write}" />
-                    <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     onclick="PF('addDialog').show();" action="#{bean.loadProperties()}"
-                                     rendered="#{systemParamsUtil.write}" />
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 45px); padding: 3px;">
-                <div style="height: 100%;">
-                    <p:treeTable value="#{bean['root']}" var="structType" id="structType" scrollable="true" scrollHeight="100%"
+            <p:panel id="structTypePanel" styleClass="tc-panel" header="#{bean.header}" style="padding-bottom: 5px;">
+                <div style="height: 100%; padding: 3px 0 3px 3px;">
+                    <p:treeTable value="#{bean['root']}" var="structType" id="structType" filteredValue="#{bean['rootFiltered']}"
+                                 scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{bean.selectedStructNode}" rowKey="#{structType.id}"
-                                 sortBy="#{structType.name}">
+                                 sortBy="#{structType.name}" widgetVar="structTableWidget">
 
+<!--                        window.dispatchEvent(new Event('resize')); Заглушка что бы проавильно общиталась высота таблицы-->
                         <p:ajax event="select" listener="#{bean.onRowSelect}"
-                                update="divisionPanel:divisionPropTable divisionPanel:divisionRemove divisionPanel:divisionAddProp divisionPanel:divisionRemoveProp"
-                                onstart="PF('buiTable').show();" oncomplete="PF('buiTable').hide();"/>
+                                update="divisionPanel:structPropPanel divisionPanel:divisionRemove"
+                                onstart="PF('buiTable').show();" oncomplete="window.dispatchEvent(new Event('resize')); PF('buiTable').hide();"/>
 
-<!--                        без этих тегов криво работает раскрытие/закрытие дерева-->
+                        <!--без этих тегов криво работает раскрытие/закрытие дерева-->
                         <p:ajax event="expand" />
                         <p:ajax event="collapse" />
 
                         <p:column headerText="Название" filterBy="#{structType.name}" filterMatchMode="contains">
                             <h:outputText value="#{structType.name}" />
+                            <f:facet name="filter">
+                                <p:inputText placeholder="Поиск..." style="width: 100%;" onkeyup="PF('structTableWidget').filter();"/>
+                            </f:facet>
                         </p:column>
-                        <p:column headerText="Код" width="55" style="text-align: center;">
+                        <p:column headerText="Код" width="70" style="text-align: center;">
                             <h:outputText value="#{structType.typeChar}" />
                         </p:column>
                     </p:treeTable>
                 </div>
-            </div>
+
+                <f:facet name="actions">
+                    <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                   onclick="PF('addDialog').show();" action="#{bean.loadProperties()}"
+                                   rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                    </p:commandLink>
+                    <p:commandLink id="divisionRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                                   disabled="#{bean.disableRemoveStructBtn}" update="divisionPanel growl"
+                                   onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide(); PF('structTableWidget').filter();"
+                                   action="#{bean.onRemoveStruct()}" rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                    </p:commandLink>
+                </f:facet>
+            </p:panel>
         </div>
         <div style="height: 50%;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="#{bean.propHeader}"/>
-                <div style="padding: 3px;">
-                    <p:commandButton id="divisionRemoveProp" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                     disabled="#{bean.disableRemoveStructPropBtn}" action="#{bean.onRemoveStructProp}"
-                                     onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                     update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl"
-                                     rendered="#{systemParamsUtil.write}">
-                        <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить свойство? #{bean.confirmRemoveText}" icon="pi pi-info-circle"/>
-                    </p:commandButton>
-                    <p:commandButton id="divisionAddProp" icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                     disabled="#{bean.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
-                                     action="#{bean.loadProperties()}" update="addPropDialog"
-                                     rendered="#{systemParamsUtil.write}" />
-
-                    <p:confirmDialog id="confirmDialog" global="true" showEffect="fade" hideEffect="fade" responsive="true"
-                                     rendered="#{systemParamsUtil.write}">
-                        <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no"/>
-                        <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes"
-                                         onclick="PF('statusDialog').show();"/>
-                    </p:confirmDialog>
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 3px); padding: 3px;">
-                <p:outputPanel id="contentToBlock" style="height: 100%;">
+            <p:panel id="structPropPanel" styleClass="tc-panel" header="#{bean.propHeader}#{bean.propHeaderExtended}" style="position: relative;">
+                <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="divisionPropTable" value="#{bean.structTypeProps}" var="prop" scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{bean.selectedStructProp}" rowKey="#{prop.id}"
-                                 draggableRows="#{systemParamsUtil.write}" emptyMessage="#{global['table.empty.value']}">
+                                 draggableRows="#{systemParamsUtil.write}" emptyMessage="#{global['table.empty.value']}"
+                                 disabledSelection="#{!systemParamsUtil.write}">
 
                         <p:ajax event="rowReorder" listener="#{bean.onRowReorder}" update="growl" />
                         <p:ajax event="rowSelect" listener="#{bean.onRowPropSelect}" update="divisionPanel:divisionRemoveProp divisionPanel:confirmDialog" />
@@ -93,33 +73,58 @@
                         <p:column headerText="Название">
                             <h:outputText value="#{prop.name}" />
                         </p:column>
-                        <p:column headerText="Тип" width="20" style="text-align: center;">
+                        <p:column headerText="Тип" width="50" style="text-align: center;">
                             <h:outputText value="#{prop.type.code}" />
                         </p:column>
-                        <p:column headerText="Кат" width="20" style="text-align: center;">
+                        <p:column headerText="Кат" width="50" style="text-align: center;">
                             <h:outputText value="#{prop.cat.id}" />
                         </p:column>
-                        <p:column headerText="Ед.изм." width="50" style="text-align: center;">
+                        <p:column headerText="Ед.изм." width="70" style="text-align: center;">
                             <h:outputText value="#{prop.measure.shortName}" />
                         </p:column>
-                        <p:column headerText="Значение по умолч." width="150">
+                        <p:column headerText="Значение по умолч." width="200">
                             <h:outputText value="#{prop.def}" />
                         </p:column>
-                        <p:column headerText="Название справочника" width="170">
+                        <p:column headerText="Название справочника" width="220">
                             <h:outputText value="#{prop.spHeader.name}" />
                         </p:column>
                     </p:dataTable>
-                </p:outputPanel>
+                </div>
 
-                <p:blockUI block="contentToBlock" widgetVar="buiTable"/>
-            </div>
+                <f:facet name="actions">
+                    <p:commandLink id="divisionAddProp" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                   disabled="#{bean.disableRemoveStructBtn}" oncomplete="PF('addPropDialog').show();"
+                                   action="#{bean.loadProperties()}" update="addPropDialog"
+                                   rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                    </p:commandLink>
+                    <p:commandLink id="divisionRemoveProp" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                                   disabled="#{bean.disableRemoveStructPropBtn}" action="#{bean.onRemoveStructProp}"
+                                   update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl"
+                                   rendered="#{systemParamsUtil.write}" oncomplete="PF('statusDialog').hide();">
+                        <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                        <p:confirm header="Подтверждение" message="Вы уверены что хотите удалить свойство? #{bean.confirmRemoveText}" icon="pi pi-info-circle"/>
+                    </p:commandLink>
+
+                    <p:confirmDialog id="confirmDialog" global="true" showEffect="fade" hideEffect="fade" responsive="true"
+                                     rendered="#{systemParamsUtil.write}" styleClass="tc-panel">
+                        <p:commandButton value="Нет" type="button" styleClass="ui-confirmdialog-no ui-button-secondary tc-no-loading" />
+                        <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes tc-no-loading"
+                                         onclick="PF('statusDialog').show();"/>
+                    </p:confirmDialog>
+                </f:facet>
+            </p:panel>
+
+            <p:blockUI block="structPropPanel" widgetVar="buiTable"/>
         </div>
     </h:form>
 
     <p:dialog id="addDialog" rendered="#{systemParamsUtil.write}" header="#{bean.dialogHeader}" widgetVar="addDialog"
-              width="1012" height="325" modal="true" resizable="false">
-        <p:ajax event="close" listener="#{bean.onclose()}" update="addForm"/>
-        <h:form id="addForm">
+              width="1150" height="325" modal="true" resizable="false" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <p:ajax event="close" listener="#{bean.onclose()}" oncomplete="PF('newPropTable').filter();" update="addForm" resetValues="true"/>
+
+        <h:form id="addForm" style="padding: 3px 0 3px 3px;">
             <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 5px;">
                 <div>
                     <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
@@ -135,11 +140,11 @@
                 </div>
             </div>
             <p:dataTable id="newPropTable" value="#{bean.newStructTypeProps}" var="prop" widgetVar="newPropTable"
-                         scrollable="true" scrollHeight="180" emptyMessage="#{global['table.empty.value']}"
+                         scrollable="true" scrollHeight="195" emptyMessage="#{global['table.empty.value']}"
                          editable="true">
 
                 <p:ajax event="rowEdit" />
-                <p:ajax event="rowEditCancel" />
+                <p:ajax event="rowEditCancel" listener="#{bean.onRowEditCancel}" oncomplete="PF('newPropTable').filter();"/>
 
                 <p:column headerText="Название">
                     <p:cellEditor>
@@ -157,7 +162,7 @@
                             <h:outputText value="#{prop.type.code}" />
                         </f:facet>
                         <f:facet name="input">
-                            <h:selectOneMenu value="#{prop.type}" style="width: 100%;">
+                            <h:selectOneMenu value="#{prop.type}">
                                 <f:converter converterId="propValTypeConverter"/>
                                 <f:attribute name="bean" value="#{beanName}"/>
                                 <f:selectItems value="#{bean.propValTypes}" var="valType"
@@ -172,7 +177,7 @@
                             <h:outputText value="#{prop.cat.id}" />
                         </f:facet>
                         <f:facet name="input">
-                            <h:selectOneMenu value="#{prop.cat}" style="width: 100%;">
+                            <h:selectOneMenu value="#{prop.cat}">
                                 <f:converter converterId="propCatConverter"/>
                                 <f:attribute name="bean" value="#{beanName}"/>
                                 <f:selectItems value="#{bean.propCat}" var="cat"
@@ -181,13 +186,13 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column headerText="Ед.изм." width="50" style="text-align: center;">
+                <p:column headerText="Ед.изм." width="70" style="text-align: center;">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{prop.measure.shortName}" />
                         </f:facet>
                         <f:facet name="input">
-                            <h:selectOneMenu value="#{prop.measure}" style="width: 100%;">
+                            <h:selectOneMenu value="#{prop.measure}">
                                 <f:converter converterId="measureConverter"/>
                                 <f:selectItems value="#{measureControllerApplication.measures}" var="measureItem"
                                                itemLabel="#{measureItem.name} (#{measureItem.shortName})" itemValue="#{measureItem}"/>
@@ -195,7 +200,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column headerText="Значение по умолч." width="150">
+                <p:column headerText="Значение по умолч." width="200">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{prop.def}" />
@@ -205,13 +210,13 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column headerText="Название справочника" width="150">
+                <p:column headerText="Название справочника" width="220">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{prop.spHeader.name}" />
                         </f:facet>
                         <f:facet name="input">
-                            <h:selectOneMenu value="#{prop.spHeader}" style="width: 100%;">
+                            <h:selectOneMenu value="#{prop.spHeader}">
                                 <f:converter converterId="spHeaderConverter"/>
                                 <f:attribute name="bean" value="#{beanName}"/>
                                 <f:selectItems value="#{bean.spHeaders}" var="sp"
@@ -220,32 +225,33 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column width="30" style="text-align: center;">
+                <p:column width="40" style="text-align: center;">
                     <p:rowEditor rendered="#{prop.id == 0}" editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку"/>
                 </p:column>
             </p:dataTable>
 
-            <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;"
-                             update=":addForm:newPropTable" action="#{bean.onAddNew()}" />
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Добавить свойство" process="@this" style="position: absolute; bottom: 5px;" styleClass="tc-no-loading"
+                             oncomplete="PF('newPropTable').filter(); showRowEdit();" action="#{bean.onAddNew()}" />
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              validateClient="true" update="addForm" action="#{bean.saveStructWrapper()}" />
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addDialog').hide();"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addDialog').hide();" process="@this"/>
         </h:form>
     </p:dialog>
 
     <p:dialog id="addPropDialog" rendered="#{systemParamsUtil.write}" header="Добавить новое свойство" widgetVar="addPropDialog"
-              width="450" height="290" modal="true" resizable="false">
+              width="420" modal="true" resizable="false" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
-        <p:ajax event="close" listener="#{bean.onAddPropDialogClose()}" update="addPropForm"/>
-        <h:form id="addPropForm">
-            <div style="text-align: center; margin-bottom: 10px;">
+        <p:ajax event="close" listener="#{bean.onAddPropDialogClose()}" update="addPropForm" resetValues="true"/>
+
+        <h:form id="addPropForm" style="padding: 3px 0 3px 3px; margin-bottom: 45px;">
+            <div style="text-align: center; margin-bottom: 5px;">
                 <p:outputLabel value="Название" for="@next" style="margin-right: 5px;"/>
                 <p:inputText required="true" value="#{bean.newStructTypeProp.name}"
                              requiredMessage="#{global['validation.view.text']}" style="width: 300px;"/>
-                <p:message style="margin-left: 5px;" for="@previous" />
+                <p:message style="margin-top: 5px;" for="@previous" />
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 5px;">
                 <div style="margin-right: 10px;">
                     <p:outputLabel value="Тип" for="@next"/>
                     <p:selectOneMenu value="#{bean.newStructTypeProp.type}" style="width: 200px;">
@@ -265,7 +271,7 @@
                     </p:selectOneMenu>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-bottom: 5px;">
                 <div style="margin-right: 10px;">
                     <p:outputLabel value="Единицы измерения" for="@next"/>
                     <p:selectOneMenu value="#{bean.newStructTypeProp.measure}" style="width: 200px;">
@@ -286,13 +292,12 @@
             </div>
             <div style="text-align: center;">
                 <p:outputLabel value="Значение по умолчанию" for="@next" style="margin-right: 5px;"/>
-                <p:inputText value="#{bean.newStructTypeProp.def}" style="width: 245px;"/>
+                <p:inputText value="#{bean.newStructTypeProp.def}" style="width: 300px;"/>
             </div>
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              validateClient="true" update="addPropForm" action="#{bean.savePropWrapper}"/>
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addPropDialog').hide();"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addPropDialog').hide();" process="@this"/>
         </h:form>
     </p:dialog>
 </ui:composition>
-</html>

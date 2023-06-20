@@ -1,5 +1,6 @@
 package ru.tecon.admTools.systemParams.model.groundTemp;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -9,7 +10,7 @@ import java.util.StringJoiner;
  * Класс описывающий данные по температуре грунта
  * @author Maksim Shchelkonogov
  */
-public class GroundTemp {
+public class GroundTemp implements Serializable {
 
     private LocalDate date;
     private double value;

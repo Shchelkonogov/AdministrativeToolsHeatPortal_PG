@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi;
 
-import org.primefaces.event.RowEditEvent;
+import org.primefaces.PrimeFaces;
+import org.primefaces.event.CellEditEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.MultiYearTempSB;
 import ru.tecon.admTools.systemParams.model.MultiYearTemp;
@@ -22,11 +23,12 @@ import java.util.logging.Logger;
  */
 @Named("multiYearTemp")
 @ViewScoped
-public class MultiYearTempMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(MultiYearTempMB.class.getName());
+public class MultiYearTempMB implements Serializable, AutoUpdate {
 
     private List<MultiYearTemp> multiYearTemps = new ArrayList<>();
+
+    @Inject
+    private transient Logger logger;
 
     @EJB
     private MultiYearTempSB multiYearTempSB;
@@ -34,35 +36,49 @@ public class MultiYearTempMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    /**
-     * Метод выполняется при загрузки формы
-     */
-    public void onFormLoad() {
-        LOGGER.info("load form data");
+    @Override
+    public void update() {
+        logger.info("load form data");
 
-        loadData();
-    }
-
-    private void loadData() {
         multiYearTemps = multiYearTempSB.getMultiTnv();
     }
 
     /**
-     * Обработчик сохранения изменения строки
-     * @param event событие
+     * Метод обрабатывает нажатие на кнопку сохранить.
+     * Сохраняет изменения температур в базу
      */
-    public void onRowEdit(RowEditEvent<MultiYearTemp> event) {
-        LOGGER.info("update row " + event.getObject());
+    public void onSaveChanges() {
+        FacesContext context = FacesContext.getCurrentInstance();
 
-        MultiYearTemp temp = event.getObject();
+        List<String> errorMessages = new ArrayList<>();
 
-        try {
-            multiYearTempSB.updateMultiYearTemp(temp, utilMB.getLogin(), utilMB.getIp());
-        } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
-            loadData();
+        multiYearTemps.stream().filter(MultiYearTemp::isChanged).forEach(multiYearTemp -> {
+            logger.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " temperature " + multiYearTemp);
+
+            try {
+                multiYearTempSB.updateMultiYearTemp(multiYearTemp, utilMB.getLogin(), utilMB.getIp());
+                multiYearTemp.updateTemperature();
+            } catch (SystemParamException e) {
+                multiYearTemp.revert();
+                errorMessages.add(multiYearTemp.getName());
+                logger.warning(e.getMessage());
+            }
+        });
+
+        update();
+
+        if (!errorMessages.isEmpty()) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", String.join(", ", errorMessages)));
         }
+    }
+
+    /**
+     * Обработчик изменения значения температуры (изменение цвета ячейки)
+     * @param event событие изменения значения
+     */
+    public void onCellEdit(CellEditEvent<?> event) {
+        String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     public List<MultiYearTemp> getMultiYearTemps() {

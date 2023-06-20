@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ParamTypeSettingSB;
@@ -64,6 +65,13 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
 
     @Override
     public void update() {
+        loadData();
+
+        PrimeFaces.current().executeScript("PF('filterWidget').selectValue('')");
+        PrimeFaces.current().executeScript("PF('typeTableWV').filter()");
+    }
+
+    public void loadData() {
         logger.info("update data for form paramTypeSetting");
         typesFilter = types = bean.getParamTypes();
 
@@ -86,9 +94,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
         disableTypeRemoveBtn = true;
         disablePropRemoveBtn = true;
         disablePropAddBtn = true;
-
-        PrimeFaces.current().executeScript("PF('filterWidget').selectValue('')");
-        PrimeFaces.current().executeScript("PF('typeTableWV').filter()");
     }
 
     /**
@@ -195,7 +200,7 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
                 bean.removeTypeAggregate(selectedType, utilMB.getLogin(), utilMB.getIp());
             }
 
-            update();
+            loadData();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -211,7 +216,7 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
         try {
             bean.removeType(selectedType, utilMB.getLogin(), utilMB.getIp());
 
-            update();
+            loadData();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
@@ -228,8 +233,18 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
      */
     public void initAddType() {
         if (selectedType != null) {
+            System.out.println("need select " + selectedType.getParamType().getId());
             PrimeFaces.current().executeScript("PF('selectAddTypeVW').selectValue(" + selectedType.getParamType().getId() + ");");
+            PrimeFaces.current().executeScript("PF('selectAddTypeVW').callBehavior('valueChange')");
         }
+    }
+
+    /**
+     * Действие при отмене редактирования свойства
+     * @param event событие отмены редактирования
+     */
+    public void onRowEditCancel(RowEditEvent<ParamTypeTable> event) {
+        newTypes.remove(event.getObject());
     }
 
     /**
@@ -262,7 +277,7 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
                 newTypes.forEach(System.out::println);
             }
 
-            update();
+            loadData();
 
             PrimeFaces.current().executeScript("PF('typeTableWV').filter(); PF('addTypeDialog').hide();");
         } catch (SystemParamException e) {
@@ -453,6 +468,7 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
     }
 
     public void setNewParamType(ParamType newParamType) {
+        System.out.println("select " + newParamType);
         this.newParamType = newParamType;
     }
 

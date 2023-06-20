@@ -1,10 +1,11 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import org.primefaces.PrimeFaces;
+import org.primefaces.event.CellEditEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.ProblemPrioritySB;
 import ru.tecon.admTools.systemParams.model.ProblemPriority;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -22,11 +23,12 @@ import java.util.logging.Logger;
  */
 @Named("problemPriority")
 @ViewScoped
-public class ProblemPriorityMB implements Serializable {
-
-    private static final Logger LOGGER = Logger.getLogger(ProblemPriorityMB.class.getName());
+public class ProblemPriorityMB implements Serializable, AutoUpdate {
 
     private List<ProblemPriority> problemPriorityList = new ArrayList<>();
+
+    @Inject
+    private transient Logger logger;
 
     @EJB
     private ProblemPrioritySB problemPrioritySB;
@@ -34,8 +36,8 @@ public class ProblemPriorityMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
         problemPriorityList = problemPrioritySB.getProblemPriority();
     }
 
@@ -48,7 +50,7 @@ public class ProblemPriorityMB implements Serializable {
         List<String> errorMessages = new ArrayList<>();
 
         problemPriorityList.stream().filter(ProblemPriority::isChanged).forEach(problemPriority -> {
-            LOGGER.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " problem priority " + problemPriority);
+            logger.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " problem priority " + problemPriority);
 
             try {
                 problemPrioritySB.updateProblemPriority(problemPriority.getId(), problemPriority.getPriority(), utilMB.getLogin(), utilMB.getIp());
@@ -56,13 +58,24 @@ public class ProblemPriorityMB implements Serializable {
             } catch (SystemParamException e) {
                 problemPriority.revert();
                 errorMessages.add(problemPriority.getName());
-                LOGGER.warning(e.getMessage());
+                logger.warning(e.getMessage());
             }
         });
+
+        update();
 
         if (!errorMessages.isEmpty()) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", String.join(", ", errorMessages)));
         }
+    }
+
+    /**
+     * Обработик изменения ячейки таблицы
+     * @param event событие изменения
+     */
+    public void onCellEdit(CellEditEvent<?> event) {
+        String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     public List<ProblemPriority> getProblemPriorityList() {

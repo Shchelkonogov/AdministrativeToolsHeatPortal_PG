@@ -5,9 +5,11 @@ import java.util.StringJoiner;
 
 /**
  * Класс описывающий структуру таблицы статистических агрегатов
+ *
  * @author Aleksey Sergeev
  */
 public class StatAggrTable implements Serializable {
+
     private long id;
     private String stat_agr_code;
     private String stat_agr_name;

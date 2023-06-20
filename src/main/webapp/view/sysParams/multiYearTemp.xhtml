@@ -3,25 +3,14 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <h:form>
-        <p:remoteCommand autoRun="true" action="#{multiYearTemp.onFormLoad}" update="multiYearTemp"/>
-    </h:form>
-
     <h:form id="multiYearTemp" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Тнв по многолетним наблюдениям"/>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
+        <p:panel styleClass="tc-panel" header="Тнв по многолетним наблюдениям">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                 <p:dataTable id="tempTable" var="tempData" value="#{multiYearTemp.multiYearTemps}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{systemParamsUtil.write}">
+                             editable="#{systemParamsUtil.write}" editMode="cell">
 
-                    <p:ajax event="rowEdit" listener="#{multiYearTemp.onRowEdit}"
-                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"
-                            update="growl" />
+                    <p:ajax event="cellEdit" listener="#{multiYearTemp.onCellEdit}" />
 
                     <p:column headerText="Месяц">
                         <h:outputText style="display: block;" value="#{tempData.name}" />
@@ -36,11 +25,17 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
-                        <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
-                    </p:column>
                 </p:dataTable>
             </div>
-        </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
+                               onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
+                               action="#{multiYearTemp.onSaveChanges}" update="tempTable growl"
+                               oncomplete="PF('statusDialog').hide();">
+                    <h:outputText styleClass="ui-icon pi pi-save"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
     </h:form>
 </ui:composition>

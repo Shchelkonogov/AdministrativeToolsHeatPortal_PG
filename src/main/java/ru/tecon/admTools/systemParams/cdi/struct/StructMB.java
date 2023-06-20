@@ -3,10 +3,12 @@ package ru.tecon.admTools.systemParams.cdi.struct;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.AutoUpdate;
 import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
@@ -28,13 +30,14 @@ import java.util.logging.Logger;
  * Класс родитель для группы контроллеров категории структура
  * @author Maksim Shchelkonogov
  */
-public abstract class StructMB implements Serializable, MyConverter {
+public abstract class StructMB implements Serializable, MyConverter, AutoUpdate {
 
     private static final Logger LOGGER = Logger.getLogger(StructMB.class.getName());
 
-    private TreeNode root;
+    private TreeNode<StructType> root;
+    private TreeNode<StructType> rootFiltered;
 
-    private TreeNode selectedStructNode;
+    private TreeNode<StructType> selectedStructNode;
     private StructType selectedStruct;
     private List<StructTypeProp> structTypeProps;
     private StructTypeProp selectedStructProp;
@@ -53,6 +56,8 @@ public abstract class StructMB implements Serializable, MyConverter {
 
     private StructCurrentRemote structCurrentBean;
 
+    private String extendedHeader = "";
+
     private boolean addToRoot = true;
 
     @EJB
@@ -61,10 +66,15 @@ public abstract class StructMB implements Serializable, MyConverter {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    void initForm() {
-        root = new DefaultTreeNode(new StructType(), null);
+    @Override
+    public void update() {
+        root = rootFiltered = new DefaultTreeNode<>(new StructType(), null);
 
         loadData();
+
+        PrimeFaces.current().executeScript("PF('structTableWidget').clearFilters();");
+        PrimeFaces.current().executeScript("PF('structTableWidget').filter()");
+        PrimeFaces.current().executeScript("PF('structTableWidget').unselectAllNodes()");
     }
 
     List<StructType> getStructTypes() {
@@ -81,11 +91,11 @@ public abstract class StructMB implements Serializable, MyConverter {
 
         List<StructType> structTypes = getStructTypes();
 
-        Map<Long, TreeNode> nodes = new HashMap<>();
+        Map<Long, TreeNode<StructType>> nodes = new HashMap<>();
         nodes.put(null, root);
         for (StructType structType: structTypes) {
-            TreeNode parent = nodes.get(structType.getParentID());
-            DefaultTreeNode treeNode = new DefaultTreeNode(structType, parent);
+            TreeNode<StructType> parent = nodes.get(structType.getParentID());
+            DefaultTreeNode<StructType> treeNode = new DefaultTreeNode<>(structType, parent);
             if (expandedNodes.contains(structType)) {
                 treeNode.setExpanded(true);
             }
@@ -97,6 +107,8 @@ public abstract class StructMB implements Serializable, MyConverter {
                 treeNode.setExpanded(true);
             }
         });
+
+        extendedHeader = "";
 
         structTypeProps = null;
         selectedStruct = null;
@@ -110,7 +122,7 @@ public abstract class StructMB implements Serializable, MyConverter {
      * @return список элементов
      */
     private List<StructType> getExpandedNodes() {
-        return getExpandedNodes(root);
+        return getExpandedNodes(rootFiltered);
     }
 
     /**
@@ -118,12 +130,11 @@ public abstract class StructMB implements Serializable, MyConverter {
      * @param startFrom начинать с этого узла
      * @return список элементов
      */
-    private List<StructType> getExpandedNodes(TreeNode startFrom){
+    private List<StructType> getExpandedNodes(TreeNode<StructType> startFrom){
         List<StructType> result = new ArrayList<>();
-        List<TreeNode> subChild = startFrom.getChildren();
-        for (TreeNode treeNode: subChild) {
+        for (TreeNode<StructType> treeNode: startFrom.getChildren()) {
             if (treeNode.isExpanded()) {
-                result.add((StructType) treeNode.getData());
+                result.add(treeNode.getData());
             }
             if (!treeNode.isLeaf()) {
                 result.addAll(getExpandedNodes(treeNode));
@@ -144,6 +155,8 @@ public abstract class StructMB implements Serializable, MyConverter {
 
         selectedStructProp = null;
         disableRemoveStructPropBtn = true;
+
+        extendedHeader = selectedRow.getName();
     }
 
     /**
@@ -327,14 +340,14 @@ public abstract class StructMB implements Serializable, MyConverter {
         return structTypeProps;
     }
 
-    public TreeNode getSelectedStructNode() {
+    public TreeNode<StructType> getSelectedStructNode() {
         return selectedStructNode;
     }
 
-    public void setSelectedStructNode(TreeNode selectedStructNode) {
+    public void setSelectedStructNode(TreeNode<StructType> selectedStructNode) {
         this.selectedStructNode = selectedStructNode;
         if (selectedStructNode != null) {
-            this.selectedStruct = (StructType) selectedStructNode.getData();
+            this.selectedStruct = selectedStructNode.getData();
         } else {
             this.selectedStruct = null;
         }
@@ -384,7 +397,7 @@ public abstract class StructMB implements Serializable, MyConverter {
         this.structBean = structBean;
     }
 
-    public TreeNode getRoot() {
+    public TreeNode<StructType> getRoot() {
         return root;
     }
 
@@ -397,10 +410,41 @@ public abstract class StructMB implements Serializable, MyConverter {
         this.addToRoot = addToRoot;
     }
 
+    /**
+     * Получение текста подтверждения удаления
+     * @return текст подтверждения удаления
+     */
     public String getConfirmRemoveText() {
         if ((selectedStructProp != null) && (selectedStructProp.getCount() != 0)) {
             return "У " + selectedStructProp.getCount() + " типов есть данное свойство.";
         }
         return "";
+    }
+
+    /**
+     * Получение текста описания свойства
+     * @return описание свойства
+     */
+    public String getPropHeaderExtended() {
+        if ((extendedHeader != null) && (!extendedHeader.isEmpty())) {
+            return " (" + extendedHeader + ")";
+        }
+        return "";
+    }
+
+    /**
+     * Действие при отмене редактирования свойства
+     * @param event событие отмены редактирования
+     */
+    public void onRowEditCancel(RowEditEvent<StructTypeProp> event) {
+        newStructTypeProps.remove(event.getObject());
+    }
+
+    public TreeNode<StructType> getRootFiltered() {
+        return rootFiltered;
+    }
+
+    public void setRootFiltered(TreeNode<StructType> rootFiltered) {
+        this.rootFiltered = rootFiltered;
     }
 }

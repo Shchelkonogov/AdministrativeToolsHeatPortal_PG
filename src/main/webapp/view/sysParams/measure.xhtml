@@ -5,28 +5,14 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <h:form>
-        <p:remoteCommand name="saveMeasureWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+        <p:remoteCommand name="saveMeasureWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide(); PF('measureTable').filter();"
                          action="#{measureMB.onAddMeasure()}" rendered="#{systemParamsUtil.write}"
-                         update="measureForm:measureTable measureForm:btnRemove growl" />
+                         update="measureForm:btnRemove growl" />
     </h:form>
 
     <h:form id="measureForm" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Справочник единиц измерений"/>
-            <div style="padding: 3px;">
-                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                 disabled="#{measureMB.disableRemoveBtn}" action="#{measureMB.onRemoveMeasure}"
-                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                 update="measureForm:measureTable measureForm:btnRemove growl"
-                                 rendered="#{systemParamsUtil.write}"/>
-                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 onclick="PF('addMeasureDialog').show();" rendered="#{systemParamsUtil.write}"/>
-            </div>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
+        <p:panel id="measurePanel" styleClass="tc-panel" header="Справочник единиц измерений">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                 <p:dataTable id="measureTable" var="measureData" widgetVar="measureTable" value="#{measureControllerApplication.measures}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                              editable="#{systemParamsUtil.write}" disabledSelection="#{!systemParamsUtil.write}"
@@ -58,35 +44,53 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column width="30" style="text-align: center" rendered="#{systemParamsUtil.write}">
+                    <p:column width="40" style="text-align: center" rendered="#{systemParamsUtil.write}">
                         <p:rowEditor editTitle="Изменить строку" cancelTitle="Отменить изменения" saveTitle="Сохранить строку" />
                     </p:column>
                 </p:dataTable>
+
+                <f:facet name="actions">
+                    <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                                   onclick="PF('addMeasureDialog').show();" rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                    </p:commandLink>
+                    <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                                   disabled="#{measureMB.disableRemoveBtn}" action="#{measureMB.onRemoveMeasure}"
+                                   onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide(); PF('measureTable').filter();"
+                                   update="measureForm:btnRemove growl"
+                                   rendered="#{systemParamsUtil.write}">
+                        <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                    </p:commandLink>
+                </f:facet>
             </div>
-        </div>
+        </p:panel>
     </h:form>
 
     <p:dialog id="addMeasureDialog" rendered="#{systemParamsUtil.write}" header="Добавить новую единицу измерения"
-              widgetVar="addMeasureDialog" modal="true" resizable="false" onShow="PF('addMeasureDialog').initPosition();">
+              widgetVar="addMeasureDialog" modal="true" resizable="false" onShow="PF('addMeasureDialog').initPosition();"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
-        <p:ajax event="close" listener="#{measureMB.onAddMeasureDialogClose()}" update="addMeasureForm"/>
+        <p:ajax event="close" listener="#{measureMB.onAddMeasureDialogClose()}" update="addMeasureForm" resetValues="true"/>
+
         <h:form id="addMeasureForm">
-            <h:panelGrid columns="3" style="margin-bottom: 35px;">
+            <h:panelGrid columns="2" style="margin-bottom: 45px;">
                 <p:outputLabel value="Название" for="@next"/>
                 <p:inputText required="true" value="#{measureMB.addMeasure.name}"
-                             requiredMessage="#{global['validation.view.text']}"/>
-                <p:message for="@previous"/>
+                             requiredMessage="#{global['validation.view.text']}" style="width: 287px;"/>
+                <div></div>
+                <p:message for="@previous" styleClass="tc-show-on-active"/>
 
                 <p:outputLabel value="Обозначение" for="@next"/>
                 <p:inputText required="true" value="#{measureMB.addMeasure.shortName}"
-                             requiredMessage="#{global['validation.view.text']}"/>
-                <p:message for="@previous"/>
+                             requiredMessage="#{global['validation.view.text']}" style="width: 287px;"/>
+                <div></div>
+                <p:message for="@previous" styleClass="tc-show-on-active"/>
             </h:panelGrid>
 
-            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 95px;"
+            <p:commandButton value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
                              validateClient="true" update="addMeasureForm" action="#{measureMB.addMeasureWrapper}"/>
-            <p:commandButton value="Отмена" styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"
-                             onclick="PF('addMeasureDialog').hide();"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addMeasureDialog').hide();" process="@this"/>
         </h:form>
     </p:dialog>
 </ui:composition>

@@ -2,6 +2,7 @@ package ru.tecon.admTools.systemParams.model.paramTypeSetting;
 
 import ru.tecon.admTools.systemParams.model.Measure;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -9,7 +10,7 @@ import java.util.*;
  * @author Maksim Shchelkonogov
  * 16.02.2023
  */
-public class ParamTypeTable {
+public class ParamTypeTable implements Serializable {
 
     private UUID rowIndex;
     private ParamType paramType;

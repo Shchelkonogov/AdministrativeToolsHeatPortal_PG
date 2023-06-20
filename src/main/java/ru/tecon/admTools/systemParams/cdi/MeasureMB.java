@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 @Named("measureMB")
 @ViewScoped
-public class MeasureMB implements Serializable {
+public class MeasureMB implements Serializable, AutoUpdate {
 
     private Measure selectedMeasure;
     private Measure addMeasure = new Measure();
@@ -42,6 +42,12 @@ public class MeasureMB implements Serializable {
 
     @Inject
     private MeasureController measures;
+
+    @Override
+    public void update() {
+        PrimeFaces.current().executeScript("PF('measureTable').filter();");
+        PrimeFaces.current().executeScript("PF('measureTable').unselectAllRows();");
+    }
 
     /**
      * Обработчик сохранения изменения строки

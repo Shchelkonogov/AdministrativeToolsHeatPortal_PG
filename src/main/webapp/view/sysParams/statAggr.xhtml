@@ -11,29 +11,13 @@
     </h:form>
 
     <h:form id="statAggrForm" style="height: 100%;">
-        <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-            <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Статистические агрегаты"/>
-            <div style="padding: 3px;">
-                <p:commandButton id="btnRemove" icon="btnRemove" styleClass="iconOnlyButton btnLeft"
-                                 disabled="#{statAggrMB.disableRemoveBtn}" action="#{statAggrMB.onRemoveTableParam}"
-                                 onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-                                 update="statAggrForm:statAggrTable statAggrForm:btnRemove"
-                                 rendered="#{systemParamsUtil.write}" />
-                <p:commandButton icon="btnAdd" styleClass="iconOnlyButton btnRight"
-                                 update="statAggrForm:statAggrTable"
-                                 onclick="PF('addNewParam').show();"
-                                 rendered="#{systemParamsUtil.write}" />
-            </div>
-        </div>
-        <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-            <div style="height: 100%;">
+        <p:panel styleClass="tc-panel" header="Статистические агрегаты">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                 <p:dataTable id="statAggrTable" var="statAggrData" widgetVar="statAggrTable" value="#{statAggrMB.statsAggrTable}"
                              scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
                              editable="#{systemParamsUtil.write}"
                              selectionMode="single" selection="#{statAggrMB.selectedPartInSATable}"
-                             rowKey="#{statAggrData.id}">
+                             rowKey="#{statAggrData.id}" disabledSelection="#{!systemParamsUtil.write}">
 
                     <p:ajax event="rowSelect" listener="#{statAggrMB.onRowSelect}" update="statAggrForm:btnRemove" />
 
@@ -42,7 +26,7 @@
                     </p:column>
 
                     <p:column headerText="Код статистического агрегата" width="200" style="white-space: nowrap">
-                              <h:outputText style="display: block; width: 200px;" value="#{statAggrData.stat_agr_code}" />
+                        <h:outputText style="display: block; width: 200px;" value="#{statAggrData.stat_agr_code}" />
                     </p:column>
 
                     <p:column headerText="Имя статистического агрегата" >
@@ -53,42 +37,64 @@
                     </p:column>
                 </p:dataTable>
             </div>
-        </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                               update="statAggrForm:statAggrTable" onclick="PF('addNewParam').show();"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                </p:commandLink>
+                <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                               disabled="#{statAggrMB.disableRemoveBtn}" action="#{statAggrMB.onRemoveTableParam}"
+                               onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                               update="statAggrForm:statAggrTable statAggrForm:btnRemove"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
     </h:form>
 
     <p:dialog id="dialog" header="Добавление нового статистического агрегата" widgetVar="addNewParam" modal="true"
-              resizable="false" rendered="#{systemParamsUtil.write}" >
+              resizable="false" rendered="#{systemParamsUtil.write}" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
-        <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="addStatAggrForm"/>
+        <p:ajax event="close" listener="#{statAggrMB.onAddStatAggrDialogClose}" update="addStatAggrForm" resetValues="true"/>
 
         <h:form id="addStatAggrForm">
-            <h:panelGrid columns="3" style="margin-bottom: 35px;">
+            <h:panelGrid columns="2" style="margin-bottom: 45px;">
                 <p:outputLabel value="ID" for="@next"/>
                 <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
-                               requiredMessage="#{global['validation.view.text']}"/>
-                <p:message for="@previous"/>
+                               requiredMessage="#{global['validation.view.text']}" styleClass="tc-width-290"/>
+
+                <h:panelGroup layout="block"/>
+                <p:message for="inputId" styleClass="tc-show-on-active"/>
 
                 <p:outputLabel value="Код статистического агрегата" for="@next"/>
-                <p:inputText required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_code}"
-                             requiredMessage="#{global['validation.view.text']}" style="width: 200px;"/>
-                <p:message for="@previous" />
+                <p:inputText id="inputCode" required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_code}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 290px;"/>
+
+                <h:panelGroup layout="block"/>
+                <p:message for="inputCode" styleClass="tc-show-on-active"/>
 
                 <p:outputLabel value="Имя статистического агрегата" for="@next"/>
-                <p:inputText required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_name}"
-                             requiredMessage="#{global['validation.view.text']}" style="width: 200px;"/>
-                <p:message for="@previous" />
+                <p:inputText id="inptuName" required="true" value="#{statAggrMB.addStatAggrTable.stat_agr_name}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 290px;"/>
+
+                <h:panelGroup layout="block"/>
+                <p:message for="inptuName" styleClass="tc-show-on-active"/>
 
                 <p:outputLabel value="Интегратор/дифференциатор " for="@next"/>
-                <p:selectOneMenu id="params" style="width: 200px;" value="#{statAggrMB.addStatAggrTable.dif_int}">
+                <p:selectOneMenu id="params" style="width: 290px;" value="#{statAggrMB.addStatAggrTable.dif_int}">
                     <f:selectItem itemLabel="Интегратор" itemValue="I"/>
                     <f:selectItem itemLabel="Дифференциатор" itemValue="D"/>
                 </p:selectOneMenu>
             </h:panelGrid>
 
-            <p:commandButton value="Сохранить" id="btnSave" style="position: absolute; bottom: 5px; right: 95px;" action="#{statAggrMB.onSaveChangesWrapper}"
-                             validateClient="true" update="@form"/>
+            <p:commandButton value="Сохранить" id="btnSave" action="#{statAggrMB.onSaveChangesWrapper}"
+                             style="position: absolute; bottom: 5px; right: 100px;"
+                             validateClient="true" update="@form" styleClass="tc-no-loading"/>
             <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewParam').hide();"
-                             styleClass="ui-button-secondary" style="position: absolute; bottom: 5px; right: 5px;"/>
+                             styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;" process="@this"/>
         </h:form>
     </p:dialog>
 </ui:composition>

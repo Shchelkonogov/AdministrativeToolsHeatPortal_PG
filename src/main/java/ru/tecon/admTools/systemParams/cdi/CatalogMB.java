@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -8,8 +9,8 @@ import ru.tecon.admTools.systemParams.ejb.CatalogSB;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogProp;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogType;
 import ru.tecon.admTools.systemParams.model.catalog.LazyCustomDataModel;
+import ru.tecon.admTools.systemParams.model.struct.StructTypeProp;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  */
 @Named("catalog")
 @ViewScoped
-public class CatalogMB implements Serializable {
+public class CatalogMB implements Serializable, AutoUpdate {
 
     private static final Logger LOGGER = Logger.getLogger(CatalogMB.class.getName());
 
@@ -48,9 +49,17 @@ public class CatalogMB implements Serializable {
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
+    @Override
+    public void update() {
         loadData();
+
+        PrimeFaces.current().executeScript("PF('catalogTypeWidget').clearFilters();");
+        PrimeFaces.current().executeScript("PF('catalogTypeWidget').filter();");
+        PrimeFaces.current().executeScript("PF('catalogTypeWidget').unselectAllRows();");
+
+        PrimeFaces.current().executeScript("PF('catalogPropWidget').clearFilters();");
+        PrimeFaces.current().executeScript("PF('catalogPropWidget').filter();");
+        PrimeFaces.current().executeScript("PF('catalogPropWidget').unselectAllRows();");
     }
 
     /**
@@ -98,6 +107,11 @@ public class CatalogMB implements Serializable {
 
         selectedCatalogProp = null;
         disableRemovePropBtn = true;
+
+        // Заглушка с расчетом размера scroll, когда используется virtualScroll он как-то странно рассчитывается
+        if (selectedCatalogType.getCatalogProps().size() > 10) {
+            PrimeFaces.current().executeScript("$('#catalogPanel\\\\:catalogPropPanel_content .ui-datatable-virtualscroll-wrapper').css('height', " + selectedCatalogType.getCatalogProps().size() * 31.7 + ");");
+        }
     }
 
     /**
@@ -196,6 +210,10 @@ public class CatalogMB implements Serializable {
         } catch (SystemParamException e) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
         }
+    }
+
+    public void onRowEditCancel(RowEditEvent<CatalogProp> event) {
+        newCatalogType.getCatalogProps().remove(event.getObject());
     }
 
     public void onAddTypeDialogClose() {

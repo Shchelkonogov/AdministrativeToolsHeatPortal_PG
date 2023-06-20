@@ -3,63 +3,60 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
+    <h:form id="seasonChangePanel" style="height: 100%;">
+        <p:panel styleClass="tc-panel" header="Переключение сезона">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
+                <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable"
+                             value="#{seasonChangeMB.seasonChangeTableList}" scrollable="true" scrollHeight="100%"
+                             emptyMessage="#{global['table.empty.value']}" rowKey="#{seasonChangeData.season}">
 
-    <h:form id="seasonChangePanel" style="height: 100%; display: flex;">
-        <div style="height: 100%; flex: 1 1 0; margin-right: 5px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;
-                    border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                    border-top-left-radius: 3px; height: 41px;">
-                <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Переключение сезона"/>
-                <div style="padding: 3px;">
-                    <p:commandButton id="btnChange" rendered="#{systemParamsUtil.write}" value="Сменить отопительный сезон"
-                                     onclick="PF('cd').show();"/>
-                    <p:confirmDialog id="confirm" header="Подтверждение" widgetVar="cd" closable="false">
-                        <f:facet name="message">
-                            <span class="ui-icon pi pi-info-circle" style="display: inline-block; font-size: 2em;"/>
-                            <span style="display: inline-block; vertical-align: middle;">
+                    <p:column headerText="Сезон" width="100" styleClass="center">
+                        <h:outputText value="#{seasonChangeData.season}" />
+                    </p:column>
+
+                    <p:column headerText="Начало" styleClass="center">
+                        <h:outputText value="#{seasonChangeData.start_timeAsString}" />
+                    </p:column>
+
+                    <p:column headerText="Окончание" styleClass="center">
+                        <h:outputText value="#{seasonChangeData.end_timeAsString}" />
+
+                    </p:column>
+                    <p:column headerText="Переключил" width="150" styleClass="center">
+                        <h:outputText value="#{seasonChangeData.name}" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-small tc-no-loading"
+                               onclick="PF('cd').show();" rendered="#{systemParamsUtil.write}"
+                               title="Сменить отопительный сезон" >
+                    <h:outputText styleClass="ui-icon pi pi-sync"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
+
+        <p:confirmDialog id="confirm" header="Подтверждение" widgetVar="cd" closable="false" styleClass="tc-panel">
+            <f:facet name="message">
+                <span class="ui-icon pi pi-info-circle" style="display: inline-block; font-size: 2em;"/>
+                <span style="display: inline-block; vertical-align: middle;">
                                 Вы собираетесь сменить отопительный сезон в АС "Текон-Диспетчеризация"
                                 <br/><br/>
                                 При смене сезона будут безвозвратно закрыты все извещения, отключенные от
                                 <br/><br/>
                                 контроля в наступающем сезоне, не зависимо от их текущего состояния.
                             </span>
-                        </f:facet>
-                        <p:selectBooleanCheckbox id="confirmCheckBox" value="#{seasonChangeMB.disableSaveBtn}"
-                                                 itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
-                            <p:ajax event="valueChange" update="okButton"/>
-                        </p:selectBooleanCheckbox>
-                        <p:commandButton value="Нет" update="seasonChangeTable confirmCheckBox okButton" action="#{seasonChangeMB.setDisableSaveBtn(false)}"
-                                         oncomplete="PF('cd').hide();"/>
-                        <p:commandButton value="Да" id="okButton" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();"
-                                         update="seasonChangeTable confirmCheckBox okButton growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
-                                         disabled="#{!seasonChangeMB.disableSaveBtn}" />
-                    </p:confirmDialog>
-                </div>
-            </div>
-            <div style="border: 1px solid #c8c8c8; height: calc(100% - 5px); padding: 3px;">
-                <div style="height: calc(100% - 45px);">
-                    <p:dataTable id="seasonChangeTable" var="seasonChangeData" widgetVar="seasonChangeTable"
-                                 value="#{seasonChangeMB.seasonChangeTableList}" scrollable="true" scrollHeight="100%"
-                                 emptyMessage="#{global['table.empty.value']}" rowKey="#{seasonChangeData.season}">
-
-                        <p:column headerText="Сезон" width="100" styleClass="center">
-                            <h:outputText value="#{seasonChangeData.season}" />
-                        </p:column>
-
-                        <p:column headerText="Начало" styleClass="center">
-                            <h:outputText value="#{seasonChangeData.start_timeAsString}" />
-                        </p:column>
-
-                        <p:column headerText="Окончание" styleClass="center">
-                            <h:outputText value="#{seasonChangeData.end_timeAsString}" />
-
-                        </p:column>
-                        <p:column headerText="Переключил" width="150" styleClass="center">
-                            <h:outputText value="#{seasonChangeData.name}" />
-                        </p:column>
-                    </p:dataTable>
-                </div>
-            </div>
-        </div>
+            </f:facet>
+            <p:selectBooleanCheckbox id="confirmCheckBox" value="#{seasonChangeMB.disableSaveBtn}"
+                                     itemLabel="Я принимаю на себя ответственность за смену отопительного сезона в Системе." >
+                <p:ajax event="valueChange" update="okButton"/>
+            </p:selectBooleanCheckbox>
+            <p:commandButton value="Нет" update="seasonChangeTable confirmCheckBox okButton" action="#{seasonChangeMB.setDisableSaveBtn(false)}"
+                             oncomplete="PF('cd').hide();" styleClass="ui-button-secondary tc-no-loading"/>
+            <p:commandButton value="Да" id="okButton" action="#{seasonChangeMB.onSeasonChange}" onclick="PF('statusDialog').show();"
+                             update="seasonChangeTable confirmCheckBox okButton growl" oncomplete="PF('statusDialog').hide(); PF('cd').hide();"
+                             disabled="#{!seasonChangeMB.disableSaveBtn}" styleClass="tc-no-loading"/>
+        </p:confirmDialog>
     </h:form>
 </ui:composition>

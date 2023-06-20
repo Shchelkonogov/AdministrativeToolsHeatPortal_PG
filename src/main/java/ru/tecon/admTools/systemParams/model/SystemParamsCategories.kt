@@ -6,4 +6,7 @@ package ru.tecon.admTools.systemParams.model
  * @author Maksim Shchelkonogov
  * 19.05.2023
  */
-data class SystemParamsCategories(val path: String, val beanName: String)
+data class SystemParamsCategories(val path: String, val beanName: String) {
+
+    constructor(path: String) : this(path, "")
+}
