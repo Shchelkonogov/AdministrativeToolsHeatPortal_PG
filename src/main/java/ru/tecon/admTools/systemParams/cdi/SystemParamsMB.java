@@ -52,7 +52,10 @@ public class SystemParamsMB implements Serializable {
             {"Основные параметры", new SystemParamsCategories("/view/sysParams/mainParam.xhtml", "mainParamMB")},
             {"Статистические агрегаты", new SystemParamsCategories("/view/sysParams/statAggr.xhtml", "statAggrMB")},
             {"Переключение сезона", new SystemParamsCategories("/view/sysParams/seasonChange.xhtml", "seasonChangeMB")},
-            {"Настройка типа параметра", new SystemParamsCategories("/view/sysParams/paramTypeSetting.xhtml", "paramTypeSetting")}
+            {"Настройка типа параметра", new SystemParamsCategories("/view/sysParams/paramTypeSetting.xhtml", "paramTypeSetting")},
+            {"Обобщенная модель", new SystemParamsCategories("/view/sysParams/genModel.xhtml")},
+            {"Плановые отключения", new SystemParamsCategories("/view/sysParams/plannedOutages.xhtml")},
+            {"Прочие", new SystemParamsCategories("/view/sysParams/other.xhtml")}
     }).collect(Collectors.toMap(k -> (String) k[0], v -> (SystemParamsCategories) v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String content = "";
