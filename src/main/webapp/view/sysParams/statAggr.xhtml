@@ -63,7 +63,7 @@
         <h:form id="addStatAggrForm">
             <h:panelGrid columns="2" style="margin-bottom: 45px;">
                 <p:outputLabel value="ID" for="@next"/>
-                <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" minValue="-9999" maxValue="9999"
+                <p:inputNumber id="inputId" required="true" value="#{statAggrMB.addStatAggrTable.id}" emptyValue="0"
                                requiredMessage="#{global['validation.view.text']}" styleClass="tc-width-290"/>
 
                 <h:panelGroup layout="block"/>
