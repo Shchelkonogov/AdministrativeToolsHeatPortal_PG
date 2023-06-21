@@ -40,7 +40,6 @@ public class SystemParamsMB implements Serializable {
             {"Устройства", new SystemParamsCategories("/view/sysParams/struct/structDevices.xhtml", "structDevices")},
             {"Единицы измерения", new SystemParamsCategories("/view/sysParams/measure.xhtml", "measureMB")},
             {"Справочники", new SystemParamsCategories("/view/sysParams/catalog.xhtml", "catalog")},
-            {"Тип объекта по умолчанию", new SystemParamsCategories("/view/sysParams/defaultValues.xhtml")},
             {"Температурные графики", new SystemParamsCategories("/view/sysParams/temperature/tempGraphs.xhtml", "tempGraphs")},
             {"Суточные снижения", new SystemParamsCategories("/view/sysParams/temperature/dailyReduction.xhtml", "dailyReduction")},
             {"Коэффициенты для режимной карты", new SystemParamsCategories("/view/sysParams/coefficientsForRegimeCard.xhtml", "coefficientsRC")},
@@ -53,9 +52,8 @@ public class SystemParamsMB implements Serializable {
             {"Статистические агрегаты", new SystemParamsCategories("/view/sysParams/statAggr.xhtml", "statAggrMB")},
             {"Переключение сезона", new SystemParamsCategories("/view/sysParams/seasonChange.xhtml", "seasonChangeMB")},
             {"Настройка типа параметра", new SystemParamsCategories("/view/sysParams/paramTypeSetting.xhtml", "paramTypeSetting")},
-            {"Обобщенная модель", new SystemParamsCategories("/view/sysParams/genModel.xhtml")},
-            {"Плановые отключения", new SystemParamsCategories("/view/sysParams/plannedOutages.xhtml")},
-            {"Прочие", new SystemParamsCategories("/view/sysParams/other.xhtml")}
+//            {"Обобщенная модель", new SystemParamsCategories("/view/sysParams/genModel.xhtml")},
+            {"Прочее", new SystemParamsCategories("/view/sysParams/other.xhtml")}
     }).collect(Collectors.toMap(k -> (String) k[0], v -> (SystemParamsCategories) v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
     private String content = "";
