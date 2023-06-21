@@ -3,36 +3,34 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-
    <h:form id="plannedOutagesPanel" style="height: 100%; ">
-
-      <div style="display: flex; align-items: center; justify-content: space-between;
-                border: 1px solid #c8c8c8; background-color: #f4f4f4; border-top-right-radius: 3px;
-                border-top-left-radius: 3px; height: 41px;">
-         <h:outputText style="font-weight: 700; margin-left: 15px; color: #333;" value="Плановые отключения"/>
+      <p:panel styleClass="tc-panel" header="Плановые отключения">
          <div style="padding: 3px;">
-            <p:commandButton rendered="#{systemParamsUtil.write}" value="Сохранить" onclick="PF('statusDialog').show();"
-                             action="#{plannedOutagesMB.save}" update="plannedOutagesPanel"
-                             oncomplete="PF('statusDialog').hide();" />
+            <h:panelGrid columns="2" style="margin: auto;">
+               <p:outputLabel value="Максимальный перид до начала отключения" style="font-weight: bold;"/>
+               <p:outputLabel value="&quot;#{plannedOutagesMB.begShutdownRange.shutdownRange}&quot;"
+                              style="font-weight: bold;"
+                              rendered="#{!systemParamsUtil.write}"/>
+               <p:inputNumber value="#{plannedOutagesMB.begShutdownRange.shutdownRange}" rendered="#{systemParamsUtil.write}"
+                              styleClass="tc-width-45" emptyValue="0" minValue="0" maxValue="365"/>
+
+               <p:outputLabel value="Максимальная продолжительность отключения" style="font-weight: bold;"/>
+               <p:outputLabel value="&quot;#{plannedOutagesMB.endShutdownRange.shutdownRange}&quot;"
+                              style="font-weight: bold;"
+                              rendered="#{!systemParamsUtil.write}"/>
+               <p:inputNumber value="#{plannedOutagesMB.endShutdownRange.shutdownRange}" rendered="#{systemParamsUtil.write}"
+                              styleClass="tc-width-45" emptyValue="0" minValue="0" maxValue="365"/>
+            </h:panelGrid>
          </div>
 
-      </div>
-
-      <h:panelGrid columns="4" style="display: flex; justify-content: center; border: 1px solid #c8c8c8;
-      height: calc(100% - 5px); padding: 3px; align-items: center">
-
-         <h:outputLabel value="Максимальный период до начала отключения" style="margin-right: 10px;"/>
-         <h:outputLabel value="#{plannedOutagesMB.begShutdownRange.shutdownRange}" rendered="#{!systemParamsUtil.write}"/>
-         <p:inputNumber value="#{plannedOutagesMB.begShutdownRange.shutdownRange}" rendered="#{systemParamsUtil.write}"
-         valueChangeListener="#{plannedOutagesMB.changedBeg}"/>
-
-
-         <h:outputLabel value="Максимальная продолжительность отключения" style="margin-right: 10px; margin-left: 70px"/>
-         <h:outputLabel value="#{plannedOutagesMB.endShutdownRange.shutdownRange}" rendered="#{!systemParamsUtil.write}"/>
-         <p:inputNumber value="#{plannedOutagesMB.endShutdownRange.shutdownRange}" rendered="#{systemParamsUtil.write}"
-                        valueChangeListener="#{plannedOutagesMB.changedEnd}"/>
-
-      </h:panelGrid>
-
+         <f:facet name="actions">
+            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
+                           onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
+                           action="#{plannedOutagesMB.save}" update="plannedOutagesPanel"
+                           oncomplete="PF('statusDialog').hide();">
+               <h:outputText styleClass="ui-icon pi pi-save"/>
+            </p:commandLink>
+         </f:facet>
+      </p:panel>
    </h:form>
 </ui:composition>

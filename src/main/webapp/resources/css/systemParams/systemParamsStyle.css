@@ -464,6 +464,10 @@ body .ui-treetable .ui-treetable-data>tr>td .ui-treetable-toggler {
     width: 30px;
 }
 
+.tc-width-45 .ui-inputtext {
+    width: 45px;
+}
+
 /*Стили для отображения colorPicker в настроечной форме Расцветка параметров*/
 
 #colorForm\:colorTable .ui-colorpicker>button {

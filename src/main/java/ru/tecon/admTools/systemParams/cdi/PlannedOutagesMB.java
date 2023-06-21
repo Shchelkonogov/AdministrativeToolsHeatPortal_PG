@@ -8,11 +8,9 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import java.io.Serializable;
-
 
 /**
  * Контроллер для формы плановые отключения
@@ -65,28 +63,10 @@ public class PlannedOutagesMB implements Serializable {
     public void save() {
         if (begShutdownRange.isChanged()) {
             saveNewBegShutdownRange();
-            begShutdownRange.setChanged(false);
-
         }
         if (endShutdownRange.isChanged()) {
             saveNewEndShutdownRange();
-            endShutdownRange.setChanged(false);
         }
-    }
-
-    /**
-     * Обработчик изменения значения для начала
-     */
-    public void changedBeg(ValueChangeEvent ignored) {
-        begShutdownRange.setChanged(true);
-
-    }
-
-    /**
-     * Обработчик изменения значения для конца
-     */
-    public void changedEnd(ValueChangeEvent ignored) {
-        endShutdownRange.setChanged(true);
     }
 
     public ShutdownRange getBegShutdownRange() {

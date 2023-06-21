@@ -13,36 +13,48 @@ import java.util.StringJoiner;
 public class ShutdownRange implements Serializable {
 
     private int shutdownRange;
-    private boolean changed;
+    private int newShutdownRange;
 
     public ShutdownRange() {
     }
 
-    public ShutdownRange(int shutdownRange, boolean changed) {
+    public ShutdownRange(int shutdownRange) {
+        this();
         this.shutdownRange = shutdownRange;
-        this.changed = changed;
+        this.newShutdownRange = shutdownRange;
     }
 
     public int getShutdownRange() {
-        return shutdownRange;
+        return newShutdownRange;
     }
 
     public void setShutdownRange(int shutdownRange) {
-        this.shutdownRange = shutdownRange;
+        this.newShutdownRange = shutdownRange;
     }
 
     public boolean isChanged() {
-        return changed;
+        return shutdownRange != newShutdownRange;
     }
 
-    public void setChanged(boolean changed) {
-        this.changed = changed;
+    /**
+     * Подтверждение изменения значения
+     */
+    public void updateValue() {
+        shutdownRange = newShutdownRange;
+    }
+
+    /**
+     * Отмена изменения значения
+     */
+    public void revert() {
+        newShutdownRange = shutdownRange;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", ShutdownRange.class.getSimpleName() + "[", "]")
                 .add("shutdownRange=" + shutdownRange)
+                .add("newShutdownRange=" + newShutdownRange)
                 .toString();
     }
 }
