@@ -5,14 +5,16 @@
                 xmlns:p="http://primefaces.org/ui">
     <h:form id="defaultValuesPanel" style="height: 100%;">
         <p:panel styleClass="tc-panel" header="Тип объекта по умолчанию">
-            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px; text-align: center;">
+            <div style="height: calc(100% - 6px); padding: 3px; text-align: center;">
+                <p:outputLabel for="@next" value="Тип объекта по умолчанию" style="font-weight: bold; vertical-align: middle; margin-right: 5px;"/>
                 <p:selectOneMenu id="objectTypeSelector" value="#{defaultValues.selectedObjectType}"
-                                 style="width: 300px; margin-top: 5px;" rendered="#{systemParamsUtil.write}">
+                                 style="width: 300px;" rendered="#{systemParamsUtil.write}">
                     <f:converter converterId="objectTypeConverter" />
                     <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
                                    itemLabel="#{objType.name}" itemValue="#{objType}" />
                 </p:selectOneMenu>
-                <h:outputText rendered="#{!systemParamsUtil.write}" value="#{objectTypeControllerApplication.defaultObjectType.name}"/>
+                <p:outputLabel rendered="#{!systemParamsUtil.write}" style="font-weight: bold; vertical-align: middle;"
+                               value="&quot;#{objectTypeControllerApplication.defaultObjectType.name}&quot;"/>
             </div>
 
             <f:facet name="actions">
