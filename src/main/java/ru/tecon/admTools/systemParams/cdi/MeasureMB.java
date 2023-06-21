@@ -59,14 +59,15 @@ public class MeasureMB implements Serializable, AutoUpdate {
 
         try {
             measureSB.updateMeasure(event.getObject(), utilMB.getLogin(), utilMB.getIp());
-            measures.init();
+
+            selectedMeasure = null;
+            disableRemoveBtn = true;
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
         }
 
-        selectedMeasure = null;
-        disableRemoveBtn = true;
+        measures.init();
     }
 
     /**
@@ -91,12 +92,12 @@ public class MeasureMB implements Serializable, AutoUpdate {
 
             selectedMeasure = null;
             disableRemoveBtn = true;
-
-            measures.init();
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
         }
+
+        measures.init();
     }
 
     public void addMeasureWrapper() {

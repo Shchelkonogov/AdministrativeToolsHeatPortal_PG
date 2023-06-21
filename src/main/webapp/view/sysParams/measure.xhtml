@@ -5,9 +5,10 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <h:form>
-        <p:remoteCommand name="saveMeasureWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide(); PF('measureTable').filter();"
+        <p:remoteCommand name="saveMeasureWrapper" onstart="PF('statusDialog').show();"
+                         oncomplete="PF('statusDialog').hide(); PF('measureTable').filter();"
                          action="#{measureMB.onAddMeasure()}" rendered="#{systemParamsUtil.write}"
-                         update="measureForm:btnRemove growl" />
+                         update="measureForm growl" />
     </h:form>
 
     <h:form id="measureForm" style="height: 100%;">
@@ -20,7 +21,8 @@
                              rowKey="#{measureData.id}">
 
                     <p:ajax event="rowEdit" listener="#{measureMB.onRowEdit}"
-                            onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide(); PF('measureTable').unselectAllRows();"
+                            onstart="PF('statusDialog').show();"
+                            onsuccess="PF('statusDialog').hide(); PF('measureTable').filter(); PF('measureTable').unselectAllRows();"
                             update="measureForm:btnRemove growl" />
                     <p:ajax event="rowSelect" listener="#{measureMB.onRowSelect}" update="measureForm:btnRemove" />
 
@@ -40,7 +42,7 @@
                                 <h:outputText style="display: block;" value="#{measureData.shortName}" />
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputText value="#{measureData.shortName}" />
+                                <p:inputText value="#{measureData.shortName}" maxlength="8" />
                             </f:facet>
                         </p:cellEditor>
                     </p:column>

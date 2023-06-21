@@ -30,8 +30,8 @@
                         <p:column headerText="Тип параметра" groupRow="true" filterBy="#{type.paramType.name}" filterMatchMode="exact"
                                   styleClass="center" width="250">
                             <f:facet name="filter">
-                                <p:selectOneMenu widgetVar="filterWidget" onchange="PF('typeTableWV').filter()">
-                                    <f:selectItem itemLabel="Выберите" itemValue="#{null}" noSelectionOption="true"/>
+                                <p:selectOneMenu widgetVar="filterWidget" onchange="PF('typeTableWV').filter()" style="width: 200px;">
+                                    <f:selectItem itemLabel="Все типы параметра" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{paramTypeSetting.typeFilterValues}"/>
                                 </p:selectOneMenu>
                             </f:facet>

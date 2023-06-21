@@ -12,7 +12,7 @@ import java.util.List;
  * @author Maksim Shchelkonogov
  * 21.06.2023
  */
-@Named("other")
+@Named("otherController")
 @ViewScoped
 public class OtherMB implements Serializable {
 
