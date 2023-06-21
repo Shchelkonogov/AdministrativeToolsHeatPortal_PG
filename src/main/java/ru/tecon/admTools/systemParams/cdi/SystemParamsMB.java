@@ -45,7 +45,6 @@ public class SystemParamsMB implements Serializable {
             {"Коэффициенты для режимной карты", new SystemParamsCategories("/view/sysParams/coefficientsForRegimeCard.xhtml", "coefficientsRC")},
             {"Расцветка параметров", new SystemParamsCategories("/view/sysParams/paramColor.xhtml", "paramColor")},
             {"Приоритет проблем", new SystemParamsCategories("/view/sysParams/problemPriority.xhtml", "problemPriority")},
-            {"Температура грунта", new SystemParamsCategories("/view/sysParams/groundTemp.xhtml", "groundTempMB")},
             {"Нормативные показатели", new SystemParamsCategories("/view/sysParams/normIndicators.xhtml", "normIndicators")},
             {"Тнв по многолетним наблюдениям", new SystemParamsCategories("/view/sysParams/multiYearTemp.xhtml", "multiYearTemp")},
             {"Основные параметры", new SystemParamsCategories("/view/sysParams/mainParam.xhtml", "mainParamMB")},

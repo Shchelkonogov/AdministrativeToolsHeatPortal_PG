@@ -505,7 +505,6 @@ body .ui-tooltip .ui-tooltip-text {
 
 #multiYearTemp\:tempTable .ui-editable-column,
 #normIndicators .ui-editable-column,
-#groundTempForm\:referenceValueTable .ui-editable-column,
 #problemForm .ui-editable-column,
 #regimeCardForm .ui-editable-column {
     cursor: pointer;
