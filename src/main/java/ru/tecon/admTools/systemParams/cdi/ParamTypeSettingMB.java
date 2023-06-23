@@ -233,7 +233,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
      */
     public void initAddType() {
         if (selectedType != null) {
-            System.out.println("need select " + selectedType.getParamType().getId());
             PrimeFaces.current().executeScript("PF('selectAddTypeVW').selectValue(" + selectedType.getParamType().getId() + ");");
             PrimeFaces.current().executeScript("PF('selectAddTypeVW').callBehavior('valueChange')");
         }
@@ -273,8 +272,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
                     }
                 }
-
-                newTypes.forEach(System.out::println);
             }
 
             loadData();
@@ -468,7 +465,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
     }
 
     public void setNewParamType(ParamType newParamType) {
-        System.out.println("select " + newParamType);
         this.newParamType = newParamType;
     }
 

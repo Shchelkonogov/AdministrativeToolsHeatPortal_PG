@@ -39,7 +39,7 @@
                     <p:column headerText="Обозначение" width="90">
                         <p:cellEditor disabled="#{!systemParamsUtil.write}">
                             <f:facet name="output">
-                                <h:outputText style="display: block;" value="#{measureData.shortName}" />
+                                <h:outputText style="display: block;" escape="false" value="#{measureData.shortNameWithSupTag}" />
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{measureData.shortName}" maxlength="8" />

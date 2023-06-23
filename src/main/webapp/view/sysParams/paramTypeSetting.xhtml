@@ -41,7 +41,7 @@
                             <h:outputText value="#{type.aggregate != null ? type.aggregate.name : ''}"/>
                         </p:column>
                         <p:column headerText="Ед.изм." width="50" styleClass="center">
-                            <h:outputText value="#{type.measure != null ? type.measure.shortName : ''}"/>
+                            <h:outputText escape="false" value="#{type.measure != null ? type.measure.shortNameWithSupTag : ''}"/>
                         </p:column>
                         <p:column headerText="Кат" width="20" styleClass="center">
                             <h:outputText value="#{type.category}"/>
@@ -206,13 +206,13 @@
                 <p:column headerText="Ед.изм." width="70" styleClass="center">
                     <p:cellEditor>
                         <f:facet name="output">
-                            <h:outputText value="#{newAggr.measure.shortName}" />
+                            <h:outputText escape="false" value="#{newAggr.measure.shortNameWithSupTag}" />
                         </f:facet>
                         <f:facet name="input">
                             <h:selectOneMenu value="#{newAggr.measure}" style="width: 100%;">
                                 <f:converter converterId="measureConverter"/>
-                                <f:selectItems value="#{measureControllerApplication.measures}" var="measureItem"
-                                               itemLabel="#{measureItem.name} (#{measureItem.shortName})" itemValue="#{measureItem}"/>
+                                <f:selectItems itemLabelEscaped="false" value="#{measureControllerApplication.measures}" var="measureItem"
+                                               itemLabel="#{measureItem.name} (#{measureItem.shortNameWithSupMnemonic})" itemValue="#{measureItem}"/>
                             </h:selectOneMenu>
                         </f:facet>
                     </p:cellEditor>
