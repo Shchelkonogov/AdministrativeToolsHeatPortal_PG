@@ -21,7 +21,7 @@
                     <p:treeTable value="#{bean['root']}" var="structType" id="structType" filteredValue="#{bean['rootFiltered']}"
                                  scrollable="true" scrollHeight="100%"
                                  selectionMode="single" selection="#{bean.selectedStructNode}" rowKey="#{structType.id}"
-                                 sortBy="#{structType.name}" widgetVar="structTableWidget">
+                                 widgetVar="structTableWidget">
 
 <!--                        window.dispatchEvent(new Event('resize')); Заглушка что бы проавильно общиталась высота таблицы-->
                         <p:ajax event="select" listener="#{bean.onRowSelect}"
@@ -31,8 +31,11 @@
                         <!--без этих тегов криво работает раскрытие/закрытие дерева-->
                         <p:ajax event="expand" />
                         <p:ajax event="collapse" />
+                        <p:ajax event="filter" oncomplete="PF('buiStructType').hide();"/>
 
-                        <p:column headerText="Название" filterBy="#{structType.name}" filterMatchMode="contains">
+                        <p:column headerText="Название"
+                                  filterBy="#{structType.name}" filterMatchMode="contains"
+                                  sortBy="#{structType.name}" sortOrder="asc">
                             <h:outputText value="#{structType.name}" />
                             <f:facet name="filter">
                                 <p:inputText placeholder="Поиск..." style="width: 100%;" onkeyup="PF('structTableWidget').filter();"/>
@@ -42,6 +45,8 @@
                             <h:outputText value="#{structType.typeChar}" />
                         </p:column>
                     </p:treeTable>
+
+                    <p:blockUI block="structType" widgetVar="buiStructType"/>
                 </div>
 
                 <f:facet name="actions">

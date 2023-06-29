@@ -9,7 +9,6 @@ import ru.tecon.admTools.systemParams.ejb.CatalogSB;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogProp;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogType;
 import ru.tecon.admTools.systemParams.model.catalog.LazyCustomDataModel;
-import ru.tecon.admTools.systemParams.model.struct.StructTypeProp;
 
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -54,11 +53,9 @@ public class CatalogMB implements Serializable, AutoUpdate {
         loadData();
 
         PrimeFaces.current().executeScript("PF('catalogTypeWidget').clearFilters();");
-        PrimeFaces.current().executeScript("PF('catalogTypeWidget').filter();");
         PrimeFaces.current().executeScript("PF('catalogTypeWidget').unselectAllRows();");
 
         PrimeFaces.current().executeScript("PF('catalogPropWidget').clearFilters();");
-        PrimeFaces.current().executeScript("PF('catalogPropWidget').filter();");
         PrimeFaces.current().executeScript("PF('catalogPropWidget').unselectAllRows();");
     }
 

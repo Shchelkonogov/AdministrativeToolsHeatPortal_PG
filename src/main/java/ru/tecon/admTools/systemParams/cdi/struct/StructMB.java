@@ -72,8 +72,8 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
         loadData();
 
+        PrimeFaces.current().executeScript("PF('buiStructType').show();");
         PrimeFaces.current().executeScript("PF('structTableWidget').clearFilters();");
-        PrimeFaces.current().executeScript("PF('structTableWidget').filter()");
         PrimeFaces.current().executeScript("PF('structTableWidget').unselectAllNodes()");
     }
 

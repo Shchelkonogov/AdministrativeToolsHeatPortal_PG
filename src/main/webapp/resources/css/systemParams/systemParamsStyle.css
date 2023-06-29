@@ -544,3 +544,15 @@ body .ui-dialog.ui-confirm-dialog .ui-dialog-buttonpane {
 .column2Class {
     text-align: center;
 }
+
+/*Стиль для шапки treetable с возможностью сортировки*/
+
+body .ui-treetable thead th.ui-state-active {
+    background: #f4f4f4;
+    color: #007ad9;
+}
+
+body .ui-treetable thead th.ui-state-active.ui-state-hover {
+    background: #e0e0e0;
+    color: #007ad9;
+}
