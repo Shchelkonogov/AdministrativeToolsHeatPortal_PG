@@ -8,10 +8,14 @@ import java.util.StringJoiner;
  */
 public class Condition {
 
-    private final int id;
-    private final String name;
+    private int id;
+    private String name;
+
+    public Condition() {
+    }
 
     public Condition(int id, String name) {
+        this();
         this.id = id;
         this.name = name;
     }
