@@ -1,6 +1,6 @@
-package ru.tecon.admTools.systemParams.cdi.converter.paramTypeSetting;
+package ru.tecon.admTools.systemParams.cdi.converter;
 
-import ru.tecon.admTools.systemParams.cdi.ParamTypeSettingMB;
+import ru.tecon.admTools.systemParams.cdi.scope.view.ConditionController;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
 
 import javax.el.ValueExpression;
@@ -19,11 +19,11 @@ public class ConditionConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{paramTypeSetting}", ParamTypeSettingMB.class);
+                .createValueExpression(context.getELContext(), "#{conditionControllerView}", ConditionController.class);
 
-        ParamTypeSettingMB paramTypeSetting = (ParamTypeSettingMB) vex.getValue(context.getELContext());
+        ConditionController conditionController = (ConditionController) vex.getValue(context.getELContext());
 
-        return paramTypeSetting.getParamConditions().stream()
+        return conditionController.getParamConditions().stream()
                 .filter(condition -> condition.getId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);

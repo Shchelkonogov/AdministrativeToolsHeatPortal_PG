@@ -1,31 +1,22 @@
 package ru.tecon.admTools.systemParams.model;
 
+import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
+
 import java.util.StringJoiner;
 
 /**
  * Класс для хранения информации по цветам параметров
  * @author Maksim Shchelkonogov
  */
-public class ParametersColor {
+public class ParametersColor extends Condition {
 
-    private final int id;
-    private final String name;
     private String oldColor;
     private String newColor;
 
     public ParametersColor(int id, String name, String color) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.oldColor = color;
         this.newColor = color;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getColor() {
@@ -61,8 +52,8 @@ public class ParametersColor {
     @Override
     public String toString() {
         return new StringJoiner(", ", ParametersColor.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("name='" + name + "'")
+                .add("id=" +super.getId())
+                .add("name='" + super.getName() + "'")
                 .add("oldColor='" + oldColor + "'")
                 .add("newColor='" + newColor + "'")
                 .toString();

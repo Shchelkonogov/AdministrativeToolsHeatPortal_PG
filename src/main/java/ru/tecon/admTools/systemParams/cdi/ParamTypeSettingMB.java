@@ -46,8 +46,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
 
     private List<Properties> paramProperties = new ArrayList<>();
 
-    private List<Condition> paramConditions = new ArrayList<>();
-
     private boolean disableTypeRemoveBtn = true;
     private boolean disablePropRemoveBtn = true;
     private boolean disablePropAddBtn = true;
@@ -77,8 +75,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
 
         newTypes.clear();
         newParamType = null;
-
-        paramConditions = bean.getParamConditions();
 
         selectedType = null;
 
@@ -446,10 +442,6 @@ public class ParamTypeSettingMB implements Serializable, AutoUpdate {
 
     public void setNewPropP(ParamPropTableP newPropP) {
         this.newPropP = newPropP;
-    }
-
-    public List<Condition> getParamConditions() {
-        return paramConditions;
     }
 
     public List<Properties> getParamProperties() {

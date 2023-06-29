@@ -266,7 +266,7 @@
                     <p:outputLabel value="Нижние" for="@next"/>
                     <p:selectOneMenu value="#{paramTypeSetting.newPropA.lessCond}" style="width: 200px;">
                         <f:converter converterId="conditionConverter"/>
-                        <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                        <f:selectItems value="#{conditionControllerView.paramConditions}" var="cond"
                                        itemLabel="#{cond.name}" itemValue="#{cond}"/>
                     </p:selectOneMenu>
                 </div>
@@ -274,7 +274,7 @@
                     <p:outputLabel value="Верхние" for="@next"/>
                     <p:selectOneMenu value="#{paramTypeSetting.newPropA.greatCond}" style="width: 200px;">
                         <f:converter converterId="conditionConverter"/>
-                        <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                        <f:selectItems value="#{conditionControllerView.paramConditions}" var="cond"
                                        itemLabel="#{cond.name}" itemValue="#{cond}"/>
                     </p:selectOneMenu>
                 </div>
@@ -295,7 +295,7 @@
         <h:form id="addPropFormP">
             <h:panelGrid columns="2" style="margin-bottom: 45px;" columnClasses="column1Class, column2Class">
                 <p:outputLabel value="Код" for="@next" style="margin-right: 5px;"/>
-                <p:inputNumber id="inputNumberP" styleClass="tc-width-30" value="#{paramTypeSetting.newPropP.code}" minValue="0" maxValue="99"/>
+                <p:inputNumber id="inputNumberP" styleClass="tc-width-45" value="#{paramTypeSetting.newPropP.code}" minValue="0" maxValue="99"/>
 
                 <h:panelGroup layout="block"/>
                 <h:panelGroup layout="block"/>
@@ -310,7 +310,7 @@
                 <p:outputLabel value="Состояние" for="@next" style="margin-right: 5px;"/>
                 <p:selectOneMenu value="#{paramTypeSetting.newPropP.condition}" style="width: 290px;">
                     <f:converter converterId="conditionConverter"/>
-                    <f:selectItems value="#{paramTypeSetting.paramConditions}" var="cond"
+                    <f:selectItems value="#{conditionControllerView.paramConditions}" var="cond"
                                    itemLabel="#{cond.name}" itemValue="#{cond}" />
                 </p:selectOneMenu>
             </h:panelGrid>
