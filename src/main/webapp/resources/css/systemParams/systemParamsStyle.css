@@ -310,20 +310,23 @@ html .tc-no-loading.ui-state-loading .ui-icon:not(.ui-icon-loading) {
     height: calc(100% - 80px) !important;
 }
 
-/*Задал размеры панелей в форме "Структура"*/
+/*Задал размеры панелей в форме "Структура" и "Обобщенная модель"*/
 
 #divisionPanel\:structType,
-#divisionPanel\:divisionPropTable {
+#divisionPanel\:divisionPropTable,
+#genModelForm\:genModel {
     height: 100%;
 }
 
-#divisionPanel\:structType > .ui-treetable-scrollable-body {
+#divisionPanel\:structType > .ui-treetable-scrollable-body,
+#genModelForm\:genModel > .ui-treetable-scrollable-body {
     height: calc(100% - 80px);
 }
 
 /*Что бы не разбегалась ширина колонок шапки и значений в таблице, относится к treeTable в форме "Cтруктура"*/
 
-#divisionPanel\:structType .ui-treetable-scrollable-body .ui-treetable-scrollable-theadclone tr th>* {
+#divisionPanel\:structType .ui-treetable-scrollable-body .ui-treetable-scrollable-theadclone tr th>*,
+#genModelForm\:genModel .ui-treetable-scrollable-body .ui-treetable-scrollable-theadclone tr th>* {
     display: block;
     height: 0;
     padding: 0;
@@ -555,4 +558,18 @@ body .ui-treetable thead th.ui-state-active {
 body .ui-treetable thead th.ui-state-active.ui-state-hover {
     background: #e0e0e0;
     color: #007ad9;
+}
+
+/*Стили для wizard, используется в обобщенной модели*/
+
+#addNewFormulaForm\:inputWizard .ui-wizard-nav-next {
+    margin-right: 213px;
+}
+
+#addNewFormulaForm\:inputWizard .ui-wizard-nav-back {
+    margin-left: 2px;
+}
+
+body .ui-wizard .ui-wizard-step-titles .ui-wizard-step-title {
+    padding: 0.4em;
 }

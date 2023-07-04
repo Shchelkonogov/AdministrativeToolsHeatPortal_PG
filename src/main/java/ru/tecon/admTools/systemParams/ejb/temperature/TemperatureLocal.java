@@ -65,4 +65,11 @@ public interface TemperatureLocal {
      * @throws SystemParamException в случае ошибки базы
      */
     int createTemperature(Temperature temperature, String login, String ip) throws SystemParamException;
+
+    /**
+     * Поиск типа по его id
+     * @param id идентификатор типа
+     * @return найденный тип
+     */
+    Temperature findById(int id);
 }

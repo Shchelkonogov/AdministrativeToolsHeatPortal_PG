@@ -7,6 +7,7 @@ import java.util.StringJoiner;
 
 /**
  * Класс описывающий структуру свойств аналогового стат. агрегата параметра обобщенной модели
+ *
  * @author Aleksey Sergeev
  */
 public class ParamProp implements Serializable {
@@ -20,7 +21,11 @@ public class ParamProp implements Serializable {
     private Condition greatCond;
     private Condition lessCond;
 
+    public ParamProp() {
+    }
+
     public ParamProp(long parId, long paramTypeId, long statAgrId, long propId, String propName, String propValDef, Condition greatCond, Condition lessCond) {
+        this();
         this.parId = parId;
         this.paramTypeId = paramTypeId;
         this.statAgrId = statAgrId;

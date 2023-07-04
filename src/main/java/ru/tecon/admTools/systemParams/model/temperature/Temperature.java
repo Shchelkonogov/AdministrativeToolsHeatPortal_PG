@@ -7,6 +7,7 @@ import java.util.StringJoiner;
 
 /**
  * Класс описывающий типы для форм суточные снижения и температурные графики
+ *
  * @author Maksim Shchelkonogov
  */
 public class Temperature implements Serializable {
@@ -19,10 +20,6 @@ public class Temperature implements Serializable {
     private List<TemperatureProp> temperatureProps = new ArrayList<>();
 
     public Temperature() {
-    }
-
-    public Temperature(int id) {
-        this.id = id;
     }
 
     public Temperature(int id, String name, String description) {
@@ -40,12 +37,6 @@ public class Temperature implements Serializable {
     }
 
     public int getId() {
-        return id;
-    }
-    public Integer getIDInteger(){
-        if (id == 0) {
-            return null;
-        }
         return id;
     }
 

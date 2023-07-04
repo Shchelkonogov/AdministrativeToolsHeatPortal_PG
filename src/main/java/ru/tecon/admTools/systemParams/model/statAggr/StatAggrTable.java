@@ -15,6 +15,11 @@ public class StatAggrTable implements Serializable {
     private String stat_agr_name;
     private String dif_int;
 
+    public StatAggrTable(long id, String stat_agr_code) {
+        this.id = id;
+        this.stat_agr_code = stat_agr_code;
+    }
+
     public long getId() {
         return id;
     }

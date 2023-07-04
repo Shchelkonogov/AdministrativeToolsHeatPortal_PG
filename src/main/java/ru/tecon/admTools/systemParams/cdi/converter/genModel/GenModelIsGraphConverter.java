@@ -1,7 +1,7 @@
-package ru.tecon.admTools.systemParams.cdi.converter;
+package ru.tecon.admTools.systemParams.cdi.converter.genModel;
 
 import ru.tecon.admTools.systemParams.cdi.GenModelMB;
-import ru.tecon.admTools.systemParams.model.genModel.ParamList;
+import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
@@ -10,11 +10,13 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Конвертер для выбора типа объекта
+ * Конвертер для выбора температурного графика на форме Обобщенная модель
+ *
  * @author Aleksey Sergeev
  */
-@FacesConverter("genModelParamConverter")
-public class GenModelParamConverter implements Converter {
+@FacesConverter("genModelGraphOrDecreaseConverter")
+public class GenModelIsGraphConverter implements Converter {
+
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()
@@ -22,14 +24,18 @@ public class GenModelParamConverter implements Converter {
 
         GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
 
-        return defaultValues.getParamListForCalc().stream()
-                .filter(leftType -> leftType.getParName().equals(value))
+
+        return defaultValues.getGraphOrDecreaseList().stream()
+                .filter(isGraph -> isGraph.getId() == Integer.parseInt(value))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((ParamList) value).getParName());
+        if (value == null) {
+            return "";
+        }
+        return String.valueOf(((Temperature) value).getId());
     }
 }

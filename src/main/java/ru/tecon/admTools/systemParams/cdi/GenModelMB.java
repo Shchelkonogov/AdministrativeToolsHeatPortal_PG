@@ -9,9 +9,10 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.GenModelSB;
 import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
 import ru.tecon.admTools.systemParams.model.genModel.*;
+import ru.tecon.admTools.systemParams.model.statAggr.StatAggrTable;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
+import ru.tecon.admTools.systemParams.model.temperature.TemperatureStatus;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -19,284 +20,255 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Контроллер для формы обобщенная модель
+ *
  * @author Aleksey Sergeev
  */
 @Named("genModelMB")
 @ViewScoped
-public class GenModelMB implements Serializable {
+public class GenModelMB implements Serializable, AutoUpdate {
 
-    private static final Logger LOGGER = Logger.getLogger(GenModelMB.class.getName());
+    // Поля описывающие данные для основной таблицы обобщенной модели
+    private TreeNode<GMTree> root;
+    private TreeNode<GMTree> rootFiltered;
+    private TreeNode<GMTree> selectedObjNode;
 
-    private TreeNode root;
-    private TreeNode selectedObjNode;
-
-    private List<GMTree> objTypesList;
-    private GMTree selectedRow;
-    private GMTree parent;
-
-    private Param paramList;
-    private Param addParam = new Param();
-    private boolean disableParamTable = false;
-    private List<Temperature> isGraphList;
-    private boolean graphRender;
-    private List<Temperature> isDecreaseList;
-    private boolean decreaseRender;
-
-    private List<ParamProp> paramPropList;
-    private boolean disableParamPropTable = false;
-
-    private List<ParamPropPer> paramPropPerList;
-    private boolean disableParamPropPerTable = false;
-
-    private List<CalcAgrVars> calcAgrVarsList;
-    private String calcAgrFormulaString;
-    private String calcAgrFormulaStringForSave;
-    private List<CalcAgrFormula> calcAgrFormulaList = new ArrayList<>();
-    private boolean disableSelect;
-    private boolean disableSave;
-
-    private List<ParamList> paramListForCalc;
-
-    private boolean disableCalcAgrVars = false;
+    // Disable для кнопок удалить/добавить для основной таблицы обобщенной модели
     private boolean disableRemoveBtn = true;
     private boolean disableAddBtn = true;
-    private boolean addCalcAgr;
-    private boolean saveCalcAgr;
-    private boolean delCalcAgr;
 
-    private String tableHeader = "Свойства агрегата";
+    // Поле описывающие данные для графиков и суточных снижений
+    private List<Temperature> graphOrDecreaseList;
+    private TemperatureStatus temperatureStatus;
 
+    // Текст заголовка таблицы свойств
+    private String tableHeader;
+
+    // Данные для описания параметра
+    private Param paramList;
+    private Param addParam = new Param();
+    private boolean renderParamTable;
+
+    // Данные для аналоговых свойств агрегата
+
+    private List<ParamProp> paramPropList;
+    private boolean renderParamPropTable;
+
+    // Данные для перечислимых свойств агрегата
+
+    private List<ParamPropPer> paramPropPerList;
+    private boolean renderParamPropPerTable;
+
+    // Данные для таблицы с формулой
+
+    private ParamPropCalc propCalc = new ParamPropCalc();
+    private ParamPropCalc newPropCalc = new ParamPropCalc();
+    private boolean renderCalcAgrVars;
+
+    @Inject
+    private transient Logger logger;
 
     @EJB
     private GenModelSB genModelSB;
+
     @EJB(beanName = "tempGraphSB")
-    private TemperatureLocal temperatureBean;
+    private TemperatureLocal tempGraphBean;
+
     @EJB(beanName = "dailyReductionSB")
-    private TemperatureLocal temperatureBean1;
+    private TemperatureLocal dailyReductionBean;
 
     @Inject
     private SystemParamsUtilMB utilMB;
 
-    @PostConstruct
-    private void init() {
-        root = new DefaultTreeNode(new GMTree(), null);
+    @Override
+    public void update() {
+        root = rootFiltered = new DefaultTreeNode<>(new GMTree(), null);
 
         loadData();
-        getGraphList();
-        getDecreaseList();
-        paramListForCalc = genModelSB.getParamList();
+
+        PrimeFaces.current().executeScript("PF('buiGenModelTable').show();");
+        PrimeFaces.current().executeScript("PF('genModelWidget').clearFilters();");
+        PrimeFaces.current().executeScript("PF('genModelWidget').unselectAllNodes()");
     }
 
     /**
      * Первоначальная загрузка данных для контроллера
      */
     private void loadData() {
-
-        List<GMTree> expandedList = new ArrayList<>(getRowDown(root));
+        List<GMTree> expandedList = getRowDown(rootFiltered);
 
         root.getChildren().clear();
 
-        objTypesList = genModelSB.getTreeParam();
-        Map<String, TreeNode> nodes = new HashMap<>();
+        Map<String, TreeNode<GMTree>> nodes = new HashMap<>();
         nodes.put(null, root);
-        for (GMTree genTree: objTypesList) {
-            switch (genTree.getMyType()) {
-                case "SA":
-                    genTree.setIcon("pi pi-check");
-                    break;
-                case "PP":
-                    genTree.setIcon("pi pi-cog");
-                    break;
-                default:
-                    genTree.setIcon("pi pi-folder");
-                    break;
-            }
-            TreeNode parent = nodes.get(genTree.getParent());
-            DefaultTreeNode treeNode = new DefaultTreeNode(genTree, parent);
+        for (GMTree genTree: genModelSB.getTreeParam()) {
+            TreeNode<GMTree> parent = nodes.get(genTree.getParent());
+            DefaultTreeNode<GMTree> treeNode = new DefaultTreeNode<>(genTree, parent);
 
             if (expandedList.contains(genTree)) {
                 treeNode.setExpanded(true);
             }
+
             nodes.put(genTree.getId(), treeNode);
         }
+
+        tableHeader = "Свойства";
+        tablesHide();
     }
 
     /**
-     * Метод обрабатывает выбор строки в дереве обощенной модели, для получения данных в таблицы
+     * Метод обрабатывает выбор строки в дереве обобщенной модели, для получения данных в таблицы
+     *
      * @param event событие выбора строки
      */
-    public void onRowSelect(NodeSelectEvent event) throws SystemParamException {
-        selectedRow = (GMTree) event.getTreeNode().getData();
-        disableSelect = true;
+    public void onRowSelect(NodeSelectEvent event) {
+        GMTree selectedRow = (GMTree) event.getTreeNode().getData();
 
-        if(selectedRow.getParent()!= null) {
-            parent = (GMTree) event.getTreeNode().getParent().getData();
-        }
+        logger.log(Level.INFO, "Selected row {0}", selectedRow);
+
+        // Заблокировали кнопки удалить и добавить в основной таблице Обобщенной модели
         disableRemoveBtn = true;
         disableAddBtn = true;
+
         tablesHide();
 
-        LOGGER.info("select obj: " + selectedRow);
-
         switch (selectedRow.getMyType()) {
-            case"PT":
-                disableAddBtn = false;
-                tableHeader = "Свойства агрегата";
-                if (selectedRow.getName().equals("Температура") && parent.getName().equals("Горячее водоснабжение")) {
-                    graphRender = false;
-                    decreaseRender = true;
-                } else if(selectedRow.getName().equals("Температура") && !parent.getName().equals("Горячее водоснабжение")) {
-                    graphRender = true;
-                    decreaseRender = false;
-
-                }else {
-                    graphRender = false;
-                    decreaseRender = false;
-                }
-                break;
-
-            /**
-             * Для параметра (шестеренка)
-             */
             case "PP":
+                tableHeader = "Параметр \"" + selectedRow.getName() + "\"";
                 paramList = genModelSB.getParam(selectedRow.getMyId());
-                if (paramList.getIsGraph().getId() != 0) {
-                    for (Temperature i: isGraphList) {
-                        if (i.getId() == paramList.getIsGraph().getId()) {
-                            paramList.setIsGraph(i);
+
+                // Проверка отображать ли колонки "графики"/"суточные снижения"/"оптимальное значение"
+                switch (selectedObjNode.getParent().getData().getName()) {
+                    case "Давление":
+                        temperatureStatus = TemperatureStatus.OPT_VALUE;
+                        break;
+                    case "Температура":
+                        if (selectedObjNode.getParent().getParent().getData().getName().equals("Горячее водоснабжение")) {
+                            temperatureStatus = TemperatureStatus.DAILY_REDUCTION;
+                        } else {
+                            temperatureStatus = TemperatureStatus.GRAPH;
                         }
-                    }
-                } else {
-                    paramList.getIsGraph().setName("нет графика");
+                        break;
+                    default:
+                        temperatureStatus = TemperatureStatus.EMPTY;
                 }
-                if (paramList.getIsDecrease().getId() != 0) {
-                    for (Temperature i: isDecreaseList) {
-                        if (i.getId() == paramList.getIsDecrease().getId()) {
-                            paramList.setIsDecrease(i);
-                        }
-                    }
-                } else {
-                    paramList.getIsDecrease().setName("нет суточного снижения");
-                }
-                if (paramList.getParamTypeId()!=1) {
-                    graphRender = false;
-                    decreaseRender = false;
-                } else if (paramList.getTechprocTypeId() == 3){
-                    graphRender = false;
-                    decreaseRender = true;
-                } else {
-                    graphRender = true;
-                    decreaseRender = false;
-                }
-                disableParamTable = true;
+
+                renderParamTable = true;
                 disableRemoveBtn = false;
-                tableHeader = selectedRow.getName();
                 break;
-        }
+            case "SA":
+                GMTree parentOfSelectedRow = (GMTree) event.getTreeNode().getParent().getData();
+                tableHeader = "Свойства агрегата \"" + selectedRow.getName() + "\"";
 
-        switch (selectedRow.getCateg()) {
-            /**
-             * Для аналоговых значений
-             */
-            case"A":
-                paramPropList = genModelSB.getParamProp(parent.getMyId(), selectedRow.getMyId());
-                disableParamPropTable = true;
-                tableHeader = "Свойства агрегата";
+                switch (selectedRow.getCateg()) {
+                    case "A":
+                        paramPropList = genModelSB.getParamProp(parentOfSelectedRow.getMyId(), selectedRow.getMyId());
+                        renderParamPropTable = true;
+                        break;
+                    case "P":
+                        paramPropPerList = genModelSB.getParamPropPer(parentOfSelectedRow.getMyId(), selectedRow.getMyId());
+                        renderParamPropPerTable = true;
+                        break;
+                    case "F":
+                        paramPropList = genModelSB.getParamProp(parentOfSelectedRow.getMyId(), selectedRow.getMyId());
+                        propCalc = genModelSB.getParamPropCalc(parentOfSelectedRow.getMyId(), selectedRow.getMyId());
+                        renderCalcAgrVars = true;
+                        break;
+                }
                 break;
-
-            /**
-             * Для перечислимых значений
-             */
-            case"P":
-                paramPropPerList = genModelSB.getParamPropPer(parent.getMyId(), selectedRow.getMyId());
-                disableParamPropPerTable = true;
-                tableHeader = "Свойства агрегата";
-                break;
-
-            /**
-             * Для вычислимых значений
-             */
-            case"F":
-                updCalcAgrTable();
-
-                disableCalcAgrVars = true;
-                delCalcAgr = !calcAgrVarsList.isEmpty();
-                addCalcAgr = calcAgrVarsList.isEmpty();
-                saveCalcAgr = false;
-                break;
+            case "PT":
+                disableAddBtn = false;
+            case "TP":
+            default:
+                tableHeader = "Свойства";
         }
     }
+
     /**
-     * Метод для отрисовки таблиц
+     * Настройка диалогового окна "Добавление нового параметра"
+     */
+    public void addParamDialogSetting() {
+        switch (selectedObjNode.getData().getName()) {
+            case "Давление":
+                temperatureStatus = TemperatureStatus.OPT_VALUE;
+                break;
+            case "Температура":
+                if (selectedObjNode.getParent().getData().getName().equals("Горячее водоснабжение")) {
+                    temperatureStatus = TemperatureStatus.DAILY_REDUCTION;
+                    graphOrDecreaseList = dailyReductionBean.getTemperatures();
+                } else {
+                    temperatureStatus = TemperatureStatus.GRAPH;
+                    graphOrDecreaseList = tempGraphBean.getTemperatures();
+                }
+                break;
+            default:
+                temperatureStatus = TemperatureStatus.EMPTY;
+        }
+    }
+
+    /**
+     * Метод скрывает все таблицы
      */
     public void tablesHide() {
-        disableParamTable = false;
-        disableParamPropTable = false;
-        disableParamPropPerTable = false;
-        disableCalcAgrVars = false;
-    }
-
-    /**
-     * Метод для загрузки данных в таблицу для вычислимых
-     */
-    public void updCalcAgrTable() throws SystemParamException {
-        paramPropList = genModelSB.getParamProp(parent.getMyId(), selectedRow.getMyId());
-        calcAgrVarsList = genModelSB.getCalcAgrVars(parent.getMyId(), selectedRow.getMyId());
-        calcAgrFormulaString = genModelSB.getCalcAgrFormula(parent.getMyId(), selectedRow.getMyId());
+        renderParamTable = false;
+        renderParamPropTable = false;
+        renderParamPropPerTable = false;
+        renderCalcAgrVars = false;
     }
 
     /**
      * Обработчик сохранения добавления нового параметра в дерево, нажатие на копку сохранить
      */
     public void onSaveChanges() {
-        try {
-            if (addParam.getIsGraph() != null && addParam.getIsGraph().getId() == 0) {
-                addParam.setIsGraph(null);
-            }
-            if (addParam.getIsDecrease() != null && addParam.getIsDecrease().getId() == 0) {
-                addParam.setIsDecrease(null);
-            }
-            Long addedParamID = genModelSB.addParam(parent.getMyId(), selectedRow.getMyId(), addParam, utilMB.getLogin(), utilMB.getIp());
+        logger.log(Level.INFO, "Create new parameter {0}", addParam);
 
-            String Id = "P"+ addedParamID;
-            List<GMTree> addedObjList = genModelSB.getTreeParamPP(Id);
-            objTypesList.addAll(addedObjList);
+        try {
+            genModelSB.addParam(selectedObjNode.getParent().getData().getMyId(), selectedObjNode.getData().getMyId(),
+                    addParam, utilMB.getLogin(), utilMB.getIp());
 
             loadData();
 
-            PrimeFaces.current().executeScript("PF('addNewParam').hide();");
-            PrimeFaces.current().ajax().update("genModelForm:genModel");
-            PrimeFaces.current().ajax().update("genModelTableForm");
+            PrimeFaces.current().executeScript("PF('addNewParam').hide(); PF('buiGenModelTable').show(); PF('genModelWidget').filter();");
+            PrimeFaces.current().ajax().update("genModelForm", "genModelTableForm:propPanelMain");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка добавления", e.getMessage()));
             PrimeFaces.current().ajax().update("growl");
         }
-        tablesHide();
-        disableParamPropPerTable = true;
     }
 
     /**
      * Функция составляет список ранее раскрытых объектов в дереве
+     *
      * @return - возвращает список открытых объектов
      */
-    private List <GMTree> getRowDown(TreeNode treeNode) {
-            List<GMTree> expandedList1 = new ArrayList<>();
+    private List<GMTree> getRowDown(TreeNode<GMTree> treeNode) {
+        List<GMTree> expandedList = new ArrayList<>();
 
         for (int i = 0; i < treeNode.getChildCount(); i++) {
             if (!treeNode.getChildren().get(i).isLeaf()) {
                 if (treeNode.getChildren().get(i).isExpanded()) {
-                    expandedList1.add((GMTree) treeNode.getChildren().get(i).getData());
+                    expandedList.add(treeNode.getChildren().get(i).getData());
                 }
-                expandedList1.addAll(getRowDown(treeNode.getChildren().get(i)));
+                expandedList.addAll(getRowDown(treeNode.getChildren().get(i)));
             }
         }
-        return expandedList1;
+        return expandedList;
+    }
+
+    /**
+     * Метод обертка для разнесения вызова диалогового окна для сохранения значения в базу при сохранении нового параметра
+     */
+    public void saveParamWrapper() {
+        PrimeFaces.current().executeScript("saveParamWrapper()");
     }
 
     /**
@@ -310,85 +282,120 @@ public class GenModelMB implements Serializable {
      * Обработчик удаления параметра из дерева, нажатие на копку -
      */
     public void onRemoveParam() {
-        LOGGER.info("remove param: " + selectedRow.getName());
+        logger.log(Level.INFO, "Remove param: {0}", selectedObjNode);
 
         try {
-            genModelSB.removeParam(selectedRow.getMyId(), utilMB.getLogin(), utilMB.getIp());
-            loadData();
-            selectedRow = null;
-            disableRemoveBtn = true;
-            tableHeader = "Свойства агрегата";
+            genModelSB.removeParam(selectedObjNode.getData().getMyId(), utilMB.getLogin(), utilMB.getIp());
 
-            PrimeFaces.current().ajax().update("genModelForm:genModel");
-            PrimeFaces.current().ajax().update("genModelTableForm");
+            loadData();
+            disableRemoveBtn = true;
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
         }
-        tablesHide();
-        disableParamPropPerTable = true;
     }
 
     /**
      * Обработчик нажатия на галку в столбце визуализации
      */
-    public void changeVisualization(GMTree item) {
-        selectedRow = item;
-        for (GMTree visParent: objTypesList) {
-            if(item.getParent().equals(visParent.getId())) {
-                parent = visParent;
-            }
-        }
+    public void changeVisualization(DefaultTreeNode<GMTree> item) {
+        logger.log(Level.INFO, "change visualization for {0}", item);
+
+        long parentId = ((GMTree) item.getParent().getData()).getMyId();
+
         try {
-            genModelSB.updParamStat(parent.getMyId(), selectedRow.getMyId(), selectedRow, utilMB.getLogin(), utilMB.getIp());
+            genModelSB.updParamStat(parentId, item.getData(), utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка изменения визуализации", e.getMessage()));
+            item.getData().setVisStat(!item.getData().isVisStat());
         }
     }
 
     /**
      * Обработчик сохранения изменения строки для таблицы параметров
+     *
      * @param event событие
      */
     public void onRowEditParam(RowEditEvent<Param> event) {
-        LOGGER.info("update row " + event.getObject());
-        Param param = event.getObject();
+        logger.log(Level.INFO, "update row {0}", event.getObject());
         try {
-            genModelSB.updParam(param, utilMB.getLogin(), utilMB.getIp());
+            genModelSB.updParam(event.getObject(), utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
         }
+
+        paramList = genModelSB.getParam(selectedObjNode.getData().getMyId());
     }
 
     /**
      * Обработчик сохранения изменения строки для таблицы аналоговых
+     *
      * @param event событие
      */
     public void onRowEditParamProp(RowEditEvent<ParamProp> event) {
-        LOGGER.info("update row " + event.getObject());
+        logger.log(Level.INFO, "Update row {0}", event.getObject());
 
-        ParamProp paramProp = event.getObject();
         try {
-            genModelSB.updParamProp(paramProp, utilMB.getLogin(), utilMB.getIp());
+            genModelSB.updParamProp(event.getObject(), utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
         }
+
+        paramPropList = genModelSB.getParamProp(selectedObjNode.getParent().getData().getMyId(), selectedObjNode.getData().getMyId());
     }
 
     /**
      * Обработчик сохранения изменения строки для таблицы перечислимых
+     *
      * @param event событие
      */
     public void onRowEditParamPropPer(RowEditEvent<ParamPropPer> event) {
-        LOGGER.info("update row " + event.getObject());
-
-        ParamPropPer paramPropPer = event.getObject();
+        logger.info("update row " + event.getObject());
 
         try {
-            genModelSB.updParamPropPer(paramPropPer, utilMB.getLogin(), utilMB.getIp());
+            genModelSB.updParamPropPer(event.getObject(), utilMB.getLogin(), utilMB.getIp());
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
+        }
+
+        paramPropPerList = genModelSB.getParamPropPer(selectedObjNode.getParent().getData().getMyId(), selectedObjNode.getData().getMyId());
+    }
+
+    /**
+     * Метод обрабатывает закрытие окна создания формулы
+     */
+    public void onCreateNewFormulaDialogClose() {
+        newPropCalc = new ParamPropCalc();
+    }
+
+    public void onCheckFormulaWrapper() {
+        PrimeFaces.current().executeScript("checkFormula();");
+    }
+
+    /**
+     * Метод проверяет правильность ввода формулы
+     */
+    public void onCheckFormula() {
+        try {
+            List<String> variables = genModelSB.checkNewFormula(newPropCalc.getFormula());
+
+            if (variables.size() <= 1) {
+                throw new SystemParamException("Формула введена неверно. Проверьте правильность ввода.");
+            }
+
+            newPropCalc.setProps(new ArrayList<>());
+            for (String var: variables) {
+                newPropCalc.addParamProp(var);
+            }
+
+            newPropCalc.setParamListForChoice(genModelSB.getParamList());
+
+            List<StatAggrTable> statAgrList = genModelSB.getStatAgrList(newPropCalc.getParamListForChoice().get(0).getId());
+            newPropCalc.getProps().forEach(propRow -> propRow.setStatAggrListForChoice(statAgrList));
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
@@ -396,168 +403,67 @@ public class GenModelMB implements Serializable {
     }
 
     /**
-     * Обработчик удаления формулы, нажатие на копку -
+     * Метод подгружает списки статистических агрегатов в зависимости от выбранного параметра
+     * @param index номер переменной
      */
-    public void onRemoveCalcAgrFormula() {
-        LOGGER.info("remove calc arg formula" );
-
-        try {
-            Short linked = genModelSB.checkLinkedCalcAgr(parent.getMyId(), selectedRow.getMyId());
-            if (linked == 0) {
-                try {
-                    genModelSB.removeCalcAgrFormula(parent.getMyId(), selectedRow.getMyId(), utilMB.getLogin(), utilMB.getIp());
-                    delCalcAgr = false;
-                    addCalcAgr = true;
-                    saveCalcAgr = false;
-                    disableSelect = true;
-                    updCalcAgrTable();
-                    PrimeFaces.current().ajax().update("genModelTableForm");
-                } catch (SystemParamException e) {
-                    FacesContext.getCurrentInstance()
-                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
-                }
-            }
-        }  catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Ошибка удаления", e.getMessage()));
-        }
+    public void onParamSelect(int index) {
+        newPropCalc.getProps().get(index).setStatAggrListForChoice(genModelSB.getStatAgrList(newPropCalc.getProps().get(index).getParam().getId()));
     }
 
     /**
-     * Проверка правильности ввода формулы
+     * Сохранение формулы
      */
-    public void checkNewFormula() {
-        try {
-            List<String> calcAgrFormulaListString = genModelSB.checkNewFormula(calcAgrFormulaString);
-            calcAgrFormulaList.clear();
-            calcAgrVarsList.clear();
-            disableSelect = false;
-            disableSave = true;
+    public void onSaveFormula() {
+        logger.log(Level.INFO, "Save formula {0}", newPropCalc);
 
-            for (int i = 0; i< calcAgrFormulaListString.size(); i++) {
-                ParamList paramList = new ParamList();
-                StatAgrList statAgrList = new StatAgrList();
-                calcAgrVarsList.add(i, new CalcAgrVars(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaListString.get(i),
-                        paramList, statAgrList, true, new ArrayList<>()));
-            }
-            if (!calcAgrFormulaString.equals("")) {
-                addCalcAgr = false;
-                saveCalcAgr = true;
-            }
-        } catch (SystemParamException e ) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Ошибка", e.getMessage()));
-            PrimeFaces.current().ajax().update("growl");
-        }
-        calcAgrFormulaStringForSave = calcAgrFormulaString;
-    }
+        long parentMyId = selectedObjNode.getParent().getData().getMyId();
+        long myId = selectedObjNode.getData().getMyId();
 
-    /**
-     * Обработчик сохранения добавления новой формулы в вычислимые параметры, нажатие на копку сохранить
-     */
-    public void onSaveChangesFormula() {
-        for (CalcAgrVars i: calcAgrVarsList) {
-            calcAgrFormulaList.add(new CalcAgrFormula(i.getVariable(), i.getParamList().getId(), i.getStatAgrList().getStatAgrId()));
-            i.setDisableStatAgr(true);
-        }
         try {
-            genModelSB.addCalcAgrFormula(parent.getMyId(), selectedRow.getMyId(), calcAgrFormulaStringForSave,
-                    calcAgrFormulaList, utilMB.getLogin(), utilMB.getIp());
-            PrimeFaces.current().executeScript("PF('addNewParamF').hide();");
-            calcAgrFormulaString = calcAgrFormulaStringForSave;
-            delCalcAgr = true;
-            saveCalcAgr = false;
-            disableSelect = true;
+            genModelSB.addCalcAgrFormula(parentMyId, myId, newPropCalc, utilMB.getLogin(), utilMB.getIp());
+
+            PrimeFaces.current().executeScript("PF('addNewFormula').hide();");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
-            PrimeFaces.current().ajax().update("growl");
-        }
-    }
-
-    /**
-     * Обработчик обновления диалогового окна ввода формулы в случае его закрытия
-     */
-    public void onAddParamDialogCloseF() {
-        calcAgrFormulaString = "";
-    }
-
-    /**
-     * Обработчик выбора значения в выпадающем меню параметров для таблицы вычислимых
-     */
-    public void paramSelected(CalcAgrVars item, int rowIndex) {
-        StatAgrList undo = new StatAgrList(null,"");
-        item.setStatAgrList(undo);
-        item.setRowList(genModelSB.getStatAgrList(item.getParamList().getId()));
-        int y =0;
-        for (StatAgrList i: item.getRowList()) {
-            i.setVariable(item.getVariable() + y);
-            y++;
-        }
-        item.setDisableStatAgr(false);
-
-
-        for (CalcAgrVars i: calcAgrVarsList) {
-            if (item.getVariable().equals(i.getVariable())) {
-                i.setParamList(item.getParamList());
-            }
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
         }
 
-        disableSave = true;
-        PrimeFaces.current().ajax().update("genModelTableForm:btnSaveFTable");
-
-        LOGGER.info("Select param "+ item.getParamList().getParName() + " at row " + rowIndex);
+        propCalc = genModelSB.getParamPropCalc(parentMyId, myId);
     }
 
-    /**
-     * Обработчик выбора значения в выпадающем меню статистических агрегатов для таблицы вычислимых
-     */
-    public void statAgrSelect (CalcAgrVars item, int rowIndex) {
 
-        disableSave = false;
-        for (CalcAgrVars i: calcAgrVarsList) {
-            if (item.getVariable().equals(i.getVariable())) {
-                i.setStatAgrList(item.getStatAgrList());
-            }
-            if (i.getStatAgrList() == null || i.getStatAgrList().getStatAgrId() == null) {
-                disableSave = true;
-            }
+    /**
+     * Обработчик удаления формулы, нажатие на копку -
+     */
+    public void onRemoveFormula() {
+        logger.info("remove calc arg formula");
+
+        long parentMyId = selectedObjNode.getParent().getData().getMyId();
+        long myId = selectedObjNode.getData().getMyId();
+
+        try {
+            genModelSB.removeCalcAgrFormula(parentMyId, myId, utilMB.getLogin(), utilMB.getIp());
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка удаления", e.getMessage()));
         }
-        PrimeFaces.current().ajax().update("genModelTableForm:btnSaveFTable");
-        LOGGER.info("Select statAgr " + item.getStatAgrList().getStatAgrCode() + " at row " + rowIndex);
+
+        propCalc = genModelSB.getParamPropCalc(parentMyId, myId);
     }
 
-    /**
-     * Метод возвращает список температурных графиков
-     */
-    public void getGraphList() {
-        isGraphList = temperatureBean.getTemperatures();
-        isGraphList.add(0, new Temperature(0, "нет графика", ""));
-    }
-
-    /**
-     * Метод возвращает список суточных снижений
-     */
-    public void getDecreaseList() {
-        isDecreaseList = temperatureBean1.getTemperatures();
-        isDecreaseList.add(0, new Temperature(0, "нет суточного снижения",""));
-    }
-
-    public TreeNode getRoot() {
+    public TreeNode<GMTree> getRoot() {
         return root;
     }
 
-    public void setRoot(TreeNode root) {
+    public void setRoot(TreeNode<GMTree> root) {
         this.root = root;
     }
 
-    public TreeNode getSelectedObjNode() {
+    public TreeNode<GMTree> getSelectedObjNode() {
         return selectedObjNode;
     }
 
-    public void setSelectedObjNode(TreeNode selectedObjNode) {
+    public void setSelectedObjNode(TreeNode<GMTree> selectedObjNode) {
         this.selectedObjNode = selectedObjNode;
     }
 
@@ -593,52 +499,40 @@ public class GenModelMB implements Serializable {
         this.paramPropPerList = paramPropPerList;
     }
 
-    public List<CalcAgrVars> getCalcAgrVarsList() {
-        return calcAgrVarsList;
+    public boolean isRenderParamTable() {
+        return renderParamTable;
     }
 
-    public void setCalcAgrVarsList(List<CalcAgrVars> calcAgrVarsList) {
-        this.calcAgrVarsList = calcAgrVarsList;
+    public void setRenderParamTable(boolean renderParamTable) {
+        this.renderParamTable = renderParamTable;
     }
 
-    public boolean isDisableParamTable() {
-        return disableParamTable;
+    public boolean isRenderParamPropTable() {
+        return renderParamPropTable;
     }
 
-    public void setDisableParamTable(boolean disableParamTable) {
-        this.disableParamTable = disableParamTable;
+    public void setRenderParamPropTable(boolean renderParamPropTable) {
+        this.renderParamPropTable = renderParamPropTable;
     }
 
-    public boolean isDisableParamPropTable() {
-        return disableParamPropTable;
+    public boolean isRenderParamPropPerTable() {
+        return renderParamPropPerTable;
     }
 
-    public void setDisableParamPropTable(boolean disableParamPropTable) {
-        this.disableParamPropTable = disableParamPropTable;
+    public void setRenderParamPropPerTable(boolean renderParamPropPerTable) {
+        this.renderParamPropPerTable = renderParamPropPerTable;
     }
 
-    public boolean isDisableParamPropPerTable() {
-        return disableParamPropPerTable;
+    public boolean isRenderCalcAgrVars() {
+        return renderCalcAgrVars;
     }
 
-    public void setDisableParamPropPerTable(boolean disableParamPropPerTable) {
-        this.disableParamPropPerTable = disableParamPropPerTable;
-    }
-
-    public boolean isDisableCalcAgrVars() {
-        return disableCalcAgrVars;
-    }
-
-    public void setDisableCalcAgrVars(boolean disableCalcAgrVars) {
-        this.disableCalcAgrVars = disableCalcAgrVars;
+    public void setRenderCalcAgrVars(boolean renderCalcAgrVars) {
+        this.renderCalcAgrVars = renderCalcAgrVars;
     }
 
     public String getCalcAgrFormulaString() {
-        return calcAgrFormulaString;
-    }
-
-    public void setCalcAgrFormulaString(String calcAgrFormulaString) {
-        this.calcAgrFormulaString = calcAgrFormulaString;
+        return "Формула" + (propCalc.getFormula() != null ? ": " + propCalc.getFormula() : "");
     }
 
     public Param getAddParam() {
@@ -647,30 +541,6 @@ public class GenModelMB implements Serializable {
 
     public void setAddParam(Param addParam) {
         this.addParam = addParam;
-    }
-
-    public List<ParamList> getParamListForCalc() {
-        return paramListForCalc;
-    }
-
-    public void setParamListForCalc(List<ParamList> paramListForCalc) {
-        this.paramListForCalc = paramListForCalc;
-    }
-
-    public boolean isAddCalcAgr() {
-        return addCalcAgr;
-    }
-
-    public void setAddCalcAgr(boolean addCalcAgr) {
-        this.addCalcAgr = addCalcAgr;
-    }
-
-    public boolean isDelCalcAgr() {
-        return delCalcAgr;
-    }
-
-    public void setDelCalcAgr(boolean delCalcAgr) {
-        this.delCalcAgr = delCalcAgr;
     }
 
     public boolean isDisableAddBtn() {
@@ -689,59 +559,47 @@ public class GenModelMB implements Serializable {
         this.tableHeader = tableHeader;
     }
 
-    public boolean isSaveCalcAgr() {
-        return saveCalcAgr;
+    public List<Temperature> getGraphOrDecreaseList() {
+        return graphOrDecreaseList;
     }
 
-    public void setSaveCalcAgr(boolean saveCalcAgr) {
-        this.saveCalcAgr = saveCalcAgr;
-    }
-
-    public List<Temperature> getIsGraphList() {
-        return isGraphList;
-    }
-
-    public void setIsGraphList(List<Temperature> isGraphList) {
-        this.isGraphList = isGraphList;
+    public void setGraphOrDecreaseList(List<Temperature> graphOrDecreaseList) {
+        this.graphOrDecreaseList = graphOrDecreaseList;
     }
 
     public boolean isGraphRender() {
-        return graphRender;
-    }
-
-    public void setGraphRender(boolean graphRender) {
-        this.graphRender = graphRender;
-    }
-
-    public List<Temperature> getIsDecreaseList() {
-        return isDecreaseList;
-    }
-
-    public void setIsDecreaseList(List<Temperature> isDecreaseList) {
-        this.isDecreaseList = isDecreaseList;
+        return temperatureStatus == TemperatureStatus.GRAPH;
     }
 
     public boolean isDecreaseRender() {
-        return decreaseRender;
+        return temperatureStatus == TemperatureStatus.DAILY_REDUCTION;
     }
 
-    public void setDecreaseRender(boolean decreaseRender) {
-        this.decreaseRender = decreaseRender;
+    public boolean isOptValueRender() {
+        return temperatureStatus == TemperatureStatus.OPT_VALUE;
     }
 
-    public boolean isDisableSelect() {
-        return disableSelect;
+    public TreeNode<GMTree> getRootFiltered() {
+        return rootFiltered;
     }
 
-    public void setDisableSelect(boolean disableSelect) {
-        this.disableSelect = disableSelect;
+    public void setRootFiltered(TreeNode<GMTree> rootFiltered) {
+        this.rootFiltered = rootFiltered;
     }
 
-    public boolean isDisableSave() {
-        return disableSave;
+    public boolean isDisableAddFormulaBtn() {
+        return propCalc.getFormula() != null;
     }
 
-    public void setDisableSave(boolean disableSave) {
-        this.disableSave = disableSave;
+    public ParamPropCalc getPropCalc() {
+        return propCalc;
+    }
+
+    public ParamPropCalc getNewPropCalc() {
+        return newPropCalc;
+    }
+
+    public void setNewPropCalc(ParamPropCalc newPropCalc) {
+        this.newPropCalc = newPropCalc;
     }
 }

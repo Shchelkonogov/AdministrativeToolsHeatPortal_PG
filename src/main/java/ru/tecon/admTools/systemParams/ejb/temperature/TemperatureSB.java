@@ -70,6 +70,23 @@ public class TemperatureSB {
         return result;
     }
 
+    public Temperature getTemperatureById(int id, String select) {
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(select)) {
+            stm.setInt(1, id);
+
+            ResultSet res = stm.executeQuery();
+
+            if (res.next()) {
+                return new Temperature(res.getInt("graph_id"), res.getString("code"), res.getString("name"));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error load temperature props", e);
+        }
+
+        return null;
+    }
+
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void removeTemperature(Temperature temperature, String login, String ip, String select) throws SystemParamException {
         try (Connection connect = ds.getConnection();

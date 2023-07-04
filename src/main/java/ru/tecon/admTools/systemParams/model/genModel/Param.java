@@ -1,12 +1,15 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
+import ru.tecon.admTools.systemParams.model.temperature.TemperatureStatus;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.StringJoiner;
 
 /**
  * Класс описывающий структуру параметров обобщенной модели
+ *
  * @author Aleksey Sergeev
  */
 public class Param implements Serializable {
@@ -18,18 +21,21 @@ public class Param implements Serializable {
     private String parName;
     private long techprocTypeId;
     private short zone;
-    private Temperature isGraph;
     private long visible;
     private String calc;
-    private Temperature isDecrease;
     private boolean editEnable;
     private boolean letoControl;
+
+    private BigDecimal optValue;
+    private Temperature temperature;
+    private TemperatureStatus tempStatus = TemperatureStatus.EMPTY;
 
     public Param() {
     }
 
     public Param(long id, long paramTypeId, String parCode, String parMemo, String parName, long techprocTypeId, short zone,
-                 Temperature isGraph, long visible, String calc, Temperature isDecrease, boolean editEnable, boolean letoControl) {
+                 long visible, String calc, boolean editEnable, boolean letoControl) {
+        this();
         this.id = id;
         this.paramTypeId = paramTypeId;
         this.parCode = parCode;
@@ -37,10 +43,8 @@ public class Param implements Serializable {
         this.parName = parName;
         this.techprocTypeId = techprocTypeId;
         this.zone = zone;
-        this.isGraph = isGraph;
         this.visible = visible;
         this.calc = calc;
-        this.isDecrease = isDecrease;
         this.editEnable = editEnable;
         this.letoControl = letoControl;
     }
@@ -85,12 +89,13 @@ public class Param implements Serializable {
         this.zone = zone;
     }
 
-    public Temperature getIsGraph() {
-        return isGraph;
+    public Temperature getGraph() {
+        return temperature;
     }
 
-    public void setIsGraph(Temperature isGraph) {
-        this.isGraph = isGraph;
+    public void setGraph(Temperature graph) {
+        this.temperature = graph;
+        tempStatus = TemperatureStatus.GRAPH;
     }
 
     public long getVisible() {
@@ -109,41 +114,26 @@ public class Param implements Serializable {
         this.calc = calc;
     }
 
-    public Temperature getIsDecrease() {
-        return isDecrease;
+    public Temperature getDecrease() {
+        return temperature;
     }
 
-    public void setIsDecrease(Temperature isDecrease) {
-        this.isDecrease = isDecrease;
+    public void setDecrease(Temperature decrease) {
+        this.temperature = decrease;
+        tempStatus = TemperatureStatus.DAILY_REDUCTION;
     }
 
-    public boolean getEditEnable() {
-        return editEnable;
+    public BigDecimal getOptValue() {
+        return optValue;
     }
 
-    public short getEditEnableShort() {
-
-        if (editEnable){
-            return 1;
-        } else {
-            return 0;
-        }
+    public void setOptValue(BigDecimal optValue) {
+        this.optValue = optValue;
+        tempStatus = TemperatureStatus.OPT_VALUE;
     }
 
     public void setEditEnable(boolean editEnable) {
         this.editEnable = editEnable;
-    }
-
-    public boolean getLetoControl() {
-        return letoControl;
-    }
-
-    public short getLetoControlShort(){
-        if (letoControl){
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     public void setLetoControl(boolean letoControl) {
@@ -158,6 +148,18 @@ public class Param implements Serializable {
         return techprocTypeId;
     }
 
+    public TemperatureStatus getTempStatus() {
+        return tempStatus;
+    }
+
+    public boolean isEditEnable() {
+        return editEnable;
+    }
+
+    public boolean isLetoControl() {
+        return letoControl;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", Param.class.getSimpleName() + "[", "]")
@@ -168,12 +170,13 @@ public class Param implements Serializable {
                 .add("parName='" + parName + "'")
                 .add("techprocTypeId=" + techprocTypeId)
                 .add("zone=" + zone)
-                .add("isGraph=" + isGraph)
                 .add("visible=" + visible)
                 .add("calc='" + calc + "'")
-                .add("isDecrease=" + isDecrease)
                 .add("editEnable=" + editEnable)
                 .add("letoControl=" + letoControl)
+                .add("optValue=" + optValue)
+                .add("temperature=" + temperature)
+                .add("tempStatus=" + tempStatus)
                 .toString();
     }
 }

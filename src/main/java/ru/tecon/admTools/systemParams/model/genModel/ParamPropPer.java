@@ -7,16 +7,22 @@ import java.util.StringJoiner;
 
 /**
  * Класс описывающий структуру перечислений перечислимого стат. агрегата параметра обобщенной модели
+ *
  * @author Aleksey Sergeev
  */
 public class ParamPropPer implements Serializable {
+
     private long parId;
     private long paramTypeId;
     private long statAgrId;
     private long enumCode;
     private Condition propCond;
 
+    public ParamPropPer() {
+    }
+
     public ParamPropPer(long parId, long paramTypeId, long statAgrId, long enumCode, Condition propCond) {
+        this();
         this.parId = parId;
         this.paramTypeId = paramTypeId;
         this.statAgrId = statAgrId;
@@ -34,10 +40,6 @@ public class ParamPropPer implements Serializable {
 
     public long getEnumCode() {
         return enumCode;
-    }
-
-    public void setEnumCode(long enumCode) {
-        this.enumCode = enumCode;
     }
 
     public Condition getPropCond() {

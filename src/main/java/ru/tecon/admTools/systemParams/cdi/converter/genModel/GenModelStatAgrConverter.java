@@ -1,8 +1,7 @@
-package ru.tecon.admTools.systemParams.cdi.converter;
+package ru.tecon.admTools.systemParams.cdi.converter.genModel;
 
 import ru.tecon.admTools.systemParams.cdi.GenModelMB;
-import ru.tecon.admTools.systemParams.model.genModel.CalcAgrVars;
-import ru.tecon.admTools.systemParams.model.genModel.StatAgrList;
+import ru.tecon.admTools.systemParams.model.statAggr.StatAggrTable;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
@@ -16,27 +15,25 @@ import javax.faces.convert.FacesConverter;
  */
 @FacesConverter("genModelStatAgrConverter")
 public class GenModelStatAgrConverter implements Converter {
+
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
 
         ValueExpression vex = context.getApplication().getExpressionFactory()
                 .createValueExpression(context.getELContext(), "#{genModelMB}", GenModelMB.class);
 
-        GenModelMB defaultValues = (GenModelMB) vex.getValue(context.getELContext());
-        String val = String.valueOf(value.charAt(0));
-        for (CalcAgrVars i: defaultValues.getCalcAgrVarsList()) {
-            if (i.getVariable().equals(val)) {
-                return i.getRowList().stream()
-                        .filter(leftType -> leftType.getVariable().equals(value))
-                        .findFirst()
-                        .orElse(null);
-            }
-        }
-        return null;
+        GenModelMB genModelMB = (GenModelMB) vex.getValue(context.getELContext());
+        int index = (int) component.getAttributes().get("index");
+
+
+        return genModelMB.getNewPropCalc().getProps().get(index).getStatAggrListForChoice().stream()
+                .filter(statAggrTable -> statAggrTable.getId() == Integer.parseInt(value))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return String.valueOf(((StatAgrList) value).getVariable());
+        return String.valueOf(((StatAggrTable) value).getId());
     }
 }
