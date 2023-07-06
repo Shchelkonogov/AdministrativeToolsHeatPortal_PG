@@ -19,12 +19,12 @@ public class CustomRangeValidator implements Validator {
 
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-        String tMin = (String) ((HtmlOutputText) context.getViewRoot().findComponent("graphSelectForm:gTab:tMin")).getValue();
-        String tMax = (String) ((HtmlOutputText) context.getViewRoot().findComponent("graphSelectForm:gTab:tMax")).getValue();
-        String aMin = (String) ((HtmlOutputText) context.getViewRoot().findComponent("graphSelectForm:gTab:aMin")).getValue();
-        String aMax = (String) ((HtmlOutputText) context.getViewRoot().findComponent("graphSelectForm:gTab:aMax")).getValue();
+        String tMin = (String) ((HtmlOutputText) context.getViewRoot().findComponent("optValueSelectForm:tMin")).getValue();
+        String tMax = (String) ((HtmlOutputText) context.getViewRoot().findComponent("optValueSelectForm:tMax")).getValue();
+        String aMin = (String) ((HtmlOutputText) context.getViewRoot().findComponent("optValueSelectForm:aMin")).getValue();
+        String aMax = (String) ((HtmlOutputText) context.getViewRoot().findComponent("optValueSelectForm:aMax")).getValue();
 
-        String optValue = (String) ((UIInput) context.getViewRoot().findComponent("graphSelectForm:gTab:optValue")).getValue();
+        String optValue = (String) ((UIInput) context.getViewRoot().findComponent("optValueSelectForm:optValue")).getValue();
 
         if (optValue.isEmpty()) {
             throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка проверки",

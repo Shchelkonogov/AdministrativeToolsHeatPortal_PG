@@ -1,45 +1,50 @@
 package ru.tecon.admTools.specificModel.ejb;
 
+import org.postgresql.util.PSQLException;
 import ru.tecon.admTools.specificModel.model.*;
 import ru.tecon.admTools.specificModel.model.additionalModel.AnalogData;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
+import ru.tecon.admTools.systemParams.SystemParamException;
 
 import javax.annotation.Resource;
-import javax.ejb.*;
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Startup
+
 @Stateless
 @Local(SpecificModelLocal.class)
 public class SpecificModelSB implements SpecificModelLocal {
 
     private static final Logger LOG = Logger.getLogger(SpecificModelSB.class.getName());
 
-    private static final String ALTER_SESSION = "alter session set NLS_NUMERIC_CHARACTERS = '.,'";
 
-    private static final String SELECT_DATA = "select * from table(dsp_0031t.sel_a_params(?))";
-    private static final String SELECT_ECO_DATA = "select * from table(dsp_0050t.sel_a_params(?))";
-    private static final String SELECT_GET_OBJECT_PATH = "select get_obj_path_all(?) || ' (' || get_obj_address(?) || ')' from dual";
-    private static final String SELECT_ENUMERABLE_DATA = "select * from table(dsp_0031t.sel_p_params(?))";
-    private static final String SELECT_PARAM_CONDITION = "select * from table(dsp_0031t.sel_p_param_cond(?, ?, ?))";
-    private static final String SELECT_CONDITIONS = "select * from dz_param_condition order by param_cond_name";
-    private static final String SELECT_DECREASES = "select * from table(dsp_0031t.sel_decrease_list()) order by code";
-    private static final String SELECT_GRAPHS = "select * from table(dsp_0031t.sel_graph_list()) order by code";
-    private static final String SELECT_GRAPH_DESCRIPTION = "select * from table(dsp_0031t.sel_graph_value(?))";
-    private static final String SELECT_DECREASE_DESCRIPTION = "select * from table(dsp_0031t.sel_decrease_value(?))";
+    private static final String SELECT_DATA = "select * from dsp_0031t.sel_a_params(?)";
+
+    private static final String SELECT_ECO_DATA = "select * from dsp_0050t.sel_a_params(?)";
+    private static final String SELECT_GET_OBJECT_PATH = "select admin.get_obj_path_all(?) || ' (' || admin.get_obj_address(?) || ')'";
+    private static final String SELECT_ENUMERABLE_DATA = "select * from dsp_0031t.sel_p_params(?)";
+    private static final String SELECT_PARAM_CONDITION = "select * from dsp_0031t.sel_p_param_cond(?, ?, ?)";
+    private static final String SELECT_CONDITIONS = "select * from admin.dz_param_condition order by param_cond_name";
+    private static final String SELECT_DECREASES = "select * from dsp_0031t.sel_decrease_list() order by code";
+
+    private static final String SELECT_GRAPHS = "select * from dsp_0031t.sel_graph_list() order by code";
+    private static final String SELECT_GRAPH_DESCRIPTION = "select * from dsp_0031t.sel_graph_value(?)";
+    private static final String SELECT_DECREASE_DESCRIPTION = "select * from dsp_0031t.sel_decrease_value(?)";
     private static final String SELECT_HISTORY = "select to_char(system_date, 'dd.mm.yyyy hh24:mi:ss') as system_date, " +
-            "user_name, prop_name, old_val, new_val from table(dsp_0031t.sel_change_param_ranges(?, ?, ?))";
+            "user_name, prop_name, old_val, new_val from dsp_0031t.sel_change_param_ranges(?, ?, ?)";
 
-    private static final String SAVE_GRAPH = "{? = call dsp_0031t.save_graph_rt(?, ?, ?, ?, ?, ?)}";
-    private static final String SAVE_ENUM_PARAMS = "{? = call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?)}";
-    private static final String SAVE_RANGES = "{? = call dsp_0031t.save_ranges(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-    private static final String SAVE_DECREASE = "{? = call dsp_0031t.save_decrease(?, ?, ?)}";
-    private static final String CLEAR_RANGES = "{? = call dsp_0031t.clear_ranges(?, ?, ?)}";
+    private static final String SAVE_ENUM_PARAMS = "call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?, ?)";
+    private static final String SAVE_ANALOG_PARAMS = "call dsp_0031t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String CLEAR_RANGES = "call dsp_0031t.clear_ranges(?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -53,9 +58,8 @@ public class SpecificModelSB implements SpecificModelLocal {
     public List<DataModel> getData(int objectID, boolean eco) {
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
-             PreparedStatement alter = connect.prepareStatement(ALTER_SESSION);
-             PreparedStatement stm = connect.prepareStatement(eco ? SELECT_ECO_DATA : SELECT_DATA)) {
-            alter.executeQuery();
+//             PreparedStatement stm = connect.prepareStatement(eco ? SELECT_ECO_DATA : SELECT_DATA)) { //TODO заменить когда будет экомониторинг
+             PreparedStatement stm = connect.prepareStatement(SELECT_DATA)) {
 
             stm.setInt(1, objectID);
             ResultSet res = stm.executeQuery();
@@ -210,139 +214,109 @@ public class SpecificModelSB implements SpecificModelLocal {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String saveGraph(int objectID, DataModel saveData) {
-        AnalogData data = (AnalogData) saveData.getAdditionalData();
-        if (data.isGraphDisable()) {
-            return null;
-        }
-        try (Connection connect = ds.getConnection();
-             CallableStatement stm = connect.prepareCall(SAVE_GRAPH)) {
-            stm.registerOutParameter(1, Types.INTEGER);
-            stm.setInt(2, objectID);
-            stm.setInt(3, saveData.getParID());
-            stm.setInt(4, saveData.getStatAgr());
-            if (data.getGraphID() == null) {
-                if ((data.getGraphName() != null) && !data.getGraphName().isEmpty()) {
-                    stm.setNull(5, Types.INTEGER);
-                    stm.setFloat(6, Float.parseFloat(data.getGraphName()));
-                } else {
-                    stm.setNull(5, Types.INTEGER);
-                    stm.setNull(6, Types.INTEGER);
-                }
-            } else {
-                stm.setInt(5, data.getGraphID());
-                stm.setNull(6, Types.INTEGER);
-            }
-            stm.registerOutParameter(7, Types.VARCHAR);
-            stm.executeUpdate();
-
-            if (stm.getInt(1) == 1) {
-                return stm.getString(7);
-            }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error upload graph data", e);
-        }
-
-        return null;
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void saveEnumParam(int objectID, DataModel saveData) {
+    public void saveEnumParam(int objectID, DataModel saveData, String login) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_ENUM_PARAMS)) {
 
             for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
                 if (item.isEdited()) {
                     try {
-                        stm.registerOutParameter(1, Types.INTEGER);
-                        stm.setInt(2, objectID);
-                        stm.setInt(3, saveData.getParID());
-                        stm.setInt(4, saveData.getStatAgr());
-                        stm.setInt(5, item.getEnumCode());
-                        stm.setString(6, item.getCondition().getName());
-                        stm.setInt(7, item.getCondition().getId());
+                        stm.setInt(1, objectID);
+                        stm.setInt(2, saveData.getParID());
+                        stm.setInt(3, saveData.getStatAgr());
+                        stm.setInt(4, item.getEnumCode());
+                        stm.setString(5, item.getCondition().getName());
+                        stm.setInt(6, item.getCondition().getId());
+                        //            stm.setString(7, login); //TODO заменить хардкод на логин для релизной версии
+                        stm.setString(7,"ADMIN");
                         stm.executeUpdate();
                     } catch (SQLException e) {
-                        LOG.log(Level.WARNING, "error upload enum param", e);
+                        LOG.log(Level.WARNING, "saving error Enum Param", e);
+                        if (e.getSQLState().equals("11111")) {
+                            if (e instanceof PSQLException) {
+                                PSQLException exception = (PSQLException)e;
+                                String ex = exception.getServerErrorMessage().getMessage();
+                                throw new SystemParamException(ex);
+                            }
+                        } else throw new SystemParamException("Внутренняя ошибка сервера");
                     }
                 }
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error upload enum param", e);
+            LOG.log(Level.WARNING, "saving error Enum Param", e);
         }
     }
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String saveRanges(int objectID, DataModel saveData) {
+    public void saveAParam(int objectID, DataModel saveData, String login) throws SystemParamException {
         try (Connection connect = ds.getConnection();
-             CallableStatement stm = connect.prepareCall(SAVE_RANGES)) {
-            stm.registerOutParameter(1, Types.INTEGER);
-            stm.setInt(2, objectID);
-            stm.setInt(3, saveData.getParID());
-            stm.setInt(4, saveData.getStatAgr());
+             CallableStatement stm = connect.prepareCall(SAVE_ANALOG_PARAMS)) {
+            stm.setLong(1, objectID);
+            stm.setLong(2, saveData.getParID());
+            stm.setLong(3, saveData.getStatAgr());
 
             AnalogData data = (AnalogData) saveData.getAdditionalData();
 
             if (data.getaMin() == null) {
-                stm.setNull(5, Types.INTEGER);
+                stm.setNull(4, Types.NUMERIC);
             } else {
-                stm.setDouble(5, data.getaMin());
+                stm.setBigDecimal(4, BigDecimal.valueOf(data.getaMin()));
             }
             if (data.gettMin() == null) {
-                stm.setNull(6, Types.INTEGER);
+                stm.setNull(5, Types.NUMERIC);
             } else {
-                stm.setDouble(6, data.gettMin());
+                stm.setBigDecimal(5, BigDecimal.valueOf(data.gettMin()));
             }
             if (data.gettMax() == null) {
-                stm.setNull(7, Types.INTEGER);
+                stm.setNull(6, Types.NUMERIC);
             } else {
-                stm.setDouble(7, data.gettMax());
+                stm.setBigDecimal(6, BigDecimal.valueOf(data.gettMax()));
             }
             if (data.getaMax() == null) {
-                stm.setNull(8, Types.INTEGER);
+                stm.setNull(7, Types.NUMERIC);
             } else {
-                stm.setDouble(8, data.getaMax());
+                stm.setBigDecimal(7, BigDecimal.valueOf(data.getaMax()));
             }
 
-            stm.setInt(9, data.istPercent() ? 1 : 0);
-            stm.setInt(10, data.isaPercent() ? 1 : 0);
-            stm.setInt(11, data.isAbsolute() ? 0 : 1);
+            stm.setShort(8, (short) (data.istPercent() ? 1 : 0));
+            stm.setShort(9, (short) (data.isaPercent() ? 1 : 0));
+            stm.setShort(10, (short) (data.isAbsolute() ? 0 : 1));
 
-            stm.registerOutParameter(12, Types.VARCHAR);
+            if (saveData.isTempGraphRender() && data.getGraphID() != null) {
+                stm.setLong(11, data.getGraphID());
+            } else {
+                stm.setNull(11, Types.BIGINT);
+            }
+
+            if (saveData.isOptValuesRender() && data.getGraphName() != null && !data.getGraphName().equals("")) {
+                stm.setBigDecimal(12, BigDecimal.valueOf(Double.parseDouble(data.getGraphName())));
+            } else {
+                stm.setNull(12, Types.NUMERIC);
+
+            }
+
+            if (saveData.isDecreaseValueRender() && data.getDecreaseID() != null) {
+                stm.setLong(13, data.getDecreaseID());
+            } else {
+                stm.setNull(13, Types.BIGINT);
+
+            }
+
+            stm.setString(14, "ADMIN");
+//            stm.setString(14, login); //TODO заменить хардкод на логин для релизной версии
+
             stm.executeUpdate();
 
-            if (stm.getInt(1) == 1) {
-                return stm.getString(12);
-            }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error upload ranges", e);
-        }
-
-        return null;
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void saveDecrease(int objectID, DataModel saveData) {
-        AnalogData data = (AnalogData) saveData.getAdditionalData();
-        if (data.isDecreaseDisable()) {
-            return;
-        }
-        try (Connection connect = ds.getConnection();
-             CallableStatement stm = connect.prepareCall(SAVE_DECREASE)) {
-            stm.registerOutParameter(1, Types.INTEGER);
-            stm.setInt(2, objectID);
-            stm.setInt(3, saveData.getParID());
-            if (data.getDecreaseID() == null) {
-                stm.setNull(4, Types.INTEGER);
-            } else {
-                stm.setInt(4, data.getDecreaseID());
-            }
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error upload decrease", e);
+            LOG.log(Level.WARNING, "saving error A Params ", e);
+            if (e.getSQLState().equals("11111")) {
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 
@@ -401,7 +375,7 @@ public class SpecificModelSB implements SpecificModelLocal {
     }
 
     @Override
-    public void clearRanges(int objectID, int parID, int statAgrID) {
+    public void clearRanges(int objectID, int parID, int statAgrID) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(CLEAR_RANGES)) {
             stm.registerOutParameter(1, Types.INTEGER);
@@ -410,7 +384,14 @@ public class SpecificModelSB implements SpecificModelLocal {
             stm.setInt(4, statAgrID);
             stm.executeUpdate();
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error clear ranges", e);
+            LOG.log(Level.WARNING, "error clearRanges ", e);
+            if (e.getSQLState().equals("11111")) {
+                if (e instanceof PSQLException) {
+                    PSQLException exception = (PSQLException)e;
+                    String ex = exception.getServerErrorMessage().getMessage();
+                    throw new SystemParamException(ex);
+                }
+            } else throw new SystemParamException("Внутренняя ошибка сервера");
         }
     }
 }

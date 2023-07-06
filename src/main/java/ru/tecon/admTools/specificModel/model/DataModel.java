@@ -26,6 +26,9 @@ public class DataModel implements Serializable {
     private Additional additionalData;
 
     private boolean change = false;
+    private boolean tempGraphRender = false;
+    private boolean optValuesRender = false;
+    private boolean decreaseValueRender = false;
 
     public DataModel() {
     }
@@ -120,6 +123,30 @@ public class DataModel implements Serializable {
         this.paramTypeName = paramTypeName;
     }
 
+    public boolean isTempGraphRender() {
+        return tempGraphRender;
+    }
+
+    public void setTempGraphRender(boolean tempGraphRender) {
+        this.tempGraphRender = tempGraphRender;
+    }
+
+    public boolean isOptValuesRender() {
+        return optValuesRender;
+    }
+
+    public void setOptValuesRender(boolean optValuesRender) {
+        this.optValuesRender = optValuesRender;
+    }
+
+    public boolean isDecreaseValueRender() {
+        return decreaseValueRender;
+    }
+
+    public void setDecreaseValueRender(boolean decreaseValueRender) {
+        this.decreaseValueRender = decreaseValueRender;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", DataModel.class.getSimpleName() + "[", "]")
@@ -135,6 +162,9 @@ public class DataModel implements Serializable {
                 .add("paramTypeName='" + paramTypeName + "'")
                 .add("additionalData=" + additionalData)
                 .add("change=" + change)
+                .add("tempGraphRender=" + tempGraphRender)
+                .add("optValuesRender=" + optValuesRender)
+                .add("decreaseValueRender=" + decreaseValueRender)
                 .toString();
     }
 }

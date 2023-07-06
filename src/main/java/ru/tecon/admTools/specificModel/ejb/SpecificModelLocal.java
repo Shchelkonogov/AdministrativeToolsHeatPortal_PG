@@ -2,6 +2,7 @@ package ru.tecon.admTools.specificModel.ejb;
 
 import ru.tecon.admTools.specificModel.model.*;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
+import ru.tecon.admTools.systemParams.SystemParamException;
 
 import javax.ejb.Local;
 import java.util.List;
@@ -69,34 +70,19 @@ public interface SpecificModelLocal {
     List<GraphDecreaseItemModel> getGraphs();
 
     /**
-     * Метод сохраняет выбранный график
-     * @param objectID id объекта
-     * @param saveData данные для сохранения
-     * @return в случае ошибки сохранения возвращается сообщение об ошибке.
-     */
-    String saveGraph(int objectID, DataModel saveData);
-
-    /**
      * Метод сохраняет изменения дополнительных данных для перечеслимых объектов
      * @param objectID id объекта
      * @param saveData данные для сохранения
      */
-    void saveEnumParam(int objectID, DataModel saveData);
+    void saveEnumParam(int objectID, DataModel saveData, String login) throws SystemParamException;
 
     /**
-     * Метод сохраняет изменения границ дополнительных данных аналоговых параметров
+     * Метод сохраняет изменения для аналоговых параметров
      * @param objectID id объекта
      * @param saveData данные для сохранения
      * @return в случае ошибки сохранения возвращается сообщение об ошибке.
      */
-    String saveRanges(int objectID, DataModel saveData);
-
-    /**
-     * Метод сохраняет изменения суточного снижения для аналоговых параметров
-     * @param objectID id объекта
-     * @param saveData данные для сохранения
-     */
-    void saveDecrease(int objectID, DataModel saveData);
+    void saveAParam(int objectID, DataModel saveData, String login) throws SystemParamException;
 
     /**
      * Метод выгружает данные по описанию графика
@@ -127,5 +113,5 @@ public interface SpecificModelLocal {
      * @param parID id параметра
      * @param statAgrID id агрегата
      */
-    void clearRanges(int objectID, int parID, int statAgrID);
+    void clearRanges (int objectID, int parID, int statAgrID) throws SystemParamException;
 }

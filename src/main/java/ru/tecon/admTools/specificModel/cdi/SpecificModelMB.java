@@ -2,25 +2,29 @@ package ru.tecon.admTools.specificModel.cdi;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
-import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.ejb.SpecificModelLocal;
 import ru.tecon.admTools.specificModel.model.Condition;
 import ru.tecon.admTools.specificModel.model.DataModel;
 import ru.tecon.admTools.specificModel.model.GraphDecreaseItemModel;
 import ru.tecon.admTools.specificModel.model.additionalModel.AnalogData;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
+import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -31,14 +35,11 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class SpecificModelMB implements Serializable {
 
-    private static Logger log  = Logger.getLogger(SpecificModelMB.class.getName());
-
     // Параметр для переключения с конкретной модели на конкретную модель экомониторинга
     private boolean eco = false;
 
     private int objectID;
     private String objectPath;
-    private boolean write = false;
 
     // Модели данных для закладки аналоговые параметры
     private List<DataModel> tableModel;
@@ -74,8 +75,10 @@ public class SpecificModelMB implements Serializable {
     @EJB
     private SpecificModelLocal bean;
 
-    @EJB
-    private CheckUserSB checkBean;
+    @Inject
+    private SystemParamsUtilMB utilMB;
+    @Inject
+    private transient Logger logger;
 
     @PostConstruct
     private void init() {
@@ -84,8 +87,8 @@ public class SpecificModelMB implements Serializable {
         eco = Boolean.parseBoolean(request.getParameter("eco"));
 
         try {
-            objectID = Integer.parseInt(request.getParameter("objectID"));
-            write = checkBean.checkSessionWrite(request.getParameter("sessionID"), Integer.parseInt(request.getParameter("formID")));
+//            objectID = Integer.parseInt(request.getParameter("objectID")); - не удалять
+            objectID = 7401; //TODO заменить на реквест в релизной версии
         } catch (NumberFormatException e) {
             return;
         }
@@ -104,8 +107,35 @@ public class SpecificModelMB implements Serializable {
         paramNameFilter = tableModel.stream().map(DataModel::getParamTypeName).collect(Collectors.toSet());
     }
 
+    /**
+     * Метод для загрузки данных
+     */
     private void loadData() {
         tableModel = bean.getData(objectID, eco);
+        //проводим лексический разбор для установления какое диалоговое окно будет открываться
+        for (DataModel dataModel: tableModel) {
+            if (dataModel.getParamTypeName().equals("Температура")) {
+                if (dataModel.getTechProcCode().equals("ГВС")) {
+                    dataModel.setDecreaseValueRender(true);
+                } else {
+                    dataModel.setTempGraphRender(true);
+                }
+            }
+            if (dataModel.getParamTypeName().equals("Давление")) {
+                dataModel.setOptValuesRender(true);
+            }
+            //объединяем информацию из разных столбцов выгруженной таблицы в один на форме График/Опт.знач/Суточные снижения
+            if (!((AnalogData) dataModel.getAdditionalData()).isDecreaseDisable()) {
+                ((AnalogData) dataModel.getAdditionalData()).setGraph(((AnalogData) dataModel.getAdditionalData()).getGraphID(),
+                        ((AnalogData) dataModel.getAdditionalData()).getGraphName(), false);
+            }
+            if (((AnalogData) dataModel.getAdditionalData()).getGraphName() == null &&
+                    ((AnalogData) dataModel.getAdditionalData()).getDecreaseName() != null ) {
+                ((AnalogData) dataModel.getAdditionalData()).setGraph(((AnalogData) dataModel.getAdditionalData()).getGraphID(),
+                        ((AnalogData) dataModel.getAdditionalData()).getDecreaseName(),
+                        ((AnalogData) dataModel.getAdditionalData()).isGraphDisable());
+            }
+        }
 
         filteredTableModel.clear();
         filteredTableModel.addAll(tableModel);
@@ -118,12 +148,14 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Метод обрабатывает инициализацию события изменения значения ячейки таблицы аналоговых параметров
+     * Метод обрабатывает инициализацию события изменения значения ячейки в столбце График/Опт.знач/Суточные снижения
+     * в таблице аналоговых параметров
      * @param event событие
      */
-    public void onCellEditInit(CellEditEvent event) {
+    public void onCellEditInit(CellEditEvent<?> event) {
         rowIndex = event.getRowIndex();
         changedDecreaseGraphItem = filteredTableModel.get(rowIndex);
+
         if (event.getColumn().getClientId().endsWith("graphColumn")) {
             if ((((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphID() == null) &&
                     (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphName() != null)) {
@@ -131,10 +163,15 @@ public class SpecificModelMB implements Serializable {
             } else {
                 optValue = "";
             }
-            PrimeFaces.current().ajax().update("graphSelectForm");
-            PrimeFaces.current().executeScript("PF('graphDialog').show();");
-        } else {
-            if (event.getColumn().getClientId().endsWith("decreaseColumn")) {
+            if (changedDecreaseGraphItem.isTempGraphRender()) {
+                PrimeFaces.current().ajax().update("graphSelectForm");
+                PrimeFaces.current().executeScript("PF('graphDialog').show();");
+            }
+            if (changedDecreaseGraphItem.isOptValuesRender()) {
+                PrimeFaces.current().ajax().update("optValueSelectForm");
+                PrimeFaces.current().executeScript("PF('optValueDialog').show();");
+            }
+            if (changedDecreaseGraphItem.isDecreaseValueRender()) {
                 PrimeFaces.current().executeScript("PF('decreaseDialog').show();");
             }
         }
@@ -144,45 +181,56 @@ public class SpecificModelMB implements Serializable {
      * Метод обрабатывает событие изменения значения ячейки таблицы аналоговых параметров
      * @param event событие
      */
-    public void onCellEdit(CellEditEvent event) {
+    public void onCellEdit(CellEditEvent<?> event) {
         filteredTableModel.get(event.getRowIndex()).setChange(true);
     }
 
     /**
-     * Метод обрабатывает нажатие на кнопку сохранить и осхраняет все изменения в базе
+     * Метод обрабатывает нажатие на кнопку сохранить и сохраняет все изменения в базе
      */
     public void saveData() {
-        log.info("update analog objects:");
-        tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> log.info(dataModel.toString()));
-        log.info("end;");
 
-        log.info("update enumerate objects:");
-        enumerableTableModel.stream().filter(DataModel::isChange).forEach(dataModel -> log.info(dataModel.toString()));
-        log.info("end;");
-
-        FacesContext context = FacesContext.getCurrentInstance();
-
+        //добавляем измененные значения во все стат агрегаты относящиеся к одному параметру
         tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> {
-            String message;
-
-            log.info("save analog data: " + dataModel);
-
-            message = bean.saveGraph(objectID, dataModel);
-            if (message != null) {
-                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + ": " + message));
+            for (DataModel model: tableModel) {
+                if (dataModel.getParID() == model.getParID()) {
+                    model.setAdditionalData(dataModel.getAdditionalData());
+                    model.setChange(true);
+                }
             }
-
-            message = bean.saveRanges(objectID, dataModel);
-            if (message != null) {
-                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", dataModel.getParMemo() + ": " + message));
-            }
-
-            bean.saveDecrease(objectID, dataModel);
         });
 
+        //логгируем все изменения
+        logger.info("update analog objects:");
+        tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> logger.info(dataModel.toString()));
+        logger.info("end;");
+
+        logger.info("update enumerate objects:");
+        enumerableTableModel.stream().filter(DataModel::isChange).forEach(dataModel -> logger.info(dataModel.toString()));
+        logger.info("end;");
+
+        //цикл для сохранения всех изменений в таблице аналоговых параметров
+        tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> {
+
+            logger.info("save analog data: " + dataModel);
+
+            try {
+                bean.saveAParam(objectID, dataModel, utilMB.getLogin());
+            } catch (SystemParamException e) {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+            }
+        });
+
+        //цикл для сохранения всех изменений в таблице перечислимых параметров
         enumerableTableModel.stream().filter(DataModel::isChange).forEach(dataModel -> {
-            log.info("save enum data: " + dataModel);
-            bean.saveEnumParam(objectID, dataModel);
+            logger.info("save enum data: " + dataModel);
+            try {
+                bean.saveEnumParam(objectID, dataModel, utilMB.getLogin());
+            } catch (SystemParamException e) {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+            }
         });
 
         loadData();
@@ -191,7 +239,7 @@ public class SpecificModelMB implements Serializable {
     /**
      * Метод обрабатывает нажатие contextMenu Сбросить границы
      */
-    public void clearRanges(int objectID, int parID, int statAgrID) {
+    public void clearRanges(int objectID, int parID, int statAgrID) throws SystemParamException {
         bean.clearRanges(objectID, parID, statAgrID);
         loadData();
     }
@@ -205,43 +253,50 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора суточного снижения
+     * Метод обрабатывает нажатие на выбрать во всплывающем окне выбора суточного снижения
      */
     public void saveDecrease() {
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseName(selectDecrease.getName());
         ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseID(selectDecrease.getId());
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectDecrease.getName());
         changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":decreaseValuePanel");
+        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
     }
 
     /**
-     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора суточного снижения
+     * Метод обрабатывает нажатие на Без снижения во всплывающем окне выбора суточного снижения
      */
     public void saveNoDecrease() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseName(null);
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseID(null);
-        changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":decreaseValuePanel");
+        if (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getDecreaseName() != null) {
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseName(null);
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setDecreaseID(null);
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(null);
+            changedDecreaseGraphItem.setChange(true);
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+        }
+
     }
 
     /**
-     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора графика
+     * Метод обрабатывает нажатие на выбрать во всплывающем окне выбора графика
      */
     public void saveGraph() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectGraph.getName());
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(selectGraph.getId());
-        changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectGraph.getName());
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(selectGraph.getId());
+            changedDecreaseGraphItem.setChange(true);
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
     }
 
     /**
-     * Метод обрабатывает нажатие на выбрать в всплывающем окне выбора графика
+     * Метод обрабатывает нажатие на Без графика во всплывающем окне выбора графика
      */
     public void saveNoGraph() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
-        changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+        if (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphID() != null) {
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
+            changedDecreaseGraphItem.setChange(true);
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+        }
     }
 
     /**
@@ -260,22 +315,21 @@ public class SpecificModelMB implements Serializable {
      * Метод обрабатывает событие изменения состояний в уточняющей таблице перечислимых параметров
      * @param event событие
      */
-    public void onCellEnumEdit(CellEditEvent event) {
+    public void onCellEnumEdit(CellEditEvent<?> event) {
         ((EnumerateData) selectedEnumerateItem.getAdditionalData()).getConditions().get(event.getRowIndex()).setEdited(true);
         selectedEnumerateItem.setChange(true);
     }
 
     /**
-     * Метод обрабатывает нажание кнопки выбрать в выборе графика или оптимального значения
-     * на закладке оптимальное значение
+     * Метод обрабатывает нажание кнопки выбрать в диалоговом окне выбора оптимального значения
      */
     public void saveOptValue() {
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
         List<String> updateList = new ArrayList<>();
 
         if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
-            data.setA(-10d, 10d, true, true, true);
-            data.setT(-5d, 5d, true, true, true);
+            data.setA(-10d, 10d, false, false, true);
+            data.setT(-5d, 5d, false, false, true);
             data.setAbsolute(true);
 
             updateList.add("tabView:tableForm:tableData:" + rowIndex + ":tMinCellEditor");
@@ -285,8 +339,6 @@ public class SpecificModelMB implements Serializable {
             updateList.add("tabView:tableForm:tableData:" + rowIndex + ":aMaxCellEditor");
             updateList.add("tabView:tableForm:tableData:" + rowIndex + ":aPercentColumn");
             updateList.add("tabView:tableForm:tableData:" + rowIndex + ":absoluteColumn");
-
-            PrimeFaces.current().executeScript("blockRow(" + rowIndex + ");");
         }
 
         data.setGraphName(optValue);
@@ -299,29 +351,22 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Метод обрабатывает нажание кнопки выбрать в выборе графика или оптимального значения
-     * на закладке оптимальное значение
+     * Метод обрабатывает нажание кнопки Без Опт.знач в диалоговом окне выбора оптимального значения
      */
     public void saveNoOptValue() {
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
-        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
-        changedDecreaseGraphItem.setChange(true);
-        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
-    }
-
-    public String getLabelForNewOptValue() {
-        if (changedDecreaseGraphItem == null) {
-            return "";
+        if (((AnalogData) changedDecreaseGraphItem.getAdditionalData()).getGraphName() != null) {
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName("");
+            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(null);
+            changedDecreaseGraphItem.setChange(true);
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":absoluteColumn");
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":aPercentColumn");
+            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":tPercentColumn");
         }
-        AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
-        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
-            return "Новое оптимальное значение. Границы будут сброшены!";
-        }
-        return "";
     }
 
     /**
-     * Получение границ с перерасчетом процентов
+     * Получение верхней технологической границы с перерасчетом процентов
      * @return границы
      */
     public String gettMax() {
@@ -331,12 +376,14 @@ public class SpecificModelMB implements Serializable {
 
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
 
+        //пересчет для новой границы с заранее установленным %
         if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
             try {
-                return new BigDecimal(5)
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(5))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return 5 + "%";
             }
@@ -346,20 +393,23 @@ public class SpecificModelMB implements Serializable {
             return "-";
         }
 
+        //пересчет для новой границы для установленных вручную значений
         if (data.istPercent()) {
             try {
-                return new BigDecimal(data.gettMax())
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(data.gettMax()))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.gettMax() + "%";
             }
-        } else {
+        }
+        else {
             try {
                 return new BigDecimal(data.gettMax())
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.gettMax().toString();
             }
@@ -367,7 +417,7 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Получение границ с перерасчетом процентов
+     * Получение нижней технологической границы с перерасчетом процентов
      * @return границы
      */
     public String gettMin() {
@@ -379,10 +429,11 @@ public class SpecificModelMB implements Serializable {
 
         if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
             try {
-                return new BigDecimal(-5)
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(-5))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return -5 + "%";
             }
@@ -394,10 +445,11 @@ public class SpecificModelMB implements Serializable {
 
         if (data.istPercent()) {
             try {
-                return new BigDecimal(data.gettMin())
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(data.gettMin()))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.gettMin() + "%";
             }
@@ -405,7 +457,7 @@ public class SpecificModelMB implements Serializable {
             try {
                 return new BigDecimal(data.gettMin())
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.gettMin().toString();
             }
@@ -413,7 +465,7 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Получение границ с перерасчетом процентов
+     * Получение верхней аварийной границы с перерасчетом процентов
      * @return границы
      */
     public String getaMax() {
@@ -425,10 +477,11 @@ public class SpecificModelMB implements Serializable {
 
         if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
             try {
-                return new BigDecimal(10)
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(10))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return 10 + "%";
             }
@@ -440,10 +493,11 @@ public class SpecificModelMB implements Serializable {
 
         if (data.isaPercent()) {
             try {
-                return new BigDecimal(data.getaMax())
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(data.getaMax()))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.getaMax() + "%";
             }
@@ -452,7 +506,7 @@ public class SpecificModelMB implements Serializable {
                 try {
                     return new BigDecimal(data.getaMax())
                             .add(new BigDecimal(optValue))
-                            .setScale(2, RoundingMode.HALF_EVEN).toString();
+                            .setScale(2, RoundingMode.HALF_UP).toString();
                 } catch (NumberFormatException e) {
                     return data.getaMax().toString();
                 }
@@ -463,7 +517,7 @@ public class SpecificModelMB implements Serializable {
     }
 
     /**
-     * Получение границ с перерасчетом процентов
+     * Получение нижней аварийной границы с перерасчетом процентов
      * @return границы
      */
     public String getaMin() {
@@ -475,10 +529,11 @@ public class SpecificModelMB implements Serializable {
 
         if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
             try {
-                return new BigDecimal(-10)
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(-10))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return -10 + "%";
             }
@@ -490,10 +545,11 @@ public class SpecificModelMB implements Serializable {
 
         if (data.isaPercent()) {
             try {
-                return new BigDecimal(data.getaMin())
-                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN)
+                return new BigDecimal(optValue)
+                        .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(data.getaMin()))
                         .add(new BigDecimal(optValue))
-                        .setScale(2, RoundingMode.HALF_EVEN).toString();
+                        .setScale(2, RoundingMode.HALF_UP).toString();
             } catch (NumberFormatException e) {
                 return data.getaMin() + "%";
             }
@@ -502,7 +558,7 @@ public class SpecificModelMB implements Serializable {
                 try {
                     return new BigDecimal(data.getaMin())
                             .add(new BigDecimal(optValue))
-                            .setScale(2, RoundingMode.HALF_EVEN).toString();
+                            .setScale(2, RoundingMode.HALF_UP).toString();
                 } catch (NumberFormatException e) {
                     return data.getaMin().toString();
                 }
@@ -590,10 +646,6 @@ public class SpecificModelMB implements Serializable {
 
     public int getObjectID() {
         return objectID;
-    }
-
-    public boolean isWrite() {
-        return write;
     }
 
     public boolean isEco() {
