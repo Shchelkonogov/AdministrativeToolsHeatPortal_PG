@@ -2,6 +2,7 @@ package ru.tecon.admTools.specificModel.cdi;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
+import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.ejb.SpecificModelLocal;
 import ru.tecon.admTools.specificModel.model.Condition;
 import ru.tecon.admTools.specificModel.model.DataModel;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -74,6 +76,8 @@ public class SpecificModelMB implements Serializable {
 
     @EJB
     private SpecificModelLocal bean;
+    @EJB
+    private CheckUserSB checkUserSB;
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -82,15 +86,17 @@ public class SpecificModelMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 
-        eco = Boolean.parseBoolean(request.getParameter("eco"));
+        Map<String, String> request = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 
-        try {
-            objectID = Integer.parseInt(request.getParameter("objectID"));
-        } catch (NumberFormatException e) {
-            return;
-        }
+        String sessionID = request.get("sessionID");
+        objectID = Integer.parseInt(request.get("objectID"));
+
+        utilMB.setLogin(checkUserSB.getUser(sessionID));
+        utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formID"))));
+
+
+        eco = Boolean.parseBoolean(request.get("eco"));
 
         objectPath = bean.getObjectPath(objectID);
 
