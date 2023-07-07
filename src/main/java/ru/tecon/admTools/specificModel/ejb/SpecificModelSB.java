@@ -32,19 +32,38 @@ public class SpecificModelSB implements SpecificModelLocal {
     private static final String SELECT_ECO_DATA = "select * from dsp_0050t.sel_a_params(?)";
     private static final String SELECT_GET_OBJECT_PATH = "select admin.get_obj_path_all(?) || ' (' || admin.get_obj_address(?) || ')'";
     private static final String SELECT_ENUMERABLE_DATA = "select * from dsp_0031t.sel_p_params(?)";
+    private static final String SELECT_ECO_ENUMERABLE_DATA = "select * from dsp_0050t.sel_p_params(?)";
     private static final String SELECT_PARAM_CONDITION = "select * from dsp_0031t.sel_p_param_cond(?, ?, ?)";
+    private static final String SELECT_ECO_PARAM_CONDITION = "select * from dsp_0050t.sel_p_param_cond(?, ?, ?)";
+
     private static final String SELECT_CONDITIONS = "select * from admin.dz_param_condition order by param_cond_name";
     private static final String SELECT_DECREASES = "select * from dsp_0031t.sel_decrease_list() order by code";
+    private static final String SELECT_ECO_DECREASES = "select * from dsp_0050t.sel_decrease_list() order by code";
+
 
     private static final String SELECT_GRAPHS = "select * from dsp_0031t.sel_graph_list() order by code";
+    private static final String SELECT_ECO_GRAPHS = "select * from dsp_0050t.sel_graph_list() order by code";
+
     private static final String SELECT_GRAPH_DESCRIPTION = "select * from dsp_0031t.sel_graph_value(?)";
+    private static final String SELECT_ECO_GRAPH_DESCRIPTION = "select * from dsp_0050t.sel_graph_value(?)";
+
     private static final String SELECT_DECREASE_DESCRIPTION = "select * from dsp_0031t.sel_decrease_value(?)";
+    private static final String SELECT_ECO_DECREASE_DESCRIPTION = "select * from dsp_0050t.sel_decrease_value(?)";
+
     private static final String SELECT_HISTORY = "select to_char(system_date, 'dd.mm.yyyy hh24:mi:ss') as system_date, " +
             "user_name, prop_name, old_val, new_val from dsp_0031t.sel_change_param_ranges(?, ?, ?)";
+    private static final String SELECT_ECO_HISTORY = "select to_char(system_date, 'dd.mm.yyyy hh24:mi:ss') as system_date, " +
+            "user_name, prop_name, old_val, new_val from dsp_0050t.sel_change_param_ranges(?, ?, ?)";
 
     private static final String SAVE_ENUM_PARAMS = "call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?, ?)";
+    private static final String SAVE_ECO_ENUM_PARAMS = "call dsp_0050t.save_p_param(?, ?, ?, ?, ?, ?, ?)";
+
     private static final String SAVE_ANALOG_PARAMS = "call dsp_0031t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SAVE_ECO_ANALOG_PARAMS = "call dsp_0050t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
     private static final String CLEAR_RANGES = "call dsp_0031t.clear_ranges(?, ?, ?)";
+    private static final String CLEAR_ECO_RANGES = "call dsp_0050t.clear_ranges(?, ?, ?)";
+
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -126,7 +145,9 @@ public class SpecificModelSB implements SpecificModelLocal {
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_ENUMERABLE_DATA)) {
-            stm.setInt(1, objectID);
+//            PreparedStatement stm = connect.prepareStatement(eco ? SELECT_ENUMERABLE_DATA : SELECT_ECO_ENUMERABLE_DATA)) {
+
+                stm.setInt(1, objectID);
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 DataModel item = new DataModel(res.getInt("par_id"), res.getInt("stat_agr_id"));
@@ -151,7 +172,8 @@ public class SpecificModelSB implements SpecificModelLocal {
         EnumerateData result = new EnumerateData();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_PARAM_CONDITION)) {
-            stm.setInt(1, objectID);
+//            PreparedStatement stm = connect.prepareStatement(eco ? SELECT_PARAM_CONDITION : SELECT_ECO_PARAM_CONDITION)) {
+                stm.setInt(1, objectID);
             stm.setInt(2, parId);
             stm.setInt(3, statAgrID);
 
@@ -186,11 +208,15 @@ public class SpecificModelSB implements SpecificModelLocal {
     @Override
     public List<GraphDecreaseItemModel> getDecreases() {
         return getGraphsDecreases(SELECT_DECREASES);
+//        return getGraphsDecreases(eco ? SELECT_DECREASES : SELECT_ECO_DECREASES);
+
     }
 
     @Override
     public List<GraphDecreaseItemModel> getGraphs() {
         return getGraphsDecreases(SELECT_GRAPHS);
+//        return getGraphsDecreases(eco ? SELECT_GRAPHS : SELECT_ECO_GRAPHS);
+
     }
 
     /**
@@ -217,8 +243,9 @@ public class SpecificModelSB implements SpecificModelLocal {
     public void saveEnumParam(int objectID, DataModel saveData, String login) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_ENUM_PARAMS)) {
+//            CallableStatement stm = connect.prepareCall(eco ? SAVE_ENUM_PARAMS : SAVE_ECO_ENUM_PARAMS)) {
 
-            for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
+                for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
                 if (item.isEdited()) {
                     try {
                         stm.setInt(1, objectID);
@@ -227,8 +254,8 @@ public class SpecificModelSB implements SpecificModelLocal {
                         stm.setInt(4, item.getEnumCode());
                         stm.setString(5, item.getCondition().getName());
                         stm.setInt(6, item.getCondition().getId());
-                        //            stm.setString(7, login); //TODO заменить хардкод на логин для релизной версии
-                        stm.setString(7,"ADMIN");
+                        stm.setString(7, login);
+//                        stm.setString(7,"ADMIN");
                         stm.executeUpdate();
                     } catch (SQLException e) {
                         LOG.log(Level.WARNING, "saving error Enum Param", e);
@@ -303,8 +330,7 @@ public class SpecificModelSB implements SpecificModelLocal {
 
             }
 
-            stm.setString(14, "ADMIN");
-//            stm.setString(14, login); //TODO заменить хардкод на логин для релизной версии
+            stm.setString(14, login);
 
             stm.executeUpdate();
 
@@ -323,11 +349,14 @@ public class SpecificModelSB implements SpecificModelLocal {
     @Override
     public List<GraphDecreaseDescription> getGraphDescription(int graphID) {
         return getGraphDecreaseDescriptions(graphID, SELECT_GRAPH_DESCRIPTION);
+//        return getGraphDecreaseDescriptions(graphID, eco ? SELECT_GRAPH_DESCRIPTION : SELECT_ECO_GRAPH_DESCRIPTION);
     }
 
     @Override
     public List<GraphDecreaseDescription> getDecreaseDescription(int decreaseID) {
         return getGraphDecreaseDescriptions(decreaseID, SELECT_DECREASE_DESCRIPTION);
+        //        return getGraphDecreaseDescriptions(graphID, eco ? SELECT_DECREASE_DESCRIPTION : SELECT_ECO_DECREASE_DESCRIPTION);
+
     }
 
     /**
@@ -356,7 +385,8 @@ public class SpecificModelSB implements SpecificModelLocal {
         List<ParamHistory> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_HISTORY)) {
-            stm.setInt(1, objectID);
+//            PreparedStatement stm = connect.prepareStatement(eco ? SELECT_HISTORY : SELECT_ECO_HISTORY)) {
+                stm.setInt(1, objectID);
             stm.setInt(2, paramID);
             stm.setInt(3, statAgrID);
 

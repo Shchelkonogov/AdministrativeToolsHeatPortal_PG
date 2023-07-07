@@ -87,8 +87,7 @@ public class SpecificModelMB implements Serializable {
         eco = Boolean.parseBoolean(request.getParameter("eco"));
 
         try {
-//            objectID = Integer.parseInt(request.getParameter("objectID")); - не удалять
-            objectID = 7401; //TODO заменить на реквест в релизной версии
+            objectID = Integer.parseInt(request.getParameter("objectID"));
         } catch (NumberFormatException e) {
             return;
         }
