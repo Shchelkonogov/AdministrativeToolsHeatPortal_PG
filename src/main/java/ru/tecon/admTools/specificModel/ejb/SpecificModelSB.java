@@ -64,6 +64,8 @@ public class SpecificModelSB implements SpecificModelLocal {
     private static final String CLEAR_RANGES = "call dsp_0031t.clear_ranges(?, ?, ?)";
     private static final String CLEAR_ECO_RANGES = "call dsp_0050t.clear_ranges(?, ?, ?)";
 
+    private boolean eco;
+
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -74,7 +76,8 @@ public class SpecificModelSB implements SpecificModelLocal {
     }
 
     @Override
-    public List<DataModel> getData(int objectID, boolean eco) {
+    public List<DataModel> getData(int objectID, boolean ecoRq) {
+        eco = ecoRq;
         List<DataModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
 //             PreparedStatement stm = connect.prepareStatement(eco ? SELECT_ECO_DATA : SELECT_DATA)) { //TODO заменить когда будет экомониторинг
@@ -408,10 +411,9 @@ public class SpecificModelSB implements SpecificModelLocal {
     public void clearRanges(int objectID, int parID, int statAgrID) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(CLEAR_RANGES)) {
-            stm.registerOutParameter(1, Types.INTEGER);
-            stm.setInt(2, objectID);
-            stm.setInt(3, parID);
-            stm.setInt(4, statAgrID);
+            stm.setInt(1, objectID);
+            stm.setInt(2, parID);
+            stm.setInt(3, statAgrID);
             stm.executeUpdate();
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "error clearRanges ", e);

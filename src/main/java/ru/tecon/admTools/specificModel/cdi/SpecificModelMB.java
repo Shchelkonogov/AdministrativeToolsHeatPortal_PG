@@ -225,7 +225,10 @@ public class SpecificModelMB implements Serializable {
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
             }
+            PrimeFaces.current().ajax().update("tabView");
         });
+
+
 
         //цикл для сохранения всех изменений в таблице перечислимых параметров
         enumerableTableModel.stream().filter(DataModel::isChange).forEach(dataModel -> {
@@ -236,6 +239,7 @@ public class SpecificModelMB implements Serializable {
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
             }
+            PrimeFaces.current().ajax().update("tabView:cTableForm");
         });
 
         loadData();

@@ -23,7 +23,7 @@
                                  action="#{specificModel.saveData}"
                                  onclick="PF('statusDialog').show();"
                                  oncomplete="PF('statusDialog').hide();"
-                                 update=":tabView :growl"  />
+                                 update=":growl"  />
             </td>
         </tr>
     </table>
@@ -43,7 +43,7 @@
                                       style="text-align: center">
                                 <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
-                                        <f:selectItem itemLabel="-" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="Все" itemValue="#{null}" noSelectionOption="true"/>
                                         <f:selectItems value="#{specificModel.paramNameFilter}" />
                                     </p:selectOneMenu>
                                 </f:facet>
@@ -54,7 +54,7 @@
                                       filterMatchMode="exact" style="text-align: center">
                                 <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
-                                        <f:selectItem itemLabel="-" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="Все" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems value="#{specificModel.techProcFilter}" />
                                     </p:selectOneMenu>
                                 </f:facet>
@@ -105,13 +105,13 @@
                                     <p:contextMenu id="graphContext" for="graphValuePanel" >
                                         <p:menuitem value="Посмотреть график" rendered="#{data.additionalData.graphID != null}"
                                                     action="#{graphDecreaseDataShow.loadGraphData(data.additionalData.graphID, data.additionalData.graphName)}"
-                                                    oncomplete="PF('graphDecreaseShowDialog').show()"
-                                                    update="graphDecreaseShowDialogID" process="@this" />
+                                                    oncomplete="PF('graphShowDialog').show()"
+                                                    update="graphShowDialogID" process="@this" />
 
                                         <p:menuitem value="Посмотреть суточное снижение" rendered="#{data.additionalData.decreaseID != null}"
                                                     action="#{graphDecreaseDataShow.loadDecreaseData(data.additionalData.decreaseID, data.additionalData.decreaseName)}"
-                                                    oncomplete="PF('graphDecreaseShowDialog').show()"
-                                                    update="graphDecreaseShowDialogID" process="@this" />
+                                                    oncomplete="PF('decreaseShowDialog').show()"
+                                                    update="decreaseShowDialogID" process="@this" />
                                     </p:contextMenu>
 
                                 </p:outputPanel>
@@ -234,7 +234,7 @@
             </h:form>
         </p:tab>
         <p:tab id="cTab" rendered="#{!specificModel.eco}" title="Перечислимые">
-            <h:form style="height: 100%; float: left; width: calc(100% - 305px);">
+            <h:form style="height: 100%; float: left; width: calc(100% - 305px);" id="cTableForm">
                 <p:dataTable id="tableDataCountable" var="data" value="#{specificModel.enumerableTableModel}"
                              selection="#{specificModel.selectedEnumerateItem}" selectionMode="single" rowKey="#{data.id}"
                              scrollable="true" scrollHeight="100%">
@@ -399,16 +399,32 @@
         </p:dialog>
     </h:form>
 
-    <p:dialog id="graphDecreaseShowDialogID" header="#{graphDecreaseDataShow.name}" widgetVar="graphDecreaseShowDialog" modal="true"
-              resizable="false" width="400" height="500">
+    <p:dialog id="graphShowDialogID" header="#{graphDecreaseDataShow.name}" widgetVar="graphShowDialog" modal="true"
+              resizable="false" width="auto" height="500" >
         <div style="height: calc(100% - 5px); margin: 2px;">
             <p:dataTable var="graphDecreaseData" value="#{graphDecreaseDataShow.tableData}"
                          scrollable="true" scrollHeight="100%">
-                <p:column headerText="Тнв" styleClass="centre-column">
+                <p:column headerText="Тнв" styleClass="centre-column" style="text-align: center">
                     <h:outputText value="#{graphDecreaseData.x}"/>
                 </p:column>
 
-                <p:column headerText="Температура" styleClass="centre-column">
+                <p:column headerText="Температура" styleClass="centre-column" style="text-align: center">
+                    <h:outputText value="#{graphDecreaseData.y}"/>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </p:dialog>
+
+    <p:dialog id="decreaseShowDialogID" header="#{graphDecreaseDataShow.name}" widgetVar="decreaseShowDialog" modal="true"
+              resizable="false" width="auto" height="500" >
+        <div style="height: calc(100% - 5px); margin: 2px;">
+            <p:dataTable var="graphDecreaseData" value="#{graphDecreaseDataShow.tableData}"
+                         scrollable="true" scrollHeight="100%">
+                <p:column headerText="Время суток" styleClass="centre-column" style="text-align: center">
+                    <h:outputText value="#{graphDecreaseData.x}"/>
+                </p:column>
+
+                <p:column headerText="Температура" styleClass="centre-column" style="text-align: center">
                     <h:outputText value="#{graphDecreaseData.y}"/>
                 </p:column>
             </p:dataTable>
