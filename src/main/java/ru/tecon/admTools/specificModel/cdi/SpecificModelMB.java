@@ -19,7 +19,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -94,7 +93,6 @@ public class SpecificModelMB implements Serializable {
 
         utilMB.setLogin(checkUserSB.getUser(sessionID));
         utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formID"))));
-
 
         eco = Boolean.parseBoolean(request.get("eco"));
 
@@ -220,7 +218,7 @@ public class SpecificModelMB implements Serializable {
             logger.info("save analog data: " + dataModel);
 
             try {
-                bean.saveAParam(objectID, dataModel, utilMB.getLogin());
+                bean.saveAParam(objectID, dataModel, utilMB.getLogin(), eco);
             } catch (SystemParamException e) {
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
@@ -249,7 +247,7 @@ public class SpecificModelMB implements Serializable {
      * Метод обрабатывает нажатие contextMenu Сбросить границы
      */
     public void clearRanges(int objectID, int parID, int statAgrID) throws SystemParamException {
-        bean.clearRanges(objectID, parID, statAgrID);
+        bean.clearRanges(objectID, parID, statAgrID, eco);
         loadData();
     }
 

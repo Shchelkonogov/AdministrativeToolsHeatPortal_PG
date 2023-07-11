@@ -82,7 +82,7 @@ public interface SpecificModelLocal {
      * @param saveData данные для сохранения
      * @return в случае ошибки сохранения возвращается сообщение об ошибке.
      */
-    void saveAParam(int objectID, DataModel saveData, String login) throws SystemParamException;
+    void saveAParam(int objectID, DataModel saveData, String login, boolean eco) throws SystemParamException;
 
     /**
      * Метод выгружает данные по описанию графика
@@ -113,5 +113,5 @@ public interface SpecificModelLocal {
      * @param parID id параметра
      * @param statAgrID id агрегата
      */
-    void clearRanges (int objectID, int parID, int statAgrID) throws SystemParamException;
+    void clearRanges (int objectID, int parID, int statAgrID, boolean eco) throws SystemParamException;
 }
