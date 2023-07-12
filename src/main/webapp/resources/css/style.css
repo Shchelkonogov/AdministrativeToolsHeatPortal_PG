@@ -20,6 +20,18 @@ body .ui-datatable .ui-datatable-data>tr>td {
     padding: 2px 1px;
 }
 
+#specHeader {
+    background: #f4f4f4;
+}
+
+#specHeader .ui-button {
+    background: #f4f4f4;
+    color: #6c757d;
+    border: #ffffff;
+    scale: 1.5;
+    padding: unset;
+}
+
 .ui-datatable table {
     table-layout: unset !important;
 }
@@ -41,12 +53,12 @@ body .ui-datatable .ui-datatable-data>tr>td {
     background-color: red !important;
 }
 
-#tabView\:aTab, #tabView\:cTab, #graphSelectForm\:gTab\:gTab1, #graphSelectForm\:gTab\:gTab2 {
+#tabView\:aTab, #tabView\:cTab {
     height: 100%;
     padding: 2px;
 }
 
-#tabView .ui-tabs-panels, #graphSelectForm\:gTab .ui-tabs-panels {
+#tabView .ui-tabs-panels {
     border-bottom: 1px solid #c8c8c8;
     border-top: none;
     border-left: none;
@@ -71,3 +83,4 @@ body .ui-datatable .ui-datatable-data>tr>td {
     border: none;
     overflow: hidden;
 }
+

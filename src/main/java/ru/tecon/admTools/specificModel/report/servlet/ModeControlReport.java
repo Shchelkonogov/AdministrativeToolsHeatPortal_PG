@@ -5,6 +5,7 @@ import ru.tecon.admTools.specificModel.report.ModeControl;
 import ru.tecon.admTools.specificModel.report.ejb.ModeControlLocal;
 
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,40 +27,49 @@ import java.util.logging.Logger;
 @WebServlet("/specificModel/report/modeControl")
 public class ModeControlReport extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(ModeControlReport.class.getName());
+    @EJB
+    private ModeControlLocal bean;
 
-//    @EJB
-//    private ModeControlLocal bean;
+    @EJB
+    private CheckUserSB checkBean;
 
-//    @EJB
-//    private CheckUserSB checkBean;
+    @Inject
+    private Logger logger;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // TODO модуль в стадии переработки под PostgreSQL
-        try {
-            req.getRequestDispatcher("/inWork.html").forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        }
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 
-//        String user = checkBean.getUser(req.getParameter("sessionID"));
-//        if (user != null) {
-//            int objectType = Integer.parseInt(req.getParameter("objectType"));
-//            int structID = Integer.parseInt(req.getParameter("structID"));
-//            int paramID = Integer.parseInt(req.getParameter("paramID"));
-//
-//            resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-//            resp.setHeader("Content-Disposition", "attachment; filename=\"" +
-//                    URLEncoder.encode("Контроль режима.xlsx", "UTF-8") + "\"");
-//            resp.setCharacterEncoding("UTF-8");
-//
-//            try (OutputStream output = resp.getOutputStream()) {
-//                ModeControl.generateModeControl(objectType, 0, "", structID, paramID, user, bean).write(output);
-//                output.flush();
-//            } catch (IOException e) {
-//                log.log(Level.WARNING, "error send report", e);
-//            }
-//        }
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("objectType") &&
+                parameterMap.containsKey("structID") && parameterMap.containsKey("paramID")) {
+            String user = checkBean.getUser(req.getParameter("sessionID"));
+            try (OutputStream output = resp.getOutputStream()) {
+                int objectType = Integer.parseInt(req.getParameter("objectType"));
+                int structID = Integer.parseInt(req.getParameter("structID"));
+                int paramID = Integer.parseInt(req.getParameter("paramID"));
+
+                if (checkBean.checkSession(req.getParameter("sessionID"))) {
+
+                    resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
+                    resp.setHeader("Content-Disposition", "attachment; filename=\"" +
+                            URLEncoder.encode("Контроль режима.xlsx", "UTF-8") + "\"");
+                    resp.setCharacterEncoding("UTF-8");
+
+                    ModeControl.generateModeControl(objectType, 0, "", structID, paramID, user, bean).write(output);
+                    output.flush();
+                } else {
+                    //             Авторизуйтесь в системе
+                    logger.log(Level.WARNING, "authorization error");
+                    req.getRequestDispatcher("/error.html").forward(req, resp);
+                }
+            } catch (IOException e) {
+                    logger.log(Level.WARNING, "error send report", e);
+                    req.getRequestDispatcher("/error.html").forward(req, resp);
+            }
+        } else {
+            // Не хватает параметров
+            logger.log(Level.WARNING, "missing parameters");
+            req.getRequestDispatcher("/error.html").forward(req, resp);
+        }
     }
 }

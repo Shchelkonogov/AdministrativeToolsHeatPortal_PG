@@ -23,15 +23,15 @@ public class ChangeRangesSB implements ChangeRangesLocal {
 
     private static final Logger LOG = Logger.getLogger(ChangeRangesSB.class.getName());
 
-    private static final String SELECT_OBJECT_PATH = "select get_obj_path_all(?) from dual";
-    private static final String SELECT_STRUCT_PATH = "select get_struct_path_all(?) from dual";
+    private static final String SELECT_OBJECT_PATH = "select admin.get_obj_path_all(?)";
+    private static final String SELECT_STRUCT_PATH = "select admin.get_struct_path_all(?)";
 
     private static final String SELECT_LOAD_DATA = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
             "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
-            "from table(dsp_0031t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?))";
+            "from dsp_0031t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?)";
     private static final String SELECT_LOAD_DATA_ECO = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
             "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
-            "from table(dsp_0050t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?))";
+            "from dsp_0050t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;

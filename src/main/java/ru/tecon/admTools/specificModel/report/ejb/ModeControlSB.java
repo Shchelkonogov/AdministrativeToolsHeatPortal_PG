@@ -27,9 +27,9 @@ public class ModeControlSB implements ModeControlLocal {
 
     private static final Logger LOG = Logger.getLogger(ModeControlSB.class.getName());
 
-    private static final String SELECT_PARAM_NAME = "select par_name from dz_param where id = ?";
-    private static final String SELECT_STRUCT_PATH = "select get_struct_path_all(?) from dual";
-    private static final String SELECT_REPORT_DATA = "select * from table(dsp_0031t.sel_rep_control(?, ?, ?, ?, ?, ?))";
+    private static final String SELECT_PARAM_NAME = "select par_name from admin.dz_param where id = ?";
+    private static final String SELECT_STRUCT_PATH = "select admin.get_struct_path_all(?)";
+    private static final String SELECT_REPORT_DATA = "select * from dsp_0031t.sel_rep_control(?, ?, ?, ?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;

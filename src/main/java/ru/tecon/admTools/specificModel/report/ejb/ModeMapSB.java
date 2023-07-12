@@ -27,13 +27,13 @@ public class ModeMapSB implements ModeMapLocal {
 
     private static final Logger LOG = Logger.getLogger(ModeMapSB.class.getName());
 
-    private static final String SELECT_FILIAL = "select get_obj_filial(?) from dual";
-    private static final String SELECT_MODE_MAP = "select * from table(dsp_0031t.sel_rep_karta(?))";
-    private static final String SELECT_TS = "select * from table(dsp_0031t.sel_rep_karta_ts(?))";
+    private static final String SELECT_FILIAL = "select admin.get_obj_filial(?)";
+    private static final String SELECT_MODE_MAP = "select * from dsp_0031t.sel_rep_karta(?)";
+    private static final String SELECT_TS = "select * from dsp_0031t.sel_rep_karta_ts(?)";
 
-    private static final String SELECT_CO = "select * from table(dsp_0031t.sel_rep_karta_co(?))";
-    private static final String SELECT_GVS = "select * from table(dsp_0031t.sel_rep_karta_gvs(?))";
-    private static final String SELECT_HVS = "select * from table(dsp_0031t.sel_rep_karta_hvs(?))";
+    private static final String SELECT_CO = "select * from dsp_0031t.sel_rep_karta_co(?)";
+    private static final String SELECT_GVS = "select * from dsp_0031t.sel_rep_karta_gvs(?)";
+    private static final String SELECT_HVS = "select * from dsp_0031t.sel_rep_karta_hvs(?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;

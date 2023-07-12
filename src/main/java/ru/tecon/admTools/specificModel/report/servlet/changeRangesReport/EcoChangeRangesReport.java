@@ -20,21 +20,14 @@ import java.io.IOException;
 @WebServlet("/ecoSpecificModel/report/technicalLimitsChangeReport")
 public class EcoChangeRangesReport extends HttpServlet {
 
-//    @EJB
-//    private ChangeRangesLocal bean;
+    @EJB
+    private ChangeRangesLocal bean;
 
-//    @EJB
-//    private CheckUserSB checkBean;
+    @EJB
+    private CheckUserSB checkBean;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // TODO модуль в стадии переработки под PostgreSQL
-        try {
-            req.getRequestDispatcher("/inWork.html").forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        }
-
-//        ReportWrapper.report(req, resp, checkBean, bean, true);
+        ReportWrapper.report(req, resp, checkBean, bean, true);
     }
 }
