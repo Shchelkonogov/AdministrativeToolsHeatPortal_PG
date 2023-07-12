@@ -28,7 +28,6 @@ body .ui-datatable .ui-datatable-data>tr>td {
     background: #f4f4f4;
     color: #6c757d;
     border: #ffffff;
-    scale: 1.5;
     padding: unset;
 }
 
@@ -82,5 +81,10 @@ body .ui-datatable .ui-datatable-data>tr>td {
     background-color: transparent;
     border: none;
     overflow: hidden;
+}
+
+#specHeader .pi {
+    font-size: 1.7rem;
+    margin-top: -0.8rem;
 }
 
