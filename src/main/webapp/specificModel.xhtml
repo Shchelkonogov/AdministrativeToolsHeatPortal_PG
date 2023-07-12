@@ -39,10 +39,10 @@
 
                     <p:columnGroup type="header">
                         <p:row>
-                            <p:column rowspan="2" headerText="Обозн" width="50" filterBy="#{data.paramTypeName}" filterMatchMode="exact"
+                            <p:column rowspan="2" headerText="Обозн" width="70" filterBy="#{data.paramTypeName}" filterMatchMode="exact"
                                       style="text-align: center">
                                 <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
+                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 70px;">
                                         <f:selectItem itemLabel="Все" itemValue="#{null}" noSelectionOption="true"/>
                                         <f:selectItems value="#{specificModel.paramNameFilter}" />
                                     </p:selectOneMenu>
@@ -50,10 +50,10 @@
                             </p:column>
                             <p:column rowspan="2" headerText="Стат.агр." width="150" style="text-align: center" />
                             <p:column rowspan="2" headerText="Зона" width="50" style="text-align: center"/>
-                            <p:column rowspan="2" headerText="Техпр" width="50" filterable="#{!specificModel.eco}" filterBy="#{data.techProcCode}"
+                            <p:column rowspan="2" headerText="Техпр" width="70" filterable="#{!specificModel.eco}" filterBy="#{data.techProcCode}"
                                       filterMatchMode="exact" style="text-align: center">
                                 <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 50px;">
+                                    <p:selectOneMenu onchange="PF('tableWidget').filter()" style="width: 70px;">
                                         <f:selectItem itemLabel="Все" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems value="#{specificModel.techProcFilter}" />
                                     </p:selectOneMenu>
@@ -75,7 +75,7 @@
                         </p:row>
                     </p:columnGroup>
 
-                    <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px;">
+                    <p:column style="white-space: nowrap; text-overflow: ellipsis; max-width: 50px; text-align: center">
                         <h:outputText id="parMemo" title="#{data.parName}" value="#{data.parMemo}" />
                     </p:column>
 
