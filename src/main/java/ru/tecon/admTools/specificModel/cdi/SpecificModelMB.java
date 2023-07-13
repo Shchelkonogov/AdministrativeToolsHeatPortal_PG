@@ -193,16 +193,6 @@ public class SpecificModelMB implements Serializable {
      */
     public void saveData() {
 
-        //добавляем измененные значения во все стат агрегаты относящиеся к одному параметру
-        tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> {
-            for (DataModel model: tableModel) {
-                if (dataModel.getParID() == model.getParID()) {
-                    model.setAdditionalData(dataModel.getAdditionalData());
-                    model.setChange(true);
-                }
-            }
-        });
-
         //логгируем все изменения
         logger.info("update analog objects:");
         tableModel.stream().filter(DataModel::isChange).forEach(dataModel -> logger.info(dataModel.toString()));
