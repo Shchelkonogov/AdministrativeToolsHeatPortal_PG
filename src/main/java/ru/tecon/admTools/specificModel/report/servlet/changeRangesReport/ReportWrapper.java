@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,18 +29,22 @@ class ReportWrapper {
             String id = req.getParameter("id");
             Integer structID = null;
             Integer objID = null;
+            String objName = "";
+            String curDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
             if (id.contains("O")) {
                 objID = Integer.parseInt(id.replace("O", ""));
+                objName = bean.getName(objID);
             }
 
             if (id.contains("S")) {
                 structID = Integer.parseInt(id.replace("S", ""));
             }
 
+
             resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
             resp.setHeader("Content-Disposition", "attachment; filename=\"" +
-                    URLEncoder.encode("Отчет по изменению тех границ.xlsx", "UTF-8") + "\"");
+                    URLEncoder.encode("Отчет по изменению тех границ " + objName + " " + curDate + ".xlsx", "UTF-8") + "\"");
             resp.setCharacterEncoding("UTF-8");
 
             try (OutputStream output = resp.getOutputStream()) {

@@ -27,6 +27,7 @@ public class ModeMapSB implements ModeMapLocal {
 
     private static final Logger LOG = Logger.getLogger(ModeMapSB.class.getName());
 
+    private static final String SELECT_OBJECT_NAME = "select admin.get_obj_name(?)";
     private static final String SELECT_FILIAL = "select admin.get_obj_filial(?)";
     private static final String SELECT_MODE_MAP = "select * from dsp_0031t.sel_rep_karta(?)";
     private static final String SELECT_TS = "select * from dsp_0031t.sel_rep_karta_ts(?)";
@@ -37,6 +38,28 @@ public class ModeMapSB implements ModeMapLocal {
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
+
+    @Override
+    public String getName(Integer objectID) {
+        try (Connection connection = ds.getConnection();
+             PreparedStatement stm = connection.prepareStatement(SELECT_OBJECT_NAME)) {
+            stm.setInt(1, objectID);
+
+            ResultSet res = stm.executeQuery();
+            if (res.next() && (res.getString(1) != null)) {
+                String objName = res.getString(1);
+                objName = objName.replace('/', '_').replace(':', '_')
+                        .replace('*', '_').replace('?', '_')
+                        .replace('<', '_').replace('>', '_')
+                        .replace('|', '_').replace('\\', '_')
+                        .replace('\"', '_');
+                return objName;
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load name ", e);
+        }
+        return null;
+    }
 
     @Override
     public Map<String, String> loadSingleData(int objectID) {

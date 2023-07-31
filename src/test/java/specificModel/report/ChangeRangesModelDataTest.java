@@ -28,4 +28,9 @@ public class ChangeRangesModelDataTest implements ChangeRangesLocal {
                                                   int filterType, String filter, String date, String user, boolean eco) {
         return loadReportData(objType, structID, objID, filterType, filter, date, user);
     }
+
+    @Override
+    public String getName(Integer objectID) {
+        return null;
+    }
 }

@@ -23,6 +23,7 @@ public class ChangeRangesSB implements ChangeRangesLocal {
 
     private static final Logger LOG = Logger.getLogger(ChangeRangesSB.class.getName());
 
+    private static final String SELECT_OBJECT_NAME = "select admin.get_obj_name(?)";
     private static final String SELECT_OBJECT_PATH = "select admin.get_obj_path_all(?)";
     private static final String SELECT_STRUCT_PATH = "select admin.get_struct_path_all(?)";
 
@@ -35,6 +36,28 @@ public class ChangeRangesSB implements ChangeRangesLocal {
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
+
+    @Override
+    public String getName(Integer objectID) {
+        try (Connection connection = ds.getConnection();
+             PreparedStatement stm = connection.prepareStatement(SELECT_OBJECT_NAME)) {
+            stm.setInt(1, objectID);
+
+            ResultSet res = stm.executeQuery();
+            if (res.next() && (res.getString(1) != null)) {
+                String objName = res.getString(1);
+                objName = objName.replace('/', '_').replace(':', '_')
+                        .replace('*', '_').replace('?', '_')
+                        .replace('<', '_').replace('>', '_')
+                        .replace('|', '_').replace('\\', '_')
+                        .replace('\"', '_');
+                return objName;
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load name ", e);
+        }
+        return null;
+    }
 
     @Override
     public String getPath(Integer structID, Integer objectID) {

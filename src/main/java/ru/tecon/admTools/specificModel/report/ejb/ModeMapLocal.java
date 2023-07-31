@@ -11,6 +11,13 @@ import java.util.Map;
 public interface ModeMapLocal {
 
     /**
+     * Метод выгружает из бд имя объекта.
+     * @param objectID id объекта
+     * @return имя объекта
+     */
+    String getName(Integer objectID);
+
+    /**
      * Метод выгружает из базы данные для отчета
      * @param objectID id объекта
      * @return данные

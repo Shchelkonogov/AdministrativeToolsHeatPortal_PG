@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,8 +45,12 @@ public class ModeMapReport extends HttpServlet {
                 int object = Integer.parseInt(req.getParameter("objectID"));
 
                 if (checkBean.checkSession(req.getParameter("sessionID"))) {
+                    String curDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                    String objName = bean.getName(object);
+
                     resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-                    resp.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode("Режимная карта.xlsx", "UTF-8") + "\"");
+                    resp.setHeader("Content-Disposition", "attachment; filename=\"" +
+                            URLEncoder.encode("Режимная карта " + objName + " " + curDate + ".xlsx", "UTF-8") + "\"");
                     resp.setCharacterEncoding("UTF-8");
 
                     ModeMap.generateModeMap(object, bean).write(output);

@@ -51,4 +51,12 @@ public interface ChangeRangesLocal {
      */
     List<ChangeRangesModel> loadReportData(int objType, Integer structID, Integer objID, int filterType,
                                            String filter, String date, String user, boolean eco);
+
+    /**
+     * Метод выгружает из бд имя объекта.
+     * @param objectID id объекта
+     * @return имя объекта
+     */
+    String getName(Integer objectID);
 }
+

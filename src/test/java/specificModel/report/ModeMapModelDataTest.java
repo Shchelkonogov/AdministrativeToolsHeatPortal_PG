@@ -58,4 +58,9 @@ public class ModeMapModelDataTest implements ModeMapLocal {
 
         return arrayData;
     }
+
+    @Override
+    public String getName(Integer objectID) {
+        return null;
+    }
 }
