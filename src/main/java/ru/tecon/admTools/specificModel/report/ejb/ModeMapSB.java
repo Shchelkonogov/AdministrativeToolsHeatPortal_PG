@@ -48,11 +48,7 @@ public class ModeMapSB implements ModeMapLocal {
             ResultSet res = stm.executeQuery();
             if (res.next() && (res.getString(1) != null)) {
                 String objName = res.getString(1);
-                objName = objName.replace('/', '_').replace(':', '_')
-                        .replace('*', '_').replace('?', '_')
-                        .replace('<', '_').replace('>', '_')
-                        .replace('|', '_').replace('\\', '_')
-                        .replace('\"', '_');
+                objName = objName.replaceAll("[/:*?<>\\\\|\"]", "_");
                 return objName;
             }
         } catch (SQLException e) {
