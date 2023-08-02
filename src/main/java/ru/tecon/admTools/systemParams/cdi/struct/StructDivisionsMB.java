@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
-import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 
 import javax.annotation.PostConstruct;
@@ -21,8 +21,8 @@ public class StructDivisionsMB extends StructMB implements Serializable {
     private static final String DIALOG_HEADER = "Создать новый тип подразделения";
     private static final String PROP_HEADER = "Свойства подразделения";
 
-    @EJB(name = "structDivisionSB", mappedName = "ejb/structDivisionsSB")
-    private StructCurrentRemote structCurrentBean;
+    @EJB(beanName = "structDivisionSB")
+    private StructCurrentLocal structCurrentBean;
 
     @EJB
     private StructSB structBean;

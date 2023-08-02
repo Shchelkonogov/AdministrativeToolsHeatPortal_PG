@@ -12,8 +12,8 @@ import java.util.List;
  * @author Maksim Shchelkonogov
  */
 @Stateless(name = "structAggregatesSB", mappedName = "ejb/structAggregatesSB")
-@Remote(StructCurrentRemote.class)
-public class StructAggregatesSB implements StructCurrentRemote {
+@Local(StructCurrentLocal.class)
+public class StructAggregatesSB implements StructCurrentLocal {
 
     private static final String SELECT_STRUCT_TYPES = "select agr_type_id as type_id, agr_type_name as type_name, agr_type_char as type_char " +
             "from sys_0001t.sel_agr_type()";

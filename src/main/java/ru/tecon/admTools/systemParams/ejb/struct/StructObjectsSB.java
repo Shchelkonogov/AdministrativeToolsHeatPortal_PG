@@ -13,8 +13,8 @@ import java.util.List;
  * @author Maksim Shchelkonogov
  */
 @Stateless(name = "structObjectsSB", mappedName = "ejb/structObjectsSB")
-@Remote(StructCurrentRemote.class)
-public class StructObjectsSB implements StructCurrentRemote {
+@Local(StructCurrentLocal.class)
+public class StructObjectsSB implements StructCurrentLocal {
 
     private static final String SELECT_STRUCT_TYPE_PROPS = "select * from ( " +
             "select a.obj_prop_id as prop_id, a.prop_name, a.prop_type, a.prop_cat, " +

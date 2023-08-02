@@ -2,7 +2,7 @@ package ru.tecon.admTools.systemParams.cdi.struct;
 
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController;
-import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.StructType;
 
@@ -28,8 +28,8 @@ public final class StructObjectsMB extends StructMB implements Serializable {
     private static final String DIALOG_HEADER = "Создать новый тип объекта";
     private static final String PROP_HEADER = "Свойства объекта";
 
-    @EJB(name = "structObjectsSB", mappedName = "ejb/structObjectsSB")
-    private StructCurrentRemote structCurrentBean;
+    @EJB(beanName = "structObjectsSB")
+    private StructCurrentLocal structCurrentBean;
 
     @EJB
     private StructSB structBean;

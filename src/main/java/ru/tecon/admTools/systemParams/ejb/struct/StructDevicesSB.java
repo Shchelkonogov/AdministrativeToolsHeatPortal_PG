@@ -18,8 +18,8 @@ import java.util.logging.Logger;
  * 17.01.2023
  */
 @Stateless(name = "structDevicesSB", mappedName = "ejb/structDevicesSB")
-@Remote(StructCurrentRemote.class)
-public class StructDevicesSB implements StructCurrentRemote {
+@Local(StructCurrentLocal.class)
+public class StructDevicesSB implements StructCurrentLocal {
 
     private static final Logger LOGGER = Logger.getLogger(StructDevicesSB.class.getName());
 

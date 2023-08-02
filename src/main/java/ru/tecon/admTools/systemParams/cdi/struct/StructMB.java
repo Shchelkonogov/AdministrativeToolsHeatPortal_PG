@@ -11,7 +11,7 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.AutoUpdate;
 import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 import ru.tecon.admTools.systemParams.cdi.converter.MyConverter;
-import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
@@ -54,7 +54,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
     private boolean disableRemoveStructBtn = true;
     private boolean disableRemoveStructPropBtn = true;
 
-    private StructCurrentRemote structCurrentBean;
+    private StructCurrentLocal structCurrentBean;
 
     private String extendedHeader = "";
 
@@ -389,7 +389,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
         return newStructTypeProp;
     }
 
-    void setStructCurrentBean(StructCurrentRemote structCurrentBean) {
+    void setStructCurrentBean(StructCurrentLocal structCurrentBean) {
         this.structCurrentBean = structCurrentBean;
     }
 

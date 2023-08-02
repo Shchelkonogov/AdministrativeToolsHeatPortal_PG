@@ -4,15 +4,15 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.struct.StructType;
 import ru.tecon.admTools.systemParams.model.struct.StructTypeProp;
 
-import javax.ejb.Remote;
+import javax.ejb.Local;
 import java.util.List;
 
 /**
  * Remote интерфейс для реализаций уточненных методов получения данных по группе форм структура
  * @author Maksim Shchelkonogov
  */
-@Remote
-public interface StructCurrentRemote {
+@Local
+public interface StructCurrentLocal {
 
     /**
      * Метод удаляет из базы выбранную структуру

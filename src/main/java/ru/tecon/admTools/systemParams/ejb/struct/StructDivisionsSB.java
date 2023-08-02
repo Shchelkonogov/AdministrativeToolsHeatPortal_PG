@@ -12,8 +12,8 @@ import java.util.List;
  * @author Maksim Shchelkonogov
  */
 @Stateless(name = "structDivisionSB", mappedName = "ejb/structDivisionsSB")
-@Remote(StructCurrentRemote.class)
-public class StructDivisionsSB implements StructCurrentRemote {
+@Local(StructCurrentLocal.class)
+public class StructDivisionsSB implements StructCurrentLocal {
 
     private static final String SELECT_STRUCT_TYPES = "select struct_type_id as type_id, struct_type_name as type_name, struct_type_char as type_char " +
             "from sys_0001t.sel_struct_type()";

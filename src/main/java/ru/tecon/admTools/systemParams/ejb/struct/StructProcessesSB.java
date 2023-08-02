@@ -22,8 +22,8 @@ import java.util.logging.Logger;
  * @author Maksim Shchelkonogov
  */
 @Stateless(name = "structProcessesSB", mappedName = "ejb/structProcessesSB")
-@Remote(StructCurrentRemote.class)
-public class StructProcessesSB implements StructCurrentRemote {
+@Local(StructCurrentLocal.class)
+public class StructProcessesSB implements StructCurrentLocal {
 
     private static final String SELECT_STRUCT_TYPES = "select techproc_type_id as type_id, techproc_type_name as type_name, techproc_type_char as type_char " +
             "from sys_0001t.sel_techproc_type()";

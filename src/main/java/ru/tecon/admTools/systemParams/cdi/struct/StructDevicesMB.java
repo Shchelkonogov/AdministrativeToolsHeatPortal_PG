@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
-import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -21,8 +21,8 @@ public class StructDevicesMB extends StructMB implements Serializable {
     private static final String DIALOG_HEADER = "Создать новый тип устройства";
     private static final String PROP_HEADER = "Свойства устройства";
 
-    @EJB(name = "structDevicesSB", mappedName = "ejb/structDevicesSB")
-    private StructCurrentRemote devicesSB;
+    @EJB(beanName = "structDevicesSB")
+    private StructCurrentLocal devicesSB;
 
     @PostConstruct
     public void init() {

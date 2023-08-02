@@ -1,6 +1,6 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
-import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentRemote;
+import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 
 import javax.annotation.PostConstruct;
@@ -21,8 +21,8 @@ public class StructProcessesMB extends StructMB implements Serializable {
     private static final String DIALOG_HEADER = "Создать новый тип технологического процесса";
     private static final String PROP_HEADER = "Свойства технологического процесса";
 
-    @EJB(name = "structProcessesSB", mappedName = "ejb/structProcessesSB")
-    private StructCurrentRemote structCurrentBean;
+    @EJB(beanName = "structProcessesSB")
+    private StructCurrentLocal structCurrentBean;
 
     @EJB
     private StructSB structBean;
