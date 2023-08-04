@@ -1,13 +1,10 @@
 package ru.tecon.admTools.systemParams.cdi;
 
 import org.primefaces.PrimeFaces;
-import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.systemParams.model.SystemParamsCategories;
 import ru.tecon.admTools.utils.AdmTools;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,6 +12,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,21 +58,16 @@ public class SystemParamsMB implements Serializable {
     private String selectedButton;
     private Integer oldSelectedButtonIndex;
 
-    @EJB
-    private CheckUserSB checkUserSB;
+    @Inject
+    private transient Logger logger;
 
     @Inject
     private SystemParamsUtilMB utilMB;
 
     @PostConstruct
     private void init() {
-        Map<String, String> request = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-
-        String sessionID = request.get("sessionID");
-
-        utilMB.setIp(request.get("ip"));
-        utilMB.setLogin(checkUserSB.getUser(sessionID));
-        utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formID"))));
+        // По факту это заглушка для запуска инициализации контроллера SystemParamsUtilMB
+        logger.log(Level.INFO, "Init data {0}", utilMB);
     }
 
     private void updateContent(String parameter) {

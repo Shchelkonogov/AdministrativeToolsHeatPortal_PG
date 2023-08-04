@@ -7,10 +7,10 @@ import org.primefaces.model.SortMeta;
 import org.primefaces.model.filter.FilterConstraint;
 import org.primefaces.util.LocaleUtils;
 import ru.tecon.admTools.utils.AdmTools;
+import ru.tecon.admTools.utils.LazySorter;
 
 import javax.faces.context.FacesContext;
 import java.beans.IntrospectionException;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +62,7 @@ public class LazyCustomDataModel extends LazyDataModel<CatalogProp> {
         // sort
         if (!sortBy.isEmpty()) {
             List<Comparator<CatalogProp>> comparators = sortBy.values().stream()
-                    .map(o -> new LazySorter(o.getField(), o.getOrder()))
+                    .map(o -> new LazySorter<CatalogProp>(o.getField(), o.getOrder()))
                     .collect(Collectors.toList());
             Comparator<CatalogProp> cp = ComparatorUtils.chainedComparator(comparators); // from apache
             catalogProps.sort(cp);

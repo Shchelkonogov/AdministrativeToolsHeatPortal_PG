@@ -19,9 +19,27 @@ public class AdmTools {
         return (T) context.getApplication().evaluateExpressionGet(context, "#{" + beanName + "}", Object.class);
     }
 
+    /**
+     * Получение конечно объекта в случае записи через el через "."
+     *
+     * @param o начальный объект
+     * @param field поле
+     * @return ошибка выполнения
+     * @throws ReflectiveOperationException ошибка выполнения
+     * @throws IllegalArgumentException ошибка выполнения
+     * @throws IntrospectionException ошибка выполнения
+     */
     public static Object getPropertyValueViaReflection(Object o, String field)
             throws ReflectiveOperationException, IllegalArgumentException, IntrospectionException {
-        return new PropertyDescriptor(field, o.getClass()).getReadMethod().invoke(o);
+        Class<?> aClass = o.getClass();
+        Object o1 = o;
+
+        String[] split = field.split("[.]");
+        for (String s: split) {
+            o1 = new PropertyDescriptor(s, aClass).getReadMethod().invoke(o1);
+            aClass = o1.getClass();
+        }
+        return o1;
     }
 
     /**

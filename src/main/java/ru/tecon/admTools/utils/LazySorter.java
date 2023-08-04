@@ -1,16 +1,13 @@
-package ru.tecon.admTools.systemParams.model.catalog;
+package ru.tecon.admTools.utils;
 
 import org.primefaces.model.SortOrder;
-import ru.tecon.admTools.utils.AdmTools;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.util.Comparator;
 
 /**
  * @author Maksim Shchelkonogov
  */
-public class LazySorter implements Comparator<CatalogProp> {
+public class LazySorter<T> implements Comparator<T> {
 
     private final String sortField;
 
@@ -22,7 +19,7 @@ public class LazySorter implements Comparator<CatalogProp> {
     }
 
     @Override
-    public int compare(CatalogProp prop1, CatalogProp prop2) {
+    public int compare(Object prop1, Object prop2) {
         try {
             Object value1 = AdmTools.getPropertyValueViaReflection(prop1, sortField);
             Object value2 = AdmTools.getPropertyValueViaReflection(prop2, sortField);

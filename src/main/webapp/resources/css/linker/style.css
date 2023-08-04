@@ -1,0 +1,44 @@
+/* Стили для окошек Фильтр и Перерасчет*/
+
+#filterForm {
+    position: absolute;
+    top: 35px;
+    right: 23px;
+    box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
+    border-radius: 3px;
+}
+
+#recountForm {
+    position: absolute;
+    top: 35px;
+    right: 48px;
+    box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
+    border-radius: 3px;
+}
+
+#filterForm\:filterPanel_content,
+#recountForm\:recountPanel_content {
+    display: flex;
+    justify-content: center;
+}
+
+body #filterForm\:filterPanel.tc-panel .ui-panel-titlebar,
+body #recountForm\:recountPanel.tc-panel .ui-panel-titlebar {
+    padding-left: 0.1em;
+}
+
+body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon {
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+/* Стили для двух панелей закладок, что бы они отображались в одной строке*/
+
+body #linkerForm\:linkerTabView\:objectTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
+    justify-content: end;
+    margin-left: 50%;
+}
+
+body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
+    margin-right: 50%;
+}
