@@ -38,6 +38,11 @@ public class LinkerStateless {
     private final static String PROCEDURE_REMOVE_ALL_LINKS = "call lnk_0001t.unlink_aspid_object(?, ?, ?)";
     private final static String SELECT_OPC_OBJECTS_FOR_LINK = "select * from lnk_0001t.sel_unlinked_opc_object('')";
     private final static String PROCEDURE_ADD_LINK = "call lnk_0001t.link_add_opc_object(?, ?, ?, ?, ?)";
+    private final static String SELECT_FULL_NAME = "select admin.get_obj_path_all(?,', ') || ' (' || admin.get_obj_address(?) || ')'";
+    private final static String SELECT_CALC_TREE = "select * from lnk_0001t.sel_param_tree_calc(?);";
+    private final static String SELECT_CALC_PARAM = "select par_memo, par_name, stat_agr_name, color from lnk_0001t.sel_calc_param(?, ?, ?);";
+    private final static String PROCEDURE_UNLINK_CALC_PARAM = "call lnk_0001t.unlink_calc_param(?, ?, ?);";
+    private final static String PROCEDURE_LINK_CALC_PARAM = "call lnk_0001t.link_calc_param(?, ?, ?);";
 
     @Inject
     private Logger logger;
@@ -281,6 +286,124 @@ public class LinkerStateless {
             cStm.executeUpdate();
         } catch (SQLException e) {
             logger.log(Level.WARNING, "Error add link", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Получение полного имени объекта
+     * @param id id объекта
+     * @return имя объекта
+     */
+    public String getFullObjectName(int id) {
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_FULL_NAME)) {
+
+            stm.setInt(1, id);
+            stm.setInt(2, id);
+
+            ResultSet res = stm.executeQuery();
+            if (res.next()) {
+                return res.getString(1);
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load opc objects for link", ex);
+        }
+        return "";
+    }
+
+    /**
+     * Получение данных дерева в закладке "Линкованные объекты / Вычислимые параметры"
+     * @param id id выбранного объекта
+     * @return данные дерева
+     */
+    public List<TreeData> getCalcTreeData(int id) {
+        List<TreeData> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_CALC_TREE)) {
+
+            stm.setInt(1, id);
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new TreeData(res.getString("id"), res.getString("name"), res.getString("parent"),
+                        res.getString("my_id"), res.getString("my_type")));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load calc tree data", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Получение данных для таблицы в закладке "Линкованные объекты / Вычислимые параметры"
+     * @param objId id объекта
+     * @param paramId id параметра
+     * @param statAgrId id статистического агрегата параметра
+     * @return данные для таблицы
+     */
+    public List<CalcDataTable> getCalcParamTable(int objId, int paramId, int statAgrId) {
+        List<CalcDataTable> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_CALC_PARAM)) {
+
+            stm.setInt(1, objId);
+            stm.setInt(2, paramId);
+            stm.setInt(3, statAgrId);
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new CalcDataTable(res.getString("par_memo"), res.getString("stat_agr_name"),
+                        res.getString("par_name"), res.getInt("color")));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load calc param table", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Создает связь для параметра в закладке "Линкованные объекты / Вычислимые параметры"
+     * @param objectId id объекта
+     * @param paramId id параметра
+     * @param statAgrId id статистического агрегата
+     * @throws SystemParamException ошибка создания связи
+     */
+    public void linkCalcParam(int objectId, int paramId, int statAgrId) throws SystemParamException {
+        changeParamLink(true, objectId, paramId, statAgrId);
+    }
+
+    /**
+     * Удаляет связь для параметра в закладке "Линкованные объекты / Вычислимые параметры"
+     * @param objectId id объекта
+     * @param paramId id параметра
+     * @param statAgrId id статистического агрегата
+     * @throws SystemParamException ошибка удаления связи
+     */
+    public void unlinkCalcParam(int objectId, int paramId, int statAgrId) throws SystemParamException {
+        changeParamLink(false, objectId, paramId, statAgrId);
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    private void changeParamLink(boolean link, int objectId, int paramId, int statAgrId) throws SystemParamException {
+        try (Connection connect = ds.getConnection()) {
+
+            String select;
+            if (link) {
+                select = PROCEDURE_LINK_CALC_PARAM;
+            } else {
+                select = PROCEDURE_UNLINK_CALC_PARAM;
+            }
+
+            try (CallableStatement cStm = connect.prepareCall(select)) {
+                cStm.setInt(1, objectId);
+                cStm.setInt(2, paramId);
+                cStm.setInt(3, statAgrId);
+
+                cStm.executeUpdate();
+            }
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error change param link", e);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
     }

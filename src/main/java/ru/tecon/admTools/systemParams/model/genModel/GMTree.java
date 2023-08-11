@@ -38,7 +38,7 @@ public class GMTree implements Serializable {
 
         switch (myType) {
             case "SA":
-                icon = "pi pi-check";
+                icon = "pi pi-check-circle";
                 break;
             case "PP":
                 icon = "pi pi-cog";

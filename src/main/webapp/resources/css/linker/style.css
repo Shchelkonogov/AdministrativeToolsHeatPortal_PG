@@ -42,3 +42,115 @@ body #linkerForm\:linkerTabView\:objectTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-n
 body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
     margin-right: 50%;
 }
+
+/*Устанавливаем свойства scrollbar для дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+#calcTreeBox .ui-tree-container {
+    overflow: unset;
+}
+
+#calcTreeBox {
+    overflow: auto;
+}
+
+#calcTreeBox::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    display: initial;
+}
+
+#calcTreeBox::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.2);
+    transition: background 250ms ease;
+    border-radius: 2px;
+    -moz-transition: background 250ms;
+    -webkit-transition: background 250ms;
+}
+
+#calcTreeBox::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,.35);
+}
+
+#calcTreeBox::-webkit-scrollbar-track {
+    background: rgba(0,0,0,.1);
+    border-width: 0;
+}
+
+#calcTreeBox::-webkit-scrollbar-button,
+#calcTreeBox::-webkit-scrollbar-corner,
+#calcTreeBox::-webkit-resizer {
+    display: none;
+}
+
+/*устанавливаю шилину элемента дерева в закладке "Линкованные объекты / Вычислимые параметры" что бы оно скрывалось "..."*/
+
+.ui-treenode-label {
+    width: 420px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*Цвет некоторых иконок в дереве в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+.lsaColor {
+    color: mediumseagreen;
+}
+
+.nlsaColor {
+    color: blue;
+}
+
+.nlbopColor {
+    color: red;
+}
+
+/*Скрываю стандартный фильтр в дереве в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+.ui-tree-filter-container {
+    display: none;
+}
+
+/*Стили таблицы в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+#linkerForm\:linkerTabView\:objectTabView\:calcDataTable {
+    margin-top: -1px;
+    margin-left: -1px;
+    margin-right: -1px;
+}
+
+#linkerForm\:linkerTabView\:objectTabView\:calcDataTable .ui-datatable-tablewrapper {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+/*Стили шапки дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_header {
+    padding: 0.394em 0.6em 0.3em 0.7em;
+}
+
+#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_content {
+    height: calc(100% - 34px);
+}
+
+/*Стили выделения элементов дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+body .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content.ui-tree-selectable:not(.ui-state-highlight).ui-state-hover {
+    background: #eaeaea;
+    color: #333;
+    cursor: pointer;
+}
+
+body .ui-tree .ui-tree-container .ui-treenode-outline {
+    box-shadow: unset;
+}
+
+/*Цвета для строк таблицы в закладке "Линкованные объекты / Вычислимые параметры"*/
+
+.greenRow {
+    background-color: lightgreen !important;
+}
+
+.redRow {
+    background-color: salmon !important;
+}

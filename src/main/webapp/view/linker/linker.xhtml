@@ -28,7 +28,8 @@
                     oncomplete="PF('statusDialog').hide();"
                     update="linkerForm:linkerTabView:objectTabView:recountBtn
                             linkerForm:linkerTabView:objectTabView:setSchemaNameBtn
-                            linkerForm:linkerTabView:objectTabView:linkBtnGroup"
+                            linkerForm:linkerTabView:objectTabView:linkBtnGroup
+                            linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader"
                     global="false"/>
 
             <p:tab title="Не линкованные объекты">
@@ -48,7 +49,8 @@
                             update="linkerForm:linkerTabView:objectTabView:recountBtn
                                     linkerForm:linkerTabView:objectTabView:setSchemaNameBtn
                                     linkerForm:linkerTabView:objectTabView:linkBtnGroup
-                                    linkerForm:linkerTabView:objectTabView:linkedDataTable"
+                                    linkerForm:linkerTabView:objectTabView:linkedDataTable
+                                    linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader"
                             global="false"/>
 
                     <p:tab title="Объекты">
@@ -183,19 +185,108 @@
                             </f:facet>
                         </p:panel>
                     </p:tab>
-                    <p:tab title="Параметры" disabled="true" titleStyleClass="update">
+                    <p:tab title="Параметры">
                         <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
                             <div>
                                 <p:graphicImage name="inWork.gif" library="images"/>
                             </div>
                         </div>
                     </p:tab>
-                    <p:tab title="Вычислимые параметры" disabled="true">
-                        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
-                            <div>
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                    <p:tab title="Вычислимые параметры">
+                        <p:panel id="calcParamDataPanel" styleClass="tc-panel">
+                            <f:facet name="header">
+                                <h:outputText id="calcParamDataPanelHeader"
+                                              value="Вычислимые параметры#{linkerController.fullObjectName}"/>
+                            </f:facet>
+
+                            <div style="height: 100%; padding: 3px; display: flex;">
+                                <p:panel id="calcTreePanel" header="Обобщенная модель"
+                                         styleClass="tc-panel" style="width: 560px; margin-right: 3px;">
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterCalcTree" value="#{linkerController.filterCalcTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%" >
+                                                <p:ajax event="keyup" oncomplete="PF('calcTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div id="calcTreeBox" style="height: calc(100% - 43px);">
+                                        <p:tree id="calcTree" value="#{linkerController.root}" var="calcNode" styleClass="ui-noborder"
+                                                widgetVar="calcTreeWidget" filterFunction="#{linkerController.customFilter}"
+                                                style="padding: 3px;"
+                                                selection="#{linkerController.selectedCalcTreeNode}" selectionMode="single">
+
+                                            <p:ajax event="select" listener="#{linkerController.onCalcTreeNodeSelect}"
+                                                    update="linkerForm:linkerTabView:objectTabView:calcDataTable
+                                                        linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn
+                                                        linkerForm:linkerTabView:objectTabView:createCalcLinkBtn"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="TP" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lsaColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLBOP" icon="pi pi pi-check-circle nlbopColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlsaColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLPA" icon="pi pi-cog">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </div>
+                                </p:panel>
+
+                                <p:outputPanel style="width: calc(100% - 560px); border: 1px solid #c8c8c8; border-radius: 3px;">
+                                    <p:dataTable id="calcDataTable" value="#{linkerController.calcDataTableList}" var="calcData"
+                                                 emptyMessage="#{global['table.empty.value']}" rowStyleClass="#{calcData.styleClass}">
+                                        <p:column headerText="Параметр" width="100" styleClass="center">
+                                            <h:outputText value="#{calcData.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Стат. агрегат" width="250" styleClass="center">
+                                            <h:outputText value="#{calcData.statAggr}"/>
+                                        </p:column>
+                                        <p:column headerText="Название" width="100%">
+                                            <h:outputText value="#{calcData.fullName}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>
                             </div>
-                        </div>
+
+                            <f:facet name="actions">
+                                <div style="display: flex;">
+                                    <h:outputText value="Линковка:" style="margin-right: 3px;"/>
+                                    <p:commandLink id="removeCalcLinkBtn" title="Разлинковать" disabled="#{!linkerController.enableCalcUnlinksBtn}"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   update="linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn
+                                                        linkerForm:linkerTabView:objectTabView:createCalcLinkBtn
+                                                        growl"
+                                                   oncomplete="PF('calcTreeWidget').filter();"
+                                                   action="#{linkerController.removeCalcLink()}">
+                                        <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                                    </p:commandLink>
+                                    <p:commandLink id="createCalcLinkBtn" title="Слинковать" disabled="#{!linkerController.enableCalcLinksBtn}"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   update="linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn
+                                                        linkerForm:linkerTabView:objectTabView:createCalcLinkBtn
+                                                        growl"
+                                                   oncomplete="PF('calcTreeWidget').filter();"
+                                                   action="#{linkerController.createCalcLink()}">
+                                        <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                                    </p:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:panel>
                     </p:tab>
                 </p:tabView>
             </p:tab>

@@ -78,11 +78,16 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar,
-#normIndicators\:rootPanel_content::-webkit-scrollbar,
+#normIndicators\:rootPanel_content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    display: initial;
+}
+
 #menuPanel_content::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-    display: none
+    display: none;
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-thumb,
@@ -108,10 +113,8 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
     border-width: 0
 }
 
-#normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar,
-#normIndicators\:rootPanel_content::-webkit-scrollbar,
 #menuPanel_content:hover::-webkit-scrollbar {
-    display: initial
+    display: initial;
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-button,
