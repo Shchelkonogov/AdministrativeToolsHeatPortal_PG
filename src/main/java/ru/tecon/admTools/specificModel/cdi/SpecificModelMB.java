@@ -88,11 +88,11 @@ public class SpecificModelMB implements Serializable {
 
         Map<String, String> request = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 
-        String sessionID = request.get("sessionID");
-        objectID = Integer.parseInt(request.get("objectID"));
+        String sessionID = request.get("sessionId");
+        objectID = Integer.parseInt(request.get("objectId"));
 
         utilMB.setLogin(checkUserSB.getUser(sessionID));
-        utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formID"))));
+        utilMB.setWrite(checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(request.get("formId"))));
 
         eco = Boolean.parseBoolean(request.get("eco"));
 

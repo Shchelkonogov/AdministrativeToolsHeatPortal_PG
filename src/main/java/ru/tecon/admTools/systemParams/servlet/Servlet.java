@@ -30,11 +30,11 @@ public class Servlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("formID") && parameterMap.containsKey("ip")) {
+        if (parameterMap.containsKey("sessionId") && parameterMap.containsKey("formId") && parameterMap.containsKey("ip")) {
             try {
-                int ignore = Integer.parseInt(req.getParameter("formID"));
+                int ignore = Integer.parseInt(req.getParameter("formId"));
 
-                if (bean.checkSession(req.getParameter("sessionID"))) {
+                if (bean.checkSession(req.getParameter("sessionId"))) {
                     req.getRequestDispatcher("/view/sysParams/systemParams.xhtml").forward(req, resp);
                 } else {
                     // Авторизуйтесь в системе
@@ -43,7 +43,7 @@ public class Servlet extends HttpServlet {
                 }
             } catch (NumberFormatException ex) {
                 // Не корректный параметр formID
-                logger.log(Level.WARNING, "invalid parameter \"formID\"");
+                logger.log(Level.WARNING, "invalid parameter \"formId\"");
                 req.getRequestDispatcher("/error.html").forward(req, resp);
             }
         } else {

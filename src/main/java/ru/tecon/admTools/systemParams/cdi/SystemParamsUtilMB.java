@@ -38,14 +38,14 @@ public class SystemParamsUtilMB implements Serializable {
 
         Map<String, String> parameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 
-        String sessionID = parameterMap.get("sessionID");
+        String sessionID = parameterMap.get("sessionId");
 
         ip = parameterMap.get("ip");
         login = checkUserSB.getUser(sessionID);
         try {
-            write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(parameterMap.get("formID")));
+            write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(parameterMap.get("formId")));
         } catch (NumberFormatException ignore) {
-            logger.log(Level.WARNING, "Error parse \"formID\" parameter: {0}", parameterMap.get("formID"));
+            logger.log(Level.WARNING, "Error parse \"formId\" parameter: {0}", parameterMap.get("formId"));
             write = false;
         }
     }

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 /**
  * Сервлет обертка для запуска формы Конкретная модель объекта экомониторинг
+ *
  * @author Aleksey Sergeev
  */
 @WebServlet("/ecoSpecificModel")
@@ -30,20 +31,20 @@ public class ServletEco extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("formID") && parameterMap.containsKey("objectID")) {
+        if (parameterMap.containsKey("sessionId") && parameterMap.containsKey("formId") && parameterMap.containsKey("objectId")) {
             try {
-                int ignore = Integer.parseInt(req.getParameter("formID"));
+                int ignore = Integer.parseInt(req.getParameter("formId"));
 
-                    if (bean.checkSession(req.getParameter("sessionID"))) {
-                        req.getRequestDispatcher("/specificModel.xhtml?eco=true").forward(req, resp);
-                    } else {
-    //             Авторизуйтесь в системе
-                        logger.log(Level.WARNING, "authorization error");
-                        req.getRequestDispatcher("/error.html").forward(req, resp);
-                    }
+                if (bean.checkSession(req.getParameter("sessionId"))) {
+                    req.getRequestDispatcher("/specificModel.xhtml?eco=true").forward(req, resp);
+                } else {
+                    // Авторизуйтесь в системе
+                    logger.log(Level.WARNING, "authorization error");
+                    req.getRequestDispatcher("/error.html").forward(req, resp);
+                }
             } catch (NumberFormatException ex) {
                 // Не корректный параметр formID
-                logger.log(Level.WARNING, "invalid parameter \"formID\"");
+                logger.log(Level.WARNING, "invalid parameter \"formId\"");
                 req.getRequestDispatcher("/error.html").forward(req, resp);
             }
         } else {
