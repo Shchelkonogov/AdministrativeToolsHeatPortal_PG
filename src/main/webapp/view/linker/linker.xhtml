@@ -18,9 +18,20 @@
 
     <h:form>
         <p:remoteCommand name="createMaskWrapper" action="#{linkerController.createMask()}" update="growl" />
+        <p:remoteCommand name="updateParamTrees" action="#{linkerController.updateParamTreesWrapper()}"
+                         oncomplete="handleMsg(xhr, status, args);" />
     </h:form>
 
-    <h:form id="linkerForm" style="height: 100%;">
+    <h:form style="padding-top: 0.1rem; padding-left: 0.1rem; padding-right: 0.1rem;">
+        <p:breadCrumb style="padding: 3px;">
+            <p:menuitem value="home"/>
+            <p:menuitem value="Администрирование"/>
+            <p:menuitem value="Системные настройки"/>
+            <p:menuitem value="Линковщик"/>
+        </p:breadCrumb>
+    </h:form>
+
+    <h:form id="linkerForm" style="height: calc(100% - 31px);">
         <p:tabView id="linkerTabView" style="padding: 0.1rem; height: 100%;" orientation="bottom" styleClass="tc-panel">
 
             <p:ajax event="tabChange" listener="#{linkerController.onTabChange}"
@@ -50,7 +61,8 @@
                                     linkerForm:linkerTabView:objectTabView:setSchemaNameBtn
                                     linkerForm:linkerTabView:objectTabView:linkBtnGroup
                                     linkerForm:linkerTabView:objectTabView:linkedDataTable
-                                    linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader"
+                                    linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader
+                                    linkerForm:linkerTabView:objectTabView:paramDataPanelHeader"
                             global="false"/>
 
                     <p:tab title="Объекты">
@@ -186,11 +198,178 @@
                         </p:panel>
                     </p:tab>
                     <p:tab title="Параметры">
-                        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
-                            <div>
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                        <p:panel id="paramDataPanel" styleClass="tc-panel">
+                            <f:facet name="header">
+                                <h:outputText id="paramDataPanelHeader"
+                                              value="Параметры#{linkerController.fullObjectName}"/>
+                            </f:facet>
+
+                            <div style="height: 100%; padding: 3px; display: flex;">
+                                <p:panel id="paramTreePanel" styleClass="tc-panel" style="width: 40%; margin-right: 3px;">
+                                    <f:facet name="header">
+                                        <h:outputText id="paramTreePanelHeader"
+                                                      value="#{linkerController.paramTreePanelHeader}"/>
+                                    </f:facet>
+
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterParamTree" value="#{linkerController.filterParamTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%" >
+                                                <p:ajax event="keyup" oncomplete="PF('paramTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div id="paramTreeBox" style="height: calc(100% - 43px);">
+                                        <p:tree id="paramTree" value="#{linkerController.rootKmOmTree}" var="paramNode" styleClass="ui-noborder"
+                                                widgetVar="paramTreeWidget" filterFunction="#{linkerController.customFilter}"
+                                                dynamic="true"
+                                                selection="#{linkerController.selectedParamTreeNode}" selectionMode="single"
+                                                draggable="true" droppable="true" onDrop="#{linkerController.onDrop}" dragdropScope="param">
+
+                                            <p:ajax event="select" listener="#{linkerController.onSelectParamTree}"
+                                                    onstart="unselectNode('paramOpcTreeWidget');"
+                                                    oncomplete="handleMsg(xhr, status, args);"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand" oncomplete="initDragDropForTree('paramTreeWidget');"/>
+                                            <p:ajax event="filter" oncomplete="initDragDropForTree('paramTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="selectNode('paramTreeWidget');"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="TP" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="PT" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LPA" icon="pi pi-cog lColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLPA" icon="pi pi-cog nlColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+
+                                        <p:contextMenu for="paramTree" nodeType="LSA" style="width: 150px;">
+                                            <p:menuitem value="Разлинковать" process="@this"
+                                                        action="#{linkerController.removeParamLink()}"
+                                                        icon="pi pi-minus-circle"/>
+                                        </p:contextMenu>
+                                    </div>
+
+                                    <f:facet name="actions">
+                                        <div style="display: flex;">
+                                            <p:commandLink id="filterParamTreeBtn" title="фильтр"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           onclick="changeVisible('filterParamTreeForm');" process="@this">
+                                                <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
+                                            </p:commandLink>
+                                        </div>
+                                    </f:facet>
+                                </p:panel>
+
+                                <p:panel id="paramOpcTreePanel" styleClass="tc-panel" style="width: 60%;">
+                                    <f:facet name="header">
+                                        <h:outputText id="paramOpcTreePanelHeader"
+                                                      value="Тэги источников данных объектов (#{linkerController.paramOpcTreePanelHeader})"/>
+                                    </f:facet>
+
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterParamOpcTree" value="#{linkerController.filterParamOpcTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%" >
+                                                <p:ajax event="keyup" oncomplete="PF('paramOpcTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div id="paramOpcTreeBox" style="height: calc(100% - 43px);">
+                                        <p:tree id="paramOpcTree" value="#{linkerController.rootOpcTree}" var="paramOpcNode" styleClass="ui-noborder"
+                                                widgetVar="paramOpcTreeWidget" filterFunction="#{linkerController.customFilter}"
+                                                dynamic="true"
+                                                selection="#{linkerController.selectedParamOpcTreeNode}" selectionMode="single"
+                                                draggable="true" droppable="true" onDrop="#{linkerController.onDrop}" dragdropScope="param">
+
+                                            <p:ajax event="select" listener="#{linkerController.onSelectParamTree}"
+                                                    onstart="unselectNode('paramTreeWidget');"
+                                                    oncomplete="handleMsg(xhr, status, args);"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
+                                            <p:ajax event="filter" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="selectNode('paramOpcTreeWidget');"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LOO" expandedIcon="pi pi-folder-open lColor" collapsedIcon="pi pi-folder lColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLOO" expandedIcon="pi pi-folder-open nlColor" collapsedIcon="pi pi-folder nlColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LOP" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLOP" icon="pi pi pi-check-circle nlColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLBOP" icon="pi pi pi-check-circle nlbopColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+
+                                        <p:contextMenu for="paramOpcTree" nodeType="LOP" style="width: 150px;">
+                                            <p:menuitem value="Разлинковать" process="@this"
+                                                        action="#{linkerController.removeParamLink()}"
+                                                        icon="pi pi-minus-circle"/>
+                                        </p:contextMenu>
+                                    </div>
+
+                                    <f:facet name="actions">
+                                        <div style="display: flex;">
+                                            <p:commandLink id="refreshParamOpcTreeBtn" title="Обновить"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           action="#{linkerController.refreshParamOpcTree}" process="@this" global="false"
+                                                           onstart="PF('statusDialog').show();"
+                                                           oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                                                                unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);
+                                                                PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);"
+                                                           update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
+                                                                linkerForm:linkerTabView:objectTabView:filterParamOpcTree">
+                                                <h:outputText styleClass="ui-icon pi pi-refresh"/>
+                                            </p:commandLink>
+                                            <p:commandLink id="filterParamOpcTreeBtn" title="фильтр"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           onclick="changeVisible('filterParamOpcTreeForm');" process="@this">
+                                                <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
+                                            </p:commandLink>
+                                        </div>
+                                    </f:facet>
+                                </p:panel>
                             </div>
-                        </div>
+
+                            <f:facet name="actions">
+                                <div style="display: flex;">
+                                    <p:commandLink id="requestOpcParamBtn" title="Запросить параметры"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   action="#{linkerController.requestOpcParam}" process="@this" global="false"
+                                                   onstart="PF('statusDialog').show();"
+                                                   oncomplete="PF('statusDialog').hide();">
+                                        <h:outputText styleClass="ui-icon pi pi-cloud-download"/>
+                                    </p:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:panel>
                     </p:tab>
                     <p:tab title="Вычислимые параметры">
                         <p:panel id="calcParamDataPanel" styleClass="tc-panel">
@@ -201,7 +380,7 @@
 
                             <div style="height: 100%; padding: 3px; display: flex;">
                                 <p:panel id="calcTreePanel" header="Обобщенная модель"
-                                         styleClass="tc-panel" style="width: 560px; margin-right: 3px;">
+                                         styleClass="tc-panel" style="width: 40%; margin-right: 3px;">
                                     <div style="padding: 3px;">
                                         <span class="ui-input-icon-left" style="width: 100%;">
                                             <i class="pi pi-search"/>
@@ -212,9 +391,9 @@
                                         </span>
                                     </div>
                                     <div id="calcTreeBox" style="height: calc(100% - 43px);">
-                                        <p:tree id="calcTree" value="#{linkerController.root}" var="calcNode" styleClass="ui-noborder"
+                                        <p:tree id="calcTree" value="#{linkerController.rootCalcTree}" var="calcNode" styleClass="ui-noborder"
                                                 widgetVar="calcTreeWidget" filterFunction="#{linkerController.customFilter}"
-                                                style="padding: 3px;"
+                                                style="padding: 3px;" dynamic="true"
                                                 selection="#{linkerController.selectedCalcTreeNode}" selectionMode="single">
 
                                             <p:ajax event="select" listener="#{linkerController.onCalcTreeNodeSelect}"
@@ -231,23 +410,29 @@
                                             <p:treeNode type="TP" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
                                                 <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
                                             </p:treeNode>
-                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lsaColor">
+                                            <p:treeNode type="PT" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LPA" icon="pi pi-cog lColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLPA" icon="pi pi-cog nlColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlColor">
                                                 <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
                                             </p:treeNode>
                                             <p:treeNode type="NLBOP" icon="pi pi pi-check-circle nlbopColor">
-                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
-                                            </p:treeNode>
-                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlsaColor">
-                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
-                                            </p:treeNode>
-                                            <p:treeNode type="NLPA" icon="pi pi-cog">
                                                 <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
                                             </p:treeNode>
                                         </p:tree>
                                     </div>
                                 </p:panel>
 
-                                <p:outputPanel style="width: calc(100% - 560px); border: 1px solid #c8c8c8; border-radius: 3px;">
+                                <p:outputPanel style="width: 60%; border: 1px solid #c8c8c8; border-radius: 3px;">
                                     <p:dataTable id="calcDataTable" value="#{linkerController.calcDataTableList}" var="calcData"
                                                  emptyMessage="#{global['table.empty.value']}" rowStyleClass="#{calcData.styleClass}">
                                         <p:column headerText="Параметр" width="100" styleClass="center">
@@ -315,6 +500,59 @@
 
                     <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
                                    itemLabel="#{objType.name}" itemValue="#{objType}"/>
+                </p:selectOneMenu>
+            </div>
+        </p:panel>
+    </h:form>
+
+    <h:form id="filterParamTreeForm" style="display: none;">
+        <p:panel id="filterParamTreePanel" styleClass="tc-panel">
+            <f:facet name="header">
+                <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
+                <h:outputText value="Фильтр" />
+            </f:facet>
+
+            <div style="margin: 3px;">
+                <p:outputLabel value="Тип модели" style="margin-right: 5px; font-weight: bold;"/>
+                <p:selectOneMenu id="filterParamTreeSelectOneMenu" style="width: 280px;" widgetVar="filterParamTreeSelectOneMenuWidget"
+                                 valueChangeListener="#{linkerController.onParamTreeModelChange}">
+
+                    <p:ajax global="false"
+                            onstart="PF('statusDialog').show(); hide('filterParamTreeForm');"
+                            oncomplete="PF('statusDialog').hide(); PF('paramTreeWidget').filter();
+                                unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
+                            update="linkerForm:linkerTabView:objectTabView:paramTreePanelHeader
+                                linkerForm:linkerTabView:objectTabView:filterParamTree"/>
+
+                    <f:selectItem itemLabel="Конкретная модель" itemValue="1"/>
+                    <f:selectItem itemLabel="Обобщенная модель" itemValue="2"/>
+                </p:selectOneMenu>
+            </div>
+        </p:panel>
+    </h:form>
+
+    <h:form id="filterParamOpcTreeForm" style="display: none;">
+        <p:panel id="filterParamOpcTreePanel" styleClass="tc-panel">
+            <f:facet name="header">
+                <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
+                <h:outputText value="Фильтр" />
+            </f:facet>
+
+            <div style="margin: 3px;">
+                <p:outputLabel value="Тип параметров" style="margin-right: 5px; font-weight: bold;"/>
+                <p:selectOneMenu id="filterParamOpcTreeSelectOneMenu" style="width: 280px;" widgetVar="filterParamOpcTreeSelectOneMenuWidget"
+                                 valueChangeListener="#{linkerController.onParamOpcTreeModelChange}">
+
+                    <p:ajax global="false"
+                            onstart="PF('statusDialog').show(); hide('filterParamOpcTreeForm');"
+                            oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                                unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
+                            update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
+                                linkerForm:linkerTabView:objectTabView:filterParamOpcTree"/>
+
+                    <f:selectItem itemLabel="Все параметры" itemValue="1"/>
+                    <f:selectItem itemLabel="Линкованные параметры" itemValue="2"/>
+                    <f:selectItem itemLabel="не линкованные параметры" itemValue="3"/>
                 </p:selectOneMenu>
             </div>
         </p:panel>

@@ -5,15 +5,13 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.utils.AdmTools;
 
 import javax.annotation.Resource;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +30,7 @@ public class LinkerStateless {
     private final static String PROCEDURE_RECOUNT_PRESSURE = "call lnk_0001t.recalc_pressure(?, ?, ?, ?);";
     private final static String PROCEDURE_RECOUNT_TIME = "call lnk_0001t.recalc_time(?, ?, ?, ?);";
     private final static String PROCEDURE_RECOUNT_RESISTANCE = "call lnk_0001t.recalc_resistance(?, ?, ?, ?);";
-    private final static String PROCEDURE_SUBSCRIBE = "call lnk_0001t.set_subscribe(?, ?, ?);";
+    private final static String PROCEDURE_SUBSCRIBE = "call lnk_0001t.set_subscribe(?, ?, ?, ?);";
     private final static String PROCEDURE_CHANGE_SCHEMA_NAME = "call lnk_0001t.create_schema(?, ?);";
     private final static String PROCEDURE_REMOVE_LINK = "call lnk_0001t.unlink_opc_object(?, ?, ?, ?)";
     private final static String PROCEDURE_REMOVE_ALL_LINKS = "call lnk_0001t.unlink_aspid_object(?, ?, ?)";
@@ -43,6 +41,15 @@ public class LinkerStateless {
     private final static String SELECT_CALC_PARAM = "select par_memo, par_name, stat_agr_name, color from lnk_0001t.sel_calc_param(?, ?, ?);";
     private final static String PROCEDURE_UNLINK_CALC_PARAM = "call lnk_0001t.unlink_calc_param(?, ?, ?);";
     private final static String PROCEDURE_LINK_CALC_PARAM = "call lnk_0001t.link_calc_param(?, ?, ?);";
+    private final static String SELECT_OM_TREE = "select * from lnk_0001t.sel_param_tree_om(?);";
+    private final static String SELECT_KM_TREE = "select * from lnk_0001t.sel_param_tree_km(?);";
+    private final static String SELECT_OPC_TREE = "select * from lnk_0001t.sel_param_tree_opc(?, ?);";
+    private final static String PROCEDURE_FIND_OPC_PARAM = "select lnk_0001t.find_opc_param(?, ?);";
+    private final static String PROCEDURE_FIND_OM_KM_PARAM = "select lnk_0001t.find_om_param(?, ?);";
+    private final static String PROCEDURE_LINK_PARAM = "call lnk_0001t.link_param(?, ?, ?, ?);";
+    private final static String PROCEDURE_UNLINK_PARAM = "call lnk_0001t.unlink_param(?, ?, ?, ?);";
+    private final static String PROCEDURE_READ_OPC_PARAM = "call lnk_0001t.read_tsa_param(?)";
+    private final static String FUNCTION_REQUEST_OPC_PARAM = "select * from lnk_0001t.get_opc_param_list(?)";
 
     @Inject
     private Logger logger;
@@ -152,16 +159,18 @@ public class LinkerStateless {
      * Изменения подписи для объекта
      *
      * @param linkedData объект для изменения подписи
+     * @param user пользователь
      * @throws SystemParamException ошибка выполнения обновления
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void subscribe(LinkedData linkedData) throws SystemParamException {
+    public void subscribe(LinkedData linkedData, String user) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(PROCEDURE_SUBSCRIBE)) {
 
             cStm.setInt(1, linkedData.getDbObject().getId());
             cStm.setInt(2, linkedData.getObjIntKey());
             cStm.setShort(3, (short) (linkedData.isSubscribed() ? 1 : 0));
+            cStm.setString(4, user);
 
             cStm.executeUpdate();
         } catch (SQLException e) {
@@ -313,26 +322,109 @@ public class LinkerStateless {
     }
 
     /**
-     * Получение данных дерева в закладке "Линкованные объекты / Вычислимые параметры"
-     * @param id id выбранного объекта
-     * @return данные дерева
+     * Получение дынных для деревьев {@link TreeType}
+     * @param id id объекта
+     * @param type тип дерева
+     * @param opcTreeLinkType тип параметров для OPC дерева
+     * @return список данных для дерева
      */
-    public List<TreeData> getCalcTreeData(int id) {
+    public List<TreeData> getTreeData(int id, TreeType type, short opcTreeLinkType) {
         List<TreeData> result = new ArrayList<>();
+        String select;
+        switch (type) {
+            case CALC:
+                select = SELECT_CALC_TREE;
+                break;
+            case KM:
+                select = SELECT_KM_TREE;
+                break;
+            case OM:
+                select = SELECT_OM_TREE;
+                break;
+            case OPC:
+                select = SELECT_OPC_TREE;
+                break;
+            default:
+                return result;
+        }
+
         try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SELECT_CALC_TREE)) {
+             PreparedStatement stm = connect.prepareStatement(select)) {
 
             stm.setInt(1, id);
+            if (type == TreeType.OPC) {
+                stm.setShort(2, opcTreeLinkType);
+            }
 
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 result.add(new TreeData(res.getString("id"), res.getString("name"), res.getString("parent"),
-                        res.getString("my_id"), res.getString("my_type")));
+                        res.getString("my_id"), res.getString("my_type"), type));
             }
         } catch (SQLException ex) {
-            logger.log(Level.WARNING, "Error load calc tree data", ex);
+            logger.log(Level.WARNING, "Error load " + type + " tree data", ex);
         }
         return result;
+    }
+
+    /**
+     * Получение дынных для деревьев {@link TreeType}
+     * @param id id объекта
+     * @param type тип дерева
+     * @return список данных для дерева
+     */
+    public List<TreeData> getTreeData(int id, TreeType type) {
+        return getTreeData(id, type, (short) 2);
+    }
+
+    /**
+     * Поиск слинкованного параметра в OM/KM дереве для формы "Линкованные объекты / Параметры"
+     * @param id id объекта
+     * @param myId id выделенного элемента в OPC дереве
+     * @return id элемента в OM/KM дереве
+     */
+    public String findOmKmParam(int id, String myId) {
+        return findParam(id, myId, "OmKm");
+    }
+
+    /**
+     * Поиск слинкованного параметра в OPC дереве для формы "Линкованные объекты / Параметры"
+     * @param id id объекта
+     * @param myId id выделенного элемента в OM/KM дереве
+     * @return id элемента в OPC дереве
+     */
+    public String findOpcParam(int id, String myId) {
+        return findParam(id, myId, "Opc");
+    }
+
+    private String findParam(int id, String myId, String type) {
+        try (Connection connect = ds.getConnection()) {
+
+            String select;
+            switch (type) {
+                case "Opc":
+                    select = PROCEDURE_FIND_OPC_PARAM;
+                    break;
+                case "OmKm":
+                    select = PROCEDURE_FIND_OM_KM_PARAM;
+                    break;
+                default:
+                    return "";
+            }
+
+            try (PreparedStatement stm = connect.prepareStatement(select)) {
+                stm.setInt(1, id);
+                stm.setString(2, myId);
+
+                ResultSet res = stm.executeQuery();
+                if (res.next()) {
+                    return res.getString(1);
+                }
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error find param", ex);
+        }
+        return "";
     }
 
     /**
@@ -370,7 +462,7 @@ public class LinkerStateless {
      * @throws SystemParamException ошибка создания связи
      */
     public void linkCalcParam(int objectId, int paramId, int statAgrId) throws SystemParamException {
-        changeParamLink(true, objectId, paramId, statAgrId);
+        changeCalcParamLink(true, objectId, paramId, statAgrId);
     }
 
     /**
@@ -381,11 +473,11 @@ public class LinkerStateless {
      * @throws SystemParamException ошибка удаления связи
      */
     public void unlinkCalcParam(int objectId, int paramId, int statAgrId) throws SystemParamException {
-        changeParamLink(false, objectId, paramId, statAgrId);
+        changeCalcParamLink(false, objectId, paramId, statAgrId);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    private void changeParamLink(boolean link, int objectId, int paramId, int statAgrId) throws SystemParamException {
+    private void changeCalcParamLink(boolean link, int objectId, int paramId, int statAgrId) throws SystemParamException {
         try (Connection connect = ds.getConnection()) {
 
             String select;
@@ -406,5 +498,93 @@ public class LinkerStateless {
             logger.log(Level.WARNING, "Error change param link", e);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
+    }
+
+    /**
+     * Создает связь для параметра в закладке "Линкованные объекты / Параметры"
+     * @param objectId id объекта
+     * @param paramId id параметра
+     * @param opcParamId id opc параметра
+     * @return новая id для opc параметра
+     * @throws SystemParamException ошибка создания связи
+     */
+    public String linkParam(int objectId, String paramId, String opcParamId) throws SystemParamException {
+        return changeParamLink(true, objectId, paramId, opcParamId);
+    }
+
+    /**
+     * Удаляет связь для параметра в закладке "Линкованные объекты / Параметры"
+     * @param objectId id объекта
+     * @param paramId id параметра
+     * @param opcParamId id opc параметра
+     * @return новая id для opc параметра
+     * @throws SystemParamException ошибка удаления связи
+     */
+    public String unlinkParam(int objectId, String paramId, String opcParamId) throws SystemParamException {
+        return changeParamLink(false, objectId, paramId, opcParamId);
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    private String changeParamLink(boolean link, int objectId, String paramId, String opcParamId) throws SystemParamException {
+        try (Connection connect = ds.getConnection()) {
+
+            String select;
+            if (link) {
+                select = PROCEDURE_LINK_PARAM;
+            } else {
+                select = PROCEDURE_UNLINK_PARAM;
+            }
+
+            try (CallableStatement cStm = connect.prepareCall(select)) {
+                cStm.setInt(1, objectId);
+                cStm.setString(2, paramId);
+                cStm.setString(3, opcParamId);
+                cStm.registerOutParameter(4, Types.BIGINT);
+
+                cStm.executeUpdate();
+
+                return String.valueOf(cStm.getLong(4));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error change param link", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Метод обновляет параметры для opc дерева в базе
+     * @param opcObjectName имя opc объекта
+     */
+    public void readOpcParams(String opcObjectName) {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_READ_OPC_PARAM)) {
+            cStm.setString(1, opcObjectName);
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error read opc params", ex);
+        }
+    }
+
+    /**
+     * Метод отправляет запрос opc серверу для запроса параметров
+     * @param opcObjectName имя opc объекта
+     * @return null
+     * @throws SystemParamException если ошибка выполнения запроса
+     */
+    @Asynchronous
+    public Future<Void> requestOpcParams(String opcObjectName) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(FUNCTION_REQUEST_OPC_PARAM)) {
+            stm.setString(1, opcObjectName);
+
+            ResultSet res = stm.executeQuery();
+            if (res.next() && !res.getString(1).isEmpty()) {
+                throw new SystemParamException(res.getString(1));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error read opc params", ex);
+        }
+        return null;
     }
 }

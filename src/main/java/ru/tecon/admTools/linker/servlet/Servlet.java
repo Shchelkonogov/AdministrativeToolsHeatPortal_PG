@@ -32,9 +32,9 @@ public class Servlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("ip")) {
+        if (parameterMap.containsKey("sessionId") && parameterMap.containsKey("ip")) {
             // TODO change
-            if (!checkUserBean.checkSession(req.getParameter("sessionID"))) {
+            if (checkUserBean.checkSession(req.getParameter("sessionId"))) {
                 req.getRequestDispatcher("/view/linker/linker.xhtml").forward(req, resp);
             } else {
                 // Авторизуйтесь в системе

@@ -2,28 +2,48 @@
 
 #filterForm {
     position: absolute;
-    top: 35px;
+    top: 66px;
     right: 23px;
+    box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
+    border-radius: 3px;
+}
+
+#filterParamTreeForm {
+    position: absolute;
+    top: 104px;
+    right: 61.2%;
+    box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
+    border-radius: 3px;
+}
+
+#filterParamOpcTreeForm {
+    position: absolute;
+    top: 104px;
+    right: 28px;
     box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
     border-radius: 3px;
 }
 
 #recountForm {
     position: absolute;
-    top: 35px;
+    top: 66px;
     right: 48px;
     box-shadow: 0 0 10px 5px rgb(0 0 0 / 50%);
     border-radius: 3px;
 }
 
 #filterForm\:filterPanel_content,
-#recountForm\:recountPanel_content {
+#recountForm\:recountPanel_content,
+#filterParamTreeForm\:filterParamTreePanel_content,
+#filterParamOpcTreeForm\:filterParamOpcTreePanel_content {
     display: flex;
     justify-content: center;
 }
 
 body #filterForm\:filterPanel.tc-panel .ui-panel-titlebar,
-body #recountForm\:recountPanel.tc-panel .ui-panel-titlebar {
+body #recountForm\:recountPanel.tc-panel .ui-panel-titlebar,
+body #filterParamTreeForm\:filterParamTreePanel.tc-panel .ui-panel-titlebar,
+body #filterParamOpcTreeForm\:filterParamOpcTreePanel.tc-panel .ui-panel-titlebar {
     padding-left: 0.1em;
 }
 
@@ -43,23 +63,31 @@ body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
     margin-right: 50%;
 }
 
-/*Устанавливаем свойства scrollbar для дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+/*Устанавливаем свойства scrollbar для дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
-#calcTreeBox .ui-tree-container {
+#calcTreeBox .ui-tree-container,
+#paramTreeBox .ui-tree-container,
+#paramOpcTreeBox .ui-tree-container {
     overflow: unset;
 }
 
-#calcTreeBox {
+#calcTreeBox,
+#paramTreeBox,
+#paramOpcTreeBox {
     overflow: auto;
 }
 
-#calcTreeBox::-webkit-scrollbar {
+#calcTreeBox::-webkit-scrollbar,
+#paramTreeBox::-webkit-scrollbar,
+#paramOpcTreeBox::-webkit-scrollbar {
     width: 8px;
     height: 8px;
     display: initial;
 }
 
-#calcTreeBox::-webkit-scrollbar-thumb {
+#calcTreeBox::-webkit-scrollbar-thumb,
+#paramTreeBox::-webkit-scrollbar-thumb,
+#paramOpcTreeBox::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.2);
     transition: background 250ms ease;
     border-radius: 2px;
@@ -67,44 +95,54 @@ body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
     -webkit-transition: background 250ms;
 }
 
-#calcTreeBox::-webkit-scrollbar-thumb:hover {
+#calcTreeBox::-webkit-scrollbar-thumb:hover,
+#paramTreeBox::-webkit-scrollbar-thumb:hover,
+#paramOpcTreeBox::-webkit-scrollbar-thumb:hover {
     background: rgba(0,0,0,.35);
 }
 
-#calcTreeBox::-webkit-scrollbar-track {
+#calcTreeBox::-webkit-scrollbar-track,
+#paramTreeBox::-webkit-scrollbar-track,
+#paramOpcTreeBox::-webkit-scrollbar-track {
     background: rgba(0,0,0,.1);
     border-width: 0;
 }
 
 #calcTreeBox::-webkit-scrollbar-button,
 #calcTreeBox::-webkit-scrollbar-corner,
-#calcTreeBox::-webkit-resizer {
+#calcTreeBox::-webkit-resizer,
+#paramTreeBox::-webkit-scrollbar-button,
+#paramTreeBox::-webkit-scrollbar-corner,
+#paramTreeBox::-webkit-resizer,
+#paramOpcTreeBox::-webkit-scrollbar-button,
+#paramOpcTreeBox::-webkit-scrollbar-corner,
+#paramOpcTreeBox::-webkit-resizer {
     display: none;
 }
 
-/*устанавливаю шилину элемента дерева в закладке "Линкованные объекты / Вычислимые параметры" что бы оно скрывалось "..."*/
+/*устанавливаю ширину элемента дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)" что бы оно скрывалось "..."*/
 
 .ui-treenode-label {
-    width: 420px;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/*Цвет некоторых иконок в дереве в закладке "Линкованные объекты / Вычислимые параметры"*/
+/*Цвет некоторых иконок в дереве в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
-.lsaColor {
+.lColor {
     color: mediumseagreen;
 }
 
-.nlsaColor {
-    color: blue;
-}
-
-.nlbopColor {
+.nlColor {
     color: red;
 }
 
-/*Скрываю стандартный фильтр в дереве в закладке "Линкованные объекты / Вычислимые параметры"*/
+.nlbopColor {
+    color: blue; /*на вычислимых когда синии надо разлинковать и сделать красным*/
+}
+
+/*Скрываю стандартный фильтр в дереве в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
 .ui-tree-filter-container {
     display: none;
@@ -123,17 +161,21 @@ body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
     border-top-right-radius: 3px;
 }
 
-/*Стили шапки дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+/*Стили шапки дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
-#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_header {
+#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_header,
+#linkerForm\:linkerTabView\:objectTabView\:paramTreePanel_header,
+#linkerForm\:linkerTabView\:objectTabView\:paramOpcTreePanel_header {
     padding: 0.394em 0.6em 0.3em 0.7em;
 }
 
-#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_content {
+#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_content,
+#linkerForm\:linkerTabView\:objectTabView\:paramTreePanel_content,
+#linkerForm\:linkerTabView\:objectTabView\:paramOpcTreePanel_content {
     height: calc(100% - 34px);
 }
 
-/*Стили выделения элементов дерева в закладке "Линкованные объекты / Вычислимые параметры"*/
+/*Стили выделения элементов дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
 body .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content.ui-tree-selectable:not(.ui-state-highlight).ui-state-hover {
     background: #eaeaea;
@@ -153,4 +195,10 @@ body .ui-tree .ui-tree-container .ui-treenode-outline {
 
 .redRow {
     background-color: salmon !important;
+}
+
+body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: none;
 }

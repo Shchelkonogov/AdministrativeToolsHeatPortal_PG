@@ -14,6 +14,22 @@ document.addEventListener('click', (event) => {
     if (!withinBoundariesRecount && !recountBtn) {
         hide('recountForm');
     }
+
+    const withinBoundariesFilterParamTree = event.composedPath().includes(document.querySelector('#filterParamTreeForm'))
+        || event.composedPath().includes(document.querySelector('#filterParamTreeForm\\:filterParamTreeSelectOneMenu_panel'));
+    const filterParamTreeButton = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:filterParamTreeBtn'));
+
+    if (!withinBoundariesFilterParamTree && !filterParamTreeButton) {
+        hide('filterParamTreeForm');
+    }
+
+    const withinBoundariesFilterParamOpcTree = event.composedPath().includes(document.querySelector('#filterParamOpcTreeForm'))
+        || event.composedPath().includes(document.querySelector('#filterParamOpcTreeForm\\:filterParamOpcTreeSelectOneMenu_panel'));
+    const filterParamOpcTreeButton = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:filterParamOpcTreeBtn'));
+
+    if (!withinBoundariesFilterParamOpcTree && !filterParamOpcTreeButton) {
+        hide('filterParamOpcTreeForm');
+    }
 })
 
 // Изменения видимости для переданного элемента, используется для отображения и закрытия окошке по кнопкам "Пересчет" и "Фильтр"
@@ -54,5 +70,66 @@ function addOnDblClickEvents() {
             element.parent().attr('ondblclick', attr);
             element.removeAttr('ondblclick');
         }
+    }
+}
+
+/**
+ * Доработка интерфейса для dragAndDrop (нам не требуются dropPoint)
+ * @param widget
+ */
+function initDragDropForTree(widget) {
+    PF(widget).jq.find('li.ui-tree-droppoint').remove();
+    PF(widget).initDraggable();
+    PF(widget).initDroppable();
+}
+
+/**
+ * Перемещение scroll к выделенному элементу дерева
+ * @param widgetVar имя виджета
+ */
+function scrollToSelectedNode(widgetVar) {
+    const selectedElement = PF(widgetVar).jq.find('li .ui-state-highlight');
+    if (selectedElement != null && selectedElement.position() !== undefined) {
+        const scrollPanel = PF(widgetVar).jq.parent();
+        scrollPanel.scrollTop(selectedElement.position().top - scrollPanel.height() / 2);
+    }
+}
+
+/**
+ * Обработчик ajaxCallBack в primeFaces
+ * @param xhr
+ * @param status
+ * @param args
+ */
+function handleMsg(xhr, status, args) {
+    switch (args.command) {
+        case "updateAfterSelectWrapper":
+            updateParamTrees([{name: 'widgetName', value: args.widgetName}, {name: 'rowKey', value: args.rowKey}]);
+            break;
+        case "updateAfterSelect":
+            PF(args.widgetName).selectNode(PF(args.widgetName).jq.find('[data-rowkey="' + args.rowKey + '"]'), true);
+            scrollToSelectedNode(args.widgetName);
+            break;
+    }
+}
+
+/**
+ * Снятие выделения элемента дерева по данным из js объекта
+ * @param widgetVar имя виджета
+ * @param silent отправлять ли запрос в bean
+ */
+function unselectNode(widgetVar, silent) {
+    if (PF(widgetVar).selections.length !== 0) {
+        PF(widgetVar).unselectNode(PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]'), silent === undefined ? true : silent);
+    }
+}
+
+/**
+ * Выделения элемента дерева по данным из js объекта
+ * @param widgetVar имя виджета
+ */
+function selectNode(widgetVar) {
+    if (PF(widgetVar).selections.length !== 0) {
+        PF(widgetVar).selectNode(PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]'), false);
     }
 }

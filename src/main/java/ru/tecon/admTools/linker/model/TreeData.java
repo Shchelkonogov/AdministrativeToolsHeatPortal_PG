@@ -3,7 +3,6 @@ package ru.tecon.admTools.linker.model;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -23,18 +22,20 @@ public class TreeData implements Comparable<TreeData> {
     private String parent;
     private String myId;
     private String myType;
+    private TreeType treeType;
 
     public TreeData() {
         uuid = UUID.randomUUID();
     }
 
-    public TreeData(String itemId, String name, String parent, String myId, String myType) {
+    public TreeData(String itemId, String name, String parent, String myId, String myType, TreeType treeType) {
         this();
         this.itemId = itemId;
         this.name = name;
         this.parent = parent;
         this.myId = myId;
         this.myType = myType;
+        this.treeType = treeType;
     }
 
     public String getId() {
@@ -49,6 +50,14 @@ public class TreeData implements Comparable<TreeData> {
         return itemId;
     }
 
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public void setMyId(String myId) {
+        this.myId = myId;
+    }
+
     public String getName() {
         return name;
     }
@@ -57,18 +66,40 @@ public class TreeData implements Comparable<TreeData> {
         return myType;
     }
 
-    public SystemParam getParam() throws ParseException {
-        ArrayList<String> idList = new ArrayList<>();
-        Matcher matcher = Pattern.compile("\\d+").matcher(itemId);
-        while (matcher.find()) {
-            idList.add(matcher.group());
+    public void setMyType(String myType) {
+        this.myType = myType;
+    }
+
+    public TreeType getTreeType() {
+        return treeType;
+    }
+
+    /**
+     * Получение данных из объекта по паттерну ^PA(?<PA>\d+)SA(?<SA>-?\d+)$
+     * @return данные id и statAgr
+     * @throws ParseException в случае ошибки поиска по паттерну
+     */
+    public SystemParam getSystemParam() throws ParseException {
+        Matcher matcher = Pattern.compile("^PA(?<PA>\\d+)SA(?<SA>-?\\d+)$").matcher(itemId);
+        if (matcher.find()) {
+            return new SystemParam(Integer.parseInt(matcher.group("PA")), Integer.parseInt(matcher.group("SA")));
         }
 
-        if (idList.size() == 2) {
-            return new SystemParam(Integer.parseInt(idList.get(0)), Integer.parseInt(idList.get(1)));
-        } else {
-            throw new ParseException("Не верное количество групп", idList.size());
+        throw new ParseException("Не соответствует паттерну ^PA(?<PA>\\d+)SA(?<SA>-?\\d+)$", 0);
+    }
+
+    /**
+     * Получение данных из объекта по паттерну .*OP(?<id>\d+)$
+     * @return данные id
+     * @throws ParseException в случае ошибки поиска по паттерну
+     */
+    public String getParamId() throws ParseException {
+        Matcher matcher = Pattern.compile(".*OP(?<id>\\d+)$").matcher(itemId);
+        if (matcher.find()) {
+            return matcher.group("id");
         }
+
+        throw new ParseException("Не соответствует паттерну .*OP(?<id>\\d+)$", 0);
     }
 
     @Override
@@ -78,8 +109,9 @@ public class TreeData implements Comparable<TreeData> {
                 .add("itemId='" + itemId + "'")
                 .add("name='" + name + "'")
                 .add("parent='" + parent + "'")
-                .add("myId=" + myId)
+                .add("myId='" + myId + "'")
                 .add("myType='" + myType + "'")
+                .add("treeType=" + treeType)
                 .toString();
     }
 

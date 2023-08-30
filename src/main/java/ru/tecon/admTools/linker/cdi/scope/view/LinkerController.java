@@ -1,6 +1,7 @@
 package ru.tecon.admTools.linker.cdi.scope.view;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.component.tree.TreeDragDropInfo;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -22,12 +23,17 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -56,6 +62,7 @@ public class LinkerController implements Serializable {
             }).collect(Collectors.toMap(k -> (String) k[0], v -> (SortOrder) v[1], (oldValue, newValue) -> oldValue, LinkedHashMap::new))
     );
     private LinkedData selectedLinkedData;
+    private Integer selectedLinkedObjectId;
 
     private String newMaskName;
 
@@ -67,14 +74,26 @@ public class LinkerController implements Serializable {
 
     // Закладка "Линкованные объекты / Вычислимые параметры"
 
-    private Integer selectedLinkedObjectId;
-
-    private final TreeNode<TreeData> root = new DefaultTreeNode<>(new TreeData(), null);
+    private final TreeNode<TreeData> rootCalcTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedCalcTreeNode;
 
     private String filterCalcTreeValue = "";
 
     private List<CalcDataTable> calcDataTableList = new ArrayList<>();
+
+    // Закладка "Линкованные объекты / Параметры"
+
+    private final TreeNode<TreeData> rootKmOmTree = new DefaultTreeNode<>(new TreeData(), null);
+    private TreeNode<TreeData> selectedParamTreeNode;
+
+    private String filterParamTreeValue = "";
+    private String paramTreePanelHeader = "Конкретная модель";
+
+    private final TreeNode<TreeData> rootOpcTree = new DefaultTreeNode<>(new TreeData(), null);
+    private TreeNode<TreeData> selectedParamOpcTreeNode;
+
+    private String filterParamOpcTreeValue = "";
+    private String paramOpcTreePanelHeader = "Все параметры";
 
     @Inject
     private ObjectTypeController objectTypeController;
@@ -115,24 +134,48 @@ public class LinkerController implements Serializable {
                 // Очищаю вкладку "Линкованные объекты / Объекты"
                 linkedData.getData().clear();
                 selectedLinkedData = null;
+                selectedLinkedObjectId = null;
 
                 // Очищаю вкладку "Линкованные объекты / Вычислимые параметры"
-                selectedLinkedObjectId = null;
                 filterCalcTreeValue = "";
                 if (selectedCalcTreeNode != null) {
                     PrimeFaces.current().executeScript("PF('calcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:calcTree\\\\:" + selectedCalcTreeNode.getRowKey() + "'), false);");
                     selectedCalcTreeNode = null;
                 }
-                root.getChildren().clear();
+                rootCalcTree.getChildren().clear();
                 calcDataTableList.clear();
+
+                // Очищаю вкладку "Линкованные объекты / Параметры"
+                filterParamTreeValue = "";
+                paramTreePanelHeader = "Конкретная модель";
+                if (selectedParamTreeNode != null) {
+                    PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
+                    selectedParamTreeNode = null;
+                }
+                rootKmOmTree.getChildren().clear();
+                filterParamOpcTreeValue = "";
+                paramOpcTreePanelHeader = "Все параметры";
+                if (selectedParamOpcTreeNode != null) {
+                    PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramOpcTree\\\\:" + selectedParamOpcTreeNode.getRowKey() + "'), false);");
+                    selectedParamOpcTreeNode = null;
+                }
+                rootOpcTree.getChildren().clear();
 
                 PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:linkedDataTable",
                         "linkerForm:linkerTabView:objectTabView:calcDataTable",
                         "linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn",
                         "linkerForm:linkerTabView:objectTabView:createCalcLinkBtn",
-                        "linkerForm:linkerTabView:objectTabView:filterCalcTree");
+                        "linkerForm:linkerTabView:objectTabView:filterCalcTree",
+                        "linkerForm:linkerTabView:objectTabView:filterParamTree",
+                        "linkerForm:linkerTabView:objectTabView:filterParamOpcTree",
+                        "linkerForm:linkerTabView:objectTabView:paramTreePanelHeader",
+                        "linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader");
 
-                PrimeFaces.current().executeScript("PF('calcTreeWidget').filter();");
+                PrimeFaces.current().executeScript("PF('calcTreeWidget').filter(); " +
+                        "PF('paramTreeWidget').filter(); " +
+                        "PF('paramOpcTreeWidget').filter(); " +
+                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(1); " +
+                        "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
                 break;
             case "Линкованные объекты":
                 PrimeFaces.current().executeScript("PF('objectTabViewWidget').select(0); " +
@@ -142,29 +185,70 @@ public class LinkerController implements Serializable {
             case "Объекты":
                 linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
                 selectedLinkedData = null;
+                selectedLinkedObjectId = null;
 
                 // Очищаю вкладку "Линкованные объекты / Вычислимые параметры"
-                selectedLinkedObjectId = null;
                 filterCalcTreeValue = "";
                 if (selectedCalcTreeNode != null) {
                     PrimeFaces.current().executeScript("PF('calcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:calcTree\\\\:" + selectedCalcTreeNode.getRowKey() + "'), false);");
                     selectedCalcTreeNode = null;
                 }
-                root.getChildren().clear();
+                rootCalcTree.getChildren().clear();
                 calcDataTableList.clear();
+
+                // Очищаю вкладку "Линкованные объекты / Параметры"
+                paramTreePanelHeader = "Конкретная модель";
+                filterParamTreeValue = "";
+                if (selectedParamTreeNode != null) {
+                    PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
+                    selectedParamTreeNode = null;
+                }
+                rootKmOmTree.getChildren().clear();
+                filterParamOpcTreeValue = "";
+                paramOpcTreePanelHeader = "Все параметры";
+                if (selectedParamOpcTreeNode != null) {
+                    PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramOpcTree\\\\:" + selectedParamOpcTreeNode.getRowKey() + "'), false);");
+                    selectedParamOpcTreeNode = null;
+                }
+                rootOpcTree.getChildren().clear();
 
                 PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:calcDataTable",
                         "linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn",
                         "linkerForm:linkerTabView:objectTabView:createCalcLinkBtn",
-                        "linkerForm:linkerTabView:objectTabView:filterCalcTree");
+                        "linkerForm:linkerTabView:objectTabView:filterCalcTree",
+                        "linkerForm:linkerTabView:objectTabView:filterParamTree",
+                        "linkerForm:linkerTabView:objectTabView:filterParamOpcTree",
+                        "linkerForm:linkerTabView:objectTabView:paramTreePanelHeader",
+                        "linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader");
 
                 PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); " +
                         "PF('objectTabViewWidget').disable(2); " +
-                        "PF('calcTreeWidget').filter();");
+                        "PF('calcTreeWidget').filter(); " +
+                        "PF('paramTreeWidget').filter(); " +
+                        "PF('paramOpcTreeWidget').filter(); " +
+                        "addOnDblClickEvents(); " +
+                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(1); " +
+                        "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
                 break;
             case "Параметры":
                 linkedData.getData().clear();
-                selectedLinkedData = null;
+
+                if (selectedLinkedData != null) {
+                    selectedLinkedObjectId = selectedLinkedData.getDbObject().getId();
+
+                    selectedLinkedData = null;
+                }
+
+                if ((selectedLinkedObjectId != null) && (rootKmOmTree.getChildren().isEmpty())) {
+                    prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.KM), rootKmOmTree);
+
+                    prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC), rootOpcTree, null);
+                }
+
+                PrimeFaces.current().executeScript("document.getElementById('linkerForm:linkerTabView:objectTabView:paramTree_filter').value = 'init'; " +
+                        "PF('paramTreeWidget').filter(); " +
+                        "document.getElementById('linkerForm:linkerTabView:objectTabView:paramOpcTree_filter').value = 'init'; " +
+                        "PF('paramOpcTreeWidget').filter();");
                 break;
             case "Вычислимые параметры":
                 linkedData.getData().clear();
@@ -172,24 +256,13 @@ public class LinkerController implements Serializable {
                 if (selectedLinkedData != null) {
                     selectedLinkedObjectId = selectedLinkedData.getDbObject().getId();
 
-                    root.getChildren().clear();
-                    List<TreeData> calcTreeData = linkerBean.getCalcTreeData(selectedLinkedObjectId);
-
-                    Map<String, TreeNode<TreeData>> nodes = new HashMap<>();
-                    nodes.put("S", root);
-                    for (TreeData entry: calcTreeData) {
-                        TreeNode<TreeData> parent = nodes.get(entry.getParent());
-                        DefaultTreeNode<TreeData> node = new DefaultTreeNode<>(entry.getMyType(), entry, parent);
-                        nodes.put(entry.getItemId(), node);
-                    }
-
                     selectedLinkedData = null;
                 }
 
-                sortTree(root);
+                if ((selectedLinkedObjectId != null) && (rootCalcTree.getChildren().isEmpty())) {
+                    List<TreeData> treeData = linkerBean.getTreeData(selectedLinkedObjectId, TreeType.CALC);
 
-                if (!root.getChildren().isEmpty()) {
-                    root.getChildren().get(0).setExpanded(true);
+                    prepareTree(treeData, rootCalcTree);
                 }
 
                 PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:calcDataTable");
@@ -200,7 +273,42 @@ public class LinkerController implements Serializable {
     }
 
     /**
-     * Сортировка дерева в закладке "Линкованные объекты / Вычислимые параметры"
+     * Создание дерева на основе плоского списка данных
+     * @param treeData плоский список данных
+     * @param root корневой элемент дерева
+     */
+    private void prepareTree(List<TreeData> treeData, TreeNode<TreeData> root) {
+        prepareTree(treeData, root, "S");
+    }
+
+    /**
+     * Создание дерева на основе плоского списка данных с указанием идентификатора корневого элемента
+     * @param treeData плоский список данных
+     * @param root корневой элемент дерева
+     * @param rootPrefix идентификатор корневого элемента
+     */
+    private void prepareTree(List<TreeData> treeData, TreeNode<TreeData> root, String rootPrefix) {
+        Map<String, TreeNode<TreeData>> nodes = new HashMap<>();
+        nodes.put(rootPrefix, root);
+        for (TreeData entry: treeData) {
+            TreeNode<TreeData> parent = nodes.get(entry.getParent());
+            DefaultTreeNode<TreeData> node = new DefaultTreeNode<>(entry.getMyType(), entry, parent);
+            nodes.put(entry.getItemId(), node);
+        }
+
+        // сортировка дерева
+        sortTree(root);
+
+        // раскрытие первого уровня
+        for (TreeNode<TreeData> node: root.getChildren()) {
+            if (!node.isLeaf()) {
+                node.setExpanded(true);
+            }
+        }
+    }
+
+    /**
+     * Сортировка дерева по имени
      * @param treeNode узел дерева для сортировки вниз
      */
     private void sortTree(TreeNode<TreeData> treeNode) {
@@ -217,18 +325,33 @@ public class LinkerController implements Serializable {
     }
 
     /**
-     * Фильтр дерева в закладке "Линкованные объекты / Вычислимые параметры"
+     * Фильтр дерева в закладке "Линкованные объекты / Вычислимые параметры" и "Линкованные объекты / Параметры"
      * @param treeNode дерево
-     * @param filter фильтр (не используется)
+     * @param ignore фильтр (не используется)
      * @param locale locale
      * @return true если проходит фильтрацию
      */
-    public boolean customFilter(TreeNode<TreeData> treeNode, Object filter, Locale locale) {
+    public boolean customFilter(TreeNode<TreeData> treeNode, Object ignore, Locale locale) {
         if (treeNode.getData() == null) {
             return true;
         }
 
-        String filterText = filterCalcTreeValue.trim().toLowerCase(locale);
+        String filterText;
+        switch (treeNode.getData().getTreeType()) {
+            case CALC:
+                filterText = filterCalcTreeValue.trim().toLowerCase(locale);
+                break;
+            case KM:
+            case OM:
+                filterText = filterParamTreeValue.trim().toLowerCase(locale);
+                break;
+            case OPC:
+                filterText = filterParamOpcTreeValue.trim().toLowerCase(locale);
+                break;
+            default:
+                filterText = "";
+        }
+
         if (LangUtils.isBlank(filterText)) {
             return true;
         }
@@ -237,16 +360,371 @@ public class LinkerController implements Serializable {
     }
 
     /**
+     * Обработчик события drop в деревья на форме "Линкованные объекты / Параметры"
+     * @param info событие dragAndDrop
+     * @return возвращает разрешен ли dragAndDrop
+     */
+    public boolean onDrop(TreeDragDropInfo info) {
+        TreeData dragNode = (TreeData) info.getDragNode().getData();
+        TreeData dropNode = (TreeData) info.getDropNode().getData();
+
+        if (dropNode.getTreeType() != dragNode.getTreeType()) {
+            switch (dropNode.getTreeType()) {
+                case OPC:
+                    if (dragNode.getMyType().equals("NLSA") && dropNode.getMyType().equals("NLOP")) {
+                        logger.log(Level.INFO, "Create link for {0} and {1}", new Object[]{dragNode, dropNode});
+
+                        linkParam(info.getDragNode(), info.getDropNode());
+                    }
+                    break;
+                case OM:
+                case KM:
+                    if (dragNode.getMyType().equals("NLOP") && dropNode.getMyType().equals("NLSA")) {
+                        logger.log(Level.INFO, "Create link for {0} and {1}", new Object[]{dropNode, dragNode});
+
+                        linkParam(info.getDropNode(), info.getDragNode());
+                    }
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Линковка двух элементов дерева в форме "Линкованные объекты / Параметры"
+     * @param node1 элемент дерева KM/OM
+     * @param node2 эелемент дерева OPC
+     */
+    private void linkParam(TreeNode<?> node1, TreeNode<?> node2) {
+        TreeData node1Data =(TreeData) node1.getData();
+        TreeData node2Data =(TreeData) node2.getData();
+
+        try {
+            String newOpcId = linkerBean.linkParam(selectedLinkedObjectId, node1Data.getItemId(), node2Data.getItemId());
+
+            // Устанавливаем обновленные типы
+            node2.setType("LOP");
+            node2Data.setMyType("LOP");
+            node1.setType("LSA");
+            node2Data.setMyType("LSA");
+
+            // Устанавливаем в дерево opc обновленную id
+            String newId = node2Data.getItemId().replaceAll("OP\\d+$", "OP" + newOpcId);
+            node2Data.setItemId(newId);
+            node2Data.setMyId(newId);
+
+            PrimeFaces.current().executeScript("PF('paramTreeWidget').filter(); " +
+                    "PF('paramOpcTreeWidget').filter();");
+
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное создание связи"));
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+        }
+
+        PrimeFaces.current().ajax().update("growl");
+
+        PrimeFaces.current().executeScript("$('.ui-tree-draghelper').remove();");
+    }
+
+    /**
+     * Разрыв связи выделенных параметров в форме "Линкованные объекты / Параметры"
+     */
+    public void removeParamLink() {
+        logger.log(Level.INFO, "Remove link for {0} and {1}", new Object[]{selectedParamTreeNode, selectedParamOpcTreeNode});
+        try {
+            String newOpcId = linkerBean.unlinkParam(selectedLinkedObjectId, selectedParamTreeNode.getData().getItemId(), selectedParamOpcTreeNode.getData().getItemId());
+
+            // Устанавливаем в дерево opc обновленную id
+            selectedParamTreeNode.setType("NLSA");
+            selectedParamTreeNode.getData().setMyType("NLSA");
+            selectedParamOpcTreeNode.setType("NLOP");
+            selectedParamOpcTreeNode.getData().setMyType("NLOP");
+
+            // Устанавливаем в дерево opc обновленную id
+            String newId = selectedParamOpcTreeNode.getData().getItemId().replaceAll("OP\\d+$", "OP" + newOpcId);
+            selectedParamOpcTreeNode.getData().setItemId(newId);
+            selectedParamOpcTreeNode.getData().setMyId(newId);
+
+            PrimeFaces.current().executeScript("PF('paramTreeWidget').filter(); " +
+                    "PF('paramOpcTreeWidget').filter();");
+
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешный разрыв связи"));
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+        }
+
+        PrimeFaces.current().ajax().update("growl");
+    }
+
+    /**
+     * Обработчик выделения элементов деревьев в форме "Линкованные объекты / Параметры"
+     * @param event событие выделения
+     */
+    public void onSelectParamTree(NodeSelectEvent event) {
+        // Поскольку требуется выделить новую строку, но при этом нельзя запускать ajax,
+        //  то пришлось хитро делать выделение.
+        // В тихом режиме выключаю выделение по onstart в js.
+        // Запуская фильтрацию.
+        // Затем запуская js function для тихого выделения и перемещения scroll к выделенному объекту
+        //  (тоже хитро, что бы запустилось уже поле onComplete после filter()).
+
+        TreeData treeNodeData = (TreeData) event.getTreeNode().getData();
+        switch (treeNodeData.getTreeType()) {
+            case OPC:
+                if (event.getTreeNode().getType().equals("LOP")) {
+                    // find element in "om / km" tree then set expanded, select and scroll to select item
+                    logger.log(Level.INFO, "select linked parameter {0} and find linked aggregate in 'om/km' tree", treeNodeData);
+
+                    String omKmParam = linkerBean.findOmKmParam(selectedLinkedObjectId, treeNodeData.getItemId());
+
+                    if (omKmParam == null) {
+                        return;
+                    }
+
+                    TreeNode<TreeData> node = findNode(rootKmOmTree, omKmParam);
+
+                    if (node != null) {
+                        String rowKey = node.getRowKey();
+
+                        while (node != null) {
+                            node.setExpanded(true);
+                            node = node.getParent();
+                        }
+
+                        PrimeFaces.current().executeScript("PF('paramTreeWidget').filter();");
+
+                        PrimeFaces.Ajax ajax = PrimeFaces.current().ajax();
+                        ajax.addCallbackParam("command", "updateAfterSelectWrapper");
+                        ajax.addCallbackParam("widgetName", "paramTreeWidget");
+                        ajax.addCallbackParam("rowKey", rowKey);
+                    } else {
+                        // Бывает хитрый момент, когда связи нет в таблицы dz_par_dev_link, то надо писать сообщение
+                        PrimeFaces.current().ajax().update("growl");
+
+                        FacesContext.getCurrentInstance()
+                                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Свяжите параметр с устройством в паспорте объекта"));
+                    }
+                }
+                break;
+            case OM:
+            case KM:
+                if (event.getTreeNode().getType().equals("LSA")) {
+                    // find element in "opc" tree then set expanded, select and scroll to select item
+                    logger.log(Level.INFO, "select linked aggregate {0} and find linked parameter in 'opc' tree", treeNodeData);
+
+                    String opcParam = linkerBean.findOpcParam(selectedLinkedObjectId, treeNodeData.getItemId());
+
+                    if (opcParam == null) {
+                        return;
+                    }
+
+                    TreeNode<TreeData> node = findNode(rootOpcTree, opcParam);
+
+                    if (node != null) {
+                        String rowKey = node.getRowKey();
+
+                        while (node != null) {
+                            node.setExpanded(true);
+                            node = node.getParent();
+                        }
+
+                        PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').filter();");
+
+                        PrimeFaces.Ajax ajax = PrimeFaces.current().ajax();
+                        ajax.addCallbackParam("command", "updateAfterSelectWrapper");
+                        ajax.addCallbackParam("widgetName", "paramOpcTreeWidget");
+                        ajax.addCallbackParam("rowKey", rowKey);
+                    }
+                }
+                break;
+        }
+    }
+
+    /**
+     * Метод продолжение выделения элемента, что бы было в другом запросе и выполнилось уже после фильтрации
+     */
+    public void updateParamTreesWrapper() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+
+        PrimeFaces.Ajax ajax = PrimeFaces.current().ajax();
+        ajax.addCallbackParam("command", "updateAfterSelect");
+        ajax.addCallbackParam("widgetName", params.get("widgetName"));
+        ajax.addCallbackParam("rowKey", params.get("rowKey"));
+
+        // Устанавливаем выделенные node
+        String rowKey = params.get("rowKey");
+        String[] split = rowKey.split("_");
+        TreeNode<TreeData> node;
+        switch (params.get("widgetName")) {
+            case "paramOpcTreeWidget":
+                node = rootOpcTree;
+                for (String s: split) {
+                    node = node.getChildren().get(Integer.parseInt(s));
+                }
+                setSelectedParamOpcTreeNode(node);
+                break;
+            case "paramTreeWidget":
+                node = rootKmOmTree;
+                for (String s: split) {
+                    node = node.getChildren().get(Integer.parseInt(s));
+                }
+                setSelectedParamTreeNode(node);
+                break;
+        }
+    }
+
+    /**
+     * Поиск элемента в дереве по шаблону
+     * @param node элемент для начала поиска
+     * @param regex шаблон
+     * @return найденный элемент
+     */
+    private TreeNode<TreeData> findNode(TreeNode<TreeData> node, String regex) {
+        for (TreeNode<TreeData> child: node.getChildren()) {
+
+            if (child.isLeaf()) {
+                if (child.getData().getItemId().matches(regex)) {
+                    return child;
+                }
+            } else {
+                TreeNode<TreeData> result = findNode(child, regex);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Обработчик фильтрации дерева OM/KM по типу в форме "Линкованные объекты / Параметры"
+     * @param event событие изменение selectOneMenu
+     */
+    public void onParamTreeModelChange(ValueChangeEvent event) {
+        switch (Integer.parseInt(event.getNewValue().toString())) {
+            case 1:
+                filterParamTreeValue = "";
+                rootKmOmTree.getChildren().clear();
+                prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.KM), rootKmOmTree);
+                paramTreePanelHeader = "Конкретная модель";
+                break;
+            case 2:
+                filterParamTreeValue = "";
+                rootKmOmTree.getChildren().clear();
+                prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OM), rootKmOmTree);
+                paramTreePanelHeader = "Обобщенная модель";
+                break;
+        }
+    }
+
+    /**
+     * Обработчик фильтрации дерева OPC по типу в форме "Линкованные объекты / Параметры"
+     * @param event событие изменение selectOneMenu
+     */
+    public void onParamOpcTreeModelChange(ValueChangeEvent event) {
+        switch (Integer.parseInt(event.getNewValue().toString())) {
+            case 1:
+                filterParamOpcTreeValue = "";
+                rootOpcTree.getChildren().clear();
+                prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 2), rootOpcTree, null);
+                paramOpcTreePanelHeader = "Все параметры";
+                break;
+            case 2:
+                filterParamOpcTreeValue = "";
+                rootOpcTree.getChildren().clear();
+                prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 1), rootOpcTree, null);
+                paramOpcTreePanelHeader = "Линкованные параметры";
+                break;
+            case 3:
+                filterParamOpcTreeValue = "";
+                rootOpcTree.getChildren().clear();
+                prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 0), rootOpcTree, null);
+                paramOpcTreePanelHeader = "не линкованные параметры";
+                break;
+        }
+    }
+
+    /**
+     * Обработчик нажатия кнопки "Обновить" в форме "Линкованные объекты / Параметры"
+     */
+    public void refreshParamOpcTree() {
+        rootOpcTree.getChildren().forEach(node -> linkerBean.readOpcParams(node.getData().getName()));
+
+        filterParamOpcTreeValue = "";
+        rootOpcTree.getChildren().clear();
+        prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 2), rootOpcTree, null);
+        paramOpcTreePanelHeader = "Все параметры";
+    }
+
+    /**
+     * Обработчки нажатия кнопки "Запросить параметры" в форме "Линкованные объекты / Параметры"
+     */
+    public void requestOpcParam() {
+        boolean update = false;
+        List<String> errorList = new ArrayList<>();
+        List<Future<Void>> requests = new ArrayList<>();
+
+        for (TreeNode<TreeData> node: rootOpcTree.getChildren()) {
+            try {
+                requests.add(linkerBean.requestOpcParams(node.getData().getName()));
+                update = true;
+            } catch (SystemParamException e) {
+                errorList.add(e.getMessage());
+            }
+        }
+
+        for (Future<Void> future: requests) {
+            try {
+                future.get(1, TimeUnit.MINUTES);
+            } catch (InterruptedException | TimeoutException e) {
+                errorList.add("Внутренняя ошибка сервера");
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof SystemParamException) {
+                    SystemParamException cause = (SystemParamException) e.getCause();
+                    errorList.add(cause.getMessage());
+                } else {
+                    errorList.add("Внутренняя ошибка сервера");
+                }
+            }
+        }
+
+        if (!errorList.isEmpty()) {
+            PrimeFaces.current().ajax().update("growl");
+
+            errorList.forEach(error -> FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", error)));
+        }
+
+        if (update) {
+            filterParamOpcTreeValue = "";
+            rootOpcTree.getChildren().clear();
+            prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 2), rootOpcTree, null);
+            paramOpcTreePanelHeader = "Все параметры";
+
+            PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').filter(); " +
+                    "unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false); " +
+                    "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
+            PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader",
+                    "linkerForm:linkerTabView:objectTabView:filterParamOpcTree");
+        }
+    }
+
+    /**
      * Обработчик выбора элемента дерева в закладке "Линкованные объекты / Вычислимые параметры"
      * @param event событие выделения
      */
     public void onCalcTreeNodeSelect(NodeSelectEvent event) {
-        List<String> types = Arrays.asList("LSA", "NLBOP");
+        List<String> types = Arrays.asList("LSA", "NLBOP", "NLSA");
         if (event.getTreeNode().isLeaf() && types.contains(event.getTreeNode().getType())) {
             logger.log(Level.INFO, "select tree node item {0}", event.getTreeNode());
 
             try {
-                SystemParam systemParam = ((TreeData) event.getTreeNode().getData()).getParam();
+                SystemParam systemParam = ((TreeData) event.getTreeNode().getData()).getSystemParam();
 
                 calcDataTableList = linkerBean.getCalcParamTable(selectedLinkedObjectId, systemParam.getId(), systemParam.getAgrId());
             } catch (ParseException e) {
@@ -264,11 +742,11 @@ public class LinkerController implements Serializable {
         logger.log(Level.INFO, "remove calc param link for object {0}, param {1}", new Object[]{selectedLinkedObjectId, selectedCalcTreeNode});
 
         try {
-            SystemParam systemParam = selectedCalcTreeNode.getData().getParam();
+            SystemParam systemParam = selectedCalcTreeNode.getData().getSystemParam();
 
             linkerBean.unlinkCalcParam(selectedLinkedObjectId, systemParam.getId(), systemParam.getAgrId());
 
-            selectedCalcTreeNode.setType("NLBOP");
+            selectedCalcTreeNode.setType("NLSA");
         } catch (ParseException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера"));
@@ -285,7 +763,7 @@ public class LinkerController implements Serializable {
         logger.log(Level.INFO, "create calc param link for object {0}, param {1}", new Object[]{selectedLinkedObjectId, selectedCalcTreeNode});
 
         try {
-            SystemParam systemParam = selectedCalcTreeNode.getData().getParam();
+            SystemParam systemParam = selectedCalcTreeNode.getData().getSystemParam();
 
             linkerBean.linkCalcParam(selectedLinkedObjectId, systemParam.getId(), systemParam.getAgrId());
 
@@ -477,7 +955,7 @@ public class LinkerController implements Serializable {
         logger.log(Level.INFO, "Change subscribe {0}", data);
 
         try {
-            linkerBean.subscribe(data);
+            linkerBean.subscribe(data, utilMB.getLogin());
         } catch (SystemParamException e) {
             data.setSubscribed(!data.isSubscribed());
 
@@ -519,8 +997,14 @@ public class LinkerController implements Serializable {
     }
 
     public boolean isEnableCalcLinksBtn() {
-        if (selectedCalcTreeNode != null) {
-            return selectedCalcTreeNode.getType().equals("NLBOP");
+        if ((selectedCalcTreeNode != null) && !calcDataTableList.isEmpty()) {
+            for (CalcDataTable entry: calcDataTableList) {
+                if (entry.getColor() == 0) {
+                    return false;
+                }
+            }
+
+            return selectedCalcTreeNode.getType().equals("NLSA");
         } else {
             return false;
         }
@@ -554,8 +1038,8 @@ public class LinkerController implements Serializable {
         this.selectedOpcObjectsForLink = selectedOpcObjectsForLink;
     }
 
-    public TreeNode<TreeData> getRoot() {
-        return root;
+    public TreeNode<TreeData> getRootCalcTree() {
+        return rootCalcTree;
     }
 
     public TreeNode<TreeData> getSelectedCalcTreeNode() {
@@ -576,5 +1060,57 @@ public class LinkerController implements Serializable {
 
     public List<CalcDataTable> getCalcDataTableList() {
         return calcDataTableList;
+    }
+
+    public TreeNode<TreeData> getRootKmOmTree() {
+        return rootKmOmTree;
+    }
+
+    public String getFilterParamTreeValue() {
+        return filterParamTreeValue;
+    }
+
+    public void setFilterParamTreeValue(String filterParamTreeValue) {
+        this.filterParamTreeValue = filterParamTreeValue;
+    }
+
+    public TreeNode<TreeData> getSelectedParamTreeNode() {
+        System.out.println("get param tree " + selectedParamTreeNode);
+        return selectedParamTreeNode;
+    }
+
+    public void setSelectedParamTreeNode(TreeNode<TreeData> selectedParamTreeNode) {
+        System.out.println("set param tree " + selectedParamTreeNode);
+        this.selectedParamTreeNode = selectedParamTreeNode;
+    }
+
+    public String getFilterParamOpcTreeValue() {
+        return filterParamOpcTreeValue;
+    }
+
+    public void setFilterParamOpcTreeValue(String filterParamOpcTreeValue) {
+        this.filterParamOpcTreeValue = filterParamOpcTreeValue;
+    }
+
+    public TreeNode<TreeData> getSelectedParamOpcTreeNode() {
+        System.out.println("get param opc tree " + selectedParamOpcTreeNode);
+        return selectedParamOpcTreeNode;
+    }
+
+    public void setSelectedParamOpcTreeNode(TreeNode<TreeData> selectedParamOpcTreeNode) {
+        System.out.println("set param opc tree " + selectedParamOpcTreeNode);
+        this.selectedParamOpcTreeNode = selectedParamOpcTreeNode;
+    }
+
+    public TreeNode<TreeData> getRootOpcTree() {
+        return rootOpcTree;
+    }
+
+    public String getParamTreePanelHeader() {
+        return paramTreePanelHeader;
+    }
+
+    public String getParamOpcTreePanelHeader() {
+        return paramOpcTreePanelHeader;
     }
 }
