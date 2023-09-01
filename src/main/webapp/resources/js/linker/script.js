@@ -1,55 +1,45 @@
-// Функции для скрытия окошек по кнопкам "Пересчет" и "Фильтр" в случае нажатия не в окошко или в кнопку
-document.addEventListener('click', (event) => {
-    const withinBoundaries = event.composedPath().includes(document.querySelector('#filterForm'))
-        || event.composedPath().includes(document.querySelector('#filterForm\\:filterSelectOneMenu_panel'));
-    const filterButton = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:filterBtn'));
-
-    if (!withinBoundaries && !filterButton) {
-        hide('filterForm');
-    }
-
-    const withinBoundariesRecount = event.composedPath().includes(document.querySelector('#recountForm'));
-    const recountBtn = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:recountBtn'));
-
-    if (!withinBoundariesRecount && !recountBtn) {
-        hide('recountForm');
-    }
-
-    const withinBoundariesFilterParamTree = event.composedPath().includes(document.querySelector('#filterParamTreeForm'))
-        || event.composedPath().includes(document.querySelector('#filterParamTreeForm\\:filterParamTreeSelectOneMenu_panel'));
-    const filterParamTreeButton = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:filterParamTreeBtn'));
-
-    if (!withinBoundariesFilterParamTree && !filterParamTreeButton) {
-        hide('filterParamTreeForm');
-    }
-
-    const withinBoundariesFilterParamOpcTree = event.composedPath().includes(document.querySelector('#filterParamOpcTreeForm'))
-        || event.composedPath().includes(document.querySelector('#filterParamOpcTreeForm\\:filterParamOpcTreeSelectOneMenu_panel'));
-    const filterParamOpcTreeButton = event.composedPath().includes(document.querySelector('#linkerForm\\:linkerTabView\\:objectTabView\\:filterParamOpcTreeBtn'));
-
-    if (!withinBoundariesFilterParamOpcTree && !filterParamOpcTreeButton) {
-        hide('filterParamOpcTreeForm');
-    }
-})
-
-// Изменения видимости для переданного элемента, используется для отображения и закрытия окошке по кнопкам "Пересчет" и "Фильтр"
-function changeVisible(id) {
+/**
+ * Изменение видимости для переданного элемента, используется для отображения и закрытия окошек около кнопок
+ * @param id окна
+ * @param args для инициализации, id элементов нажатие на которых является нажатием на окно
+ *             (что бы оно закрывалось при нажатии вне окна)
+ */
+function changeVisible(id, ...args) {
     const display = document.getElementById(id).style.display
     switch (display) {
         case 'block':
+            $(document.body).off('click.' + id);
+
             document.getElementById(id).style.display = 'none';
             break;
         case 'none':
+            $(document.body).on('click.' + id, (event) => {
+                if (event.originalEvent !== undefined) {
+                    let checkClick = event.originalEvent.composedPath().includes(document.querySelector('#' + id));
+
+                    for (const arg of args) {
+                        checkClick = checkClick || event.originalEvent.composedPath().includes(document.querySelector('#' + arg.replaceAll(':', '\\:')));
+                    }
+
+                    if (!checkClick) {
+                        changeVisible(id);
+                    }
+                }
+            });
+
             document.getElementById(id).style.display = 'block';
             break;
     }
 }
 
-// Скрытие элемента если он отображается по его id
-function hide(id) {
-    if (document.getElementById(id).style.display === 'block') {
-        document.getElementById(id).style.display = 'none';
-    }
+/**
+ * Функция изменения свойства стиля для элемента
+ * @param id элемента
+ * @param name имя свойства
+ * @param value значение свойства
+ */
+function changeStyle(id, name, value) {
+    document.getElementById(id).style.setProperty(name, value);
 }
 
 // Если в таблице нет строк и включена группировка строк, то там глюк на одну колонку

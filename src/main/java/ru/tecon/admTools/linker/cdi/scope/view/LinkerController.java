@@ -9,6 +9,9 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.MenuModel;
 import org.primefaces.util.LangUtils;
 import ru.tecon.admTools.linker.cdi.converter.LinkedDataConverter;
 import ru.tecon.admTools.linker.cdi.converter.OpcObjectForLinkDataConverter;
@@ -95,6 +98,10 @@ public class LinkerController implements Serializable {
     private String filterParamOpcTreeValue = "";
     private String paramOpcTreePanelHeader = "Все параметры";
 
+
+    private MenuModel redirectMenu;
+
+
     @Inject
     private ObjectTypeController objectTypeController;
 
@@ -118,6 +125,20 @@ public class LinkerController implements Serializable {
         selectedObjectType = objectTypeController.getDefaultObjectType();
 
         PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);");
+
+        // Загрузка данных для redirect (Источники данных)
+        redirectMenu = new DefaultMenuModel();
+
+        for (Map.Entry<String, String> entry: linkerBean.getRedirect().entrySet()) {
+            DefaultMenuItem menuItem = DefaultMenuItem.builder()
+                    .value(entry.getKey())
+                    .url(entry.getValue())
+                    .target("_blank")
+                    .icon("pi pi-external-link")
+                    .onclick("changeVisible('redirectForm')")
+                    .build();
+            redirectMenu.getElements().add(menuItem);
+        }
     }
 
     /**
@@ -274,8 +295,9 @@ public class LinkerController implements Serializable {
 
     /**
      * Создание дерева на основе плоского списка данных
+     *
      * @param treeData плоский список данных
-     * @param root корневой элемент дерева
+     * @param root     корневой элемент дерева
      */
     private void prepareTree(List<TreeData> treeData, TreeNode<TreeData> root) {
         prepareTree(treeData, root, "S");
@@ -283,8 +305,9 @@ public class LinkerController implements Serializable {
 
     /**
      * Создание дерева на основе плоского списка данных с указанием идентификатора корневого элемента
-     * @param treeData плоский список данных
-     * @param root корневой элемент дерева
+     *
+     * @param treeData   плоский список данных
+     * @param root       корневой элемент дерева
      * @param rootPrefix идентификатор корневого элемента
      */
     private void prepareTree(List<TreeData> treeData, TreeNode<TreeData> root, String rootPrefix) {
@@ -309,6 +332,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Сортировка дерева по имени
+     *
      * @param treeNode узел дерева для сортировки вниз
      */
     private void sortTree(TreeNode<TreeData> treeNode) {
@@ -326,9 +350,10 @@ public class LinkerController implements Serializable {
 
     /**
      * Фильтр дерева в закладке "Линкованные объекты / Вычислимые параметры" и "Линкованные объекты / Параметры"
+     *
      * @param treeNode дерево
-     * @param ignore фильтр (не используется)
-     * @param locale locale
+     * @param ignore   фильтр (не используется)
+     * @param locale   locale
      * @return true если проходит фильтрацию
      */
     public boolean customFilter(TreeNode<TreeData> treeNode, Object ignore, Locale locale) {
@@ -361,6 +386,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Обработчик события drop в деревья на форме "Линкованные объекты / Параметры"
+     *
      * @param info событие dragAndDrop
      * @return возвращает разрешен ли dragAndDrop
      */
@@ -393,12 +419,13 @@ public class LinkerController implements Serializable {
 
     /**
      * Линковка двух элементов дерева в форме "Линкованные объекты / Параметры"
+     *
      * @param node1 элемент дерева KM/OM
      * @param node2 эелемент дерева OPC
      */
     private void linkParam(TreeNode<?> node1, TreeNode<?> node2) {
-        TreeData node1Data =(TreeData) node1.getData();
-        TreeData node2Data =(TreeData) node2.getData();
+        TreeData node1Data = (TreeData) node1.getData();
+        TreeData node2Data = (TreeData) node2.getData();
 
         try {
             String newOpcId = linkerBean.linkParam(selectedLinkedObjectId, node1Data.getItemId(), node2Data.getItemId());
@@ -463,6 +490,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Обработчик выделения элементов деревьев в форме "Линкованные объекты / Параметры"
+     *
      * @param event событие выделения
      */
     public void onSelectParamTree(NodeSelectEvent event) {
@@ -580,7 +608,8 @@ public class LinkerController implements Serializable {
 
     /**
      * Поиск элемента в дереве по шаблону
-     * @param node элемент для начала поиска
+     *
+     * @param node  элемент для начала поиска
      * @param regex шаблон
      * @return найденный элемент
      */
@@ -603,6 +632,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Обработчик фильтрации дерева OM/KM по типу в форме "Линкованные объекты / Параметры"
+     *
      * @param event событие изменение selectOneMenu
      */
     public void onParamTreeModelChange(ValueChangeEvent event) {
@@ -624,6 +654,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Обработчик фильтрации дерева OPC по типу в форме "Линкованные объекты / Параметры"
+     *
      * @param event событие изменение selectOneMenu
      */
     public void onParamOpcTreeModelChange(ValueChangeEvent event) {
@@ -716,6 +747,7 @@ public class LinkerController implements Serializable {
 
     /**
      * Обработчик выбора элемента дерева в закладке "Линкованные объекты / Вычислимые параметры"
+     *
      * @param event событие выделения
      */
     public void onCalcTreeNodeSelect(NodeSelectEvent event) {
@@ -1112,5 +1144,9 @@ public class LinkerController implements Serializable {
 
     public String getParamOpcTreePanelHeader() {
         return paramOpcTreePanelHeader;
+    }
+
+    public MenuModel getRedirectMenu() {
+        return redirectMenu;
     }
 }

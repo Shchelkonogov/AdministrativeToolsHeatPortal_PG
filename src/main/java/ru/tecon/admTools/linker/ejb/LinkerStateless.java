@@ -10,7 +10,9 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,6 +52,7 @@ public class LinkerStateless {
     private final static String PROCEDURE_UNLINK_PARAM = "call lnk_0001t.unlink_param(?, ?, ?, ?);";
     private final static String PROCEDURE_READ_OPC_PARAM = "call lnk_0001t.read_tsa_param(?)";
     private final static String FUNCTION_REQUEST_OPC_PARAM = "select * from lnk_0001t.get_opc_param_list(?)";
+    private final static String SELECT_REDIRECT = "select * from admin.opc_servers;";
 
     @Inject
     private Logger logger;
@@ -61,7 +64,7 @@ public class LinkerStateless {
      * Загрузка линкованных данных, закладка "Линкованные объекты / Объекты"
      *
      * @param objectType тип объекта
-     * @param user пользователь
+     * @param user       пользователь
      * @return коллекция данных
      */
     public List<LinkedData> getLinkedData(int objectType, String user) {
@@ -116,7 +119,7 @@ public class LinkerStateless {
      * Изменить перерасчет на объекте.
      *
      * @param linkedData объект для изменения перерасчета
-     * @param type тип перерасчета
+     * @param type       тип перерасчета
      * @return в случае удачи, передается успешное сообщение
      * @throws SystemParamException ошибка выполнения обновления
      */
@@ -159,7 +162,7 @@ public class LinkerStateless {
      * Изменения подписи для объекта
      *
      * @param linkedData объект для изменения подписи
-     * @param user пользователь
+     * @param user       пользователь
      * @throws SystemParamException ошибка выполнения обновления
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -204,8 +207,8 @@ public class LinkerStateless {
      * Удаления линквоки
      *
      * @param linkedData объект для разрыва связи
-     * @param login пользователь
-     * @param ip ip с которого обратился пользователь
+     * @param login      пользователь
+     * @param ip         ip с которого обратился пользователь
      * @throws SystemParamException ошибка выполнения удаления
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -229,8 +232,8 @@ public class LinkerStateless {
      * Удаления всех линковок
      *
      * @param linkedData объект для разрыва всех связей
-     * @param login пользователь
-     * @param ip ip с которого обратился пользователь
+     * @param login      пользователь
+     * @param ip         ip с которого обратился пользователь
      * @throws SystemParamException ошибка выполнения удаления
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -275,10 +278,10 @@ public class LinkerStateless {
     /**
      * Добавления связи для объекта системы
      *
-     * @param linkedData объект системы к которому надо добавить связь
+     * @param linkedData  объект системы к которому надо добавить связь
      * @param newLinkData объект автоматизации который надо добавить
-     * @param login пользователь
-     * @param ip ip с которого обратился пользователь
+     * @param login       пользователь
+     * @param ip          ip с которого обратился пользователь
      * @throws SystemParamException ошибка выполнения обновления
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -301,6 +304,7 @@ public class LinkerStateless {
 
     /**
      * Получение полного имени объекта
+     *
      * @param id id объекта
      * @return имя объекта
      */
@@ -323,8 +327,9 @@ public class LinkerStateless {
 
     /**
      * Получение дынных для деревьев {@link TreeType}
-     * @param id id объекта
-     * @param type тип дерева
+     *
+     * @param id              id объекта
+     * @param type            тип дерева
      * @param opcTreeLinkType тип параметров для OPC дерева
      * @return список данных для дерева
      */
@@ -369,7 +374,8 @@ public class LinkerStateless {
 
     /**
      * Получение дынных для деревьев {@link TreeType}
-     * @param id id объекта
+     *
+     * @param id   id объекта
      * @param type тип дерева
      * @return список данных для дерева
      */
@@ -379,7 +385,8 @@ public class LinkerStateless {
 
     /**
      * Поиск слинкованного параметра в OM/KM дереве для формы "Линкованные объекты / Параметры"
-     * @param id id объекта
+     *
+     * @param id   id объекта
      * @param myId id выделенного элемента в OPC дереве
      * @return id элемента в OM/KM дереве
      */
@@ -389,7 +396,8 @@ public class LinkerStateless {
 
     /**
      * Поиск слинкованного параметра в OPC дереве для формы "Линкованные объекты / Параметры"
-     * @param id id объекта
+     *
+     * @param id   id объекта
      * @param myId id выделенного элемента в OM/KM дереве
      * @return id элемента в OPC дереве
      */
@@ -429,8 +437,9 @@ public class LinkerStateless {
 
     /**
      * Получение данных для таблицы в закладке "Линкованные объекты / Вычислимые параметры"
-     * @param objId id объекта
-     * @param paramId id параметра
+     *
+     * @param objId     id объекта
+     * @param paramId   id параметра
      * @param statAgrId id статистического агрегата параметра
      * @return данные для таблицы
      */
@@ -456,8 +465,9 @@ public class LinkerStateless {
 
     /**
      * Создает связь для параметра в закладке "Линкованные объекты / Вычислимые параметры"
-     * @param objectId id объекта
-     * @param paramId id параметра
+     *
+     * @param objectId  id объекта
+     * @param paramId   id параметра
      * @param statAgrId id статистического агрегата
      * @throws SystemParamException ошибка создания связи
      */
@@ -467,8 +477,9 @@ public class LinkerStateless {
 
     /**
      * Удаляет связь для параметра в закладке "Линкованные объекты / Вычислимые параметры"
-     * @param objectId id объекта
-     * @param paramId id параметра
+     *
+     * @param objectId  id объекта
+     * @param paramId   id параметра
      * @param statAgrId id статистического агрегата
      * @throws SystemParamException ошибка удаления связи
      */
@@ -502,8 +513,9 @@ public class LinkerStateless {
 
     /**
      * Создает связь для параметра в закладке "Линкованные объекты / Параметры"
-     * @param objectId id объекта
-     * @param paramId id параметра
+     *
+     * @param objectId   id объекта
+     * @param paramId    id параметра
      * @param opcParamId id opc параметра
      * @return новая id для opc параметра
      * @throws SystemParamException ошибка создания связи
@@ -514,8 +526,9 @@ public class LinkerStateless {
 
     /**
      * Удаляет связь для параметра в закладке "Линкованные объекты / Параметры"
-     * @param objectId id объекта
-     * @param paramId id параметра
+     *
+     * @param objectId   id объекта
+     * @param paramId    id параметра
      * @param opcParamId id opc параметра
      * @return новая id для opc параметра
      * @throws SystemParamException ошибка удаления связи
@@ -553,6 +566,7 @@ public class LinkerStateless {
 
     /**
      * Метод обновляет параметры для opc дерева в базе
+     *
      * @param opcObjectName имя opc объекта
      */
     public void readOpcParams(String opcObjectName) {
@@ -568,6 +582,7 @@ public class LinkerStateless {
 
     /**
      * Метод отправляет запрос opc серверу для запроса параметров
+     *
      * @param opcObjectName имя opc объекта
      * @return null
      * @throws SystemParamException если ошибка выполнения запроса
@@ -586,5 +601,24 @@ public class LinkerStateless {
             logger.log(Level.WARNING, "Error read opc params", ex);
         }
         return null;
+    }
+
+    /**
+     * Получение map источников данных
+     *
+     * @return map с данными
+     */
+    public Map<String, String> getRedirect() {
+        Map<String, String> result = new HashMap<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_REDIRECT)) {
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.put(res.getString(1), res.getString(2));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 }

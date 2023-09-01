@@ -9,6 +9,7 @@
 <h:head>
     <h:outputStylesheet name="linker/style.css" library="css"/>
     <h:outputStylesheet name="system/style.css" library="css"/>
+    <h:outputStylesheet name="primeflex/3.3.1/primeflex.min.css" library="webjars"/>
     <h:outputScript name="linker/script.js" library="js"/>
 </h:head>
 <h:body>
@@ -97,8 +98,9 @@
 
                                     <p:column id="test" headerText="Объекты системы" width="300" groupRow="true"
                                               filterBy="#{link.dbObject.name}" filterMatchMode="contains">
-                                                <p:outputLabel id="systemObjectName" value="#{link.dbObject.name}"
-                                                               ondblclick="PF('linkedDataTableWidget').selectRow(#{rowIndex}, false); PF('createMaskDialogWidget').show();"/>
+                                        <p:outputLabel id="systemObjectName" value="#{link.dbObject.name}"
+                                                       ondblclick="PF('linkedDataTableWidget').selectRow(#{rowIndex}, false); PF('createMaskDialogWidget').show();"/>
+
                                         <f:facet name="filter">
                                             <p:inputText placeholder="Поиск..." style="width: 100%"
                                                          onkeyup="PF('linkedDataTableWidget').filter();"/>
@@ -116,8 +118,14 @@
                                                          onkeyup="PF('linkedDataTableWidget').filter();"/>
                                         </f:facet>
                                     </p:column>
-                                    <p:column headerText="Сервер" width="200">
+                                    <p:column headerText="Сервер" width="200"
+                                              filterBy="#{link.serverName}" filterMatchMode="contains">
                                         <h:outputText value="#{link.serverName}"/>
+
+                                        <f:facet name="filter">
+                                            <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                                         onkeyup="PF('linkedDataTableWidget').filter();"/>
+                                        </f:facet>
                                     </p:column>
                                     <p:column headerText="Подписан" width="70" styleClass="center"
                                               filterBy="#{link.subscribed}" filterMatchMode="exact">
@@ -183,14 +191,20 @@
                                                    onclick="PF('createMaskDialogWidget').show();">
                                         <h:outputText styleClass="ui-icon pi pi-book"/>
                                     </p:commandLink>
+                                    <p:commandLink id="redirectBtn_1" title="Источники данных" process="@this"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   onclick="changeStyle('redirectForm', 'right', '70px');
+                                                            changeVisible('redirectForm', 'linkerForm:linkerTabView:objectTabView:redirectBtn_1');">
+                                        <h:outputText styleClass="ui-icon pi pi-sitemap -rotate-90"/>
+                                    </p:commandLink>
                                     <p:commandLink id="recountBtn" title="пересчет" disabled="#{linkerController.disableLinksBtn}"
                                                    styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
-                                                   onclick="changeVisible('recountForm');">
+                                                   onclick="changeVisible('recountForm', 'linkerForm:linkerTabView:objectTabView:recountBtn');">
                                         <h:outputText styleClass="ui-icon pi pi-calculator"/>
                                     </p:commandLink>
-                                    <p:commandLink id="filterBtn" title="фильтр"
+                                    <p:commandLink id="filterBtn" title="фильтр" process="@this"
                                                    styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
-                                                   onclick="changeVisible('filterForm');">
+                                                   onclick="changeVisible('filterForm', 'filterForm:filterSelectOneMenu_panel', 'linkerForm:linkerTabView:objectTabView:filterBtn');">
                                         <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
                                     </p:commandLink>
                                 </div>
@@ -270,7 +284,10 @@
                                         <div style="display: flex;">
                                             <p:commandLink id="filterParamTreeBtn" title="фильтр"
                                                            styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
-                                                           onclick="changeVisible('filterParamTreeForm');" process="@this">
+                                                           onclick="changeVisible('filterParamTreeForm',
+                                                                        'filterParamTreeForm:filterParamTreeSelectOneMenu_panel',
+                                                                        'linkerForm:linkerTabView:objectTabView:filterParamTreeBtn');"
+                                                           process="@this">
                                                 <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
                                             </p:commandLink>
                                         </div>
@@ -350,7 +367,10 @@
                                             </p:commandLink>
                                             <p:commandLink id="filterParamOpcTreeBtn" title="фильтр"
                                                            styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
-                                                           onclick="changeVisible('filterParamOpcTreeForm');" process="@this">
+                                                           onclick="changeVisible('filterParamOpcTreeForm',
+                                                                                    'filterParamOpcTreeForm:filterParamOpcTreeSelectOneMenu_panel',
+                                                                                    'linkerForm:linkerTabView:objectTabView:filterParamOpcTreeBtn');"
+                                                           process="@this">
                                                 <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
                                             </p:commandLink>
                                         </div>
@@ -360,6 +380,12 @@
 
                             <f:facet name="actions">
                                 <div style="display: flex;">
+                                    <p:commandLink id="redirectBtn_2" title="Источники данных" process="@this"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   onclick="changeStyle('redirectForm', 'right', '45px');
+                                                            changeVisible('redirectForm', 'linkerForm:linkerTabView:objectTabView:redirectBtn_2');">
+                                        <h:outputText styleClass="ui-icon pi pi-sitemap -rotate-90"/>
+                                    </p:commandLink>
                                     <p:commandLink id="requestOpcParamBtn" title="Запросить параметры"
                                                    styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                                                    action="#{linkerController.requestOpcParam}" process="@this" global="false"
@@ -469,6 +495,13 @@
                                                    action="#{linkerController.createCalcLink()}">
                                         <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
                                     </p:commandLink>
+                                    <p:divider layout="vertical" style="padding: 0.6rem 0; margin: 0 0.5rem;"/>
+                                    <p:commandLink id="redirectBtn_3" title="Источники данных" process="@this"
+                                                   styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                   onclick="changeStyle('redirectForm', 'right', '20px');
+                                                            changeVisible('redirectForm', 'linkerForm:linkerTabView:objectTabView:redirectBtn_3');">
+                                        <h:outputText styleClass="ui-icon pi pi-sitemap -rotate-90"/>
+                                    </p:commandLink>
                                 </div>
                             </f:facet>
                         </p:panel>
@@ -478,7 +511,7 @@
         </p:tabView>
     </h:form>
 
-    <h:form id="filterForm" style="display: none;">
+    <h:form id="filterForm" style="display: none; top: 66px; right: 23px;" styleClass="popupPanel">
         <p:panel id="filterPanel" styleClass="tc-panel">
             <f:facet name="header">
                     <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
@@ -489,7 +522,7 @@
                 <p:outputLabel value="Тип Объекта" style="margin-right: 5px; font-weight: bold;"/>
                 <p:selectOneMenu value="#{linkerController.selectedObjectType}" id="filterSelectOneMenu" style="width: 280px;">
                     <p:ajax listener="#{linkerController.onObjectTypeChange}" global="false"
-                            onstart="PF('statusDialog').show(); hide('filterForm');"
+                            onstart="PF('statusDialog').show(); changeVisible('filterForm');"
                             oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').clearFilters();
                                 PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
                             update="linkerForm:linkerTabView:objectTabView:linkedDataPanelHeader
@@ -505,7 +538,7 @@
         </p:panel>
     </h:form>
 
-    <h:form id="filterParamTreeForm" style="display: none;">
+    <h:form id="filterParamTreeForm" style="display: none; top: 104px; right: 61.2%;" styleClass="popupPanel">
         <p:panel id="filterParamTreePanel" styleClass="tc-panel">
             <f:facet name="header">
                 <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
@@ -518,7 +551,7 @@
                                  valueChangeListener="#{linkerController.onParamTreeModelChange}">
 
                     <p:ajax global="false"
-                            onstart="PF('statusDialog').show(); hide('filterParamTreeForm');"
+                            onstart="PF('statusDialog').show(); changeVisible('filterParamTreeForm');"
                             oncomplete="PF('statusDialog').hide(); PF('paramTreeWidget').filter();
                                 unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
                             update="linkerForm:linkerTabView:objectTabView:paramTreePanelHeader
@@ -531,7 +564,7 @@
         </p:panel>
     </h:form>
 
-    <h:form id="filterParamOpcTreeForm" style="display: none;">
+    <h:form id="filterParamOpcTreeForm" style="display: none; top: 104px; right: 28px;" styleClass="popupPanel">
         <p:panel id="filterParamOpcTreePanel" styleClass="tc-panel">
             <f:facet name="header">
                 <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
@@ -544,7 +577,7 @@
                                  valueChangeListener="#{linkerController.onParamOpcTreeModelChange}">
 
                     <p:ajax global="false"
-                            onstart="PF('statusDialog').show(); hide('filterParamOpcTreeForm');"
+                            onstart="PF('statusDialog').show(); changeVisible('filterParamOpcTreeForm');"
                             oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
                                 unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
                             update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
@@ -558,7 +591,7 @@
         </p:panel>
     </h:form>
 
-    <h:form id="recountForm" style="display: none;">
+    <h:form id="recountForm" style="display: none; top: 66px; right: 48px;" styleClass="popupPanel">
         <p:panel id="recountPanel" styleClass="tc-panel">
             <f:facet name="header">
                 <span class="ui-icon pi pi-calculator" style="margin-right: 5px;" />
@@ -569,21 +602,34 @@
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['PRESSURE']}"
                                          itemLabel="Пересчет давления" style="margin-bottom: 5px;">
                     <p:ajax listener="#{linkerController.recount('PRESSURE')}"
-                            onstart="hide('recountForm');"
+                            onstart="changeVisible('recountForm');"
                             update="growl"/>
                 </p:selectBooleanCheckbox>
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['TIME']}"
                                          itemLabel="Пересчет времени" style="margin-bottom: 5px;">
                     <p:ajax listener="#{linkerController.recount('TIME')}"
-                            onstart="hide('recountForm');"
+                            onstart="changeVisible('recountForm');"
                             update="growl"/>
                 </p:selectBooleanCheckbox>
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['RESISTANCE']}"
                                          itemLabel="Пересчет сопротивления">
                     <p:ajax listener="#{linkerController.recount('RESISTANCE')}"
-                            onstart="hide('recountForm');"
+                            onstart="changeVisible('recountForm');"
                             update="growl"/>
                 </p:selectBooleanCheckbox>
+            </div>
+        </p:panel>
+    </h:form>
+
+    <h:form id="redirectForm" style="display: none; top: 66px;" styleClass="popupPanel">
+        <p:panel id="redirectPanel" styleClass="tc-panel">
+            <f:facet name="header">
+                <span class="ui-icon pi pi-sitemap -rotate-90" style="margin-right: 5px;" />
+                <h:outputText value="Источники данных" />
+            </f:facet>
+
+            <div style="margin: 3px; display: flex; flex-direction: column;">
+                <p:menu model="#{linkerController.redirectMenu}" style="border: 0;"/>
             </div>
         </p:panel>
     </h:form>
