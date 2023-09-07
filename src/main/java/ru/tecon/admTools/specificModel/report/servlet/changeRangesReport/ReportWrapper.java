@@ -22,7 +22,7 @@ class ReportWrapper {
     static void report(HttpServletRequest req, HttpServletResponse resp,
                        CheckUserSB checkBean, ChangeRangesLocal bean,
                        boolean eco) throws UnsupportedEncodingException {
-        String user = checkBean.getUser(req.getParameter("sessionID"));
+        String user = checkBean.getUser(req.getParameter("sessionId"));
         if (user != null) {
             int objectType = Integer.parseInt(req.getParameter("objectType"));
             String date = req.getParameter("date");

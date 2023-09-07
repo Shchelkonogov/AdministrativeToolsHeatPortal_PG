@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * Servlet для запроса отчета "Контроль режима".
  * URL запуска:
  * http://{host}:{port}/admTools/specificModel/report/modeControl?
- *     structID={structID}&paramID={paramID}&objectType={objectType}&sessionID={sessionID}
+ *     structId={structId}&paramId={paramId}&objectType={objectType}&sessionId={sessionId}
  */
 @WebServlet("/specificModel/report/modeControl")
 public class ModeControlReport extends HttpServlet {
@@ -40,15 +40,15 @@ public class ModeControlReport extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("objectType") &&
-                parameterMap.containsKey("structID") && parameterMap.containsKey("paramID")) {
-            String user = checkBean.getUser(req.getParameter("sessionID"));
+        if (parameterMap.containsKey("sessionId") && parameterMap.containsKey("objectType") &&
+                parameterMap.containsKey("structId") && parameterMap.containsKey("paramId")) {
+            String user = checkBean.getUser(req.getParameter("sessionId"));
             try (OutputStream output = resp.getOutputStream()) {
                 int objectType = Integer.parseInt(req.getParameter("objectType"));
-                int structID = Integer.parseInt(req.getParameter("structID"));
-                int paramID = Integer.parseInt(req.getParameter("paramID"));
+                int structID = Integer.parseInt(req.getParameter("structId"));
+                int paramID = Integer.parseInt(req.getParameter("paramId"));
 
-                if (checkBean.checkSession(req.getParameter("sessionID"))) {
+                if (checkBean.checkSession(req.getParameter("sessionId"))) {
 
                     resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
                     resp.setHeader("Content-Disposition", "attachment; filename=\"" +

@@ -15,7 +15,7 @@ import java.io.IOException;
  * Servlet для запроса отчета "Отчет по изменению тех границ" для конкретной модели экомониторинга.
  * URL запуска:
  * http://{host}:{port}/admTools/ecoSpecificModel/report/technicalLimitsChangeReport?
- *     id={("S" + structID) || ("O" + objectID)}&objectType={objectType}&date={dd.mm.yyyy}&sessionID={sessionID}
+ *     id={("S" + structId) || ("O" + objectId)}&objectType={objectType}&date={dd.mm.yyyy}&sessionId={sessionId}
  */
 @WebServlet("/ecoSpecificModel/report/technicalLimitsChangeReport")
 public class EcoChangeRangesReport extends HttpServlet {

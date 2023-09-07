@@ -171,14 +171,14 @@ public class GenModelMB implements Serializable, AutoUpdate {
             case "SA":
                 GMTree parentOfSelectedRow = (GMTree) event.getTreeNode().getParent().getData();
                 String parMemo = genModelSB.getParam(selectedObjNode.getParent().getData().getMyId()).getParMemo();
-                tableHeader = "Свойства агрегата \"" +
-                        selectedObjNode.getParent().getParent().getParent().getData().getName() +
+                tableHeader = selectedObjNode.getParent().getParent().getParent().getData().getName() +
                         " / " +
                         selectedObjNode.getParent().getData().getName() +
-                        " / " +
-                        selectedRow.getName() +
-                        " / " +
+                        "; " +
                         parMemo +
+                        ". "+
+                        "Свойства агрегата \"" +
+                        selectedRow.getName() +
                         "\"";
 
                 switch (selectedRow.getCateg()) {

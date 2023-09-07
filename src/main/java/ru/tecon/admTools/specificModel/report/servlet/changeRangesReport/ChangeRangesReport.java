@@ -15,7 +15,7 @@ import java.io.IOException;
  * Servlet для запроса отчета "Отчет по изменению тех границ" для конкретной модели.
  * URL запуска:
  * http://{host}:{port}/admTools/specificModel/report/technicalLimitsChangeReport?
- *     id={("S" + structID) || ("O" + objectID)}&objectType={objectType}&date={dd.mm.yyyy}&sessionID={sessionID}
+ *     id={("S" + structId) || ("O" + objectId)}&objectType={objectType}&date={dd.mm.yyyy}&sessionId={sessionId}
  */
 @WebServlet("/specificModel/report/technicalLimitsChangeReport")
 public class ChangeRangesReport extends HttpServlet {

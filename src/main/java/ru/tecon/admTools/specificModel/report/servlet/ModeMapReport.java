@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 /**
  * Servlet для запроса отчета "Режимная карта".
  * URL запуска:
- * http://{host}:{port}/admTools/specificModel/report/modeMap?objectID={objectID}&sessionID={sessionID}
+ * http://{host}:{port}/admTools/specificModel/report/modeMap?objectId={objectId}&sessionId={sessionId}
  */
 @WebServlet("/specificModel/report/modeMap")
 public class ModeMapReport extends HttpServlet {
@@ -39,12 +39,12 @@ public class ModeMapReport extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("sessionID") && parameterMap.containsKey("objectID")) {
+        if (parameterMap.containsKey("sessionId") && parameterMap.containsKey("objectId")) {
             try (OutputStream output = resp.getOutputStream()) {
 
-                int object = Integer.parseInt(req.getParameter("objectID"));
+                int object = Integer.parseInt(req.getParameter("objectId"));
 
-                if (checkBean.checkSession(req.getParameter("sessionID"))) {
+                if (checkBean.checkSession(req.getParameter("sessionId"))) {
                     String curDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                     String objName = bean.getName(object);
 
