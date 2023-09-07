@@ -1,10 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
 import org.primefaces.PrimeFaces;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.ReorderEvent;
-import org.primefaces.event.RowEditEvent;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -18,6 +15,7 @@ import ru.tecon.admTools.systemParams.model.struct.*;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,6 +26,7 @@ import java.util.logging.Logger;
 
 /**
  * Класс родитель для группы контроллеров категории структура
+ *
  * @author Maksim Shchelkonogov
  */
 public abstract class StructMB implements Serializable, MyConverter, AutoUpdate {
@@ -95,7 +94,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
         nodes.put(null, root);
         for (StructType structType: structTypes) {
             TreeNode<StructType> parent = nodes.get(structType.getParentID());
-            DefaultTreeNode<StructType> treeNode = new DefaultTreeNode<>(structType, parent);
+            TreeNode<StructType> treeNode = new DefaultTreeNode<>(structType, parent);
             if (expandedNodes.contains(structType)) {
                 treeNode.setExpanded(true);
             }
@@ -108,6 +107,10 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
             }
         });
 
+        if (!addToRoot) {
+            initIcon(root);
+        }
+
         extendedHeader = "";
 
         structTypeProps = null;
@@ -118,7 +121,58 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
     }
 
     /**
+     * Метод инициализирует иконки в treeTable (лепестки - шестеренки, узлы - папки)
+     *
+     * @param node элемент с которого начинается инициализация
+     */
+    private void initIcon(TreeNode<StructType> node) {
+        for (TreeNode<StructType> treeNode: node.getChildren()) {
+            if (treeNode.isExpanded()) {
+                treeNode.getData().setIcon("pi pi-folder-open");
+            } else {
+                treeNode.getData().setIcon("pi pi-folder");
+            }
+            if (treeNode.isLeaf()) {
+                treeNode.getData().setIcon("pi pi-cog");
+            } else {
+                initIcon(treeNode);
+            }
+        }
+    }
+
+    /**
+     * Обработчик раскрытия/скрытия узлов treeTable для замены иконок
+     *
+     * @param event событие
+     */
+    public void expandCollapseNode(AjaxBehaviorEvent event) {
+        if (event instanceof NodeExpandEvent) {
+            TreeNode<?> treeNode = ((NodeExpandEvent) event).getTreeNode();
+            StructType data = (StructType) treeNode.getData();
+            data.setIcon("pi pi-folder-open");
+            PrimeFaces.current().executeScript("updateIcon([{name: 'rowKey', value: '" + treeNode.getRowKey() + "'}]);");
+        }
+
+        if (event instanceof NodeCollapseEvent) {
+            TreeNode<?> treeNode = ((NodeCollapseEvent) event).getTreeNode();
+            StructType data = (StructType) treeNode.getData();
+            data.setIcon("pi pi-folder");
+            PrimeFaces.current().executeScript("updateIcon([{name: 'rowKey', value: '" + treeNode.getRowKey() + "'}]);");
+        }
+    }
+
+    /**
+     * Обновление иконок в treeTable
+     */
+    public void updateIcon() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+
+        PrimeFaces.current().ajax().update("divisionPanel:structType:" + params.get("rowKey") + ":icon");
+    }
+
+    /**
      * Получение списка раскрытых элементов дерева начиная с корневого
+     *
      * @return список элементов
      */
     private List<StructType> getExpandedNodes() {
@@ -127,10 +181,11 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Получение списка раскрытых элементов дерева начиная с переданного в параметре
+     *
      * @param startFrom начинать с этого узла
      * @return список элементов
      */
-    private List<StructType> getExpandedNodes(TreeNode<StructType> startFrom){
+    private List<StructType> getExpandedNodes(TreeNode<StructType> startFrom) {
         List<StructType> result = new ArrayList<>();
         for (TreeNode<StructType> treeNode: startFrom.getChildren()) {
             if (treeNode.isExpanded()) {
@@ -145,6 +200,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Метод обрабатывает выбор строки в таблице типы, для получения данных в таблицу свойства
+     *
      * @param event событие выбора строки
      */
     public void onRowSelect(NodeSelectEvent event) {
@@ -161,6 +217,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Обработка выбора строки в таблице свойства
+     *
      * @param event событие выбора строки
      */
     public void onRowPropSelect(SelectEvent<StructTypeProp> event) {
@@ -181,6 +238,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Обработка изменения положения строки в таблице свойства структур
+     *
      * @param event событие
      */
     public void onRowReorder(ReorderEvent event) {
@@ -403,6 +461,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Устанавливаем параметр способа добавления Типа в структуре
+     *
      * @param addToRoot true - добавлять в таблицу (к корневому элементу)
      *                  false - добавлять в дерево (к выбранному элементу)
      */
@@ -412,6 +471,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Получение текста подтверждения удаления
+     *
      * @return текст подтверждения удаления
      */
     public String getConfirmRemoveText() {
@@ -423,6 +483,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Получение текста описания свойства
+     *
      * @return описание свойства
      */
     public String getPropHeaderExtended() {
@@ -434,6 +495,7 @@ public abstract class StructMB implements Serializable, MyConverter, AutoUpdate 
 
     /**
      * Действие при отмене редактирования свойства
+     *
      * @param event событие отмены редактирования
      */
     public void onRowEditCancel(RowEditEvent<StructTypeProp> event) {

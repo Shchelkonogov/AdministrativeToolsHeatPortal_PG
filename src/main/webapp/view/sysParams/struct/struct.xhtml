@@ -12,6 +12,7 @@
                          action="#{bean.onCreateDivisionProp}" rendered="#{systemParamsUtil.write}"
                          update="divisionPanel:divisionPropTable divisionPanel:divisionRemoveProp growl" />
         <p:remoteCommand name="showRowEdit" oncomplete="switchToRowEdit('newPropTable');"/>
+        <p:remoteCommand name="updateIcon" action="#{bean.updateIcon}"/>
     </h:form>
 
     <h:form id="divisionPanel" style="height: 100%;">
@@ -29,13 +30,16 @@
                                 onstart="PF('buiTable').show();" oncomplete="window.dispatchEvent(new Event('resize')); PF('buiTable').hide();"/>
 
                         <!--без этих тегов криво работает раскрытие/закрытие дерева-->
-                        <p:ajax event="expand" />
-                        <p:ajax event="collapse" />
+                        <p:ajax event="expand" listener="#{bean.expandCollapseNode}"/>
+                        <p:ajax event="collapse" listener="#{bean.expandCollapseNode}"/>
                         <p:ajax event="filter" oncomplete="PF('buiStructType').hide();"/>
 
                         <p:column headerText="Название"
                                   filterBy="#{structType.name}" filterMatchMode="contains"
                                   sortBy="#{structType.name}" sortOrder="asc">
+                            <p:outputPanel id="icon" style="display: initial;">
+                                <i class="#{structType.icon}" style="vertical-align: middle; margin-right: 5px;"/>
+                            </p:outputPanel>
                             <h:outputText value="#{structType.name}" />
                             <f:facet name="filter">
                                 <p:inputText placeholder="Поиск..." style="width: 100%;" onkeyup="PF('structTableWidget').filter();"/>

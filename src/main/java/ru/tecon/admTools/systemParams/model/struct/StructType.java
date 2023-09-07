@@ -14,6 +14,7 @@ public class StructType implements Serializable, Comparable<StructType> {
     private String name;
     private String typeChar;
     private Long parentID;
+    private String icon;
 
     public StructType() {
     }
@@ -59,6 +60,14 @@ public class StructType implements Serializable, Comparable<StructType> {
         this.parentID = parentID;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", StructType.class.getSimpleName() + "[", "]")
@@ -66,6 +75,7 @@ public class StructType implements Serializable, Comparable<StructType> {
                 .add("name='" + name + "'")
                 .add("typeChar='" + typeChar + "'")
                 .add("parentID=" + parentID)
+                .add("icon='" + icon + "'")
                 .toString();
     }
 

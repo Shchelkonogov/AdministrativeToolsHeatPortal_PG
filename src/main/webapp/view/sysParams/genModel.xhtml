@@ -38,7 +38,7 @@
                     </p:column>
 
                     <p:column headerText="Ед.изм." style="text-align: center;" width="70">
-                        <h:outputText value="#{genModel.measureShortNameWithSupTag}" />
+                        <h:outputText escape="false" value="#{genModel.measureShortNameWithSupTag}" />
                     </p:column>
 
                     <p:column headerText="Визуализация" style="text-align: center;" width="100" >
@@ -73,7 +73,13 @@
 
     <h:form id="genModelTableForm" style="height: 45%;">
         <p:outputPanel id="propPanelMain" style="height: 100%;">
-            <p:panel styleClass="tc-panel" header="#{genModelMB.tableHeader}" rendered="#{!genModelMB.renderCalcAgrVars}">
+            <p:panel styleClass="tc-panel" rendered="#{!genModelMB.renderCalcAgrVars}">
+                <f:facet name="header">
+                    <div class="tc-text-overflow">
+                        <h:outputText value="#{genModelMB.tableHeader}" title="#{genModelMB.tableHeader}"/>
+                    </div>
+                </f:facet>
+
                 <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="paramTable" var="paramData" widgetVar="paramTable" value="#{genModelMB.paramList}"
                                  emptyMessage="#{global['table.empty.value']}"
@@ -301,8 +307,13 @@
                 </div>
             </p:panel>
 
-            <p:panel style="height: 50%; padding-bottom: 5px;" styleClass="tc-panel"
-                     header="#{genModelMB.tableHeader}" rendered="#{genModelMB.renderCalcAgrVars}">
+            <p:panel style="height: 50%; padding-bottom: 5px;" styleClass="tc-panel" rendered="#{genModelMB.renderCalcAgrVars}">
+                <f:facet name="header">
+                    <div class="tc-text-overflow">
+                        <h:outputText value="#{genModelMB.tableHeader}" title="#{genModelMB.tableHeader}"/>
+                    </div>
+                </f:facet>
+
                 <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="paramPropTableForF" var="paramPropData" widgetVar="paramPropTable" value="#{genModelMB.paramPropList}"
                                  scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"

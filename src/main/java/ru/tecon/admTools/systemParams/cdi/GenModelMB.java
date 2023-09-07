@@ -142,7 +142,11 @@ public class GenModelMB implements Serializable, AutoUpdate {
 
         switch (selectedRow.getMyType()) {
             case "PP":
-                tableHeader = "Параметр \"" + selectedRow.getName() + "\"";
+                tableHeader = "Параметр \"" +
+                        selectedObjNode.getParent().getParent().getData().getName() +
+                        " / " +
+                        selectedRow.getName() +
+                        "\"";
                 paramList = genModelSB.getParam(selectedRow.getMyId());
 
                 // Проверка отображать ли колонки "графики"/"суточные снижения"/"оптимальное значение"
@@ -166,7 +170,16 @@ public class GenModelMB implements Serializable, AutoUpdate {
                 break;
             case "SA":
                 GMTree parentOfSelectedRow = (GMTree) event.getTreeNode().getParent().getData();
-                tableHeader = "Свойства агрегата \"" + selectedRow.getName() + "\"";
+                String parMemo = genModelSB.getParam(selectedObjNode.getParent().getData().getMyId()).getParMemo();
+                tableHeader = "Свойства агрегата \"" +
+                        selectedObjNode.getParent().getParent().getParent().getData().getName() +
+                        " / " +
+                        selectedObjNode.getParent().getData().getName() +
+                        " / " +
+                        selectedRow.getName() +
+                        " / " +
+                        parMemo +
+                        "\"";
 
                 switch (selectedRow.getCateg()) {
                     case "A":
