@@ -15,9 +15,7 @@ import javax.ejb.*;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -163,6 +161,8 @@ public class GenModelSB {
                         res.getString("prop_name"),
                         res.getString("prop_val_def"), greatCond, lessCond));
             }
+
+            Collections.sort(result);
         } catch (SQLException e) {
             logger.log(Level.WARNING, "SQLException", e);
         }

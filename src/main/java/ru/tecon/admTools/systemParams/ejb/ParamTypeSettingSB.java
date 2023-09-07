@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -148,6 +149,8 @@ public class ParamTypeSettingSB {
                 Condition greatCond = new Condition(res.getInt("prop_cond_great"), res.getString("prop_cond_great_name"));
                 result.add(new ParamPropTableA(prop, lessCond, greatCond));
             }
+
+            Collections.sort(result);
             return result;
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error load data from db for paramTypeProp A category", ex);

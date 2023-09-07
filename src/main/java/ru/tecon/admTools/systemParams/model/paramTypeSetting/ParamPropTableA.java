@@ -1,5 +1,7 @@
 package ru.tecon.admTools.systemParams.model.paramTypeSetting;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -8,9 +10,9 @@ import java.util.UUID;
  * @author Maksim Shchelkonogov
  * 21.02.2023
  */
-public class ParamPropTableA {
+public class ParamPropTableA implements Comparable<ParamPropTableA> {
 
-    private UUID rowIndex;
+    private final UUID rowIndex;
     private Properties prop;
     private Condition lessCond;
     private Condition greatCond;
@@ -62,5 +64,10 @@ public class ParamPropTableA {
                 .add("lessCond=" + lessCond)
                 .add("greatCond=" + greatCond)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(@NotNull ParamPropTableA o) {
+        return prop.compareTo(o.prop);
     }
 }

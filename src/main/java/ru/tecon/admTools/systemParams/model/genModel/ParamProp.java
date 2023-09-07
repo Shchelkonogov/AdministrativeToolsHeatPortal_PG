@@ -1,8 +1,11 @@
 package ru.tecon.admTools.systemParams.model.genModel;
 
+import org.jetbrains.annotations.NotNull;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.Condition;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringJoiner;
 
 /**
@@ -10,7 +13,9 @@ import java.util.StringJoiner;
  *
  * @author Aleksey Sergeev
  */
-public class ParamProp implements Serializable {
+public class ParamProp implements Serializable, Comparable<ParamProp> {
+
+    private static final List<Long> COMPARING_LIST = Arrays.asList(102L, 307L, 308L, 309L, 310L, 103L);
 
     private long parId;
     private long paramTypeId;
@@ -100,5 +105,10 @@ public class ParamProp implements Serializable {
                 .add("greatCond=" + greatCond)
                 .add("lessCond=" + lessCond)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(@NotNull ParamProp o) {
+        return Integer.compare(COMPARING_LIST.indexOf(propId), COMPARING_LIST.indexOf(o.propId));
     }
 }
