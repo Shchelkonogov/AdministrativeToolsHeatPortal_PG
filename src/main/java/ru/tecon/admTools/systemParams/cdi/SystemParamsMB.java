@@ -35,7 +35,7 @@ public class SystemParamsMB implements Serializable {
             {"Связи", new SystemParamsCategories("/view/sysParams/objectLinks.xhtml", "objectLinks")},
             {"Агрегаты", new SystemParamsCategories("/view/sysParams/struct/structAggregates.xhtml", "structAggregates")},
             {"Техпроцессы", new SystemParamsCategories("/view/sysParams/struct/structProcesses.xhtml", "structProcesses")},
-            {"Устройства", new SystemParamsCategories("/view/sysParams/struct/structDevices.xhtml", "structDevices")},
+            {"Оборудование", new SystemParamsCategories("/view/sysParams/struct/structDevices.xhtml", "structDevices")},
             {"Единицы измерения", new SystemParamsCategories("/view/sysParams/measure.xhtml", "measureMB")},
             {"Справочники", new SystemParamsCategories("/view/sysParams/catalog.xhtml", "catalog")},
             {"Температурные графики", new SystemParamsCategories("/view/sysParams/temperature/tempGraphs.xhtml", "tempGraphs")},
