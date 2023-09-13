@@ -15,9 +15,16 @@ public class StatAggrTable implements Serializable {
     private String stat_agr_name;
     private String dif_int;
 
-    public StatAggrTable(long id, String stat_agr_code) {
+    public StatAggrTable(long id, String stat_agr_name) {
+        this.id = id;
+        this.stat_agr_name = stat_agr_name;
+    }
+
+    public StatAggrTable(long id, String stat_agr_code, String stat_agr_name, String dif_int) {
         this.id = id;
         this.stat_agr_code = stat_agr_code;
+        this.stat_agr_name = stat_agr_name;
+        this.dif_int = dif_int;
     }
 
     public long getId() {
@@ -53,13 +60,6 @@ public class StatAggrTable implements Serializable {
     }
 
     public StatAggrTable() {
-    }
-
-    public StatAggrTable(long id, String stat_agr_code, String stat_agr_name, String dif_int) {
-        this.id = id;
-        this.stat_agr_code = stat_agr_code;
-        this.stat_agr_name = stat_agr_name;
-        this.dif_int = dif_int;
     }
 
     @Override

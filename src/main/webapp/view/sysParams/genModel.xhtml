@@ -9,7 +9,7 @@
                          oncomplete="PF('statusDialog').hide();"
                          action="#{genModelMB.onSaveChanges()}" rendered="#{systemParamsUtil.write}" />
         <p:remoteCommand name="checkFormula" onstart="PF('statusDialog').show();"
-                         oncomplete="PF('statusDialog').hide(); PF('wizardWidget').loadStep('tab_0', false);"
+                         oncomplete="PF('statusDialog').hide();"
                          action="#{genModelMB.onCheckFormula()}" rendered="#{systemParamsUtil.write}"
                          update="addNewFormulaForm:inputWizard growl" />
     </h:form>
@@ -56,8 +56,8 @@
 
             <f:facet name="actions">
                 <p:commandLink id="btnAdd" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
-                               oncomplete="PF('addNewParam').show();" action="#{genModelMB.addParamDialogSetting}" disabled="#{genModelMB.disableAddBtn}"
-                               rendered="#{systemParamsUtil.write}" update="dialog">
+                               action="#{genModelMB.addParamDialogSetting}" disabled="#{genModelMB.disableAddBtn}"
+                               rendered="#{systemParamsUtil.write}">
                     <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
                 </p:commandLink>
                 <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
@@ -417,7 +417,7 @@
                         </p:column>
 
                         <p:column headerText="Стат. агрегат" styleClass="center" width="250">
-                            <h:outputText value="#{calcAgrVarsData.statAggr.stat_agr_code}"/>
+                            <h:outputText value="#{calcAgrVarsData.statAggr.stat_agr_name}"/>
                         </p:column>
                     </p:dataTable>
                 </div>
@@ -518,6 +518,22 @@
         </h:form>
     </p:dialog>
 
+    <p:dialog header="Создание новой зоны параметра" widgetVar="cloneParam" modal="true"
+              resizable="false" rendered="#{systemParamsUtil.write}" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <h:form id="cloneParamForm">
+            <div style="margin-bottom: 45px; padding: 3px;">
+                <p:outputLabel value="Вы хотите добавить следующую зону к выбранному параметру?"/>
+            </div>
+
+            <p:commandButton value="Да" style="position: absolute; bottom: 5px; right: 71px;" styleClass="tc-no-loading"
+                             action="#{genModelMB.cloneParam()}" process="@this"
+                             onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide(); PF('cloneParam').hide();"/>
+            <p:commandButton value="Нет" oncomplete="PF('cloneParam').hide();" process="@this"
+                             styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"/>
+        </h:form>
+    </p:dialog>
+
     <p:dialog header="Добавление нового параметра" widgetVar="addNewFormula" modal="true" width="614"
               resizable="false" rendered="#{systemParamsUtil.write}" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
@@ -548,7 +564,8 @@
                             <p:panel header="Свойства переменной &quot;#{item.variable}&quot;">
                                 <h:panelGrid columns="2">
                                     <p:outputLabel value="Параметр" for="@next"/>
-                                    <p:selectOneMenu value="#{genModelMB.newPropCalc.props.get(loop.index).param}" style="width: 500px;">
+                                    <p:selectOneMenu value="#{genModelMB.newPropCalc.props.get(loop.index).param}" style="width: 500px;"
+                                                     filter="true" filterMatchMode="contains">
                                         <p:ajax event="itemSelect" listener="#{genModelMB.onParamSelect(loop.index)}"
                                                 update="addNewFormulaForm:selectStatAgr#{loop.index}"/>
 
@@ -566,7 +583,7 @@
                                         <f:attribute name="index" value="#{loop.index}"/>
 
                                         <f:selectItems value="#{genModelMB.newPropCalc.props.get(loop.index).statAggrListForChoice}"
-                                                       var="statAgr" itemLabel="#{statAgr.stat_agr_code}"
+                                                       var="statAgr" itemLabel="#{statAgr.stat_agr_name}"
                                                        itemValue="#{statAgr}"/>
                                     </p:selectOneMenu>
                                 </h:panelGrid>

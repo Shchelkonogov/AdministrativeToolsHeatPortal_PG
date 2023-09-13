@@ -35,6 +35,7 @@ public class GenModelSB {
     private static final String SELECT_PARAM_PROP_PER = "select * from dsp_0029t.sel_param_prop_per(?, ?)";
     private static final String SELECT_CALC_AGR_FORMULA = "select * from dsp_0029t.sel_calc_agr_formula(?, ?)";
     private static final String FUN_ADD_PARAM = "call dsp_0029t.add_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String PROC_CLONE_PARAM = "call dsp_0029t.add_param_zone(?, ?, ?, ?)";
     private static final String FUN_ADD_CALC_AGR_FORMULA = "call dsp_0029t.add_calc_agr_formula(?, ?, ?, ?, ?, ?)";
     private static final String FUN_DEL_CALC_AGR_FORMULA = "call dsp_0029t.del_calc_agr_formula(?, ?, ?, ?)";
     private static final String FUN_DEL_PARAM = "call dsp_0029t.del_param(?, ?, ?)";
@@ -280,6 +281,33 @@ public class GenModelSB {
             return cStm.getLong(13);
         } catch (SQLException e) {
             logger.log(Level.WARNING, "error add param", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Клонирование параметра (создание новой зоны)
+     *
+     * @param paramId параметр
+     * @param login    имя пользователя
+     * @param ip       адрес пользователя
+     * @throws SystemParamException в случае ошибки клонирования параметра
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public Long cloneParam(Long paramId, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROC_CLONE_PARAM)) {
+            cStm.setLong(1, paramId);
+            cStm.registerOutParameter(2, Types.BIGINT);
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+
+            cStm.executeUpdate();
+
+            logger.log(Level.INFO, "Clone param {0}", paramId);
+            return cStm.getLong(2);
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "error clone param", e);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
     }
@@ -585,7 +613,7 @@ public class GenModelSB {
 
             while (res.next()) {
                 result.add(new StatAggrTable(res.getLong("stat_agr_id"),
-                        res.getString("stat_agr_code")));
+                        res.getString("stat_agr_name")));
             }
         } catch (SQLException e) {
             logger.log(Level.WARNING, "SQLException", e);

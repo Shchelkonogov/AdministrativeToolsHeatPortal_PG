@@ -167,6 +167,7 @@ public class GenModelMB implements Serializable, AutoUpdate {
 
                 renderParamTable = true;
                 disableRemoveBtn = false;
+                disableAddBtn = false;
                 break;
             case "SA":
                 GMTree parentOfSelectedRow = (GMTree) event.getTreeNode().getParent().getData();
@@ -209,21 +210,51 @@ public class GenModelMB implements Serializable, AutoUpdate {
      * Настройка диалогового окна "Добавление нового параметра"
      */
     public void addParamDialogSetting() {
-        switch (selectedObjNode.getData().getName()) {
-            case "Давление":
-                temperatureStatus = TemperatureStatus.OPT_VALUE;
+        switch (selectedObjNode.getData().getMyType()) {
+            case "PP":
+                PrimeFaces.current().executeScript("PF('cloneParam').show();");
                 break;
-            case "Температура":
-                if (selectedObjNode.getParent().getData().getName().equals("Горячее водоснабжение")) {
-                    temperatureStatus = TemperatureStatus.DAILY_REDUCTION;
-                    graphOrDecreaseList = dailyReductionBean.getTemperatures();
-                } else {
-                    temperatureStatus = TemperatureStatus.GRAPH;
-                    graphOrDecreaseList = tempGraphBean.getTemperatures();
+            case "PT":
+                switch (selectedObjNode.getData().getName()) {
+                    case "Давление":
+                        temperatureStatus = TemperatureStatus.OPT_VALUE;
+                        break;
+                    case "Температура":
+                        if (selectedObjNode.getParent().getData().getName().equals("Горячее водоснабжение")) {
+                            temperatureStatus = TemperatureStatus.DAILY_REDUCTION;
+                            graphOrDecreaseList = dailyReductionBean.getTemperatures();
+                        } else {
+                            temperatureStatus = TemperatureStatus.GRAPH;
+                            graphOrDecreaseList = tempGraphBean.getTemperatures();
+                        }
+                        break;
+                    default:
+                        temperatureStatus = TemperatureStatus.EMPTY;
                 }
+
+                PrimeFaces.current().executeScript("PF('addNewParam').show();");
+                PrimeFaces.current().ajax().update("dialog");
                 break;
-            default:
-                temperatureStatus = TemperatureStatus.EMPTY;
+        }
+    }
+
+    /**
+     * Клонирование параметра (создание новой зоны для выделенного параметра)
+     */
+    public void cloneParam() {
+        logger.log(Level.INFO, "create new zone for param {0}", selectedObjNode);
+
+        try {
+            genModelSB.cloneParam(selectedObjNode.getData().getMyId(), utilMB.getLogin(), utilMB.getIp());
+
+            loadData();
+
+            PrimeFaces.current().executeScript("PF('buiGenModelTable').show(); PF('genModelWidget').filter();");
+            PrimeFaces.current().ajax().update("genModelForm", "genModelTableForm:propPanelMain");
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка создания зоны", e.getMessage()));
+            PrimeFaces.current().ajax().update("growl");
         }
     }
 
@@ -409,6 +440,8 @@ public class GenModelMB implements Serializable, AutoUpdate {
 
             List<StatAggrTable> statAgrList = genModelSB.getStatAgrList(newPropCalc.getParamListForChoice().get(0).getId());
             newPropCalc.getProps().forEach(propRow -> propRow.setStatAggrListForChoice(statAgrList));
+
+            PrimeFaces.current().executeScript("PF('wizardWidget').loadStep('tab_0', false);");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка обновления", e.getMessage()));
