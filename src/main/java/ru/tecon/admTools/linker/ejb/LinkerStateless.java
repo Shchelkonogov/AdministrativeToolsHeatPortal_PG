@@ -53,6 +53,14 @@ public class LinkerStateless {
     private final static String PROCEDURE_READ_OPC_PARAM = "call lnk_0001t.read_tsa_param(?)";
     private final static String FUNCTION_REQUEST_OPC_PARAM = "select * from lnk_0001t.get_opc_param_list(?)";
     private final static String SELECT_REDIRECT = "select * from admin.opc_servers;";
+    private final static String PROCEDURE_REMOVE_OPC_OBJECT = "call lnk_0001t.del_unlinked_opc_object(?, ?, ?);";
+    private final static String PROCEDURE_REMOVE_OPC_OBJECT_PARAMS = "call lnk_0001t.clear_unlinked_opc_object(?, ?, ?);";
+    private final static String PROCEDURE_CREATE_FICTITIOUS_YY = "call lnk_0001t.add_unlinked_fict_uu(?);";
+    private final static String SELECT_OPC_OBJECT_PARAMS = "select * from lnk_0001t.sel_unlinked_opc_param_list(?, ?)";
+    private final static String SELECT_SCHEMA_LIST = "select * from lnk_0001t.get_schema_list2(?, ?)";
+    private final static String PROCEDURE_LINK_BY_SCHEMA_NO = "call lnk_0001t.link_obj_no(?, ?)";
+    private final static String PROCEDURE_LINK_BY_SCHEMA_YES = "call lnk_0001t.link_obj_yes(?, ?, ?, ?, ?)";
+    private final static String PROCEDURE_LINK_BY_SCHEMA_NO_PARAM = "call lnk_0001t.link_obj_yes_without_params(?, ?, ?, ?)";
 
     @Inject
     private Logger logger;
@@ -620,5 +628,203 @@ public class LinkerStateless {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    /**
+     * Удаление opc объекта
+     * @param opcObject opc объект
+     * @throws SystemParamException ошибка удаления
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void removeOpcObject(OpcObjectForLinkData opcObject) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_REMOVE_OPC_OBJECT)) {
+            cStm.setInt(1, opcObject.getOpcObject().getId());
+            cStm.setInt(2, opcObject.getObjIntKey());
+            cStm.setString(3, opcObject.getOpcObject().getName());
+
+            cStm.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error remove opc object", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Удаление параметров opc объекта
+     * @param opcObject opc объект
+     * @throws SystemParamException ошибка удаления
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void removeOpcObjectParams(OpcObjectForLinkData opcObject) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_REMOVE_OPC_OBJECT_PARAMS)) {
+            cStm.setInt(1, opcObject.getOpcObject().getId());
+            cStm.setInt(2, opcObject.getObjIntKey());
+            cStm.setString(3, opcObject.getOpcObject().getName());
+
+            cStm.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error remove opc object params", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Создание фиктивного узла учета
+     * @param name имя объекта системы, для которого делается фиктивный узел учета
+     * @throws SystemParamException ошибка создания узла учета
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void createFictitiousYY(String name) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_CREATE_FICTITIOUS_YY)) {
+            cStm.setString(1, name);
+
+            cStm.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error create fictitious yy", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
+        }
+    }
+
+    /**
+     * Получение списка параметров opc объекта
+     * @param opcObject opc объект
+     * @return список параметров
+     */
+    public List<OpcObjectForLinkData> getOpcObjectParams(OpcObjectForLinkData opcObject) {
+        List<OpcObjectForLinkData> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_OPC_OBJECT_PARAMS)) {
+            stm.setInt(1, opcObject.getOpcObject().getId());
+            stm.setInt(2, opcObject.getObjIntKey());
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new OpcObjectForLinkData(
+                        new SystemObject(res.getInt("id"), res.getString("item_name")),
+                        1,
+                        res.getInt("obj_int_key")));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load opc object params", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Получение списка схем линковки
+     * @param systemObjectId объект системы
+     * @param opcObjectList список opc объектов
+     * @return список схем линковок
+     * @throws SystemParamException ошибка получения списка
+     */
+    public List<LinkSchemaData> getSchemaListForLink(int systemObjectId, List<OpcObjectForLinkData> opcObjectList) throws SystemParamException {
+        List<LinkSchemaData> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_SCHEMA_LIST)) {
+            Object[] objects = opcObjectList.stream()
+                    .map(linkData -> linkData.getPgObject("lnk_0001t.t_buf_table_rec"))
+                    .toArray();
+
+            stm.setInt(1, systemObjectId);
+            stm.setArray(2, connect.createArrayOf("lnk_0001t.t_buf_table_rec", objects));
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(new LinkSchemaData(
+                        new Schema(res.getInt("sch_id"), res.getString("sch_name")),
+                        res.getInt("eq_linked"),
+                        res.getInt("neq_linked"),
+                        res.getInt("all_linked"),
+                        res.getInt("eq_nlinked"),
+                        res.getInt("neq_nlinked"),
+                        res.getInt("all_nlinked")
+                ));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load schema list", ex);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
+        }
+
+        return result;
+    }
+
+    /**
+     * Отмена линковки объектов
+     * @param systemObjectId объект системы
+     * @param opcObjectList список opc объектов
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void linkBySchemaNo(int systemObjectId, List<OpcObjectForLinkData> opcObjectList) {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_LINK_BY_SCHEMA_NO)) {
+
+            Object[] objects = opcObjectList.stream()
+                    .map(linkData -> linkData.getPgObject("lnk_0001t.t_buf_table_rec"))
+                    .toArray();
+
+            cStm.setInt(1, systemObjectId);
+            cStm.setArray(2, connect.createArrayOf("lnk_0001t.t_buf_table_rec", objects));
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error link by schema \"no\"", ex);
+        }
+    }
+
+    /**
+     * линковка объектов
+     * @param systemObjectId объект системы
+     * @param opcObjectList список opc объектов
+     * @param schema схема линковки
+     * @param login идентификатор пользователя
+     * @param ip ip пользователя
+     */
+    public void linkBySchemaYes(int systemObjectId, ArrayList<OpcObjectForLinkData> opcObjectList, LinkSchemaData schema, String login, String ip) {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_LINK_BY_SCHEMA_YES)) {
+
+            Object[] objects = opcObjectList.stream()
+                    .map(linkData -> linkData.getPgObject("lnk_0001t.t_buf_table_rec"))
+                    .toArray();
+
+            cStm.setInt(1, systemObjectId);
+            cStm.setArray(2, connect.createArrayOf("lnk_0001t.t_buf_table_rec", objects));
+            cStm.setInt(3, schema.getSchema().getId());
+            cStm.setString(4, login);
+            cStm.setString(5, ip);
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error link by schema \"yes\"", ex);
+        }
+    }
+
+    /**
+     * линковка объектов без параметров
+     * @param systemObjectId объект системы
+     * @param opcObjectList список opc объектов
+     * @param login идентификатор пользователя
+     * @param ip ip пользователя
+     */
+    public void linkBySchemaNoParam(int systemObjectId, ArrayList<OpcObjectForLinkData> opcObjectList, String login, String ip) {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_LINK_BY_SCHEMA_NO_PARAM)) {
+
+            Object[] objects = opcObjectList.stream()
+                    .map(linkData -> linkData.getPgObject("lnk_0001t.t_buf_table_rec"))
+                    .toArray();
+
+            cStm.setInt(1, systemObjectId);
+            cStm.setArray(2, connect.createArrayOf("lnk_0001t.t_buf_table_rec", objects));
+            cStm.setString(3, login);
+            cStm.setString(4, ip);
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error link by schema \"yes no param\"", ex);
+        }
     }
 }

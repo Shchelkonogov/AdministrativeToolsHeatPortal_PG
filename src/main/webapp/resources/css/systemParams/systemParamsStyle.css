@@ -109,7 +109,7 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-track,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-track,
 #menuPanel_content::-webkit-scrollbar-track {
-    background: rgba(0,0,0,.1);
+    background: rgba(0,0,0,0);
     border-width: 0
 }
 

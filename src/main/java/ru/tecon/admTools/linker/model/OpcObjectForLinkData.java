@@ -1,6 +1,10 @@
 package ru.tecon.admTools.linker.model;
 
+import org.postgresql.util.PGobject;
+
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -49,12 +53,48 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
         return objIntKey;
     }
 
+    public PGobject getPgObject(String type) {
+        String value = new StringJoiner(",", "(", ")")
+                .add(String.valueOf(opcObject.getId()))
+                .add(opcObject.getName())
+                .add(String.valueOf(objIntKey))
+                .add("")
+                .toString();
+
+        try {
+            PGobject pgObject = new PGobject();
+            pgObject.setType(type);
+            pgObject.setValue(value);
+            return pgObject;
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    public void setParamCount(int paramCount) {
+        this.paramCount = paramCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OpcObjectForLinkData that = (OpcObjectForLinkData) o;
+        return paramCount == that.paramCount && objIntKey == that.objIntKey && uuid.equals(that.uuid) && Objects.equals(opcObject, that.opcObject);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, opcObject, paramCount, objIntKey);
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", OpcObjectForLinkData.class.getSimpleName() + "[", "]")
                 .add("uuid=" + uuid)
                 .add("opcObject=" + opcObject)
                 .add("paramCount=" + paramCount)
+                .add("objIntKey=" + objIntKey)
                 .toString();
     }
 }

@@ -13,8 +13,13 @@ import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
 import org.primefaces.util.LangUtils;
+import ru.tecon.admTools.components.navigation.ejb.NavigationBeanLocal;
+import ru.tecon.admTools.components.navigation.model.LazyLoadingTreeNode;
+import ru.tecon.admTools.components.navigation.model.TreeNodeModel;
+import ru.tecon.admTools.linker.cdi.converter.LinkSchemaDataConverter;
 import ru.tecon.admTools.linker.cdi.converter.LinkedDataConverter;
 import ru.tecon.admTools.linker.cdi.converter.OpcObjectForLinkDataConverter;
+import ru.tecon.admTools.linker.cdi.converter.OpcObjectForNoLinkDataConverter;
 import ru.tecon.admTools.linker.ejb.LinkerStateless;
 import ru.tecon.admTools.linker.model.*;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -98,9 +103,33 @@ public class LinkerController implements Serializable {
     private String filterParamOpcTreeValue = "";
     private String paramOpcTreePanelHeader = "Все параметры";
 
+    // Данные для перехода на Источники данных
 
     private MenuModel redirectMenu;
 
+    // Данные "Нелинкованные объекты"
+
+    private final LazyLinkedDataModel<OpcObjectForLinkData> opcObjectsForNoLinkData = new LazyLinkedDataModel<>(
+            new OpcObjectForNoLinkDataConverter(),
+            new ArrayList<>()
+    );
+    private OpcObjectForLinkData selectedOpcObjectsForNoLink = null;
+
+    private LazyLoadingTreeNode<TreeNodeModel> selectedNavigateObject = null;
+    private ObjectType selectedNavigateObjectType;
+
+    private final Set<OpcObjectForLinkData> objectsForLink = new HashSet<>();
+
+    private final LazyLinkedDataModel<OpcObjectForLinkData> opcObjectParams = new LazyLinkedDataModel<>(
+            new OpcObjectForLinkDataConverter(),
+            new ArrayList<>()
+    );
+
+    private final LazyLinkedDataModel<LinkSchemaData> linkSchemaTable = new LazyLinkedDataModel<>(
+            new LinkSchemaDataConverter(),
+            new ArrayList<>()
+    );
+    private LinkSchemaData selectedLinkSchema = null;
 
     @Inject
     private ObjectTypeController objectTypeController;
@@ -114,13 +143,13 @@ public class LinkerController implements Serializable {
     @EJB
     private LinkerStateless linkerBean;
 
+    @EJB(beanName = "navigationBean")
+    private NavigationBeanLocal navigationBean;
+
     @PostConstruct
     private void init() {
         // По факту это заглушка для запуска инициализации контроллера SystemParamsUtilMB
         logger.log(Level.INFO, "Init data {0}", utilMB);
-
-        // TODO change
-        utilMB.setLogin("appAdmin");
 
         selectedObjectType = objectTypeController.getDefaultObjectType();
 
@@ -139,6 +168,10 @@ public class LinkerController implements Serializable {
                     .build();
             redirectMenu.getElements().add(menuItem);
         }
+
+        // Загрузка объектов для линковки
+        loadOpcObjectsForNoLink();
+        selectedNavigateObjectType = objectTypeController.getDefaultObjectType();
     }
 
     /**
@@ -150,7 +183,9 @@ public class LinkerController implements Serializable {
         logger.log(Level.INFO, "Tab changed. Active Tab {0}", event.getTab().getTitle());
 
         switch (event.getTab().getTitle()) {
-            case "Не линкованные объекты":
+            case "Нелинкованные объекты":
+                // Загрузка объектов для линковки
+                loadOpcObjectsForNoLink();
 
                 // Очищаю вкладку "Линкованные объекты / Объекты"
                 linkedData.getData().clear();
@@ -196,12 +231,28 @@ public class LinkerController implements Serializable {
                         "PF('paramTreeWidget').filter(); " +
                         "PF('paramOpcTreeWidget').filter(); " +
                         "PF('filterParamTreeSelectOneMenuWidget').selectValue(1); " +
-                        "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
+                        "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1); " +
+                        "PF('objectTabViewWidget').select(0, true); " +
+                        "PF('objectTabViewWidget').disable(1); " +
+                        "PF('objectTabViewWidget').disable(2); " +
+                        "updateEmptyRow(); " +
+                        "PF('opcObjectsForNoLinkTableWidget').filter(); " +
+                        "reloadNavigate();");
                 break;
             case "Линкованные объекты":
+                selectedOpcObjectsForNoLink = null;
+                opcObjectsForNoLinkData.getData().clear();
+                objectsForLink.clear();
+
+                PrimeFaces.current().ajax().update("linkerForm:linkerTabView:paramBtns",
+                        "linkerForm:linkerTabView:selectObjects",
+                        "linkerForm:linkerTabView:linkBtnForNoLink",
+                        "linkerForm:linkerTabView:opcObjectsForNoLinkTable");
+
                 PrimeFaces.current().executeScript("PF('objectTabViewWidget').select(0); " +
                         "PF('objectTabViewWidget').disable(1); " +
-                        "PF('objectTabViewWidget').disable(2);");
+                        "PF('objectTabViewWidget').disable(2); " +
+                        "clearNavigate();");
                 break;
             case "Объекты":
                 linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
@@ -415,6 +466,190 @@ public class LinkerController implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Обработчик выделения объекта автоматизации в таблице "Нелинкованные объекты"
+     * @param event событие выделения
+     */
+    public void onSelectObjectForLink(SelectEvent<OpcObjectForLinkData> event) {
+        objectsForLink.add(event.getObject());
+    }
+
+    /**
+     * Удаление объекта автоматизации из группы для линковки "Нелинкованные объекты"
+     */
+    public void removeObjectForLink() {
+        String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("id");
+
+        objectsForLink.removeIf(linkData -> linkData.getId().equals(id));
+    }
+
+    /**
+     * Обработчик удаления объекта автоматизации "Нелинкованные объекты"
+     */
+    public void removeOpcObject() {
+        logger.log(Level.INFO, "remove opc object {0}", selectedOpcObjectsForNoLink);
+
+        try {
+            linkerBean.removeOpcObject(selectedOpcObjectsForNoLink);
+
+            selectedOpcObjectsForNoLink = null;
+            loadOpcObjectsForNoLink();
+            objectsForLink.clear();
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление объекта", e.getMessage()));
+        }
+    }
+
+    /**
+     * Очистка параметров выделенного объекта автоматизации "Нелинкованные объекты"
+     */
+    public void removeOpcObjectParams() {
+        logger.log(Level.INFO, "remove opc object params {0}", selectedOpcObjectsForNoLink);
+
+        try {
+            linkerBean.removeOpcObjectParams(selectedOpcObjectsForNoLink);
+
+            selectedOpcObjectsForNoLink = null;
+            loadOpcObjectsForNoLink();
+            objectsForLink.clear();
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление параметров", e.getMessage()));
+        }
+    }
+
+    /**
+     * Запрос параметров для выбранного объекта автоматизации "Нелинкованные объекты"
+     */
+    public void requestOpcParamForNoLink() {
+        logger.log(Level.INFO, "request opc params for object {0}", selectedOpcObjectsForNoLink);
+
+        try {
+            Future<Void> future = linkerBean.requestOpcParams(selectedOpcObjectsForNoLink.getOpcObject().getName());
+
+            try {
+                future.get(1, TimeUnit.MINUTES);
+            } catch (InterruptedException | TimeoutException e) {
+                throw new SystemParamException("Внутренняя ошибка сервера");
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof SystemParamException) {
+                    SystemParamException cause = (SystemParamException) e.getCause();
+                    throw new SystemParamException(cause.getMessage());
+                } else {
+                    throw new SystemParamException("Внутренняя ошибка сервера");
+                }
+            }
+
+            selectedOpcObjectsForNoLink = null;
+            loadOpcObjectsForNoLink();
+            objectsForLink.clear();
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Запрос параметров", e.getMessage()));
+        }
+    }
+
+    /**
+     * Создание фиктивного узла учета "Нелинкованные объекты"
+     */
+    public void createFictitiousYY() {
+        logger.log(Level.INFO, "create fictitious yy {0}", selectedNavigateObject);
+
+        try {
+            linkerBean.createFictitiousYY(selectedNavigateObject.getData().getName());
+
+            selectedOpcObjectsForNoLink = null;
+            loadOpcObjectsForNoLink();
+            objectsForLink.clear();
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Создание фиктивного узла учета", e.getMessage()));
+        }
+    }
+
+    /**
+     * Обработчик закрытия окна с просмотром параметров "Нелинкованные объекты"
+     */
+    public void onShowOpcObjectParamsDialogClose() {
+        selectedOpcObjectsForNoLink.setParamCount(opcObjectParams.getData().size());
+        int updateIndex = opcObjectsForNoLinkData.getWrappedData().indexOf(selectedOpcObjectsForNoLink);
+
+        PrimeFaces.current().ajax().update("linkerForm:linkerTabView:opcObjectsForNoLinkTable:" + updateIndex + ":paramCount");
+
+        opcObjectParams.getData().clear();
+    }
+
+    /**
+     * Загрузка данных для окна с просмотром параметров "Нелинкованные объекты"
+     */
+    public void loadOpcObjectParams() {
+        opcObjectParams.setData(linkerBean.getOpcObjectParams(selectedOpcObjectsForNoLink));
+    }
+
+    /**
+     * Загрузка данных для таблицы объектов автоматизации "Нелинкованные объекты"
+     */
+    public void loadOpcObjectsForNoLink() {
+        opcObjectsForNoLinkData.setData(linkerBean.getOpcObjectsForLink());
+    }
+
+    /**
+     * Нажатие на кнопку слинковать, загрузка схем линковок "Нелинкованные объекты"
+     */
+    public void linkNoLinkedObjects() {
+        logger.log(Level.INFO, "link no linked object {0} {1}", new Object[]{selectedNavigateObject, objectsForLink});
+
+        try {
+            linkSchemaTable.setData(linkerBean.getSchemaListForLink(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink)));
+
+            PrimeFaces.current().executeScript("PF('schemaLinkDialogWidget').show(); PF('schemaLinkTableWidget').filter();");
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()));
+        }
+    }
+
+    /**
+     * Очистка данных окна выбора схемы линковки "Нелинкованные объекты"
+     */
+    public void onSchemaLinkDialogClose() {
+        linkSchemaTable.getData().clear();
+        selectedLinkSchema = null;
+    }
+
+    /**
+     * Обработка отказа завершать линковку (нажатие на крестик или отмена) "Нелинкованные объекты"
+     */
+    public void schemaLinkDialogClose() {
+        logger.log(Level.INFO, "Close link by schema with \"no\"");
+        linkerBean.linkBySchemaNo(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink));
+    }
+
+    /**
+     * Линковка объекта по выбранной схеме "Нелинкованные объекты"
+     */
+    public void linkBySchemaYes() {
+        logger.log(Level.INFO, "Link by schema with \"yes\" {0}", selectedLinkSchema);
+        linkerBean.linkBySchemaYes(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink), selectedLinkSchema, utilMB.getLogin(), utilMB.getIp());
+
+        selectedOpcObjectsForNoLink = null;
+        loadOpcObjectsForNoLink();
+        objectsForLink.clear();
+    }
+
+    /**
+     * Линковка объекта по выбранной схеме без параметров "Нелинкованные объекты"
+     */
+    public void linkBySchemaNoParam() {
+        logger.log(Level.INFO, "Link by schema with \"yes no param\"");
+        linkerBean.linkBySchemaNoParam(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink), utilMB.getLogin(), utilMB.getIp());
+
+        selectedOpcObjectsForNoLink = null;
+        loadOpcObjectsForNoLink();
+        objectsForLink.clear();
     }
 
     /**
@@ -675,7 +910,7 @@ public class LinkerController implements Serializable {
                 filterParamOpcTreeValue = "";
                 rootOpcTree.getChildren().clear();
                 prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 0), rootOpcTree, null);
-                paramOpcTreePanelHeader = "не линкованные параметры";
+                paramOpcTreePanelHeader = "Нелинкованные параметры";
                 break;
         }
     }
@@ -1107,12 +1342,10 @@ public class LinkerController implements Serializable {
     }
 
     public TreeNode<TreeData> getSelectedParamTreeNode() {
-        System.out.println("get param tree " + selectedParamTreeNode);
         return selectedParamTreeNode;
     }
 
     public void setSelectedParamTreeNode(TreeNode<TreeData> selectedParamTreeNode) {
-        System.out.println("set param tree " + selectedParamTreeNode);
         this.selectedParamTreeNode = selectedParamTreeNode;
     }
 
@@ -1125,12 +1358,10 @@ public class LinkerController implements Serializable {
     }
 
     public TreeNode<TreeData> getSelectedParamOpcTreeNode() {
-        System.out.println("get param opc tree " + selectedParamOpcTreeNode);
         return selectedParamOpcTreeNode;
     }
 
     public void setSelectedParamOpcTreeNode(TreeNode<TreeData> selectedParamOpcTreeNode) {
-        System.out.println("set param opc tree " + selectedParamOpcTreeNode);
         this.selectedParamOpcTreeNode = selectedParamOpcTreeNode;
     }
 
@@ -1148,5 +1379,73 @@ public class LinkerController implements Serializable {
 
     public MenuModel getRedirectMenu() {
         return redirectMenu;
+    }
+
+    public NavigationBeanLocal getNavigationBean() {
+        return navigationBean;
+    }
+
+    public LazyLinkedDataModel<OpcObjectForLinkData> getOpcObjectsForNoLinkData() {
+        return opcObjectsForNoLinkData;
+    }
+
+    public OpcObjectForLinkData getSelectedOpcObjectsForNoLink() {
+        return selectedOpcObjectsForNoLink;
+    }
+
+    public void setSelectedOpcObjectsForNoLink(OpcObjectForLinkData selectedOpcObjectsForNoLink) {
+        this.selectedOpcObjectsForNoLink = selectedOpcObjectsForNoLink;
+    }
+
+    public LazyLoadingTreeNode<TreeNodeModel> getSelectedNavigateObject() {
+        return selectedNavigateObject;
+    }
+
+    public void setSelectedNavigateObject(LazyLoadingTreeNode<TreeNodeModel> selectedNavigateObject) {
+        this.selectedNavigateObject = selectedNavigateObject;
+    }
+
+    public ObjectType getSelectedNavigateObjectType() {
+        return selectedNavigateObjectType;
+    }
+
+    public void setSelectedNavigateObjectType(ObjectType selectedNavigateObjectType) {
+        this.selectedNavigateObjectType = selectedNavigateObjectType;
+    }
+
+    public boolean isDisabledParamButtonsForNoLink() {
+        return selectedOpcObjectsForNoLink == null;
+    }
+
+    public boolean isDisabledLinkBtnForNoLink() {
+        return objectsForLink.isEmpty() || (selectedNavigateObject == null) || !selectedNavigateObject.getData().isLeaf();
+    }
+
+    public boolean isRenderNavigateCustomBtn() {
+        return selectedNavigateObjectType.getCode().equals("УУ");
+    }
+
+    public boolean isDisabledNavigateCustomBtn() {
+        return (selectedNavigateObject == null) || !selectedNavigateObject.getData().isLeaf();
+    }
+
+    public Set<OpcObjectForLinkData> getObjectsForLink() {
+        return objectsForLink;
+    }
+
+    public LazyLinkedDataModel<OpcObjectForLinkData> getOpcObjectParams() {
+        return opcObjectParams;
+    }
+
+    public LazyLinkedDataModel<LinkSchemaData> getLinkSchemaTable() {
+        return linkSchemaTable;
+    }
+
+    public LinkSchemaData getSelectedLinkSchema() {
+        return selectedLinkSchema;
+    }
+
+    public void setSelectedLinkSchema(LinkSchemaData selectedLinkSchema) {
+        this.selectedLinkSchema = selectedLinkSchema;
     }
 }

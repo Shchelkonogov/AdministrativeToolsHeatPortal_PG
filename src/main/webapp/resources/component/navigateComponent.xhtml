@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+   <composite:interface componentType="navigationComponent">
+      <composite:attribute name="bean" type="ru.tecon.admTools.components.navigation.ejb.NavigationBeanLocal"/>
+      <composite:attribute name="showOrgTree" type="java.lang.Boolean" default="true"/>
+      <composite:attribute name="showTerTree" type="java.lang.Boolean" default="false"/>
+      <composite:attribute name="showLinkTree" type="java.lang.Boolean" default="false"/>
+      <composite:attribute name="selectedObject"/>
+      <composite:attribute name="selectedObjectType"/>
+      <composite:attribute name="updateOnReload"/>
+      <composite:clientBehavior name="select" targets="navigateTab:navigateOrgTree" event="select"/>
+      <composite:facet name="customButtons"/>
+   </composite:interface>
+
+   <composite:implementation>
+      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);" update="navigateCustomBtn #{cc.attrs.updateOnReload}"/>
+      <p:remoteCommand name="reloadNavigate" global="false" onstart="PF('navigateAllBui').show();"
+                       action="#{cc.reloadNavigate()}"
+                       oncomplete="navigateRemoveSelect(); PF('navigateAllBui').hide();"
+                       update="navigateHeader navigateSelectObjectType navigateSelectSearchType navigateFilter navigateTab"/>
+      <p:remoteCommand name="clearNavigate" global="false" onstart="PF('navigateAllBui').show(); unselectNode('navigateOrgTreeWidget', false);"
+                       action="#{cc.clearNavigate()}"
+                       oncomplete="PF('navigateAllBui').hide(); navigateRemoveSelect();"
+                       update="navigateHeader navigateSelectObjectType navigateSelectSearchType navigateFilter navigateTab"/>
+
+      <h:outputStylesheet name="component/style.css" library="css" target="header"/>
+
+      <p:panel id="navigatePanel" style="width: 100%; height: 100%;" styleClass="tc-navig-panel-header">
+         <f:facet name="header">
+            <h:outputText id="navigateHeader" value="Навигация (#{cc.selectedObjectTypeCode})"/>
+         </f:facet>
+
+         <p:outputPanel style="height: 100%;">
+            <div style="padding: 3px;">
+                <span class="ui-input-icon-left" style="width: 100%;">
+                    <i class="pi pi-search"/>
+                    <p:inputText id="navigateFilter" binding="#{cc.searchTextUI}"
+                                 placeholder="Поиск... (#{cc.getOverflowText(cc.searchTypeName)})"
+                                 title="#{cc.searchTypeName}" style="width: 100%">
+                        <p:ajax event="keyup" delay="500" listener="#{cc.onSearch}" global="false"
+                                onstart="PF('navigateBui').show();"
+                                oncomplete="navigateRemoveSelect();"
+                                update="navigateTab"/>
+                    </p:inputText>
+                </span>
+            </div>
+
+            <p:tabView id="navigateTab" style="height: calc(100% - 44px);"
+                       styleClass="tc-nav tc-panel tc-nav-width">
+               <p:tab id="org" titletip="Организационная структура" rendered="#{cc.attrs.showOrgTree}">
+                  <f:facet name="title">
+                     <i class="pi pi-sitemap"/>
+                  </f:facet>
+
+                  <div style="height: 100%; border-top: 1px solid #c8c8c8;" class="tc-custom-scroll">
+                     <p:tree id="navigateOrgTree" widgetVar="navigateOrgTreeWidget" value="#{cc.orgTree}" var="node"
+                             dynamic="true" styleClass="ui-noborder" selectionMode="single" animate="true"
+                             selection="#{cc.attrs.selectedObject}">
+                        <p:ajax event="expand" global="false"
+                                onstart="PF('navigateBui').show();"
+                                oncomplete="PF('navigateBui').hide();"/>
+                        <p:ajax event="unselect" global="false"/>
+
+                        <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                           <h:outputText value="#{node.name}" title="#{node.name}"/>
+                        </p:treeNode>
+                        <p:treeNode type="firstDirectory" styleClass="tc-first-tree-item"
+                                    expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                           <h:outputText value="#{node.name}" title="#{node.name}"/>
+                        </p:treeNode>
+                        <p:treeNode type="firstLeaf" styleClass="tc-first-tree-item" icon="fa fa-link tc-fa-xs -rotate-90">
+                           <h:outputText value="#{node.name}" title="#{node.name}"/>
+                        </p:treeNode>
+                        <p:treeNode type="leaf" icon="fa fa-link tc-fa-xs -rotate-90">
+                           <h:outputText value="#{node.name}" title="#{node.name}"/>
+                        </p:treeNode>
+                     </p:tree>
+
+                     <h:outputText rendered="#{cc.emptyOrgTree}" value="Объекты не найдены..." style="display: flex; margin: 3px;"/>
+                  </div>
+               </p:tab>
+
+               <p:tab id="ter" titletip="Территориальная структура города" rendered="#{cc.attrs.showTerTree}">
+                  <f:facet name="title">
+                     <i class="fa-solid fa-city tc-fa-xs"/>
+                  </f:facet>
+               </p:tab>
+
+               <p:tab id="link" titletip="Связи" rendered="#{cc.attrs.showLinkTree}">
+                  <f:facet name="title">
+                     <i class="fa-solid fa-link tc-fa-xs"/>
+                  </f:facet>
+               </p:tab>
+            </p:tabView>
+
+            <p:blockUI block="navigateTab" widgetVar="navigateBui"/>
+         </p:outputPanel>
+
+         <f:facet name="actions">
+            <div style="display: flex;">
+               <h:panelGroup id="navigateCustomBtn" layout="block">
+                  <composite:renderFacet name="customButtons"/>
+               </h:panelGroup>
+               <p:commandLink widgetVar="navigateFilterBtn" title="фильтр"
+                              styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                              onclick="changeVisible(PF('navigateFilterWidget').jq.parent().attr('id'),
+                                       PF('navigateFilterBtn').id,
+                                       PF('navigateSelectObjectTypeWidget').id + '_items',
+                                       PF('navigateSelectSearchTypeWidget').id + '_items'); function e(e) {console(e.pageX);}"
+                              process="@this">
+                  <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
+               </p:commandLink>
+            </div>
+         </f:facet>
+      </p:panel>
+
+      <p:blockUI block="navigatePanel" widgetVar="navigateAllBui"/>
+
+      <div jsf:id="navigateFilterDiv" style="display: none;" class="popupPanel">
+         <p:panel id="filterPanel" widgetVar="navigateFilterWidget" styleClass="tc-panel tc-panel-popup">
+            <f:facet name="header">
+               <span class="ui-icon pi pi-filter-fill" style="margin-right: 5px;" />
+               <h:outputText value="Фильтр" />
+            </f:facet>
+
+            <h:panelGrid columns="2" style="margin: 3px;">
+               <p:outputLabel value="Тип Объекта" style="margin-right: 5px; font-weight: bold;"/>
+               <p:selectOneMenu id="navigateSelectObjectType" widgetVar="navigateSelectObjectTypeWidget" style="width: 170px;"
+                                binding="#{cc.selectedObjectTypeUI}" value="#{cc.attrs.selectedObjectType}"
+                                title="#{objectTypeControllerApplication.defaultObjectType.name}" syncTooltip="true">
+                  <p:ajax listener="#{cc.onObjectTypeChange}" global="false"
+                          onstart="PF('navigateBui').show(); changeVisible(PF('navigateFilterWidget').jq.parent().attr('id'));"
+                          oncomplete="navigateRemoveSelect();"
+                          update="navigateHeader navigateSelectSearchType navigateFilter navigateTab"/>
+                  <f:converter converterId="objectTypeConverter"/>
+
+                  <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
+                                 itemLabel="#{objType.name}" itemValue="#{objType}" itemDescription="#{objType.name}"/>
+               </p:selectOneMenu>
+
+               <p:outputLabel value="Тип поиска" style="font-weight: bold; margin-right: 5px;"/>
+               <p:selectOneMenu id="navigateSelectSearchType" widgetVar="navigateSelectSearchTypeWidget"
+                                value="#{cc.selectedSearch}" style="width: 170px"
+                                title="#{cc.searchList.get(0).objTypeValue}" syncTooltip="true">
+                  <p:ajax listener="#{cc.onSearchTypeChange}" global="false"
+                          onstart="PF('navigateBui').show(); changeVisible(PF('navigateFilterWidget').jq.parent().attr('id'));"
+                          oncomplete="navigateRemoveSelect();"
+                          update="navigateFilter navigateTab"/>
+
+                  <f:selectItems value="#{cc.searchList}" var="prop"
+                                 itemLabel="#{prop.objTypeValue}" itemValue="#{prop.objTypeId}"
+                                 itemDescription="#{prop.objTypeValue}"/>
+               </p:selectOneMenu>
+            </h:panelGrid>
+         </p:panel>
+      </div>
+   </composite:implementation>
+</html>

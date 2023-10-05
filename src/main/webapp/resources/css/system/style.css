@@ -406,3 +406,23 @@ body .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-togg
     text-overflow: ellipsis;
     overflow: hidden;
 }
+
+/*Закругленные стили для tabView*/
+
+body .ui-tabs.ui-tabs-top.tc-nav>.ui-tabs-nav li.ui-tabs-header {
+    margin-right: 3px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+}
+
+body .ui-tabs.ui-tabs-bottom.tc-nav>.ui-tabs-nav li.ui-tabs-header {
+    margin-right: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+body .ui-tabs.ui-tabs-bottom.tc-nav-left>.ui-tabs-nav li.ui-tabs-header {
+    margin-left: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+}

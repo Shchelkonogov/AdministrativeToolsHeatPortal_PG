@@ -15,7 +15,7 @@ function changeVisible(id, ...args) {
         case 'none':
             $(document.body).on('click.' + id, (event) => {
                 if (event.originalEvent !== undefined) {
-                    let checkClick = event.originalEvent.composedPath().includes(document.querySelector('#' + id));
+                    let checkClick = event.originalEvent.composedPath().includes(document.querySelector('#' + id.replaceAll(':', '\\:')));
 
                     for (const arg of args) {
                         checkClick = checkClick || event.originalEvent.composedPath().includes(document.querySelector('#' + arg.replaceAll(':', '\\:')));
@@ -44,7 +44,7 @@ function changeStyle(id, name, value) {
 
 // Если в таблице нет строк и включена группировка строк, то там глюк на одну колонку
 function updateEmptyRow() {
-    const tag = $('.ui-datatable-empty-message').children()
+    const tag = $('#linkerForm\\:linkerTabView\\:objectTabView\\:linkedDataTable_data .ui-datatable-empty-message').children()
     const colspan = tag.prop('colspan');
     if (colspan !== undefined) {
         tag.prop('colspan', colspan + 1);

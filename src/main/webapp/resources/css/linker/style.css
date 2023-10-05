@@ -6,19 +6,13 @@
     border-radius: 3px;
 }
 
-#filterForm\:filterPanel_content,
-#recountForm\:recountPanel_content,
-#filterParamTreeForm\:filterParamTreePanel_content,
-#filterParamOpcTreeForm\:filterParamOpcTreePanel_content {
-    display: flex;
-    justify-content: center;
+body .tc-panel.tc-panel-popup .ui-panel-titlebar {
+    padding-left: 0.1em;
 }
 
-body #filterForm\:filterPanel.tc-panel .ui-panel-titlebar,
-body #recountForm\:recountPanel.tc-panel .ui-panel-titlebar,
-body #filterParamTreeForm\:filterParamTreePanel.tc-panel .ui-panel-titlebar,
-body #filterParamOpcTreeForm\:filterParamOpcTreePanel.tc-panel .ui-panel-titlebar {
-    padding-left: 0.1em;
+body .tc-panel.tc-panel-popup .ui-panel-content {
+    display: flex;
+    justify-content: center;
 }
 
 body .ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon {
@@ -34,34 +28,36 @@ body #linkerForm\:linkerTabView\:objectTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-n
 }
 
 body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
+    padding-left: 0.1rem;
     margin-right: 50%;
 }
 
 /*Устанавливаем свойства scrollbar для дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
-#calcTreeBox .ui-tree-container,
-#paramTreeBox .ui-tree-container,
-#paramOpcTreeBox .ui-tree-container {
+.tc-custom-scroll .ui-tree-container,
+.tc-custom-scroll-small .ui-tree-container {
     overflow: unset;
 }
 
-#calcTreeBox,
-#paramTreeBox,
-#paramOpcTreeBox {
+.tc-custom-scroll,
+.tc-custom-scroll-small {
     overflow: auto;
 }
 
-#calcTreeBox::-webkit-scrollbar,
-#paramTreeBox::-webkit-scrollbar,
-#paramOpcTreeBox::-webkit-scrollbar {
+.tc-custom-scroll::-webkit-scrollbar {
     width: 8px;
     height: 8px;
     display: initial;
 }
 
-#calcTreeBox::-webkit-scrollbar-thumb,
-#paramTreeBox::-webkit-scrollbar-thumb,
-#paramOpcTreeBox::-webkit-scrollbar-thumb {
+.tc-custom-scroll-small::-webkit-scrollbar {
+    width: 3px;
+    height: 8px;
+    display: initial;
+}
+
+.tc-custom-scroll::-webkit-scrollbar-thumb,
+.tc-custom-scroll-small::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.2);
     transition: background 250ms ease;
     border-radius: 2px;
@@ -69,28 +65,23 @@ body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
     -webkit-transition: background 250ms;
 }
 
-#calcTreeBox::-webkit-scrollbar-thumb:hover,
-#paramTreeBox::-webkit-scrollbar-thumb:hover,
-#paramOpcTreeBox::-webkit-scrollbar-thumb:hover {
+.tc-custom-scroll::-webkit-scrollbar-thumb:hover,
+.tc-custom-scroll-small::-webkit-scrollbar-thumb:hover {
     background: rgba(0,0,0,.35);
 }
 
-#calcTreeBox::-webkit-scrollbar-track,
-#paramTreeBox::-webkit-scrollbar-track,
-#paramOpcTreeBox::-webkit-scrollbar-track {
-    background: rgba(0,0,0,.1);
+.tc-custom-scroll::-webkit-scrollbar-track,
+.tc-custom-scroll-small::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0);
     border-width: 0;
 }
 
-#calcTreeBox::-webkit-scrollbar-button,
-#calcTreeBox::-webkit-scrollbar-corner,
-#calcTreeBox::-webkit-resizer,
-#paramTreeBox::-webkit-scrollbar-button,
-#paramTreeBox::-webkit-scrollbar-corner,
-#paramTreeBox::-webkit-resizer,
-#paramOpcTreeBox::-webkit-scrollbar-button,
-#paramOpcTreeBox::-webkit-scrollbar-corner,
-#paramOpcTreeBox::-webkit-resizer {
+.tc-custom-scroll::-webkit-scrollbar-button,
+.tc-custom-scroll::-webkit-scrollbar-corner,
+.tc-custom-scroll::-webkit-resizer,
+.tc-custom-scroll-small::-webkit-scrollbar-button,
+.tc-custom-scroll-small::-webkit-scrollbar-corner,
+.tc-custom-scroll-small::-webkit-resizer {
     display: none;
 }
 
@@ -137,15 +128,11 @@ body #linkerForm\:linkerTabView.ui-tabs.ui-tabs-bottom>.ui-tabs-nav {
 
 /*Стили шапки дерева в закладке "Линкованные объекты / (Вычислимые параметры, Параметры)"*/
 
-#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_header,
-#linkerForm\:linkerTabView\:objectTabView\:paramTreePanel_header,
-#linkerForm\:linkerTabView\:objectTabView\:paramOpcTreePanel_header {
+body .tc-panel-header-small .ui-panel-titlebar {
     padding: 0.394em 0.6em 0.3em 0.7em;
 }
 
-#linkerForm\:linkerTabView\:objectTabView\:calcTreePanel_content,
-#linkerForm\:linkerTabView\:objectTabView\:paramTreePanel_content,
-#linkerForm\:linkerTabView\:objectTabView\:paramOpcTreePanel_content {
+body .tc-panel-header-small .ui-panel-content {
     height: calc(100% - 34px);
 }
 
@@ -175,4 +162,94 @@ body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link:focus {
     outline: 0 none;
     outline-offset: 0;
     box-shadow: none;
+}
+
+/*Стили деревьев с вертикальными и горизонтальными линиями*/
+/*Первая часть (вертикальная линия)*/
+.ui-treenode-children {
+    position: relative;
+}
+
+.ui-treenode-children::after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.ui-treenode-children::after {
+    border-left: 1px dotted #a6a6a6;
+    height: 100%;
+    top: -16px;
+    left: -2.5px;
+}
+
+.ui-tree-container li:last-child>.ui-treenode-children::after {
+    display: none;
+}
+
+.ui-tree-container .tc-first-tree-item>.ui-treenode-children::after {
+    display: none;
+}
+
+/*Вторая часть (уголок)*/
+.ui-treenode-content {
+    position: relative;
+}
+
+.ui-treenode-content::before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.ui-treenode-content::before {
+    border-bottom: 1px dotted #a6a6a6;
+    border-left: 1px dotted #a6a6a6;
+    height: 35px;
+    top: -20px;
+    width: 13px;
+    left: -2px;
+}
+
+.ui-treenode-leaf .ui-treenode-content::before {
+    width: 30px;
+}
+
+.ui-tree-container .tc-first-tree-item>.ui-treenode-content::before {
+    display: none;
+}
+
+/*Стили для выбранных элементов в закладке "Нелинкованные данные"*/
+
+.tc-add-item-info {
+    position: relative;
+    font-size: 14px;
+    float: left;
+    list-style-type: none;
+    padding: 1px 0;
+    margin: 3px;
+    background: #e3f2fd;
+    color: #495057;
+    border-radius: 4px;
+}
+
+.tc-add-item-info-text {
+    padding: 0 1.5rem 0 0.5rem;
+}
+
+.tc-add-item-info-icon {
+    cursor: pointer;
+    position: absolute;
+    right: 0.2em;
+    margin-top: 1px;
+}
+
+/*Стиль для верха таблицы в Линкованные объекты Вычислимые параметры*/
+
+#linkerForm\:linkerTabView\:objectTabView\:calcDataTable_head tr th {
+    padding-top: 0.24em;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }

@@ -1,0 +1,24 @@
+body .ui-tabs.ui-tabs-top.tc-nav.tc-nav-width>.ui-tabs-nav li.ui-tabs-header {
+    width: 70px;
+    justify-content: center;
+}
+
+body .tc-navig-panel-header .ui-panel-titlebar {
+    padding: 0.394em 0.6em 0.3em 0.7em
+}
+
+body .tc-navig-panel-header .ui-panel-content {
+    height: calc(100% - 34px);
+    padding: unset;
+}
+
+body .tc-navig-panel-no-header .ui-panel-content {
+    height: 100%;
+    padding: unset;
+}
+
+.tc-fa-xs {
+    font-size: .75em !important;
+    line-height: .08333em;
+    vertical-align: 0.125em !important;
+}
