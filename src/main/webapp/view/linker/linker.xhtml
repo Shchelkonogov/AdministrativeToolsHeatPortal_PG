@@ -106,9 +106,9 @@
                                                  lazy="true" virtualScroll="true" scrollRows="100"
                                                  emptyMessage="#{global['table.empty.value']}">
 
-                                        <p:ajax event="rowSelect" listener="#{linkerController.onSelectObjectForLink}"
+                                        <p:ajax event="rowSelect" update="linkerForm:linkerTabView:paramBtns"/>
+                                        <p:ajax event="rowDblselect" listener="#{linkerController.onSelectObjectForLink}"
                                                 update="linkerForm:linkerTabView:selectObjects
-                                                        linkerForm:linkerTabView:paramBtns
                                                         linkerForm:linkerTabView:linkBtnForNoLink"/>
 
                                         <p:column headerText="Объекты автоматизации"
@@ -121,9 +121,7 @@
                                             </f:facet>
                                         </p:column>
                                         <p:column headerText="Кол-во тегов" width="120" styleClass="center">
-<!--                                            <div jsf:id="paramCount">-->
-                                                <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
-<!--                                            </div>-->
+                                            <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
                                         </p:column>
                                     </p:dataTable>
                                 </div>
