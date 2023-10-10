@@ -275,7 +275,7 @@ public class LinkerStateless {
                 result.add(new OpcObjectForLinkData(
                         new SystemObject(res.getInt("id"), res.getString("item_name")),
                         res.getInt("param_cnt"),
-                        res.getInt("obj_int_key")));
+                        res.getInt("obj_int_key"), res.getString("server_name")));
             }
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error load opc objects for link", ex);
@@ -704,7 +704,6 @@ public class LinkerStateless {
             while (res.next()) {
                 result.add(new OpcObjectForLinkData(
                         new SystemObject(res.getInt("id"), res.getString("item_name")),
-                        1,
                         res.getInt("obj_int_key")));
             }
         } catch (SQLException ex) {

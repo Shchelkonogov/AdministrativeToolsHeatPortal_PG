@@ -120,6 +120,15 @@
                                                              onkeyup="PF('opcObjectsForNoLinkTableWidget').filter();"/>
                                             </f:facet>
                                         </p:column>
+                                        <p:column headerText="Сервер" width="200"
+                                                  filterBy="#{opcObjectForLink.serverName}" filterMatchMode="contains">
+                                            <h:outputText value="#{opcObjectForLink.serverName}"/>
+
+                                            <f:facet name="filter">
+                                                <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                                             onkeyup="PF('opcObjectsForNoLinkTableWidget').filter();"/>
+                                            </f:facet>
+                                        </p:column>
                                         <p:column headerText="Кол-во тегов" width="120" styleClass="center">
                                             <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
                                         </p:column>
@@ -802,7 +811,7 @@
     </p:dialog>
 
     <p:dialog id="addLinkDialog" widgetVar="addLinkDialogWidget"
-              width="500" height="500" modal="true" resizable="false"
+              width="800" height="500" modal="true" resizable="false"
               styleClass="tc-panel" showEffect="fade" hideEffect="fade">
 
         <f:facet name="header">
@@ -825,6 +834,15 @@
                 <p:column headerText="Объекты автоматизации"
                           filterBy="#{opcObjectForLink.opcObject.name}" filterMatchMode="contains">
                     <h:outputText value="#{opcObjectForLink.opcObject.name}"/>
+
+                    <f:facet name="filter">
+                        <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                     onkeyup="PF('opcObjectsForLinkTableWidget').filter();"/>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="Сервер" width="200"
+                          filterBy="#{opcObjectForLink.serverName}" filterMatchMode="contains">
+                    <h:outputText value="#{opcObjectForLink.serverName}"/>
 
                     <f:facet name="filter">
                         <p:inputText placeholder="Поиск..." style="width: 100%;"

@@ -20,16 +20,24 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
     private SystemObject opcObject;
     private int paramCount;
     private int objIntKey;
+    private String serverName;
 
     public OpcObjectForLinkData() {
         uuid = UUID.randomUUID();
     }
 
-    public OpcObjectForLinkData(SystemObject opcObject, int paramCount, int objIntKey) {
+    public OpcObjectForLinkData(SystemObject opcObject, int objIntKey) {
+        this();
+        this.opcObject = opcObject;
+        this.objIntKey = objIntKey;
+    }
+
+    public OpcObjectForLinkData(SystemObject opcObject, int paramCount, int objIntKey, String serverName) {
         this();
         this.opcObject = opcObject;
         this.paramCount = paramCount;
         this.objIntKey = objIntKey;
+        this.serverName = serverName;
     }
 
     public void setOpcObject(SystemObject opcObject) {
@@ -42,6 +50,14 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
 
     public int getParamCount() {
         return paramCount;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getServerName() {
+        return serverName;
     }
 
     @Override
@@ -80,12 +96,12 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OpcObjectForLinkData that = (OpcObjectForLinkData) o;
-        return paramCount == that.paramCount && objIntKey == that.objIntKey && uuid.equals(that.uuid) && Objects.equals(opcObject, that.opcObject);
+        return paramCount == that.paramCount && objIntKey == that.objIntKey && Objects.equals(uuid, that.uuid) && Objects.equals(opcObject, that.opcObject) && Objects.equals(serverName, that.serverName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, opcObject, paramCount, objIntKey);
+        return Objects.hash(uuid, opcObject, paramCount, objIntKey, serverName);
     }
 
     @Override
@@ -95,6 +111,7 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
                 .add("opcObject=" + opcObject)
                 .add("paramCount=" + paramCount)
                 .add("objIntKey=" + objIntKey)
+                .add("serverName='" + serverName + "'")
                 .toString();
     }
 }
