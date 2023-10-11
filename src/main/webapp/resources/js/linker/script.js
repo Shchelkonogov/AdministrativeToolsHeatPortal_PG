@@ -81,7 +81,7 @@ function scrollToSelectedNode(widgetVar) {
     const selectedElement = PF(widgetVar).jq.find('li .ui-state-highlight');
     if (selectedElement != null && selectedElement.position() !== undefined) {
         const scrollPanel = PF(widgetVar).jq.parent();
-        scrollPanel.scrollTop(selectedElement.position().top - scrollPanel.height() / 2);
+        scrollPanel.scrollTop(selectedElement.offset().top + scrollPanel.scrollTop() - scrollPanel.offset().top - scrollPanel.height() / 2);
     }
 }
 
