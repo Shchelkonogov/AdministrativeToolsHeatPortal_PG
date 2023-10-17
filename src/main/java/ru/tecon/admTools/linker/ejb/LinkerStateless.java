@@ -9,10 +9,7 @@ import javax.ejb.*;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -719,6 +716,7 @@ public class LinkerStateless {
      * @return список схем линковок
      * @throws SystemParamException ошибка получения списка
      */
+    @TransactionAttribute(TransactionAttributeType.NEVER)
     public List<LinkSchemaData> getSchemaListForLink(int systemObjectId, List<OpcObjectForLinkData> opcObjectList) throws SystemParamException {
         List<LinkSchemaData> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
@@ -742,6 +740,7 @@ public class LinkerStateless {
                         res.getInt("all_nlinked")
                 ));
             }
+            result.sort(Collections.reverseOrder());
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error load schema list", ex);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));

@@ -1,5 +1,7 @@
 package ru.tecon.admTools.linker.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -8,7 +10,7 @@ import java.util.UUID;
  * @author Maksim Shchelkonogov
  * 03.10.2023
  */
-public class LinkSchemaData implements Serializable, LazyData {
+public class LinkSchemaData implements Serializable, LazyData, Comparable<LinkSchemaData> {
 
     private final UUID uuid;
     private Schema schema;
@@ -83,5 +85,10 @@ public class LinkSchemaData implements Serializable, LazyData {
                 .add("neqNoLinked=" + neqNoLinked)
                 .add("allNoLinked=" + allNoLinked)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(@NotNull LinkSchemaData o) {
+        return Integer.compare(getEqLinked(), o.getEqLinked());
     }
 }
