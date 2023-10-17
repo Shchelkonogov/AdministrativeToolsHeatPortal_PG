@@ -91,11 +91,13 @@ public class LinkerController implements Serializable {
 
     // Закладка "Линкованные объекты / Параметры"
 
+    private static final String DEFAULT_MODEL_TYPE = "Обобщенная модель";
+
     private final TreeNode<TreeData> rootKmOmTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedParamTreeNode;
 
     private String filterParamTreeValue = "";
-    private String paramTreePanelHeader = "Конкретная модель";
+    private String paramTreePanelHeader = DEFAULT_MODEL_TYPE;
 
     private final TreeNode<TreeData> rootOpcTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedParamOpcTreeNode;
@@ -203,7 +205,7 @@ public class LinkerController implements Serializable {
 
                 // Очищаю вкладку "Линкованные объекты / Параметры"
                 filterParamTreeValue = "";
-                paramTreePanelHeader = "Конкретная модель";
+                paramTreePanelHeader = DEFAULT_MODEL_TYPE;
                 if (selectedParamTreeNode != null) {
                     PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
                     selectedParamTreeNode = null;
@@ -230,7 +232,7 @@ public class LinkerController implements Serializable {
                 PrimeFaces.current().executeScript("PF('calcTreeWidget').filter(); " +
                         "PF('paramTreeWidget').filter(); " +
                         "PF('paramOpcTreeWidget').filter(); " +
-                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(1); " +
+                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(2); " +
                         "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1); " +
                         "PF('objectTabViewWidget').select(0, true); " +
                         "PF('objectTabViewWidget').disable(1); " +
@@ -269,7 +271,7 @@ public class LinkerController implements Serializable {
                 calcDataTableList.clear();
 
                 // Очищаю вкладку "Линкованные объекты / Параметры"
-                paramTreePanelHeader = "Конкретная модель";
+                paramTreePanelHeader = DEFAULT_MODEL_TYPE;
                 filterParamTreeValue = "";
                 if (selectedParamTreeNode != null) {
                     PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
@@ -299,7 +301,7 @@ public class LinkerController implements Serializable {
                         "PF('paramTreeWidget').filter(); " +
                         "PF('paramOpcTreeWidget').filter(); " +
                         "addOnDblClickEvents(); " +
-                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(1); " +
+                        "PF('filterParamTreeSelectOneMenuWidget').selectValue(2); " +
                         "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
                 break;
             case "Параметры":
@@ -312,7 +314,7 @@ public class LinkerController implements Serializable {
                 }
 
                 if ((selectedLinkedObjectId != null) && (rootKmOmTree.getChildren().isEmpty())) {
-                    prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.KM), rootKmOmTree);
+                    prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OM), rootKmOmTree);
 
                     prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC), rootOpcTree, null);
                 }
