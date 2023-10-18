@@ -1,0 +1,924 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:custom="http://xmlns.jcp.org/jsf/composite/component"
+      xmlns:wordStyle="http://xmlns.jcp.org/jsf/composite/component/wordStyle">
+<h:head>
+    <h:outputStylesheet name="system/style.css" library="css"/>
+    <h:outputStylesheet name="primeflex/3.3.1/primeflex.min.css" library="webjars"/>
+    <h:outputStylesheet name="/font-awesome/6.4.2/css/all.min-jsf.css" library="webjars"/>
+    <h:outputStylesheet name="/font-awesome/6.4.2/css/v4-shims.min-jsf.css" library="webjars"/>
+    <h:outputScript name="linker/script.js" library="js"/>
+</h:head>
+<h:body>
+    <h:outputStylesheet name="linker/style.css" library="css"/>
+
+    <p:growl id="growl" showDetail="true" />
+
+    <p:ajaxStatus onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" delay="300"/>
+
+    <h:form>
+        <p:remoteCommand name="createMaskWrapper" action="#{linkerControllerWS.createMask()}" update="growl" />
+        <p:remoteCommand name="updateParamTrees" action="#{linkerControllerWS.updateParamTreesWrapper()}"
+                         oncomplete="handleMsg(xhr, status, args);" />
+        <p:remoteCommand name="removeNoLinkObject" action="#{linkerControllerWS.removeObjectForLink}"
+                         update="linkerForm:linkerTabView:selectObjects
+                                linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+        <p:remoteCommand name="schemaLinkDialogClose" action="#{linkerControllerWS.schemaLinkDialogClose()}"
+                         oncomplete="PF('schemaLinkDialogWidget').hide();"/>
+    </h:form>
+
+    <h:form id="linkerForm" style="height: 100%">
+        <p:tabView id="linkerTabView" style="padding: 0.1rem; height: 100%;" orientation="bottom" styleClass="tc-panel tc-nav">
+
+            <p:ajax event="tabChange" listener="#{linkerControllerWS.onTabChange}"
+                    onstart="PF('statusDialog').show();"
+                    oncomplete="PF('statusDialog').hide();"
+                    update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                            linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                            linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                            linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader"
+                    global="false"/>
+
+            <p:tab title="Нелинкованные объекты">
+                <div style="display: flex; align-items: center; margin: 0 2px;">
+                    <div style="width: 375px;" class="center">
+                        <p:outputLabel value="ЛИНКОВЩИК" styleClass="tc-title"/>
+                        <p:outputLabel value="(НЕЛИНКОВАННЫЕ ОБЪЕКТЫ)" styleClass="tc-subtitle"/>
+                    </div>
+                    <div style="display: flex; flex: 1 1 auto; gap: 1px; max-width: calc(100% - 375px); justify-content: flex-end;">
+                        <wordStyle:customToolbar bottomText="Календарь" icon="fa fa-calendar" width="310px"/>
+                        <wordStyle:customToolbar id="settingNoLinkBar" bottomText="Установки и параметры" icon="fa fa-sliders fa-rotate-90">
+                            <f:facet name="data">
+                                <div class="tc-word-settings" style="justify-content: space-between;">
+                                    <h:panelGroup id="paramBtns" layout="block">
+                                        <div class="tc-word-settings">
+                                            <p:commandButton value="Параметры" style="white-space: nowrap;"
+                                                             disabled="#{linkerControllerWS.disabledParamButtonsForNoLink}"
+                                                             process="@this"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             action="#{linkerControllerWS.loadOpcObjectParams()}"
+                                                             oncomplete="PF('showOpcObjectParamsDialogWidget').show(); PF('showOpcObjectParamsTableWidget').filter();"
+                                                             update="showOpcObjectParamsDialogHeader"/>
+                                            <p:commandButton value="Запрос параметров" style="white-space: nowrap;"
+                                                             disabled="#{linkerControllerWS.disabledParamButtonsForNoLink}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             action="#{linkerControllerWS.requestOpcParamForNoLink()}"
+                                                             process="@this" global="false"
+                                                             onstart="PF('statusDialog').show();"
+                                                             oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                             update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                                        linkerForm:linkerTabView:selectObjects
+                                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                            <p:commandButton value="Создать Фикт.УУ" style="white-space: nowrap;"
+                                                             disabled="#{linkerControllerWS.disabledNavigateCustomBtn or !linkerControllerWS.renderNavigateCustomBtn}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             process="@this" global="false"
+                                                             action="#{linkerControllerWS.createFictitiousYY()}"
+                                                             onstart="PF('statusDialog').show();"
+                                                             oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                             update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                                        linkerForm:linkerTabView:selectObjects
+                                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                        </div>
+                                        <div class="tc-word-settings">
+                                            <p:commandButton value="Очистить объект" style="white-space: nowrap;"
+                                                             disabled="#{linkerControllerWS.disabledParamButtonsForNoLink}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             action="#{linkerControllerWS.removeOpcObjectParams()}"
+                                                             process="@this" global="false"
+                                                             onstart="PF('statusDialog').show();"
+                                                             oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                             update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                                        linkerForm:linkerTabView:selectObjects
+                                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                            <p:commandButton value="Удалить объект" style="white-space: nowrap;"
+                                                             disabled="#{linkerControllerWS.disabledParamButtonsForNoLink}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             action="#{linkerControllerWS.removeOpcObject()}"
+                                                             process="@this" global="false"
+                                                             onstart="PF('statusDialog').show();"
+                                                             oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                             update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                                        linkerForm:linkerTabView:selectObjects
+                                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                        </div>
+                                    </h:panelGroup>
+                                    <div style="display: flex; align-items: center;">
+                                        <p:commandButton id="linkBtnForNoLink" value="Слинковать объект" style="white-space: nowrap;"
+                                                         disabled="#{linkerControllerWS.disabledLinkBtnForNoLink}"
+                                                         styleClass="tc-no-loading tc-button-word"
+                                                         action="#{linkerControllerWS.linkNoLinkedObjects()}"
+                                                         process="@this" global="false"
+                                                         onstart="PF('statusDialog').show();"
+                                                         oncomplete="PF('statusDialog').hide();"
+                                                         update="growl"/>
+                                    </div>
+                                </div>
+                            </f:facet>
+                        </wordStyle:customToolbar>
+                        <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
+                        <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
+                            <p:commandButton icon="pi pi-file" value="${redirect.name}"
+                                             onclick="window.open('${redirect.value}', '_blank').focus();"
+                                             styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                             style="width: 100%; text-align: initial; color: #000;" />
+                        </wordStyle:customToolbarDropdown>
+                        <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
+                        <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                    </div>
+                </div>
+
+                <p:panel id="noLinkedDataPanel" header="Нелинкованные объекты" styleClass="tc-panel"
+                         style="padding: 0.1rem 0.1rem 0; height: calc(100% - 88px);">
+                    <div style="display: flex; height: 100%; padding: 3px;">
+                        <div style="height: 100%; margin-right: 3px; width: 366px;">
+                            <custom:navigateComponent id="navigate" bean="#{linkerControllerWS.navigationBean}"
+                                                      selectedObject="#{linkerControllerWS.selectedNavigateObject}"
+                                                      selectedObjectType="#{linkerControllerWS.selectedNavigateObjectType}"
+                                                      updateOnReload="linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink">
+                                <p:ajax event="select"
+                                        update="linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink
+                                                linkerForm:linkerTabView:settingNoLinkBar:paramBtns"/>
+                            </custom:navigateComponent>
+                        </div>
+                        <div style="width: calc(100% - 369px);">
+                            <p:panel header="Объекты" styleClass="tc-panel tc-panel-header-small">
+                                <h:panelGroup id="selectObjects" styleClass="tc-custom-scroll-small" layout="block" style="height: 40px; overflow: auto; padding-top: 8px;">
+                                    <ul style="margin: 0; padding: 0;">
+                                        <c:forEach items="#{linkerControllerWS.objectsForLink}" var="item">
+                                            <li class="tc-add-item-info">
+                                                <span class="pi pi-times tc-add-item-info-icon" onclick="removeNoLinkObject([{name:'id', value:'#{item.id}'}]);"/>
+                                                <span class="tc-add-item-info-text">#{item.opcObject.name}</span>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                    <h:outputText rendered="#{empty linkerControllerWS.objectsForLink}" value="Выбранные объекты..."
+                                                  style="display: block; color: #8e8e8e; margin-top: 3px; margin-left: 3px;"/>
+                                </h:panelGroup>
+                                <div style="height: calc(100% - 46px); padding: 3px 0 3px 3px;">
+                                    <p:dataTable id="opcObjectsForNoLinkTable" value="#{linkerControllerWS.opcObjectsForNoLinkData}" var="opcObjectForLink"
+                                                 rowKey="#{opcObjectForLink.id}" widgetVar="opcObjectsForNoLinkTableWidget"
+                                                 selection="#{linkerControllerWS.selectedOpcObjectsForNoLink}" selectionMode="single"
+                                                 scrollable="true" scrollHeight="100%"
+                                                 lazy="true" virtualScroll="true" scrollRows="100"
+                                                 emptyMessage="#{global['table.empty.value']}">
+
+                                        <p:ajax event="rowSelect" update="linkerForm:linkerTabView:settingNoLinkBar:paramBtns"/>
+                                        <p:ajax event="rowDblselect" listener="#{linkerControllerWS.onSelectObjectForLink}"
+                                                update="linkerForm:linkerTabView:selectObjects
+                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+
+                                        <p:column headerText="Объекты автоматизации"
+                                                  filterBy="#{opcObjectForLink.opcObject.name}" filterMatchMode="contains">
+                                            <h:outputText value="#{opcObjectForLink.opcObject.name}"/>
+
+                                            <f:facet name="filter">
+                                                <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                                             onkeyup="PF('opcObjectsForNoLinkTableWidget').filter();"/>
+                                            </f:facet>
+                                        </p:column>
+                                        <p:column headerText="Сервер" width="200"
+                                                  filterBy="#{opcObjectForLink.serverName}" filterMatchMode="contains">
+                                            <h:outputText value="#{opcObjectForLink.serverName}"/>
+
+                                            <f:facet name="filter">
+                                                <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                                             onkeyup="PF('opcObjectsForNoLinkTableWidget').filter();"/>
+                                            </f:facet>
+                                        </p:column>
+                                        <p:column headerText="Кол-во тегов" width="120" styleClass="center">
+                                            <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </p:panel>
+                        </div>
+                    </div>
+                </p:panel>
+            </p:tab>
+            <p:tab title="Линкованные объекты">
+                <p:tabView id="objectTabView" widgetVar="objectTabViewWidget"
+                           style="padding: 0 0.1rem 0.1rem; height: calc(100% + 37px);" orientation="bottom" styleClass="tc-panel tc-nav-left">
+
+                    <p:ajax event="tabChange" listener="#{linkerControllerWS.onTabChange}"
+                            onstart="PF('statusDialog').show(); updateEmptyRow();"
+                            oncomplete="PF('statusDialog').hide();"
+                            update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                    linkerForm:linkerTabView:objectTabView:linkedDataTable
+                                    linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader
+                                    linkerForm:linkerTabView:objectTabView:paramDataPanelHeader"
+                            global="false"/>
+
+                    <p:tab title="Объекты">
+                        <div style="display: flex; align-items: center; margin: 0 calc(2px - .1rem) .1rem;">
+                            <div style="width: 375px;" class="center">
+                                <p:outputLabel value="ЛИНКОВЩИК" styleClass="tc-title"/>
+                                <p:outputLabel value="(ЛИНКОВАННЫЕ ОБЪЕКТЫ)" styleClass="tc-subtitle"/>
+                            </div>
+                            <div style="display: flex; flex: 1 1 auto; gap: 1px; max-width: calc(100% - 375px); justify-content: flex-end;">
+                                <wordStyle:customToolbar bottomText="Календарь" icon="fa fa-calendar" width="310px"/>
+                                <wordStyle:customToolbar id="settingLinkBar" bottomText="Установки и параметры" icon="fa fa-sliders fa-rotate-90">
+                                    <f:facet name="data">
+                                        <div class="tc-word-settings" style="justify-content: space-between;">
+                                            <div class="tc-word-settings">
+                                                <h:panelGroup styleClass="ui-inputgroup">
+                                                    <h:panelGroup styleClass="ui-inputgroup-addon">
+                                                        Тип объектов
+                                                    </h:panelGroup>
+                                                    <p:selectOneMenu value="#{linkerControllerWS.selectedObjectType}" id="filterSelectOneMenu" style="width: 150px;">
+                                                        <p:ajax listener="#{linkerControllerWS.onObjectTypeChange}" global="false"
+                                                                onstart="PF('statusDialog').show();"
+                                                                oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').clearFilters();
+                                                                            PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);
+                                                                            PF('linkedSubsFilterWidget').selectValue('');"
+                                                                update="linkerForm:linkerTabView:objectTabView:linkedDataPanelHeader
+                                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+                                                        <f:converter converterId="objectTypeConverter"/>
+
+                                                        <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
+                                                                       itemLabel="#{objType.name}" itemValue="#{objType}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+                                                <h:panelGroup styleClass="ui-inputgroup">
+                                                    <h:panelGroup styleClass="ui-inputgroup-addon" style="padding: 0;">
+                                                        <p:commandButton id="setSchemaNameBtn" value="Создать схему с именем" style="color: #848484;"
+                                                                         styleClass="ui-button-flat ui-button-secondary tc-no-loading"
+                                                                         disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                         action="#{linkerControllerWS.createMaskWrapper()}"/>
+                                                    </h:panelGroup>
+                                                    <p:inputText value="#{linkerControllerWS.newMaskName}"/>
+                                                </h:panelGroup>
+                                            </div>
+                                            <h:panelGroup styleClass="ui-inputgroup">
+                                                <h:panelGroup styleClass="ui-inputgroup-addon">
+                                                    Подписка
+                                                </h:panelGroup>
+                                                <p:selectOneMenu title="Все" syncTooltip="true" widgetVar="linkedSubsFilterWidget"
+                                                                 valueChangeListener="#{linkerControllerWS.onSubsFilter}"
+                                                                 style="width: 150px;">
+                                                    <p:ajax update="linkerForm:linkerTabView:objectTabView:linkedDataTable"
+                                                            oncomplete="updateEmptyRow(); addOnDblClickEvents();"/>
+
+                                                    <f:selectItem itemLabel="Все" noSelectionOption="true" itemDescription="Все"/>
+                                                    <f:selectItem itemLabel="Подписанные" itemValue="#{true}" itemDescription="Подписанные"/>
+                                                    <f:selectItem itemLabel="Не подписанные" itemValue="#{false}" itemDescription="Не подписанные"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="tc-word-settings" style="justify-content: space-between;">
+                                            <h:panelGroup id="recountBtn" layout="block" class="tc-word-settings" style="gap: 0;">
+                                                <p:commandButton value="Пересчет давлений" style="white-space: nowrap;"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                 action="#{linkerControllerWS.recount('PRESSURE')}"
+                                                                 update="growl"/>
+                                                <p:commandButton value="Пересчет времен" style="white-space: nowrap;"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                 action="#{linkerControllerWS.recount('TIME')}"
+                                                                 update="growl"/>
+                                                <p:commandButton value="Пересчет сопротивлений" style="white-space: nowrap;"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                 action="#{linkerControllerWS.recount('RESISTANCE')}"
+                                                                 update="growl"/>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="linkBtnGroup" layout="block" class="tc-word-settings">
+                                                <div class="tc-word-settings" style="gap: 0;">
+                                                    <p:commandButton value="Разлинковать" style="white-space: nowrap;"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     onstart="PF('statusDialog').show();"
+                                                                     oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                                     update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"
+                                                                     action="#{linkerControllerWS.removeLink}" global="false"/>
+                                                    <p:commandButton value="Разлинковать все" style="white-space: nowrap;"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     onstart="PF('statusDialog').show();"
+                                                                     oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                                     update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"
+                                                                     action="#{linkerControllerWS.removeAllLinks}" global="false"/>
+                                                </div>
+                                                <p:commandButton value="Долинковать" style="white-space: nowrap;"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 action="#{linkerControllerWS.loadOpcObjectsForLink()}"
+                                                                 oncomplete="PF('addLinkDialogWidget').show(); PF('opcObjectsForLinkTableWidget').filter();"
+                                                                 update="addLinkDialogHeader"/>
+                                            </h:panelGroup>
+                                        </div>
+
+                                    </f:facet>
+                                </wordStyle:customToolbar>
+                                <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
+                                <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
+                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
+                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
+                                <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
+                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                            </div>
+                        </div>
+
+                        <p:panel id="linkedDataPanel" styleClass="tc-panel" style="height: calc(100% - 88px);">
+                            <f:facet name="header">
+                                <h:outputText id="linkedDataPanelHeader"
+                                              value="Линкованные объекты (#{linkerControllerWS.selectedObjectType.code})"/>
+                            </f:facet>
+
+                            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
+                                <p:dataTable binding="#{linkerControllerWS.linkedTable}" id="linkedDataTable" value="#{linkerControllerWS.linkedData}" var="link"
+                                             rowKey="#{link.id}" widgetVar="linkedDataTableWidget" rowIndexVar="rowIndex"
+                                             selection="#{linkerControllerWS.selectedLinkedData}" selectionMode="single"
+                                             scrollable="true" scrollHeight="100%"
+                                             lazy="true" virtualScroll="true" scrollRows="100"
+                                             emptyMessage="#{global['table.empty.value']}">
+
+                                    <p:ajax event="virtualScroll" oncomplete="addOnDblClickEvents();"/>
+                                    <p:ajax event="filter" oncomplete="updateEmptyRow(); addOnDblClickEvents();"/>
+                                    <p:ajax event="rowSelect" listener="#{linkerControllerWS.onLinkedRowSelect}"
+                                            oncomplete="PF('objectTabViewWidget').enable(1); PF('objectTabViewWidget').enable(2);"
+                                            update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+                                    <p:ajax event="contextMenu" listener="#{linkerControllerWS.onLinkedRowSelect}"
+                                            oncomplete="PF('objectTabViewWidget').enable(1); PF('objectTabViewWidget').enable(2);"
+                                            update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+
+                                    <p:column headerText="Объекты системы" width="300" groupRow="true"
+                                              filterBy="#{link.dbObject.name}" filterMatchMode="contains">
+                                        <p:outputLabel id="systemObjectName" value="#{link.dbObject.name}"/>
+
+                                        <f:facet name="filter">
+                                            <p:inputText placeholder="Поиск..." style="width: 100%"
+                                                         onkeyup="PF('linkedDataTableWidget').filter();"/>
+                                        </f:facet>
+                                    </p:column>
+                                    <p:column headerText="Схема линковки" width="200">
+                                        <h:outputText id="schemaName" value="#{link.schema.name}" title="#{link.schema.name}"/>
+                                    </p:column>
+                                    <p:column headerText="Объекты автоматизации" width="300"
+                                              filterBy="#{link.opcObject.name}" filterMatchMode="contains">
+                                        <h:outputText value="#{link.opcObject.name}"/>
+
+                                        <f:facet name="filter">
+                                            <p:inputText placeholder="Поиск..." style="width: 100%"
+                                                         onkeyup="PF('linkedDataTableWidget').filter();"/>
+                                        </f:facet>
+                                    </p:column>
+                                    <p:column headerText="Сервер" width="200"
+                                              filterBy="#{link.serverName}" filterMatchMode="contains">
+                                        <h:outputText value="#{link.serverName}"/>
+
+                                        <f:facet name="filter">
+                                            <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                                         onkeyup="PF('linkedDataTableWidget').filter();"/>
+                                        </f:facet>
+                                    </p:column>
+                                    <p:column headerText="Подписан" width="70" styleClass="center"
+                                              filterBy="#{link.subscribed}" filterMatchMode="exact" filterStyle="display: none;">
+                                        <p:selectBooleanCheckbox value="#{link.subscribed}">
+                                            <p:ajax listener="#{linkerControllerWS.subscribe(link)}" update="@this growl"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </p:panel>
+                    </p:tab>
+                    <p:tab title="Параметры">
+                        <div style="display: flex; align-items: center; margin: 0 calc(2px - .1rem) .1rem;">
+                            <div style="width: 375px;" class="center">
+                                <p:outputLabel value="ЛИНКОВЩИК" styleClass="tc-title"/>
+                                <p:outputLabel value="(ПАРАМЕТРЫ)" styleClass="tc-subtitle"/>
+                            </div>
+                            <div style="display: flex; flex: 1 1 auto; gap: 1px; max-width: calc(100% - 375px); justify-content: flex-end;">
+                                <wordStyle:customToolbar bottomText="Календарь" icon="fa fa-calendar" width="310px"/>
+                                <wordStyle:customToolbar id="settingParamBar" bottomText="Установки и параметры" icon="fa fa-sliders fa-rotate-90">
+                                    <f:facet name="data">
+                                        <div class="tc-word-settings" style="justify-content: space-between;">
+                                            <h:panelGroup styleClass="ui-inputgroup">
+                                                <h:panelGroup styleClass="ui-inputgroup-addon">
+                                                    Модель
+                                                </h:panelGroup>
+                                                <p:selectOneMenu id="filterParamTreeSelectOneMenu" style="width: 150px;" widgetVar="filterParamTreeSelectOneMenuWidget"
+                                                                 valueChangeListener="#{linkerControllerWS.onParamTreeModelChange}">
+                                                    <p:ajax global="false"
+                                                            onstart="PF('statusDialog').show();"
+                                                            oncomplete="PF('statusDialog').hide(); PF('paramTreeWidget').filter();
+                                                                        unselectNode('paramTreeWidget', false);
+                                                                        unselectNode('paramOpcTreeWidget', false);"
+                                                            update="linkerForm:linkerTabView:objectTabView:paramTreePanelHeader
+                                                                    linkerForm:linkerTabView:objectTabView:filterParamTree"/>
+
+                                                    <f:selectItem itemLabel="Конкретная модель" itemValue="1"/>
+                                                    <f:selectItem itemLabel="Обобщенная модель" itemValue="2"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+
+                                            <div class="tc-word-settings">
+                                                <p:commandButton id="requestOpcParamBtn" value="Запрос параметров" style="white-space: nowrap;"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 action="#{linkerControllerWS.requestOpcParam}"
+                                                                 process="@this" global="false"
+                                                                 onstart="PF('statusDialog').show();"
+                                                                 oncomplete="PF('statusDialog').hide();"/>
+                                                <p:commandButton id="refreshParamOpcTreeBtn" value="Параметры"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 action="#{linkerControllerWS.refreshParamOpcTree}"
+                                                                 process="@this" global="false"
+                                                                 onstart="PF('statusDialog').show();"
+                                                                 oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                                                                                unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);
+                                                                                PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);"
+                                                                 update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
+                                                                            linkerForm:linkerTabView:objectTabView:filterParamOpcTree"/>
+                                            </div>
+
+                                            <h:panelGroup styleClass="ui-inputgroup">
+                                                <h:panelGroup styleClass="ui-inputgroup-addon">
+                                                    Линковка
+                                                </h:panelGroup>
+                                                <p:selectOneMenu id="filterParamOpcTreeSelectOneMenu" style="width: 150px;" widgetVar="filterParamOpcTreeSelectOneMenuWidget"
+                                                                 valueChangeListener="#{linkerControllerWS.onParamOpcTreeModelChange}">
+                                                    <p:ajax global="false"
+                                                            onstart="PF('statusDialog').show();"
+                                                            oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                                                                        unselectNode('paramTreeWidget', false);
+                                                                        unselectNode('paramOpcTreeWidget', false);"
+                                                            update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
+                                                                    linkerForm:linkerTabView:objectTabView:filterParamOpcTree"/>
+
+                                                    <f:selectItem itemLabel="Все параметры" itemValue="1"/>
+                                                    <f:selectItem itemLabel="Линкованные параметры" itemValue="2"/>
+                                                    <f:selectItem itemLabel="Нелинкованные параметры" itemValue="3"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </div>
+                                    </f:facet>
+                                </wordStyle:customToolbar>
+                                <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
+                                <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
+                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
+                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
+                                <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
+                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                            </div>
+                        </div>
+
+                        <p:panel id="paramDataPanel" styleClass="tc-panel" style="height: calc(100% - 88px);">
+                            <f:facet name="header">
+                                <h:outputText id="paramDataPanelHeader"
+                                              value="Параметры#{linkerControllerWS.fullObjectName}"/>
+                            </f:facet>
+
+                            <div style="height: 100%; padding: 3px; display: flex;">
+                                <p:panel id="paramTreePanel" styleClass="tc-panel tc-panel-header-small" style="width: 40%; margin-right: 3px;">
+                                    <f:facet name="header">
+                                        <h:outputText id="paramTreePanelHeader"
+                                                      value="#{linkerControllerWS.paramTreePanelHeader}"/>
+                                    </f:facet>
+
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterParamTree" value="#{linkerControllerWS.filterParamTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%">
+                                                <p:ajax event="keyup" oncomplete="PF('paramTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
+                                        <p:tree id="paramTree" value="#{linkerControllerWS.rootKmOmTree}" var="paramNode" styleClass="ui-noborder"
+                                                widgetVar="paramTreeWidget" filterFunction="#{linkerControllerWS.customFilter}"
+                                                dynamic="true" animate="true"
+                                                selection="#{linkerControllerWS.selectedParamTreeNode}" selectionMode="single"
+                                                draggable="true" droppable="true" onDrop="#{linkerControllerWS.onDrop}" dragdropScope="param">
+
+                                            <p:ajax event="select" listener="#{linkerControllerWS.onSelectParamTree}"
+                                                    onstart="unselectNode('paramOpcTreeWidget');"
+                                                    oncomplete="handleMsg(xhr, status, args);"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand" oncomplete="initDragDropForTree('paramTreeWidget');"/>
+                                            <p:ajax event="filter" oncomplete="initDragDropForTree('paramTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="selectNode('paramTreeWidget');"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="TP" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder" styleClass="tc-first-tree-item">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="PT" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LPA" icon="pi pi-cog lColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLPA" icon="pi pi-cog nlColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlColor">
+                                                <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+
+                                        <p:contextMenu for="paramTree" nodeType="LSA" style="width: 150px;">
+                                            <p:menuitem value="Разлинковать" process="@this"
+                                                        action="#{linkerControllerWS.removeParamLink()}"
+                                                        icon="pi pi-minus-circle"/>
+                                        </p:contextMenu>
+                                    </div>
+                                </p:panel>
+
+                                <p:panel id="paramOpcTreePanel" styleClass="tc-panel tc-panel-header-small" style="width: 60%;">
+                                    <f:facet name="header">
+                                        <h:outputText id="paramOpcTreePanelHeader"
+                                                      value="Тэги источников данных объектов (#{linkerControllerWS.paramOpcTreePanelHeader})"/>
+                                    </f:facet>
+
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterParamOpcTree" value="#{linkerControllerWS.filterParamOpcTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%" >
+                                                <p:ajax event="keyup" oncomplete="PF('paramOpcTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
+                                        <p:tree id="paramOpcTree" value="#{linkerControllerWS.rootOpcTree}" var="paramOpcNode" styleClass="ui-noborder"
+                                                widgetVar="paramOpcTreeWidget" filterFunction="#{linkerControllerWS.customFilter}"
+                                                dynamic="true" animate="true"
+                                                selection="#{linkerControllerWS.selectedParamOpcTreeNode}" selectionMode="single"
+                                                draggable="true" droppable="true" onDrop="#{linkerControllerWS.onDrop}" dragdropScope="param">
+
+                                            <p:ajax event="select" listener="#{linkerControllerWS.onSelectParamTree}"
+                                                    onstart="unselectNode('paramTreeWidget');"
+                                                    oncomplete="handleMsg(xhr, status, args);"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
+                                            <p:ajax event="filter" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="selectNode('paramOpcTreeWidget');"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LOO" expandedIcon="pi pi-folder-open lColor" collapsedIcon="pi pi-folder lColor" styleClass="tc-first-tree-item">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLOO" expandedIcon="pi pi-folder-open nlColor" collapsedIcon="pi pi-folder nlColor" styleClass="tc-first-tree-item">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LOP" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLOP" icon="pi pi pi-check-circle nlColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLBOP" icon="pi pi pi-check-circle nlbopColor">
+                                                <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+
+                                        <p:contextMenu for="paramOpcTree" nodeType="LOP" style="width: 150px;">
+                                            <p:menuitem value="Разлинковать" process="@this"
+                                                        action="#{linkerControllerWS.removeParamLink()}"
+                                                        icon="pi pi-minus-circle"/>
+                                        </p:contextMenu>
+                                    </div>
+                                </p:panel>
+                            </div>
+                        </p:panel>
+                    </p:tab>
+                    <p:tab title="Вычислимые параметры">
+                        <div style="display: flex; align-items: center; margin: 0 calc(2px - .1rem) .1rem;">
+                            <div style="width: 375px;" class="center">
+                                <p:outputLabel value="ЛИНКОВЩИК" styleClass="tc-title"/>
+                                <p:outputLabel value="(ВЫЧИСЛИМЫЕ ПАРАМЕТРЫ)" styleClass="tc-subtitle"/>
+                            </div>
+                            <div style="display: flex; flex: 1 1 auto; gap: 1px; max-width: calc(100% - 375px); justify-content: flex-end;">
+                                <wordStyle:customToolbar bottomText="Календарь" icon="fa fa-calendar" width="310px"/>
+                                <wordStyle:customToolbar id="settingCalcBar" bottomText="Установки и параметры" icon="fa fa-sliders fa-rotate-90">
+                                    <f:facet name="data">
+                                        <div class="tc-word-settings">
+                                            <p:commandButton id="createCalcLinkBtn" value="Слинковать" disabled="#{!linkerControllerWS.enableCalcLinksBtn}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             update="removeCalcLinkBtn createCalcLinkBtn growl"
+                                                             oncomplete="PF('calcTreeWidget').filter();"
+                                                             action="#{linkerControllerWS.createCalcLink()}"/>
+                                            <p:commandButton id="removeCalcLinkBtn" value="Разлинковать" disabled="#{!linkerControllerWS.enableCalcUnlinksBtn}"
+                                                             styleClass="tc-no-loading tc-button-word"
+                                                             update="removeCalcLinkBtn createCalcLinkBtn growl"
+                                                             oncomplete="PF('calcTreeWidget').filter();"
+                                                             action="#{linkerControllerWS.removeCalcLink()}"/>
+                                        </div>
+                                    </f:facet>
+                                </wordStyle:customToolbar>
+                                <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
+                                <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
+                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
+                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
+                                <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
+                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                            </div>
+                        </div>
+
+                        <p:panel id="calcParamDataPanel" styleClass="tc-panel" style="height: calc(100% - 88px);">
+                            <f:facet name="header">
+                                <h:outputText id="calcParamDataPanelHeader"
+                                              value="Вычислимые параметры#{linkerControllerWS.fullObjectName}"/>
+                            </f:facet>
+
+                            <div style="height: 100%; padding: 3px; display: flex;">
+                                <p:panel id="calcTreePanel" header="Обобщенная модель"
+                                         styleClass="tc-panel tc-panel-header-small" style="width: 40%; margin-right: 3px;">
+                                    <div style="padding: 3px;">
+                                        <span class="ui-input-icon-left" style="width: 100%;">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="filterCalcTree" value="#{linkerControllerWS.filterCalcTreeValue}"
+                                                         placeholder="Поиск..." style="width: 100%" >
+                                                <p:ajax event="keyup" oncomplete="PF('calcTreeWidget').filter();"/>
+                                            </p:inputText>
+                                        </span>
+                                    </div>
+                                    <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
+                                        <p:tree id="calcTree" value="#{linkerControllerWS.rootCalcTree}" var="calcNode" styleClass="ui-noborder"
+                                                widgetVar="calcTreeWidget" filterFunction="#{linkerControllerWS.customFilter}"
+                                                style="padding: 3px;" dynamic="true" animate="true"
+                                                selection="#{linkerControllerWS.selectedCalcTreeNode}" selectionMode="single">
+
+                                            <p:ajax event="select" listener="#{linkerControllerWS.onCalcTreeNodeSelect}"
+                                                    update="linkerForm:linkerTabView:objectTabView:calcDataTable
+                                                        linkerForm:linkerTabView:objectTabView:settingCalcBar:removeCalcLinkBtn
+                                                        linkerForm:linkerTabView:objectTabView:settingCalcBar:createCalcLinkBtn"/>
+                                            <p:ajax event="unselect"/>
+                                            <p:ajax event="collapse"/>
+                                            <p:ajax event="expand"/>
+
+                                            <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="TP" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder" styleClass="tc-first-tree-item">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="PT" expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LPA" icon="pi pi-cog lColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLPA" icon="pi pi-cog nlColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="LSA" icon="pi pi pi-check-circle lColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLSA" icon="pi pi pi-check-circle nlColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="NLBOP" icon="pi pi pi-check-circle nlbopColor">
+                                                <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </div>
+                                </p:panel>
+
+                                <p:outputPanel style="width: 60%; border: 1px solid #c8c8c8; border-radius: 3px;">
+                                    <p:dataTable id="calcDataTable" value="#{linkerControllerWS.calcDataTableList}" var="calcData"
+                                                 emptyMessage="#{global['table.empty.value']}" rowStyleClass="#{calcData.styleClass}">
+                                        <p:column headerText="Параметр" width="100" styleClass="center">
+                                            <h:outputText value="#{calcData.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Стат. агрегат" width="250" styleClass="center">
+                                            <h:outputText value="#{calcData.statAggr}"/>
+                                        </p:column>
+                                        <p:column headerText="Название" width="100%">
+                                            <h:outputText value="#{calcData.fullName}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>
+                            </div>
+                        </p:panel>
+                    </p:tab>
+                </p:tabView>
+            </p:tab>
+        </p:tabView>
+    </h:form>
+
+    <p:dialog id="addLinkDialog" widgetVar="addLinkDialogWidget"
+              width="800" height="500" modal="true" resizable="false"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <f:facet name="header">
+            <h:outputText id="addLinkDialogHeader" value="Долинковать объект #{linkerControllerWS.selectedLinkedData.dbObject.name}"/>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{linkerControllerWS.onAddLinkDialogClose()}"
+                oncomplete="PF('opcObjectsForLinkTableWidget').clearFilters();" resetValues="true"
+                update="addLinkForm:saveAddLink"/>
+
+        <h:form id="addLinkForm" style="margin-bottom: 45px; padding: 3px 0 3px 3px;">
+            <p:dataTable id="opcObjectsForLinkTable" value="#{linkerControllerWS.opcObjectsForLinkData}" var="opcObjectForLink"
+                         rowKey="#{opcObjectForLink.id}" widgetVar="opcObjectsForLinkTableWidget"
+                         selection="#{linkerControllerWS.selectedOpcObjectsForLink}" selectionMode="multiple"
+                         scrollable="true" scrollHeight="368"
+                         lazy="true" virtualScroll="true" scrollRows="100"
+                         emptyMessage="#{global['table.empty.value']}">
+                <p:ajax event="rowSelect" update="addLinkForm:saveAddLink"/>
+
+                <p:column headerText="Объекты автоматизации"
+                          filterBy="#{opcObjectForLink.opcObject.name}" filterMatchMode="contains">
+                    <h:outputText value="#{opcObjectForLink.opcObject.name}"/>
+
+                    <f:facet name="filter">
+                        <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                     onkeyup="PF('opcObjectsForLinkTableWidget').filter();"/>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="Сервер" width="200"
+                          filterBy="#{opcObjectForLink.serverName}" filterMatchMode="contains">
+                    <h:outputText value="#{opcObjectForLink.serverName}"/>
+
+                    <f:facet name="filter">
+                        <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                     onkeyup="PF('opcObjectsForLinkTableWidget').filter();"/>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="Кол-во тегов" width="120" styleClass="center">
+                    <h:outputText value="#{opcObjectForLink.paramCount}"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton id="saveAddLink" value="Сохранить" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
+                             disabled="#{empty linkerControllerWS.selectedOpcObjectsForLink}"
+                             action="#{linkerControllerWS.addLink}"
+                             onstart="PF('statusDialog').show();"
+                             oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                        PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);
+                                        PF('addLinkDialogWidget').hide();"
+                             update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             onclick="PF('addLinkDialogWidget').hide();" process="@this"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="showOpcObjectParamsDialog" widgetVar="showOpcObjectParamsDialogWidget"
+              width="700" height="450" modal="true" resizable="false"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <f:facet name="header">
+            <h:outputText id="showOpcObjectParamsDialogHeader" value="Параметры объекта #{linkerControllerWS.selectedOpcObjectsForNoLink.opcObject.name}"/>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{linkerControllerWS.onShowOpcObjectParamsDialogClose()}"
+                oncomplete="PF('showOpcObjectParamsTableWidget').clearFilters();" resetValues="true"/>
+
+        <h:form id="showOpcObjectParamsForm" style="padding: 3px 0 3px 3px;">
+            <p:dataTable id="showOpcObjectParamsTable" value="#{linkerControllerWS.opcObjectParams}" var="opcObjectParam"
+                         rowKey="#{opcObjectParam.id}" widgetVar="showOpcObjectParamsTableWidget"
+                         scrollable="true" scrollHeight="364"
+                         lazy="true" virtualScroll="true" scrollRows="100"
+                         emptyMessage="#{global['table.empty.value']}">
+                <p:column headerText="Название"
+                          filterBy="#{opcObjectParam.opcObject.name}" filterMatchMode="contains">
+                    <h:outputText value="#{opcObjectParam.opcObject.name}"/>
+
+                    <f:facet name="filter">
+                        <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                     onkeyup="PF('showOpcObjectParamsTableWidget').filter();"/>
+                    </f:facet>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="schemaLinkDialog" widgetVar="schemaLinkDialogWidget"
+              width="1000" height="500" modal="true" resizable="false"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade"
+              header="Схемы линковки"
+              onShow="PF('schemaLinkDialogWidget').closeIcon.unbind('click').on('click', function() {schemaLinkDialogClose()});">
+
+        <p:ajax event="close" listener="#{linkerControllerWS.onSchemaLinkDialogClose()}"
+                oncomplete="PF('schemaLinkTableWidget').clearFilters();"
+                update="schemaLinkForm:link" resetValues="true"/>
+
+        <h:form id="schemaLinkForm" style="margin-bottom: 45px; padding: 3px 0 3px 3px;">
+            <p:dataTable id="schemaLinkTable" value="#{linkerControllerWS.linkSchemaTable}" var="linkSchema"
+                         rowKey="#{linkSchema.id}" widgetVar="schemaLinkTableWidget"
+                         selection="#{linkerControllerWS.selectedLinkSchema}" selectionMode="single"
+                         scrollable="true" scrollHeight="368"
+                         lazy="true" virtualScroll="true" scrollRows="100"
+                         emptyMessage="#{global['table.empty.value']}">
+
+                <p:ajax event="rowSelect" update="schemaLinkForm:link"/>
+
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="Схема линковки"
+                                  filterBy="#{linkSchema.schema.name}" filterMatchMode="contains">
+                            <f:facet name="filter">
+                                <p:inputText placeholder="Поиск..." style="width: 100%;"
+                                             onkeyup="PF('schemaLinkTableWidget').filter();"/>
+                            </f:facet>
+                        </p:column>
+                        <p:column colspan="3" headerText="Связанные агрегаты"/>
+                        <p:column colspan="3" headerText="Несвязанные агрегаты"/>
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="Совп."/>
+                        <p:column headerText="Несовп."/>
+                        <p:column headerText="Всего"/>
+                        <p:column headerText="Совп."/>
+                        <p:column headerText="Несовп."/>
+                        <p:column headerText="Всего"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <p:column>
+                    <h:outputText value="#{linkSchema.schema.name}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.eqLinked}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.neqLinked}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.allLinked}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.eqNoLinked}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.neqNoLinked}"/>
+                </p:column>
+                <p:column styleClass="center">
+                    <h:outputText value="#{linkSchema.allNoLinked}"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton id="link" value="Слинковать" style="position: absolute; bottom: 5px; right: 347px;" styleClass="tc-no-loading"
+                             disabled="#{linkerControllerWS.selectedLinkSchema == null}"
+                             action="#{linkerControllerWS.linkBySchemaYes()}"
+                             process="@this"
+                             onclick="PF('schemaLinkDialogWidget').hide();"
+                             oncomplete="PF('opcObjectsForNoLinkTableWidget').filter(); reloadNavigate();"
+                             update="linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                    linkerForm:linkerTabView:selectObjects
+                                    linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+            <p:commandButton value="Слинковать без параметров" style="position: absolute; bottom: 5px; right: 100px;" styleClass="tc-no-loading"
+                             action="#{linkerControllerWS.linkBySchemaNoParam()}"
+                             process="@this"
+                             onclick="PF('schemaLinkDialogWidget').hide();"
+                             oncomplete="PF('opcObjectsForNoLinkTableWidget').filter(); reloadNavigate();"
+                             update="linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                    linkerForm:linkerTabView:selectObjects
+                                    linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+            <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
+                             action="#{linkerControllerWS.schemaLinkDialogClose()}"
+                             process="@this"
+                             onclick="PF('schemaLinkDialogWidget').hide();"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="center center" onShow="PF('statusDialog').initPosition();">
+        <i class="pi pi-spinner pi-spin" style="font-size: 5rem;" />
+    </p:dialog>
+</h:body>
+</html>

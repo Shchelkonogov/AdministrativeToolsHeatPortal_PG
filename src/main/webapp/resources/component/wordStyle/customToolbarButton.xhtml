@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite">
+
+   <composite:interface>
+      <composite:attribute name="text"/>
+      <composite:attribute name="icon"/>
+      <composite:attribute name="style"/>
+      <composite:attribute name="width" default="60px"/>
+      <composite:attribute name="height" default="88px"/>
+      <composite:attribute name="onClick"/>
+   </composite:interface>
+
+   <composite:implementation>
+      <h:outputStylesheet name="/component/wordStyle/wordStyle.css" library="css"/>
+
+      <div style="#{empty cc.attrs.width ? 'flex: 1 1 auto;' : ''}; height: #{cc.attrs.height};
+                  #{not empty cc.attrs.onClick ? 'cursor: pointer;' : ''}
+                  #{cc.attrs.style}"
+           class="tc-custom-toolbar #{empty cc.attrs.onClick ? 'tc-empty-content' : 'tc-not-empty-content'}"
+           onclick="#{cc.attrs.onClick}">
+         <div class="tc-bottom-content">
+            <div>
+               <i class="#{cc.attrs.icon} fs-08" style="visibility: hidden;"/>
+            </div>
+         </div>
+         <div class="tc-content tc-content-button" style="#{not empty cc.attrs.width ? 'width:'.concat(cc.attrs.width).concat(';') : ''}">
+            <p:outputLabel value="#{cc.attrs.text}" styleClass="fs-08"
+                           style="#{not empty cc.attrs.onClick ? 'cursor: pointer;' : ''}"/>
+         </div>
+         <div class="tc-bottom-content">
+            <div>
+               <i class="#{cc.attrs.icon} fs-08"/>
+            </div>
+         </div>
+      </div>
+   </composite:implementation>
+</html>

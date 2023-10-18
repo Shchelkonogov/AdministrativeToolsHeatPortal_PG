@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite">
+
+   <composite:interface>
+      <composite:attribute name="bottomText"/>
+      <composite:attribute name="icon"/>
+      <composite:attribute name="style"/>
+      <composite:attribute name="width"/>
+      <composite:attribute name="height" default="88px"/>
+      <composite:facet name="data"/>
+   </composite:interface>
+
+   <composite:implementation>
+      <h:outputStylesheet name="/component/wordStyle/wordStyle.css" library="css"/>
+
+      <div style="#{empty cc.attrs.width ? 'flex: 1 1 auto;' : ''}; height: #{cc.attrs.height};
+                  #{cc.attrs.style}"
+           class="tc-custom-toolbar #{empty cc.facets.data ? 'tc-empty-content' : 'tc-not-empty-content'}">
+         <div class="tc-content" style="#{not empty cc.attrs.width ? 'width:'.concat(cc.attrs.width).concat(';') : ''}">
+            <composite:renderFacet name="data"/>
+         </div>
+         <div class="tc-bottom-content">
+            <div class="tc-bottom-text">
+               <p:outputLabel value="#{cc.attrs.bottomText}" styleClass="fs-08"/>
+            </div>
+            <div>
+               <i class="#{cc.attrs.icon} fs-08"/>
+            </div>
+         </div>
+      </div>
+   </composite:implementation>
+</html>

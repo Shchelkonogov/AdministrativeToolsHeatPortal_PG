@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite">
+
+   <composite:interface>
+      <composite:attribute name="text"/>
+      <composite:attribute name="icon"/>
+      <composite:attribute name="style"/>
+      <composite:attribute name="width" default="60px"/>
+      <composite:attribute name="height" default="88px"/>
+      <composite:attribute name="var"/>
+      <composite:attribute name="value" type="java.util.Collection"/>
+   </composite:interface>
+
+   <composite:implementation>
+      <h:outputStylesheet name="/component/wordStyle/wordStyle.css" library="css"/>
+
+      <script type="text/javascript">
+         function onShow(event) {
+            let add = event.parentNode.querySelector('.dropdown-content').classList.toggle("show");
+            let id = event.parentNode.id.replaceAll(':', '\\:');
+            if (add) {
+               let dropdown = $('#' + id + '');
+               $('#' + id + ' .dropdown-content')
+                       .css('top', dropdown.outerHeight() + dropdown.offset().top)
+                       .css('right', $(window).width() - dropdown.offset().left - dropdown.outerWidth());
+
+               $(document.body).on('click.dropdown.' + id, (event) => {
+                  let include = event.originalEvent.composedPath().includes(document.querySelector('#' + id + ' .drop-btn'));
+                  if (!include) {
+                      document.querySelector('#' + id + ' .dropdown-content').classList.remove("show");
+                      $(document.body).off('click.dropdown.' + id);
+                  }
+               });
+            } else {
+               $(document.body).off('click.dropdown.' + id);
+            }
+         }
+      </script>
+
+      <div id="#{cc.clientId}" style="">
+         <div style="#{empty cc.attrs.width ? 'flex: 1 1 auto;' : ''}; height: #{cc.attrs.height};
+                     #{not empty cc.attrs.value ? 'cursor: pointer;' : ''}
+                     #{cc.attrs.style}"
+              class="tc-custom-toolbar drop-btn #{empty cc.attrs.value ? 'tc-empty-content' : 'tc-not-empty-content'}"
+              onclick="#{not empty cc.attrs.value ? 'onShow(this);' : ''}">
+            <div class="tc-bottom-content">
+               <div>
+                  <i class="#{cc.attrs.icon} fs-08" style="visibility: hidden;"/>
+               </div>
+            </div>
+            <div class="tc-content tc-content-button" style="#{not empty cc.attrs.width ? 'width:'.concat(cc.attrs.width).concat(';') : ''}">
+               <p:outputLabel value="#{cc.attrs.text}" styleClass="fs-08"
+                              style="#{not empty cc.attrs.value ? 'cursor: pointer;' : ''}"/>
+            </div>
+            <div class="tc-bottom-content">
+               <div>
+                  <i class="#{cc.attrs.icon} fs-08"/>
+               </div>
+            </div>
+         </div>
+
+         <h:panelGroup styleClass="dropdown-content" layout="block" rendered="#{not empty cc.attrs.value}">
+            <table>
+               <ui:repeat value="#{cc.attrs.value}" var="child">
+                  <tr>
+                     <td>
+                        <c:set target="#{component}" property="var" value="#{cc.attrs.var}"/>
+                        <composite:insertChildren/>
+                     </td>
+                  </tr>
+               </ui:repeat>
+            </table>
+         </h:panelGroup>
+      </div>
+   </composite:implementation>
+</html>
