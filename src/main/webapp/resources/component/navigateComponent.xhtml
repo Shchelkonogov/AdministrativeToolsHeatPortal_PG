@@ -21,7 +21,9 @@
    </composite:interface>
 
    <composite:implementation>
-      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);" update="navigateCustomBtn #{cc.attrs.updateOnReload}"/>
+      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);"
+                       update="navigateCustomBtn #{cc.attrs.updateOnReload}"/>
+      <p:remoteCommand name="updateCustomBtn" update="navigateCustomBtn"/>
       <p:remoteCommand name="reloadNavigate" global="false" onstart="PF('navigateAllBui').show();"
                        action="#{cc.reloadNavigate()}"
                        oncomplete="navigateRemoveSelect(); PF('navigateAllBui').hide();"
@@ -68,6 +70,7 @@
                                 onstart="PF('navigateBui').show();"
                                 oncomplete="PF('navigateBui').hide();"/>
                         <p:ajax event="unselect" global="false"/>
+                        <p:ajax event="select" onstart="updateCustomBtn()"/>
 
                         <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
                            <h:outputText value="#{node.name}" title="#{node.name}"/>

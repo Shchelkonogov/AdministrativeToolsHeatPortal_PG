@@ -63,9 +63,7 @@
                                                       selectedObject="#{linkerController.selectedNavigateObject}"
                                                       selectedObjectType="#{linkerController.selectedNavigateObjectType}"
                                                       updateOnReload="linkerForm:linkerTabView:linkBtnForNoLink">
-                                <p:ajax event="select"
-                                        update="linkerForm:linkerTabView:linkBtnForNoLink
-                                                linkerForm:linkerTabView:navigate:navigateCustomBtn"/>
+                                <p:ajax event="select" update="linkerForm:linkerTabView:linkBtnForNoLink"/>
 
                                 <f:facet name="customButtons">
                                     <p:commandLink title="Создать фиктивный узел учета"
@@ -110,6 +108,7 @@
                                         <p:ajax event="rowDblselect" listener="#{linkerController.onSelectObjectForLink}"
                                                 update="linkerForm:linkerTabView:selectObjects
                                                         linkerForm:linkerTabView:linkBtnForNoLink"/>
+                                        <p:ajax event="contextMenu" update="linkerForm:linkerTabView:paramBtns"/>
 
                                         <p:column headerText="Объекты автоматизации"
                                                   filterBy="#{opcObjectForLink.opcObject.name}" filterMatchMode="contains">
@@ -133,6 +132,39 @@
                                             <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
                                         </p:column>
                                     </p:dataTable>
+
+                                    <p:contextMenu for="@previous" style="width: 220px;">
+                                        <p:menuitem value="Показать параметры" process="@this"
+                                                    action="#{linkerController.loadOpcObjectParams()}"
+                                                    oncomplete="PF('showOpcObjectParamsDialogWidget').show(); PF('showOpcObjectParamsTableWidget').filter();"
+                                                    update="showOpcObjectParamsDialogHeader"
+                                                    icon="pi pi-list"/>
+                                        <p:menuitem value="Запросить параметры" process="@this" global="false"
+                                                    action="#{linkerController.requestOpcParamForNoLink()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                    update="growl linkerForm:linkerTabView:paramBtns
+                                                            linkerForm:linkerTabView:selectObjects
+                                                            linkerForm:linkerTabView:linkBtnForNoLink"
+                                                    icon="pi pi-cloud-download"/>
+                                        <p:menuitem value="Очистить параметры" process="@this" global="false"
+                                                    action="#{linkerController.removeOpcObjectParams()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                    update="growl linkerForm:linkerTabView:paramBtns
+                                                            linkerForm:linkerTabView:selectObjects
+                                                            linkerForm:linkerTabView:linkBtnForNoLink"
+                                                    icon="fa-solid fa-broom w-16"/>
+                                        <p:divider/>
+                                        <p:menuitem value="Удалить объект" process="@this" global="false"
+                                                    action="#{linkerController.removeOpcObject()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                    update="growl linkerForm:linkerTabView:paramBtns
+                                                            linkerForm:linkerTabView:selectObjects
+                                                            linkerForm:linkerTabView:linkBtnForNoLink"
+                                                    icon="pi pi-trash"/>
+                                    </p:contextMenu>
                                 </div>
 
                                 <f:facet name="actions">
@@ -299,6 +331,32 @@
                                 </p:dataTable>
 
                                 <p:contextMenu for="linkedDataTable" style="width: 296px;">
+                                    <p:menuitem value="Долинковать"
+                                                icon="fa-solid fa-link w-16"
+                                                action="#{linkerController.loadOpcObjectsForLink()}"
+                                                oncomplete="PF('addLinkDialogWidget').show(); PF('opcObjectsForLinkTableWidget').filter();"
+                                                update="addLinkDialogHeader"/>
+                                    <p:menuitem value="Разлинковать"
+                                                icon="fa-solid fa-link-slash w-16"
+                                                onstart="PF('statusDialog').show();"
+                                                oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                update="linkerForm:linkerTabView:objectTabView:recountBtn
+                                                                linkerForm:linkerTabView:objectTabView:setSchemaNameBtn
+                                                                linkerForm:linkerTabView:objectTabView:linkBtnGroup
+                                                                recountForm:recountPanel growl"
+                                                action="#{linkerController.removeLink}" global="false"/>
+                                    <p:menuitem value="Разлинковать все"
+                                                icon="fa-solid fa-explosion w-16"
+                                                onstart="PF('statusDialog').show();"
+                                                oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                update="linkerForm:linkerTabView:objectTabView:recountBtn
+                                                                linkerForm:linkerTabView:objectTabView:setSchemaNameBtn
+                                                                linkerForm:linkerTabView:objectTabView:linkBtnGroup
+                                                                recountForm:recountPanel growl"
+                                                action="#{linkerController.removeAllLinks}" global="false"/>
+                                    <p:divider/>
                                     <p:menuitem value="Задать название схеме линковки" icon="pi pi-book"
                                                 onclick="PF('createMaskDialogWidget').show();"/>
                                 </p:contextMenu>
@@ -352,12 +410,12 @@
                                                             changeVisible('redirectForm', 'linkerForm:linkerTabView:objectTabView:redirectBtn_1');">
                                         <h:outputText styleClass="ui-icon pi pi-sitemap -rotate-90"/>
                                     </p:commandLink>
-                                    <p:commandLink id="recountBtn" title="пересчет" disabled="#{linkerController.disableLinksBtn}"
+                                    <p:commandLink id="recountBtn" title="Пересчет" disabled="#{linkerController.disableLinksBtn}"
                                                    styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                                                    onclick="changeVisible('recountForm', 'linkerForm:linkerTabView:objectTabView:recountBtn');">
                                         <h:outputText styleClass="ui-icon pi pi-calculator"/>
                                     </p:commandLink>
-                                    <p:commandLink id="filterBtn" title="фильтр" process="@this"
+                                    <p:commandLink id="filterBtn" title="Фильтр" process="@this"
                                                    styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                                                    onclick="changeVisible('filterForm', 'filterForm:filterSelectOneMenu_panel', 'linkerForm:linkerTabView:objectTabView:filterBtn');">
                                         <h:outputText styleClass="ui-icon pi pi-filter-fill"/>

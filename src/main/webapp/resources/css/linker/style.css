@@ -253,3 +253,7 @@ body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link:focus {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
+
+.w-16 {
+    width: 16px;
+}
