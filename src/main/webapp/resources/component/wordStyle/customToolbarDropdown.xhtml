@@ -15,6 +15,7 @@
       <composite:attribute name="width" default="60px"/>
       <composite:attribute name="height" default="88px"/>
       <composite:attribute name="var"/>
+      <composite:attribute name="disabled" default="false"/>
       <composite:attribute name="value" type="java.util.Collection"/>
    </composite:interface>
 
@@ -46,10 +47,10 @@
 
       <div id="#{cc.clientId}" style="">
          <div style="#{empty cc.attrs.width ? 'flex: 1 1 auto;' : ''}; height: #{cc.attrs.height};
-                     #{not empty cc.attrs.value ? 'cursor: pointer;' : ''}
+                     #{not empty cc.attrs.value and cc.attrs.disabled == false ? 'cursor: pointer;' : ''}
                      #{cc.attrs.style}"
-              class="tc-custom-toolbar drop-btn #{empty cc.attrs.value ? 'tc-empty-content' : 'tc-not-empty-content'}"
-              onclick="#{not empty cc.attrs.value ? 'onShow(this);' : ''}">
+              class="tc-custom-toolbar drop-btn #{empty cc.attrs.value or cc.attrs.disabled == true ? 'tc-empty-content' : 'tc-not-empty-content'}"
+              onclick="#{not empty cc.attrs.value and cc.attrs.disabled == false ? 'onShow(this);' : ''}">
             <div class="tc-bottom-content">
                <div>
                   <i class="#{cc.attrs.icon} fs-08" style="visibility: hidden;"/>
@@ -57,7 +58,7 @@
             </div>
             <div class="tc-content tc-content-button" style="#{not empty cc.attrs.width ? 'width:'.concat(cc.attrs.width).concat(';') : ''}">
                <p:outputLabel value="#{cc.attrs.text}" styleClass="fs-08"
-                              style="#{not empty cc.attrs.value ? 'cursor: pointer;' : ''}"/>
+                              style="#{not empty cc.attrs.value and cc.attrs.disabled == false ? 'cursor: pointer;' : ''}"/>
             </div>
             <div class="tc-bottom-content">
                <div>
@@ -66,7 +67,7 @@
             </div>
          </div>
 
-         <h:panelGroup styleClass="dropdown-content" layout="block" rendered="#{not empty cc.attrs.value}">
+         <h:panelGroup styleClass="dropdown-content" layout="block" rendered="#{not empty cc.attrs.value and cc.attrs.disabled == false}">
             <table>
                <ui:repeat value="#{cc.attrs.value}" var="child">
                   <tr>

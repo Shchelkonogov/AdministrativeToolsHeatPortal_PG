@@ -1242,6 +1242,12 @@ public class LinkerControllerWS implements Serializable {
         }
     }
 
+    public void openReport() {
+        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+
+        PrimeFaces.current().executeScript("window.open('" + contextPath + "/linker/report?objectId=" + selectedLinkedObjectId + "', '_blank').focus();");
+    }
+
     public String getFullObjectName() {
         if (selectedLinkedObjectId != null) {
             return " (" + linkerBean.getFullObjectName(selectedLinkedObjectId) + ")";
@@ -1462,6 +1468,10 @@ public class LinkerControllerWS implements Serializable {
 
     public List<Redirect> getRedirectList() {
         return redirectList;
+    }
+
+    public List<?> getReportList() {
+        return Collections.singletonList("");
     }
 
     public DataTable getLinkedTable() {

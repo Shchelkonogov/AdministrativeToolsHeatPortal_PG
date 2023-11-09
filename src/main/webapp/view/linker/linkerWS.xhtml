@@ -43,6 +43,7 @@
                     update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                             linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
                             linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                            linkerForm:linkerTabView:objectTabView:linkReports
                             linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader"
                     global="false"/>
 
@@ -125,8 +126,8 @@
                         </wordStyle:customToolbar>
                         <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
                         <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
-                            <p:commandButton icon="pi pi-file" value="${redirect.name}"
-                                             onclick="window.open('${redirect.value}', '_blank').focus();"
+                            <p:commandButton icon="pi pi-file" value="#{redirect.name}"
+                                             onclick="window.open('#{redirect.value}', '_blank').focus();"
                                              styleClass="ui-button-flat ui-button-plain tc-no-loading"
                                              style="width: 100%; text-align: initial; color: #000;" />
                         </wordStyle:customToolbarDropdown>
@@ -213,6 +214,7 @@
                             update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                     linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
                                     linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                    linkerForm:linkerTabView:objectTabView:linkReports
                                     linkerForm:linkerTabView:objectTabView:linkedDataTable
                                     linkerForm:linkerTabView:objectTabView:calcParamDataPanelHeader
                                     linkerForm:linkerTabView:objectTabView:paramDataPanelHeader"
@@ -243,7 +245,8 @@
                                                                 update="linkerForm:linkerTabView:objectTabView:linkedDataPanelHeader
                                                                         linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
                                                                         linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
-                                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+                                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                                        linkerForm:linkerTabView:objectTabView:linkReports"/>
                                                         <f:converter converterId="objectTypeConverter"/>
 
                                                         <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
@@ -304,7 +307,9 @@
                                                                                     PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
                                                                      update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
-                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                                                linkerForm:linkerTabView:objectTabView:linkReports
+                                                                                growl"
                                                                      action="#{linkerControllerWS.removeLink}" global="false"/>
                                                     <p:commandButton value="Разлинковать все" style="white-space: nowrap;"
                                                                      disabled="#{linkerControllerWS.disableLinksBtn}"
@@ -314,7 +319,9 @@
                                                                                     PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
                                                                      update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
-                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"
+                                                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                                                linkerForm:linkerTabView:objectTabView:linkReports
+                                                                                growl"
                                                                      action="#{linkerControllerWS.removeAllLinks}" global="false"/>
                                                 </div>
                                                 <p:commandButton value="Долинковать" style="white-space: nowrap;"
@@ -330,13 +337,19 @@
                                 </wordStyle:customToolbar>
                                 <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
                                 <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
-                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
-                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                    <p:commandButton icon="pi pi-file" value="#{redirect.name}"
+                                                     onclick="window.open('#{redirect.value}', '_blank').focus();"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
-                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                                <wordStyle:customToolbarDropdown id="linkReports" text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}" icon="fa fa-clone">
+                                    <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
+                                                     onclick="window.open('#{request.contextPath}/linker/report?objectId=#{linkerControllerWS.selectedLinkedData.dbObject.id}', '_blank').focus();"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
                             </div>
                         </div>
 
@@ -360,12 +373,14 @@
                                             oncomplete="PF('objectTabViewWidget').enable(1); PF('objectTabViewWidget').enable(2);"
                                             update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
-                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                linkerForm:linkerTabView:objectTabView:linkReports"/>
                                     <p:ajax event="contextMenu" listener="#{linkerControllerWS.onLinkedRowSelect}"
                                             oncomplete="PF('objectTabViewWidget').enable(1); PF('objectTabViewWidget').enable(2);"
                                             update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
-                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup"/>
+                                                linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                linkerForm:linkerTabView:objectTabView:linkReports"/>
 
                                     <p:column headerText="Объекты системы" width="300" groupRow="true"
                                               filterBy="#{link.dbObject.name}" filterMatchMode="contains">
@@ -480,13 +495,19 @@
                                 </wordStyle:customToolbar>
                                 <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
                                 <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
-                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
-                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                    <p:commandButton icon="pi pi-file" value="#{redirect.name}"
+                                                     onclick="window.open('#{redirect.value}', '_blank').focus();"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
-                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                                <wordStyle:customToolbarDropdown text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
+                                                                 icon="fa fa-clone">
+                                    <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
+                                                     action="#{linkerControllerWS.openReport}"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
                             </div>
                         </div>
 
@@ -646,13 +667,19 @@
                                 </wordStyle:customToolbar>
                                 <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
                                 <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
-                                    <p:commandButton icon="pi pi-file" value="${redirect.name}"
-                                                     onclick="window.open('${redirect.value}', '_blank').focus();"
+                                    <p:commandButton icon="pi pi-file" value="#{redirect.name}"
+                                                     onclick="window.open('#{redirect.value}', '_blank').focus();"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
-                                <wordStyle:customToolbarDropdown text="Отчет" icon="fa fa-clone"/>
+                                <wordStyle:customToolbarDropdown text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
+                                                                 icon="fa fa-clone">
+                                    <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
+                                                     action="#{linkerControllerWS.openReport}"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
                             </div>
                         </div>
 
@@ -791,7 +818,9 @@
                                         PF('addLinkDialogWidget').hide();"
                              update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                     linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
-                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup growl"/>
+                                    linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                    linkerForm:linkerTabView:objectTabView:linkReports
+                                    growl"/>
             <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;"
                              onclick="PF('addLinkDialogWidget').hide();" process="@this"/>
         </h:form>
