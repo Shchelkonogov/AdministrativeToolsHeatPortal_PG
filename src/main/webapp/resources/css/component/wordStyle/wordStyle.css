@@ -87,10 +87,32 @@ body .ui-button.tc-button-word {
     color: #6c757d;
     border: 1px solid;
     box-shadow: none;
+    height: 29px;
+}
+
+body .ui-inputgroup.tc-input-group .ui-selectonemenu .ui-selectonemenu-label {
+    color: #000;
+    font-size: .875rem;
+    padding: 0.25rem 2.357rem 0.25rem 0.5rem;
+}
+
+body .ui-button.ui-button-text-only.tc-button-word .ui-button-text,
+body .ui-inputgroup.tc-input-group .ui-inputgroup-addon {
+    color: #000;
+    font-size: .875rem;
+    padding: 0.25rem 0.5rem;
 }
 
 .tc-word-settings {
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
+}
+
+.ui-inputgroup.tc-input-group {
+    height: 29px;
+}
+
+body .ui-inputgroup.tc-input-group .ui-selectonemenu .ui-selectonemenu-trigger {
+    padding-top: 3px;
 }

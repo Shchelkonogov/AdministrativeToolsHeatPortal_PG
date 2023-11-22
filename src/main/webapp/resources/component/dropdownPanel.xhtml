@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui">
+
+   <composite:interface>
+       <composite:attribute name="width" default="250"/>
+       <composite:attribute name="icon"/>
+       <composite:attribute name="header"/>
+       <composite:attribute name="title"/>
+       <composite:attribute name="style"/>
+       <composite:attribute name="disabled" default="false"/>
+   </composite:interface>
+
+   <composite:implementation>
+       <p:commandLink id="dropdownLink" widgetVar="#{cc.id}_dropdownBtn" disabled="#{cc.attrs.disabled}" title="#{cc.attrs.title}"
+                      styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                      onclick="changeVisible(PF('#{cc.id}_dropdownPanelWidget').jq.parent().attr('id'),
+                                              PF('#{cc.id}_dropdownBtn').id);
+                                PF('#{cc.id}_dropdownPanelWidget').jq.parent().css('top', event.pageY).css('left', event.pageX - #{cc.attrs.width});"
+                      process="@this">
+           <h:outputText styleClass="ui-icon #{cc.attrs.icon}" style="#{cc.attrs.style}"/>
+       </p:commandLink>
+
+       <div jsf:id="dropdownDiv" style="display: none; z-index: 100; width: #{cc.attrs.width}px" class="popupPanel">
+           <p:panel id="dropdownPanel" widgetVar="#{cc.id}_dropdownPanelWidget" styleClass="tc-panel tc-panel-popup">
+               <f:facet name="header">
+                   <span class="ui-icon #{cc.attrs.icon}" style="margin-right: 5px;" />
+                   <h:outputText value="#{cc.attrs.header}" />
+               </f:facet>
+
+               <composite:insertChildren/>
+           </p:panel>
+       </div>
+   </composite:implementation>
+</html>

@@ -243,7 +243,7 @@ body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link:focus {
     cursor: pointer;
     position: absolute;
     right: 0.2em;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 /*Стиль для верха таблицы в Линкованные объекты Вычислимые параметры*/
@@ -256,4 +256,9 @@ body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link:focus {
 
 .w-16 {
     width: 16px;
+}
+
+/*Стиль для курсора групповой ячейки таблицы*/
+body .ui-datatable .ui-datatable-data>tr.ui-datatable-selectable>.ui-grouped-column {
+    cursor: unset;
 }

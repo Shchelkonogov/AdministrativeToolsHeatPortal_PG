@@ -101,8 +101,12 @@ public class NavigationComponent extends UIComponentBase implements NamingContai
      * Перезагрузка данных компоненты
      */
     public void reloadNavigate() {
-        ObjectTypeController bean = AdmTools.findBean("objectTypeControllerApplication");
-        selectedObjectTypeUI.setValue(bean.getDefaultObjectType());
+        boolean reload = Boolean.parseBoolean(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("reloadObjectType"));
+
+        if (reload) {
+            ObjectTypeController bean = AdmTools.findBean("objectTypeControllerApplication");
+            selectedObjectTypeUI.setValue(bean.getDefaultObjectType());
+        }
 
         searchTextUI.setValue("");
         setSearchList(getEjb().getObjTypeProps(((ObjectType) selectedObjectTypeUI.getValue()).getId()));

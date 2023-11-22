@@ -48,7 +48,7 @@ public class LinkerStateless {
     private final static String PROCEDURE_LINK_PARAM = "call lnk_0001t.link_param(?, ?, ?, ?);";
     private final static String PROCEDURE_UNLINK_PARAM = "call lnk_0001t.unlink_param(?, ?, ?, ?);";
     private final static String PROCEDURE_READ_OPC_PARAM = "call lnk_0001t.read_tsa_param(?)";
-    private final static String FUNCTION_REQUEST_OPC_PARAM = "select * from lnk_0001t.get_opc_param_list(?)";
+    private final static String PROCEDURE_REQUEST_OPC_PARAM = "call lnk_0001t.get_opc_param_list(?, ?)";
     private final static String SELECT_REDIRECT = "select * from admin.opc_servers;";
     private final static String PROCEDURE_REMOVE_OPC_OBJECT = "call lnk_0001t.del_unlinked_opc_object(?, ?, ?);";
     private final static String PROCEDURE_REMOVE_OPC_OBJECT_PARAMS = "call lnk_0001t.clear_unlinked_opc_object(?, ?, ?);";
@@ -58,6 +58,9 @@ public class LinkerStateless {
     private final static String PROCEDURE_LINK_BY_SCHEMA_NO = "call lnk_0001t.link_obj_no(?, ?)";
     private final static String PROCEDURE_LINK_BY_SCHEMA_YES = "call lnk_0001t.link_obj_yes(?, ?, ?, ?, ?)";
     private final static String PROCEDURE_LINK_BY_SCHEMA_NO_PARAM = "call lnk_0001t.link_obj_yes_without_params(?, ?, ?, ?)";
+    private final static String SELECT_UU_ZONE_LIST = "select zone from lnk_0001t.sel_add_uu_zone_list(?, ?, ?)";
+    private final static String PROCEDURE_ADD_LINK_BY_TEMPLATE = "call lnk_0001t.add_uu_zone(?, ?, ?, ?)";
+    private final static String PROCEDURE_UPDATE_ORG_TREE = "call lnk_0001t.refresh_vtp_struct_tree()";
 
     @Inject
     private Logger logger;
@@ -150,7 +153,7 @@ public class LinkerStateless {
             try (CallableStatement cStm = connect.prepareCall(select)) {
                 cStm.setInt(1, linkedData.getDbObject().getId());
                 cStm.setInt(2, linkedData.getObjIntKey());
-                cStm.setString(3, linkedData.getOpcObject().getName());
+                cStm.setString(3, linkedData.getDbObject().getName());
                 cStm.registerOutParameter(4, Types.VARCHAR);
 
                 cStm.executeUpdate();
@@ -593,17 +596,20 @@ public class LinkerStateless {
      * @throws SystemParamException если ошибка выполнения запроса
      */
     @Asynchronous
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public Future<Void> requestOpcParams(String opcObjectName) throws SystemParamException {
         try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(FUNCTION_REQUEST_OPC_PARAM)) {
-            stm.setString(1, opcObjectName);
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_REQUEST_OPC_PARAM)) {
+            cStm.setString(1, opcObjectName);
+            cStm.registerOutParameter(2, Types.VARCHAR);
 
-            ResultSet res = stm.executeQuery();
-            if (res.next() && !res.getString(1).isEmpty()) {
-                throw new SystemParamException(res.getString(1));
+            cStm.executeUpdate();
+            if (!cStm.getString(2).isEmpty()) {
+                throw new SystemParamException(cStm.getString(2));
             }
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error read opc params", ex);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
         }
         return null;
     }
@@ -823,6 +829,67 @@ public class LinkerStateless {
             cStm.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error link by schema \"yes no param\"", ex);
+        }
+    }
+
+    /**
+     * Получения списка имен шаблонных вариантов линковки параметров
+     * @param linkedData линкованный объект автоматизации
+     * @return список шаблонных имен
+     */
+    public List<String> getTemplateLinkNames(LinkedData linkedData) {
+        List<String> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SELECT_UU_ZONE_LIST)) {
+            stm.setInt(1, linkedData.getOpcObject().getId());
+            stm.setInt(2, linkedData.getObjIntKey());
+            stm.setString(3, linkedData.getOpcObject().getName());
+
+            ResultSet res = stm.executeQuery();
+            while (res.next()) {
+                result.add(res.getString("zone"));
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error load template link names", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Линковка параметров по шаблону к линкованному объекту автоматизации
+     * @param templateName имя шаблона
+     * @param linkedData линкованный объект автоматизации
+     * @throws SystemParamException в случае ошибки линковки
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void addLinkTemplate(String templateName, LinkedData linkedData) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_ADD_LINK_BY_TEMPLATE)) {
+            cStm.setInt(1, linkedData.getOpcObject().getId());
+            cStm.setString(2, linkedData.getOpcObject().getName());
+            cStm.setInt(3, linkedData.getObjIntKey());
+            cStm.setString(4, templateName);
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error create link by template", ex);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
+        }
+    }
+
+    /**
+     * Запрос на обновления дерева организационной структуры
+     * @throws SystemParamException в случае ошибки обновления
+     */
+    @TransactionAttribute(TransactionAttributeType.NEVER)
+    public void updateOrgTree() throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(PROCEDURE_UPDATE_ORG_TREE)) {
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error update org tree", ex);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
         }
     }
 }

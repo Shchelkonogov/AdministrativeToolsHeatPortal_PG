@@ -6,9 +6,9 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:custom="http://xmlns.jcp.org/jsf/composite/component"
-      xmlns:wordStyle="http://xmlns.jcp.org/jsf/composite/component/wordStyle">
+      xmlns:wordStyle="http://xmlns.jcp.org/jsf/composite/component/wordStyle"
+      xmlns:error="http://xmlns.jcp.org/jsf/composite/component/error">
 <h:head>
     <h:outputStylesheet name="system/style.css" library="css"/>
     <h:outputStylesheet name="primeflex/3.3.1/primeflex.min.css" library="webjars"/>
@@ -17,6 +17,8 @@
     <h:outputScript name="linker/script.js" library="js"/>
 </h:head>
 <h:body>
+    <error:expired/>
+
     <h:outputStylesheet name="linker/style.css" library="css"/>
 
     <p:growl id="growl" showDetail="true" />
@@ -73,10 +75,8 @@
                                                              action="#{linkerControllerWS.requestOpcParamForNoLink()}"
                                                              process="@this" global="false"
                                                              onstart="PF('statusDialog').show();"
-                                                             oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
-                                                             update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
-                                                                        linkerForm:linkerTabView:selectObjects
-                                                                        linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                                             oncomplete="PF('statusDialog').hide();"
+                                                             update="growl"/>
                                             <p:commandButton value="Создать Фикт.УУ" style="white-space: nowrap;"
                                                              disabled="#{linkerControllerWS.disabledNavigateCustomBtn or !linkerControllerWS.renderNavigateCustomBtn}"
                                                              styleClass="tc-no-loading tc-button-word"
@@ -156,11 +156,11 @@
                                         <c:forEach items="#{linkerControllerWS.objectsForLink}" var="item">
                                             <li class="tc-add-item-info">
                                                 <span class="pi pi-times tc-add-item-info-icon" onclick="removeNoLinkObject([{name:'id', value:'#{item.id}'}]);"/>
-                                                <span class="tc-add-item-info-text">#{item.opcObject.name}</span>
+                                                <h:outputText class="tc-add-item-info-text" value="#{item.opcObject.name}"/>
                                             </li>
                                         </c:forEach>
                                     </ul>
-                                    <h:outputText rendered="#{empty linkerControllerWS.objectsForLink}" value="Выбранные объекты..."
+                                    <h:outputText rendered="#{empty linkerControllerWS.objectsForLink}" value="Объекты, выбранные для линковки..."
                                                   style="display: block; color: #8e8e8e; margin-top: 3px; margin-left: 3px;"/>
                                 </h:panelGroup>
                                 <div style="height: calc(100% - 46px); padding: 3px 0 3px 3px;">
@@ -175,6 +175,7 @@
                                         <p:ajax event="rowDblselect" listener="#{linkerControllerWS.onSelectObjectForLink}"
                                                 update="linkerForm:linkerTabView:selectObjects
                                                         linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink"/>
+                                        <p:ajax event="contextMenu" update="linkerForm:linkerTabView:settingNoLinkBar:paramBtns"/>
 
                                         <p:column headerText="Объекты автоматизации"
                                                   filterBy="#{opcObjectForLink.opcObject.name}" filterMatchMode="contains">
@@ -198,6 +199,31 @@
                                             <h:outputText id="paramCount" value="#{opcObjectForLink.paramCount}"/>
                                         </p:column>
                                     </p:dataTable>
+
+                                    <p:contextMenu for="@previous" style="width: 220px;">
+                                        <p:menuitem value="Показать параметры" process="@this"
+                                                    action="#{linkerControllerWS.loadOpcObjectParams()}"
+                                                    oncomplete="PF('showOpcObjectParamsDialogWidget').show(); PF('showOpcObjectParamsTableWidget').filter();"
+                                                    update="showOpcObjectParamsDialogHeader"/>
+                                        <p:menuitem value="Запросить параметры" process="@this" global="false"
+                                                    action="#{linkerControllerWS.requestOpcParamForNoLink()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide();"
+                                                    update="growl"/>
+                                        <p:menuitem value="Очистить параметры" process="@this" global="false"
+                                                    action="#{linkerControllerWS.removeOpcObjectParams()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                    update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                            linkerForm:linkerTabView:selectObjects"/>
+                                        <p:divider/>
+                                        <p:menuitem value="Удалить объект" process="@this" global="false"
+                                                    action="#{linkerControllerWS.removeOpcObject()}"
+                                                    onstart="PF('statusDialog').show();"
+                                                    oncomplete="PF('statusDialog').hide(); PF('opcObjectsForNoLinkTableWidget').filter();"
+                                                    update="growl linkerForm:linkerTabView:settingNoLinkBar:paramBtns
+                                                            linkerForm:linkerTabView:selectObjects"/>
+                                    </p:contextMenu>
                                 </div>
                             </p:panel>
                         </div>
@@ -232,7 +258,7 @@
                                     <f:facet name="data">
                                         <div class="tc-word-settings" style="justify-content: space-between;">
                                             <div class="tc-word-settings">
-                                                <h:panelGroup styleClass="ui-inputgroup">
+                                                <h:panelGroup styleClass="ui-inputgroup tc-input-group">
                                                     <h:panelGroup styleClass="ui-inputgroup-addon">
                                                         Тип объектов
                                                     </h:panelGroup>
@@ -253,17 +279,17 @@
                                                                        itemLabel="#{objType.name}" itemValue="#{objType}"/>
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
-                                                <h:panelGroup styleClass="ui-inputgroup">
+                                                <h:panelGroup styleClass="ui-inputgroup tc-input-group">
                                                     <h:panelGroup styleClass="ui-inputgroup-addon" style="padding: 0;">
                                                         <p:commandButton id="setSchemaNameBtn" value="Создать схему с именем" style="color: #848484;"
-                                                                         styleClass="ui-button-flat ui-button-secondary tc-no-loading"
+                                                                         styleClass="ui-button-flat ui-button-secondary tc-no-loading tc-button-word"
                                                                          disabled="#{linkerControllerWS.disableLinksBtn}"
                                                                          action="#{linkerControllerWS.createMaskWrapper()}"/>
                                                     </h:panelGroup>
-                                                    <p:inputText value="#{linkerControllerWS.newMaskName}"/>
+                                                    <p:inputText value="#{linkerControllerWS.newMaskName}" style="font-size: .875rem; padding: 0.25rem 0.5rem;"/>
                                                 </h:panelGroup>
                                             </div>
-                                            <h:panelGroup styleClass="ui-inputgroup">
+                                            <h:panelGroup styleClass="ui-inputgroup tc-input-group">
                                                 <h:panelGroup styleClass="ui-inputgroup-addon">
                                                     Подписка
                                                 </h:panelGroup>
@@ -335,7 +361,14 @@
 
                                     </f:facet>
                                 </wordStyle:customToolbar>
-                                <wordStyle:customToolbarButton text="Пуск" icon="fa fa-power-off"/>
+                                <wordStyle:customToolbarDropdown text="Пуск" icon="fa fa-power-off" value="#{linkerControllerWS.startList}" var="start">
+                                    <p:commandButton value="Обновить дерево Орг. структуры"
+                                                     onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                                                     update="growl"
+                                                     action="#{linkerControllerWS.updateOrgTree()}"
+                                                     styleClass="ui-button-flat ui-button-plain tc-no-loading"
+                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarDropdown text="Переход" value="#{linkerControllerWS.redirectList}" var="redirect" icon="fa fa-sitemap fa-rotate-270">
                                     <p:commandButton icon="pi pi-file" value="#{redirect.name}"
                                                      onclick="window.open('#{redirect.value}', '_blank').focus();"
@@ -375,16 +408,18 @@
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
                                                 linkerForm:linkerTabView:objectTabView:linkReports"/>
-                                    <p:ajax event="contextMenu" listener="#{linkerControllerWS.onLinkedRowSelect}"
+                                    <p:ajax event="contextMenu" listener="#{linkerControllerWS.onContextMenu}"
                                             oncomplete="PF('objectTabViewWidget').enable(1); PF('objectTabViewWidget').enable(2);"
                                             update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
                                                 linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
-                                                linkerForm:linkerTabView:objectTabView:linkReports"/>
+                                                linkerForm:linkerTabView:objectTabView:linkReports
+                                                linkerForm:linkerTabView:objectTabView:contextMenu"/>
 
                                     <p:column headerText="Объекты системы" width="300" groupRow="true"
                                               filterBy="#{link.dbObject.name}" filterMatchMode="contains">
-                                        <p:outputLabel id="systemObjectName" value="#{link.dbObject.name}"/>
+                                        <p:outputLabel id="systemObjectName" value="#{link.dbObject.name}"
+                                                       onclick="PF('linkedDataTableWidget').selectRow(#{rowIndex}, false);"/>
 
                                         <f:facet name="filter">
                                             <p:inputText placeholder="Поиск..." style="width: 100%"
@@ -419,6 +454,41 @@
                                         </p:selectBooleanCheckbox>
                                     </p:column>
                                 </p:dataTable>
+
+                                <p:contextMenu id="contextMenu" for="linkedDataTable" style="width: 296px;">
+                                    <p:menuitem value="Долинковать"
+                                                action="#{linkerControllerWS.loadOpcObjectsForLink()}"
+                                                oncomplete="PF('addLinkDialogWidget').show(); PF('opcObjectsForLinkTableWidget').filter();"
+                                                update="addLinkDialogHeader"/>
+                                    <p:menuitem value="Разлинковать"
+                                                onstart="PF('statusDialog').show();"
+                                                oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                        linkerForm:linkerTabView:objectTabView:linkReports
+                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                        growl"
+                                                action="#{linkerControllerWS.removeLink}" global="false"/>
+                                    <p:menuitem value="Разлинковать все"
+                                                onstart="PF('statusDialog').show();"
+                                                oncomplete="PF('statusDialog').hide(); PF('linkedDataTableWidget').filter();
+                                                                    PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);"
+                                                update="linkerForm:linkerTabView:objectTabView:settingLinkBar:recountBtn
+                                                        linkerForm:linkerTabView:objectTabView:linkReports
+                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:setSchemaNameBtn
+                                                        linkerForm:linkerTabView:objectTabView:settingLinkBar:linkBtnGroup
+                                                        growl"
+                                                action="#{linkerControllerWS.removeAllLinks}" global="false"/>
+                                    <p:divider rendered="#{linkerControllerWS.renderContextSubMenu and !linkerControllerWS.templateLinkNames.isEmpty()}"/>
+                                    <p:submenu label="Добавить шаблон линковки"
+                                               rendered="#{linkerControllerWS.renderContextSubMenu and !linkerControllerWS.templateLinkNames.isEmpty()}">
+                                        <c:forEach items="#{linkerControllerWS.templateLinkNames}" var="linkName">
+                                            <p:menuitem value="#{linkName}" action="#{linkerControllerWS.addLinkTemplate(linkName)}"
+                                                        update="growl"/>
+                                        </c:forEach>
+                                    </p:submenu>
+                                </p:contextMenu>
                             </div>
                         </p:panel>
                     </p:tab>
@@ -433,8 +503,8 @@
                                 <wordStyle:customToolbar id="settingParamBar" bottomText="Установки и параметры" icon="fa fa-sliders fa-rotate-90">
                                     <f:facet name="data">
                                         <div class="tc-word-settings" style="justify-content: space-between;">
-                                            <h:panelGroup styleClass="ui-inputgroup">
-                                                <h:panelGroup styleClass="ui-inputgroup-addon">
+                                            <h:panelGroup styleClass="ui-inputgroup tc-input-group">
+                                                <h:panelGroup styleClass="ui-inputgroup-addon ">
                                                     Модель
                                                 </h:panelGroup>
                                                 <p:selectOneMenu id="filterParamTreeSelectOneMenu" style="width: 150px;" widgetVar="filterParamTreeSelectOneMenuWidget"
@@ -447,8 +517,8 @@
                                                             update="linkerForm:linkerTabView:objectTabView:paramTreePanelHeader
                                                                     linkerForm:linkerTabView:objectTabView:filterParamTree"/>
 
-                                                    <f:selectItem itemLabel="Конкретная модель" itemValue="1"/>
-                                                    <f:selectItem itemLabel="Обобщенная модель" itemValue="2"/>
+                                                    <f:selectItem itemLabel="Конкретная" itemValue="1"/>
+                                                    <f:selectItem itemLabel="Обобщенная" itemValue="2"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
 
@@ -471,7 +541,7 @@
                                                                             linkerForm:linkerTabView:objectTabView:filterParamOpcTree"/>
                                             </div>
 
-                                            <h:panelGroup styleClass="ui-inputgroup">
+                                            <h:panelGroup styleClass="ui-inputgroup tc-input-group">
                                                 <h:panelGroup styleClass="ui-inputgroup-addon">
                                                     Линковка
                                                 </h:panelGroup>
@@ -547,7 +617,7 @@
                                             <p:ajax event="collapse"/>
                                             <p:ajax event="expand" oncomplete="initDragDropForTree('paramTreeWidget');"/>
                                             <p:ajax event="filter" oncomplete="initDragDropForTree('paramTreeWidget');"/>
-                                            <p:ajax event="contextMenu" onstart="selectNode('paramTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="unselectNode('paramOpcTreeWidget');"/>
 
                                             <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
                                                 <h:outputText value="#{paramNode.name}" title="#{paramNode.name}"/>
@@ -572,6 +642,8 @@
                                             </p:treeNode>
                                         </p:tree>
 
+                                        <p:contextMenu for="paramTree" style="visibility: hidden;">
+                                        </p:contextMenu>
                                         <p:contextMenu for="paramTree" nodeType="LSA" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
                                                         action="#{linkerControllerWS.removeParamLink()}"
@@ -609,7 +681,7 @@
                                             <p:ajax event="collapse"/>
                                             <p:ajax event="expand" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
                                             <p:ajax event="filter" oncomplete="initDragDropForTree('paramOpcTreeWidget');"/>
-                                            <p:ajax event="contextMenu" onstart="selectNode('paramOpcTreeWidget');"/>
+                                            <p:ajax event="contextMenu" onstart="unselectNode('paramTreeWidget');"/>
 
                                             <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
                                                 <h:outputText value="#{paramOpcNode.name}" title="#{paramOpcNode.name}"/>
@@ -631,6 +703,8 @@
                                             </p:treeNode>
                                         </p:tree>
 
+                                        <p:contextMenu for="paramOpcTree" style="visibility: hidden;">
+                                        </p:contextMenu>
                                         <p:contextMenu for="paramOpcTree" nodeType="LOP" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
                                                         action="#{linkerControllerWS.removeParamLink()}"

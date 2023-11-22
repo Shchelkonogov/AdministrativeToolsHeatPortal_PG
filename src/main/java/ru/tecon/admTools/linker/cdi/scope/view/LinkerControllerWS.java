@@ -76,6 +76,8 @@ public class LinkerControllerWS implements Serializable {
     );
     private List<OpcObjectForLinkData> selectedOpcObjectsForLink = new ArrayList<>();
 
+    private final List<String> templateLinkNames = new ArrayList<>();
+
     // Закладка "Линкованные объекты / Вычислимые параметры"
 
     private final TreeNode<TreeData> rootCalcTree = new DefaultTreeNode<>(new TreeData(), null);
@@ -238,7 +240,7 @@ public class LinkerControllerWS implements Serializable {
                         "PF('objectTabViewWidget').disable(2); " +
                         "updateEmptyRow(); " +
                         "PF('opcObjectsForNoLinkTableWidget').filter(); " +
-                        "reloadNavigate();");
+                        "reloadNavigate([{name:'reloadObjectType', value:'true'}]);");
                 break;
             case "Линкованные объекты":
                 selectedOpcObjectsForNoLink = null;
@@ -544,9 +546,9 @@ public class LinkerControllerWS implements Serializable {
                 }
             }
 
-            selectedOpcObjectsForNoLink = null;
-            loadOpcObjectsForNoLink();
-            objectsForLink.clear();
+            loadOpcObjectParams();
+            PrimeFaces.current().executeScript("PF('showOpcObjectParamsDialogWidget').show(); PF('showOpcObjectParamsTableWidget').filter();");
+            PrimeFaces.current().ajax().update("showOpcObjectParamsDialogHeader");
         } catch (SystemParamException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Запрос параметров", e.getMessage()));
@@ -1074,6 +1076,50 @@ public class LinkerControllerWS implements Serializable {
         linkerBean.loadRecountData(selectedLinkedData);
     }
 
+    public void onContextMenu(SelectEvent<LinkedData> event) {
+        logger.log(Level.INFO, "Show context menu for linked data {0}", event.getObject());
+
+        onLinkedRowSelect(event);
+
+        if (isRenderContextSubMenu()) {
+            templateLinkNames.clear();
+            templateLinkNames.addAll(linkerBean.getTemplateLinkNames(selectedLinkedData));
+        }
+    }
+
+    /**
+     * Линковка параметров у выделенного объекта автоматизации в "Линкованные объекты / Объекты"
+     * @param templateName имя шаблона
+     */
+    public void addLinkTemplate(String templateName) {
+        logger.log(Level.INFO, "Add template {0} for {1}", new Object[]{templateName, selectedLinkedData});
+
+        try {
+            linkerBean.addLinkTemplate(templateName, selectedLinkedData);
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Шаблон линковки", "Успешная линковка параметров " + templateName));
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Шаблон линковки", e.getMessage()));
+        }
+    }
+
+    /**
+     * Запуск пересчета дерева организационной структуры
+     */
+    public void updateOrgTree() {
+        logger.log(Level.INFO, "Update org tree");
+
+        try {
+            linkerBean.updateOrgTree();
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Обновление", "Успешное обновление дерева организационной структуры"));
+        } catch (SystemParamException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Обновление", e.getMessage()));
+        }
+    }
+
     /**
      * Обработчик закрытия окна создания маски для схемы линковки
      */
@@ -1442,6 +1488,10 @@ public class LinkerControllerWS implements Serializable {
         return selectedNavigateObjectType.getCode().equals("УУ");
     }
 
+    public boolean isRenderContextSubMenu() {
+        return selectedObjectType.getCode().equals("УУ");
+    }
+
     public boolean isDisabledNavigateCustomBtn() {
         return (selectedNavigateObject == null) || !selectedNavigateObject.getData().isLeaf();
     }
@@ -1480,5 +1530,13 @@ public class LinkerControllerWS implements Serializable {
 
     public void setLinkedTable(DataTable linkedTable) {
         this.linkedTable = linkedTable;
+    }
+
+    public List<String> getTemplateLinkNames() {
+        return templateLinkNames;
+    }
+
+    public List<String> getStartList() {
+        return Collections.singletonList("Обновить дерево Орг. структуры");
     }
 }

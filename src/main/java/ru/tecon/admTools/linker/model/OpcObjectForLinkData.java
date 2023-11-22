@@ -72,7 +72,7 @@ public class OpcObjectForLinkData implements Serializable, LazyData {
     public PGobject getPgObject(String type) {
         String value = new StringJoiner(",", "(", ")")
                 .add(String.valueOf(opcObject.getId()))
-                .add(opcObject.getName())
+                .add("\"" + opcObject.getName() + "\"")
                 .add(String.valueOf(objIntKey))
                 .add("")
                 .toString();

@@ -59,6 +59,10 @@ function addOnDblClickEvents() {
             let attr = element.attr('ondblclick');
             element.parent().attr('ondblclick', attr);
             element.removeAttr('ondblclick');
+
+            attr = element.attr('onclick');
+            element.parent().attr('onclick', attr);
+            element.removeAttr('onclick');
         }
     }
 }

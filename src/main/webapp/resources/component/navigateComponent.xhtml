@@ -115,9 +115,9 @@
                <p:commandLink widgetVar="navigateFilterBtn" title="фильтр"
                               styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                               onclick="changeVisible(PF('navigateFilterWidget').jq.parent().attr('id'),
-                                       PF('navigateFilterBtn').id,
-                                       PF('navigateSelectObjectTypeWidget').id + '_items',
-                                       PF('navigateSelectSearchTypeWidget').id + '_items'); function e(e) {console(e.pageX);}"
+                                                      PF('navigateFilterBtn').id,
+                                                      PF('navigateSelectObjectTypeWidget').id + '_items',
+                                                      PF('navigateSelectSearchTypeWidget').id + '_items');"
                               process="@this">
                   <h:outputText styleClass="ui-icon pi pi-filter-fill"/>
                </p:commandLink>

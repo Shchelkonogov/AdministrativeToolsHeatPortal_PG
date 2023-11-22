@@ -27,7 +27,16 @@
         <param-name>primefaces.THEME</param-name>
         <param-value>nova-light</param-value>
     </context-param>
-    
+
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/error/expired.html</location>
+    </error-page>
+
+    <error-page>
+        <location>/error.html</location>
+    </error-page>
+
     <welcome-file-list>
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
