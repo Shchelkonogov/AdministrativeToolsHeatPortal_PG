@@ -628,7 +628,7 @@ public class LinkerStateless {
                 result.put(res.getString(1), res.getString(2));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            logger.log(Level.WARNING, "Error load redirect", e);
         }
         return result;
     }

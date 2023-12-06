@@ -75,6 +75,27 @@ function initDragDropForTree(widget) {
     PF(widget).jq.find('li.ui-tree-droppoint').remove();
     PF(widget).initDraggable();
     PF(widget).initDroppable();
+
+    PF(widget).jq.find('.ui-tree-scroller.ui-tree-scrollertop.ui-droppable').remove();
+    PF(widget).jq.find('.ui-tree-scroller.ui-tree-scrollerbottom.ui-droppable').remove();
+
+    let nodeType;
+
+    switch (widget) {
+        case 'paramTreeWidget':
+            nodeType = 'NLSA';
+            break;
+        case 'paramOpcTreeWidget':
+            nodeType = 'NLOP';
+            break;
+    }
+
+    if (nodeType !== undefined) {
+        console.log('init');
+        PF(widget).jq.find(".ui-treenode-content")
+            .filter((item, itemX) => itemX.parentNode.dataset.nodetype !== nodeType)
+            .draggable({disabled: true});
+    }
 }
 
 /**
@@ -113,7 +134,8 @@ function handleMsg(xhr, status, args) {
  * @param silent отправлять ли запрос в bean
  */
 function unselectNode(widgetVar, silent) {
-    if (PF(widgetVar).selections.length !== 0) {
+    if ((PF(widgetVar).selections.length !== 0) &&
+            (PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]').length !== 0)) {
         PF(widgetVar).unselectNode(PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]'), silent === undefined ? true : silent);
     }
 }
@@ -121,9 +143,10 @@ function unselectNode(widgetVar, silent) {
 /**
  * Выделения элемента дерева по данным из js объекта
  * @param widgetVar имя виджета
+ * @param silent отправлять ли запрос в bean
  */
-function selectNode(widgetVar) {
+function selectNode(widgetVar, silent) {
     if (PF(widgetVar).selections.length !== 0) {
-        PF(widgetVar).selectNode(PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]'), false);
+        PF(widgetVar).selectNode(PF(widgetVar).jq.find('[data-rowkey="' + PF(widgetVar).selections[0] + '"]'), silent === undefined ? false : silent);
     }
 }

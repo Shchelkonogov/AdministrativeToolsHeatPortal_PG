@@ -2,6 +2,8 @@ package ru.tecon.admTools.linker.cdi.scope.view;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.component.datatable.DataTable;
+import org.primefaces.component.inputtext.InputText;
+import org.primefaces.component.tree.Tree;
 import org.primefaces.component.tree.TreeDragDropInfo;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -21,10 +23,12 @@ import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
 import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController;
 import ru.tecon.admTools.systemParams.model.ObjectType;
+import ru.tecon.admTools.utils.TeconMessage;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
@@ -51,6 +55,8 @@ import java.util.stream.Stream;
 @Named("linkerControllerWS")
 @ViewScoped
 public class LinkerControllerWS implements Serializable {
+
+    private final Map<String, UIComponent> componentMap = new HashMap<>();
 
     // Закладка "Линкованные объекты / Объекты"
 
@@ -80,6 +86,9 @@ public class LinkerControllerWS implements Serializable {
 
     // Закладка "Линкованные объекты / Вычислимые параметры"
 
+    private Tree calcTree;
+    private InputText calcTreeFilter;
+
     private final TreeNode<TreeData> rootCalcTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedCalcTreeNode;
 
@@ -91,11 +100,17 @@ public class LinkerControllerWS implements Serializable {
 
     private static final String DEFAULT_MODEL_TYPE = "Обобщенная модель";
 
+    private Tree paramTree;
+    private InputText paramTreeFilter;
+
     private final TreeNode<TreeData> rootKmOmTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedParamTreeNode;
 
     private String filterParamTreeValue = "";
     private String paramTreePanelHeader = DEFAULT_MODEL_TYPE;
+
+    private Tree paramOpcTree;
+    private InputText paramOpcTreeFilter;
 
     private final TreeNode<TreeData> rootOpcTree = new DefaultTreeNode<>(new TreeData(), null);
     private TreeNode<TreeData> selectedParamOpcTreeNode;
@@ -198,7 +213,7 @@ public class LinkerControllerWS implements Serializable {
                 // Очищаю вкладку "Линкованные объекты / Вычислимые параметры"
                 filterCalcTreeValue = "";
                 if (selectedCalcTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('calcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:calcTree\\\\:" + selectedCalcTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('calcTreeWidget', false);");
                     selectedCalcTreeNode = null;
                 }
                 rootCalcTree.getChildren().clear();
@@ -208,14 +223,14 @@ public class LinkerControllerWS implements Serializable {
                 filterParamTreeValue = "";
                 paramTreePanelHeader = DEFAULT_MODEL_TYPE;
                 if (selectedParamTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('paramTreeWidget', false);");
                     selectedParamTreeNode = null;
                 }
                 rootKmOmTree.getChildren().clear();
                 filterParamOpcTreeValue = "";
                 paramOpcTreePanelHeader = "Все параметры";
                 if (selectedParamOpcTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramOpcTree\\\\:" + selectedParamOpcTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('paramOpcTreeWidget', false);");
                     selectedParamOpcTreeNode = null;
                 }
                 rootOpcTree.getChildren().clear();
@@ -230,9 +245,9 @@ public class LinkerControllerWS implements Serializable {
                         "linkerForm:linkerTabView:objectTabView:paramTreePanelHeader",
                         "linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader");
 
-                PrimeFaces.current().executeScript("PF('calcTreeWidget').filter(); " +
-                        "PF('paramTreeWidget').filter(); " +
-                        "PF('paramOpcTreeWidget').filter(); " +
+                PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'calcTreeWidget'}]); " +
+                        "filterTree([{name:'widget', value:'paramTreeWidget'}]); " +
+                        "filterTree([{name:'widget', value:'paramOpcTreeWidget'}]); " +
                         "PF('filterParamTreeSelectOneMenuWidget').selectValue(2); " +
                         "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1); " +
                         "PF('objectTabViewWidget').select(0, true); " +
@@ -265,7 +280,7 @@ public class LinkerControllerWS implements Serializable {
                 // Очищаю вкладку "Линкованные объекты / Вычислимые параметры"
                 filterCalcTreeValue = "";
                 if (selectedCalcTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('calcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:calcTree\\\\:" + selectedCalcTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('calcTreeWidget', false);");
                     selectedCalcTreeNode = null;
                 }
                 rootCalcTree.getChildren().clear();
@@ -275,14 +290,14 @@ public class LinkerControllerWS implements Serializable {
                 paramTreePanelHeader = DEFAULT_MODEL_TYPE;
                 filterParamTreeValue = "";
                 if (selectedParamTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('paramTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramTree\\\\:" + selectedParamTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('paramTreeWidget', false);");
                     selectedParamTreeNode = null;
                 }
                 rootKmOmTree.getChildren().clear();
                 filterParamOpcTreeValue = "";
                 paramOpcTreePanelHeader = "Все параметры";
                 if (selectedParamOpcTreeNode != null) {
-                    PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').unselectNode($('#linkerForm\\\\:linkerTabView\\\\:objectTabView\\\\:paramOpcTree\\\\:" + selectedParamOpcTreeNode.getRowKey() + "'), false);");
+                    PrimeFaces.current().executeScript("unselectNode('paramOpcTreeWidget', false);");
                     selectedParamOpcTreeNode = null;
                 }
                 rootOpcTree.getChildren().clear();
@@ -298,9 +313,9 @@ public class LinkerControllerWS implements Serializable {
 
                 PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); " +
                         "PF('objectTabViewWidget').disable(2); " +
-                        "PF('calcTreeWidget').filter(); " +
-                        "PF('paramTreeWidget').filter(); " +
-                        "PF('paramOpcTreeWidget').filter(); " +
+                        "filterTree([{name:'widget', value:'calcTreeWidget'}]); " +
+                        "filterTree([{name:'widget', value:'paramTreeWidget'}]); " +
+                        "filterTree([{name:'widget', value:'paramOpcTreeWidget'}]); " +
                         "addOnDblClickEvents(); " +
                         "PF('filterParamTreeSelectOneMenuWidget').selectValue(2); " +
                         "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
@@ -321,9 +336,9 @@ public class LinkerControllerWS implements Serializable {
                 }
 
                 PrimeFaces.current().executeScript("document.getElementById('linkerForm:linkerTabView:objectTabView:paramTree_filter').value = 'init'; " +
-                        "PF('paramTreeWidget').filter(); " +
+                        "filterTree([{name:'widget', value:'paramTreeWidget'}]); " +
                         "document.getElementById('linkerForm:linkerTabView:objectTabView:paramOpcTree_filter').value = 'init'; " +
-                        "PF('paramOpcTreeWidget').filter();");
+                        "filterTree([{name:'widget', value:'paramOpcTreeWidget'}]);");
                 break;
             case "Вычислимые параметры":
                 linkedData.getData().clear();
@@ -342,8 +357,40 @@ public class LinkerControllerWS implements Serializable {
 
                 PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:calcDataTable");
                 PrimeFaces.current().executeScript("document.getElementById('linkerForm:linkerTabView:objectTabView:calcTree_filter').value = 'init'; " +
-                        "PF('calcTreeWidget').filter();");
+                        "filterTree([{name:'widget', value:'calcTreeWidget'}]);");
                 break;
+        }
+    }
+
+    /**
+     * Метод раскрывает все элементы дерева
+     * @param tree дерево
+     */
+    public void doExpandAll(TreeNode<?> tree) {
+        for (TreeNode<?> element: tree.getChildren()) {
+            collapsingOrExpanding(element, true);
+        }
+    }
+
+    /**
+     * Метод скрывает все элементы дерева
+     * @param tree дерево
+     */
+    public void doCollapseAll(TreeNode<?> tree) {
+        for (TreeNode<?> element: tree.getChildren()) {
+            collapsingOrExpanding(element, false);
+        }
+    }
+
+    private void collapsingOrExpanding(TreeNode<?> node, boolean option) {
+        if (node.getChildren().size() == 0) {
+            node.setSelected(false);
+        } else {
+            for (TreeNode<?> child: node.getChildren()) {
+                collapsingOrExpanding(child, option);
+            }
+            node.setExpanded(option);
+            node.setSelected(false);
         }
     }
 
@@ -377,11 +424,11 @@ public class LinkerControllerWS implements Serializable {
         sortTree(root);
 
         // раскрытие первого уровня
-        for (TreeNode<TreeData> node: root.getChildren()) {
-            if (!node.isLeaf()) {
-                node.setExpanded(true);
-            }
-        }
+//        for (TreeNode<TreeData> node: root.getChildren()) {
+//            if (!node.isLeaf()) {
+//                node.setExpanded(true);
+//            }
+//        }
     }
 
     /**
@@ -398,6 +445,59 @@ public class LinkerControllerWS implements Serializable {
                         treeNode.getRowKey().equals("root") ?
                                 String.valueOf(i) : treeNode.getRowKey() + "_" + i);
                 sortTree(treeNode.getChildren().get(i));
+            }
+        }
+    }
+
+    public void customFilter() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        String widget = params.get("widget");
+        boolean updateSelect = Boolean.parseBoolean(params.get("updateSelect"));
+
+        if ((widget != null) &&
+                componentMap.containsKey(widget) && (componentMap.get(widget) instanceof Tree) &&
+                componentMap.containsKey(widget + "Filter") && (componentMap.get(widget + "Filter") instanceof InputText)) {
+            Tree tree = (Tree) componentMap.get(widget);
+            InputText filter = (InputText) componentMap.get(widget + "Filter");
+
+            String selectRowKey = params.get("selectRowKey") == null ? tree.getSelectedRowKeysAsString() : params.get("selectRowKey");
+
+            if (filter.getValue().toString().isEmpty()) {
+                doCollapseAll(tree.getValue());
+
+                if (updateSelect && (selectRowKey != null)) {
+                    String[] s = selectRowKey.split("_");
+                    TreeNode<?> value = tree.getValue();
+                    for (String index: s) {
+                        value = value.getChildren().get(Integer.parseInt(index));
+                        if (!value.isLeaf()) {
+                            value.setExpanded(true);
+                        } else {
+                            value.setSelected(true);
+                        }
+                    }
+
+                    PrimeFaces.current().executeScript("PF('" + widget + "').unselectAllNodes(); " +
+                            "PF('" + widget + "').selections=['" + selectRowKey + "']; " +
+                            "selectNode('" + widget + "', true); " +
+                            "scrollToSelectedNode('" + widget + "');");
+                }
+
+                PrimeFaces.current().ajax().update(tree.getClientId());
+                PrimeFaces.current().executeScript("document.getElementById('" + tree.getClientId() + "_filter').value = 'init';");
+                if (tree.isDraggable() && tree.isDraggable()) {
+                    PrimeFaces.current().executeScript("initDragDropForTree('" + widget + "');");
+                }
+            } else {
+                if (updateSelect && (selectRowKey != null)) {
+                    PrimeFaces.current().executeScript("PF('" + widget + "').unselectAllNodes(); " +
+                            "PF('" + widget + "').filter(); " +
+                            "PF('" + widget + "').selections=['" + selectRowKey + "']; " +
+                            "selectNode('" + widget + "', true); " +
+                            "scrollToSelectedNode('" + widget + "');");
+                } else {
+                    PrimeFaces.current().executeScript("PF('" + widget + "').filter();");
+                }
             }
         }
     }
@@ -669,18 +769,20 @@ public class LinkerControllerWS implements Serializable {
             String newOpcId = linkerBean.linkParam(selectedLinkedObjectId, node1Data.getItemId(), node2Data.getItemId());
 
             // Устанавливаем обновленные типы
+            paramOpcTree.setSelection(node2);
             node2.setType("LOP");
             node2Data.setMyType("LOP");
+            paramTree.setSelection(node1);
             node1.setType("LSA");
-            node2Data.setMyType("LSA");
+            node1Data.setMyType("LSA");
 
             // Устанавливаем в дерево opc обновленную id
             String newId = node2Data.getItemId().replaceAll("OP\\d+$", "OP" + newOpcId);
             node2Data.setItemId(newId);
             node2Data.setMyId(newId);
 
-            PrimeFaces.current().executeScript("PF('paramTreeWidget').filter(); " +
-                    "PF('paramOpcTreeWidget').filter();");
+            PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'paramTreeWidget'}, {name:'updateSelect', value:'true'}, {name:'selectRowKey', value:'" + paramTree.getSelectedRowKeysAsString() + "'}]); " +
+                    "filterTree([{name:'widget', value:'paramOpcTreeWidget'}, {name:'updateSelect', value:'true'}, {name:'selectRowKey', value:'" + paramOpcTree.getSelectedRowKeysAsString() + "'}]);");
 
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное создание связи"));
@@ -700,6 +802,10 @@ public class LinkerControllerWS implements Serializable {
     public void removeParamLink() {
         logger.log(Level.INFO, "Remove link for {0} and {1}", new Object[]{selectedParamTreeNode, selectedParamOpcTreeNode});
         try {
+            if ((selectedParamTreeNode == null) || (selectedParamOpcTreeNode == null)) {
+                throw new SystemParamException("Связь не найдена");
+            }
+
             String newOpcId = linkerBean.unlinkParam(selectedLinkedObjectId, selectedParamTreeNode.getData().getItemId(), selectedParamOpcTreeNode.getData().getItemId());
 
             // Устанавливаем в дерево opc обновленную id
@@ -713,8 +819,8 @@ public class LinkerControllerWS implements Serializable {
             selectedParamOpcTreeNode.getData().setItemId(newId);
             selectedParamOpcTreeNode.getData().setMyId(newId);
 
-            PrimeFaces.current().executeScript("PF('paramTreeWidget').filter(); " +
-                    "PF('paramOpcTreeWidget').filter();");
+            PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'paramTreeWidget'}, {name:'updateSelect', value:'true'}]); " +
+                    "filterTree([{name:'widget', value:'paramOpcTreeWidget'}, {name:'updateSelect', value:'true'}]);");
 
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешный разрыв связи"));
@@ -757,12 +863,21 @@ public class LinkerControllerWS implements Serializable {
                     if (node != null) {
                         String rowKey = node.getRowKey();
 
+                        doCollapseAll(rootKmOmTree);
+
                         while (node != null) {
-                            node.setExpanded(true);
+                            if (!node.isLeaf()) {
+                                node.setExpanded(true);
+                            }
                             node = node.getParent();
                         }
 
-                        PrimeFaces.current().executeScript("PF('paramTreeWidget').filter();");
+                        setFilterParamTreeValue("");
+                        setSelectedParamTreeNode(null);
+                        PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:filterParamTree",
+                                "linkerForm:linkerTabView:objectTabView:paramTree");
+                        PrimeFaces.current().executeScript("document.getElementById('linkerForm:linkerTabView:objectTabView:paramTree_filter').value = 'init'; " +
+                                "initDragDropForTree('paramTreeWidget');");
 
                         PrimeFaces.Ajax ajax = PrimeFaces.current().ajax();
                         ajax.addCallbackParam("command", "updateAfterSelectWrapper");
@@ -794,17 +909,32 @@ public class LinkerControllerWS implements Serializable {
                     if (node != null) {
                         String rowKey = node.getRowKey();
 
+                        doCollapseAll(rootOpcTree);
+
                         while (node != null) {
-                            node.setExpanded(true);
+                            if (!node.isLeaf()) {
+                                node.setExpanded(true);
+                            }
                             node = node.getParent();
                         }
 
-                        PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').filter();");
+                        setSelectedParamOpcTreeNode(null);
+                        setFilterParamOpcTreeValue("");
+                        PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:filterParamOpcTree",
+                                "linkerForm:linkerTabView:objectTabView:paramOpcTree");
+                        PrimeFaces.current().executeScript("document.getElementById('linkerForm:linkerTabView:objectTabView:paramOpcTree_filter').value = 'init'; " +
+                                "initDragDropForTree('paramOpcTreeWidget');");
 
                         PrimeFaces.Ajax ajax = PrimeFaces.current().ajax();
                         ajax.addCallbackParam("command", "updateAfterSelectWrapper");
                         ajax.addCallbackParam("widgetName", "paramOpcTreeWidget");
                         ajax.addCallbackParam("rowKey", rowKey);
+                    } else {
+                        // Бывает хитрый момент, когда связи нет в таблицы dz_par_dev_link, то надо писать сообщение
+                        PrimeFaces.current().ajax().update("growl");
+
+                        FacesContext.getCurrentInstance()
+                                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Связь не найдена"));
                     }
                 }
                 break;
@@ -985,7 +1115,7 @@ public class LinkerControllerWS implements Serializable {
             prepareTree(linkerBean.getTreeData(selectedLinkedObjectId, TreeType.OPC, (short) 2), rootOpcTree, null);
             paramOpcTreePanelHeader = "Все параметры";
 
-            PrimeFaces.current().executeScript("PF('paramOpcTreeWidget').filter(); " +
+            PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'paramOpcTreeWidget'}]); " +
                     "unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false); " +
                     "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
             PrimeFaces.current().ajax().update("linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader",
@@ -1538,5 +1668,59 @@ public class LinkerControllerWS implements Serializable {
 
     public List<String> getStartList() {
         return Collections.singletonList("Обновить дерево Орг. структуры");
+    }
+
+    public Tree getParamTree() {
+        return paramTree;
+    }
+
+    public void setParamTree(Tree paramTree) {
+        componentMap.put(paramTree.getWidgetVar(), paramTree);
+        this.paramTree = paramTree;
+    }
+
+    public InputText getParamTreeFilter() {
+        return paramTreeFilter;
+    }
+
+    public void setParamTreeFilter(InputText paramTreeFilter) {
+        componentMap.put(paramTreeFilter.getWidgetVar(), paramTreeFilter);
+        this.paramTreeFilter = paramTreeFilter;
+    }
+
+    public Tree getCalcTree() {
+        return calcTree;
+    }
+
+    public void setCalcTree(Tree calcTree) {
+        componentMap.put(calcTree.getWidgetVar(), calcTree);
+        this.calcTree = calcTree;
+    }
+
+    public InputText getCalcTreeFilter() {
+        return calcTreeFilter;
+    }
+
+    public void setCalcTreeFilter(InputText calcTreeFilter) {
+        componentMap.put(calcTreeFilter.getWidgetVar(), calcTreeFilter);
+        this.calcTreeFilter = calcTreeFilter;
+    }
+
+    public Tree getParamOpcTree() {
+        return paramOpcTree;
+    }
+
+    public void setParamOpcTree(Tree paramOpcTree) {
+        componentMap.put(paramOpcTree.getWidgetVar(), paramOpcTree);
+        this.paramOpcTree = paramOpcTree;
+    }
+
+    public InputText getParamOpcTreeFilter() {
+        return paramOpcTreeFilter;
+    }
+
+    public void setParamOpcTreeFilter(InputText paramOpcTreeFilter) {
+        componentMap.put(paramOpcTreeFilter.getWidgetVar(), paramOpcTreeFilter);
+        this.paramOpcTreeFilter = paramOpcTreeFilter;
     }
 }

@@ -17,6 +17,7 @@
 </h:head>
 <h:body>
     <error:expired/>
+    <error:other/>
 
     <h:outputStylesheet name="linker/style.css" library="css"/>
 
@@ -33,6 +34,7 @@
                                 linkerForm:linkerTabView:linkBtnForNoLink"/>
         <p:remoteCommand name="schemaLinkDialogClose" action="#{linkerController.schemaLinkDialogClose()}"
                          oncomplete="PF('schemaLinkDialogWidget').hide();"/>
+        <p:remoteCommand name="filterTree" action="#{linkerController.customFilter()}"/>
     </h:form>
 
     <h:form style="padding-top: 0.1rem; padding-left: 0.1rem; padding-right: 0.1rem;">
@@ -504,16 +506,19 @@
                                     <div style="padding: 3px;">
                                         <span class="ui-input-icon-left" style="width: 100%;">
                                             <i class="pi pi-search"/>
-                                            <p:inputText id="filterParamTree" value="#{linkerController.filterParamTreeValue}"
+                                            <p:inputText id="filterParamTree"
+                                                         widgetVar="paramTreeWidgetFilter" binding="#{linkerController.paramTreeFilter}"
+                                                         value="#{linkerController.filterParamTreeValue}"
                                                          placeholder="Поиск..." style="width: 100%">
-                                                <p:ajax event="keyup" oncomplete="PF('paramTreeWidget').filter();"/>
+                                                <p:ajax event="keyup" delay="500" oncomplete="filterTree([{name:'widget', value:'paramTreeWidget'}]);"/>
                                             </p:inputText>
                                         </span>
                                     </div>
                                     <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
-                                        <p:tree id="paramTree" value="#{linkerController.rootKmOmTree}" var="paramNode" styleClass="ui-noborder"
+                                        <p:tree id="paramTree" binding="#{linkerController.paramTree}"
+                                                value="#{linkerController.rootKmOmTree}" var="paramNode" styleClass="ui-noborder"
                                                 widgetVar="paramTreeWidget" filterFunction="#{linkerController.customFilter}"
-                                                dynamic="true" animate="true"
+                                                dynamic="true" animate="true" cache="false"
                                                 selection="#{linkerController.selectedParamTreeNode}" selectionMode="single"
                                                 draggable="true" droppable="true" onDrop="#{linkerController.onDrop}" dragdropScope="param">
 
@@ -549,17 +554,36 @@
                                             </p:treeNode>
                                         </p:tree>
 
-                                        <p:contextMenu for="paramTree" style="visibility: hidden;">
+                                        <p:contextMenu for="paramTree" nodeType="TP" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="paramTree" nodeType="PT" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="paramTree" nodeType="LPA" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="paramTree" nodeType="NLPA" style="visibility: hidden;">
                                         </p:contextMenu>
                                         <p:contextMenu for="paramTree" nodeType="LSA" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
                                                         action="#{linkerController.removeParamLink()}"
                                                         icon="pi pi-minus-circle"/>
                                         </p:contextMenu>
+                                        <p:contextMenu for="paramTree" nodeType="NLSA" style="visibility: hidden;">
+                                        </p:contextMenu>
                                     </div>
 
                                     <f:facet name="actions">
                                         <div style="display: flex;">
+                                            <p:commandLink title="Свернуть дерево"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           process="@this" global="false"
+                                                           actionListener="#{linkerController.setFilterParamTreeValue('')}"
+                                                           action="#{linkerController.doCollapseAll(linkerController.rootKmOmTree)}"
+                                                           oncomplete="document.getElementById('linkerForm:linkerTabView:objectTabView:paramTree_filter').value = 'init';
+                                                                    initDragDropForTree('paramTreeWidget');"
+                                                           update="linkerForm:linkerTabView:objectTabView:paramTree
+                                                                    linkerForm:linkerTabView:objectTabView:filterParamTree">
+                                                <h:outputText styleClass="ui-icon fa-solid fa-down-left-and-up-right-to-center" style="font-size: .9rem; vertical-align: 1px;"/>
+                                            </p:commandLink>
                                             <p:commandLink id="filterParamTreeBtn" title="фильтр"
                                                            styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                                                            onclick="changeVisible('filterParamTreeForm',
@@ -581,16 +605,19 @@
                                     <div style="padding: 3px;">
                                         <span class="ui-input-icon-left" style="width: 100%;">
                                             <i class="pi pi-search"/>
-                                            <p:inputText id="filterParamOpcTree" value="#{linkerController.filterParamOpcTreeValue}"
+                                            <p:inputText id="filterParamOpcTree"
+                                                         widgetVar="paramOpcTreeWidgetFilter" binding="#{linkerController.paramOpcTreeFilter}"
+                                                         value="#{linkerController.filterParamOpcTreeValue}"
                                                          placeholder="Поиск..." style="width: 100%" >
-                                                <p:ajax event="keyup" oncomplete="PF('paramOpcTreeWidget').filter();"/>
+                                                <p:ajax event="keyup" delay="500" oncomplete="filterTree([{name:'widget', value:'paramOpcTreeWidget'}]);"/>
                                             </p:inputText>
                                         </span>
                                     </div>
                                     <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
-                                        <p:tree id="paramOpcTree" value="#{linkerController.rootOpcTree}" var="paramOpcNode" styleClass="ui-noborder"
+                                        <p:tree id="paramOpcTree" binding="#{linkerController.paramOpcTree}"
+                                                value="#{linkerController.rootOpcTree}" var="paramOpcNode" styleClass="ui-noborder"
                                                 widgetVar="paramOpcTreeWidget" filterFunction="#{linkerController.customFilter}"
-                                                dynamic="true" animate="true"
+                                                dynamic="true" animate="true" cache="false"
                                                 selection="#{linkerController.selectedParamOpcTreeNode}" selectionMode="single"
                                                 draggable="true" droppable="true" onDrop="#{linkerController.onDrop}" dragdropScope="param">
 
@@ -623,22 +650,39 @@
                                             </p:treeNode>
                                         </p:tree>
 
-                                        <p:contextMenu for="paramOpcTree" style="visibility: hidden;">
+                                        <p:contextMenu for="paramOpcTree" nodeType="LOO" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="paramOpcTree" nodeType="NLOO" style="visibility: hidden;">
                                         </p:contextMenu>
                                         <p:contextMenu for="paramOpcTree" nodeType="LOP" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
                                                         action="#{linkerController.removeParamLink()}"
                                                         icon="pi pi-minus-circle"/>
                                         </p:contextMenu>
+                                        <p:contextMenu for="paramOpcTree" nodeType="NLOP" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="paramOpcTree" nodeType="NLBOP" style="visibility: hidden;">
+                                        </p:contextMenu>
                                     </div>
 
                                     <f:facet name="actions">
                                         <div style="display: flex;">
+                                            <p:commandLink title="Свернуть дерево"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           process="@this" global="false"
+                                                           actionListener="#{linkerController.setFilterParamOpcTreeValue('')}"
+                                                           action="#{linkerController.doCollapseAll(linkerController.rootOpcTree)}"
+                                                           oncomplete="document.getElementById('linkerForm:linkerTabView:objectTabView:paramOpcTree_filter').value = 'init';
+                                                                    initDragDropForTree('paramOpcTreeWidget');"
+                                                           update="linkerForm:linkerTabView:objectTabView:paramOpcTree
+                                                                    linkerForm:linkerTabView:objectTabView:filterParamOpcTree">
+                                                <h:outputText styleClass="ui-icon fa-solid fa-down-left-and-up-right-to-center" style="font-size: .9rem; vertical-align: 1px;"/>
+                                            </p:commandLink>
                                             <p:commandLink id="refreshParamOpcTreeBtn" title="Обновить"
                                                            styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
                                                            action="#{linkerController.refreshParamOpcTree}" process="@this" global="false"
                                                            onstart="PF('statusDialog').show();"
-                                                           oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                                                           oncomplete="PF('statusDialog').hide(); filterTree([{name:'widget', value:'paramOpcTreeWidget'}]);
                                                                 unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);
                                                                 PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);"
                                                            update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
@@ -696,16 +740,19 @@
                                     <div style="padding: 3px;">
                                         <span class="ui-input-icon-left" style="width: 100%;">
                                             <i class="pi pi-search"/>
-                                            <p:inputText id="filterCalcTree" value="#{linkerController.filterCalcTreeValue}"
+                                            <p:inputText id="filterCalcTree"
+                                                         widgetVar="calcTreeWidgetFilter" binding="#{linkerController.calcTreeFilter}"
+                                                         value="#{linkerController.filterCalcTreeValue}"
                                                          placeholder="Поиск..." style="width: 100%" >
-                                                <p:ajax event="keyup" oncomplete="PF('calcTreeWidget').filter();"/>
+                                                <p:ajax event="keyup" delay="500" oncomplete="filterTree([{name:'widget', value:'calcTreeWidget'}]);"/>
                                             </p:inputText>
                                         </span>
                                     </div>
                                     <div style="height: calc(100% - 43px);" class="tc-custom-scroll">
-                                        <p:tree id="calcTree" value="#{linkerController.rootCalcTree}" var="calcNode" styleClass="ui-noborder"
+                                        <p:tree id="calcTree" binding="#{linkerController.calcTree}"
+                                                value="#{linkerController.rootCalcTree}" var="calcNode" styleClass="ui-noborder"
                                                 widgetVar="calcTreeWidget" filterFunction="#{linkerController.customFilter}"
-                                                style="padding: 3px;" dynamic="true" animate="true"
+                                                style="padding: 3px;" dynamic="true" animate="true" cache="false"
                                                 selection="#{linkerController.selectedCalcTreeNode}" selectionMode="single">
 
                                             <p:ajax event="select" listener="#{linkerController.onCalcTreeNodeSelect}"
@@ -742,6 +789,21 @@
                                             </p:treeNode>
                                         </p:tree>
                                     </div>
+
+                                    <f:facet name="actions">
+                                        <div style="display: flex;">
+                                            <p:commandLink title="Свернуть дерево"
+                                                           styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-default tc-very-small tc-no-loading"
+                                                           process="@this" global="false"
+                                                           actionListener="#{linkerController.setFilterCalcTreeValue('')}"
+                                                           action="#{linkerController.doCollapseAll(linkerController.rootCalcTree)}"
+                                                           oncomplete="document.getElementById('linkerForm:linkerTabView:objectTabView:calcTree').value = 'init';"
+                                                           update="linkerForm:linkerTabView:objectTabView:calcTree
+                                                                    linkerForm:linkerTabView:objectTabView:filterCalcTree">
+                                                <h:outputText styleClass="ui-icon fa-solid fa-down-left-and-up-right-to-center" style="font-size: .9rem; vertical-align: 1px;"/>
+                                            </p:commandLink>
+                                        </div>
+                                    </f:facet>
                                 </p:panel>
 
                                 <p:outputPanel style="width: 60%; border: 1px solid #c8c8c8; border-radius: 3px;">
@@ -768,7 +830,7 @@
                                                    update="linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn
                                                         linkerForm:linkerTabView:objectTabView:createCalcLinkBtn
                                                         growl"
-                                                   oncomplete="PF('calcTreeWidget').filter();"
+                                                   oncomplete="filterTree([{name:'widget', value:'calcTreeWidget'}, {name:'updateSelect', value:'true'}]);"
                                                    action="#{linkerController.createCalcLink()}">
                                         <h:outputText styleClass="ui-icon fa-solid fa-link" style="font-size: .9rem; vertical-align: 1px;"/>
                                     </p:commandLink>
@@ -777,7 +839,7 @@
                                                    update="linkerForm:linkerTabView:objectTabView:removeCalcLinkBtn
                                                         linkerForm:linkerTabView:objectTabView:createCalcLinkBtn
                                                         growl"
-                                                   oncomplete="PF('calcTreeWidget').filter();"
+                                                   oncomplete="filterTree([{name:'widget', value:'calcTreeWidget'}, {name:'updateSelect', value:'true'}]);"
                                                    action="#{linkerController.removeCalcLink()}">
                                         <h:outputText styleClass="ui-icon fa-solid fa-link-slash" style="font-size: .9rem; vertical-align: 1px;"/>
                                     </p:commandLink>
@@ -846,7 +908,7 @@
 
                     <p:ajax global="false"
                             onstart="PF('statusDialog').show(); changeVisible('filterParamTreeForm');"
-                            oncomplete="PF('statusDialog').hide(); PF('paramTreeWidget').filter();
+                            oncomplete="PF('statusDialog').hide(); filterTree([{name:'widget', value:'paramTreeWidget'}]);
                                 unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
                             update="linkerForm:linkerTabView:objectTabView:paramTreePanelHeader
                                 linkerForm:linkerTabView:objectTabView:filterParamTree"/>
@@ -872,7 +934,7 @@
 
                     <p:ajax global="false"
                             onstart="PF('statusDialog').show(); changeVisible('filterParamOpcTreeForm');"
-                            oncomplete="PF('statusDialog').hide(); PF('paramOpcTreeWidget').filter();
+                            oncomplete="PF('statusDialog').hide(); filterTree([{name:'widget', value:'paramOpcTreeWidget'}]);
                                 unselectNode('paramTreeWidget', false); unselectNode('paramOpcTreeWidget', false);"
                             update="linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader
                                 linkerForm:linkerTabView:objectTabView:filterParamOpcTree"/>
