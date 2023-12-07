@@ -661,8 +661,7 @@
                                         </p:contextMenu>
                                         <p:contextMenu for="paramTree" nodeType="LSA" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
-                                                        action="#{linkerControllerWS.removeParamLink()}"
-                                                        icon="pi pi-minus-circle"/>
+                                                        action="#{linkerControllerWS.removeParamLink()}"/>
                                         </p:contextMenu>
                                         <p:contextMenu for="paramTree" nodeType="NLSA" style="visibility: hidden;">
                                         </p:contextMenu>
@@ -743,8 +742,7 @@
                                         </p:contextMenu>
                                         <p:contextMenu for="paramOpcTree" nodeType="LOP" style="width: 150px;">
                                             <p:menuitem value="Разлинковать" process="@this"
-                                                        action="#{linkerControllerWS.removeParamLink()}"
-                                                        icon="pi pi-minus-circle"/>
+                                                        action="#{linkerControllerWS.removeParamLink()}"/>
                                         </p:contextMenu>
                                         <p:contextMenu for="paramOpcTree" nodeType="NLOP" style="visibility: hidden;">
                                         </p:contextMenu>
@@ -845,6 +843,7 @@
                                             <p:ajax event="unselect"/>
                                             <p:ajax event="collapse"/>
                                             <p:ajax event="expand"/>
+                                            <p:ajax event="contextMenu" onstart="selectNode('calcTreeWidget');"/>
 
                                             <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
                                                 <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
@@ -871,6 +870,33 @@
                                                 <h:outputText value="#{calcNode.name}" title="#{calcNode.name}"/>
                                             </p:treeNode>
                                         </p:tree>
+
+                                        <p:contextMenu for="calcTree" nodeType="TP" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="PT" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="LPA" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="NLPA" style="visibility: hidden;">
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="LSA" style="width: 150px;">
+                                            <p:menuitem value="Разлинковать" process="@this"
+                                                        update="linkerForm:linkerTabView:objectTabView:settingCalcBar:removeCalcLinkBtn
+                                                                linkerForm:linkerTabView:objectTabView:settingCalcBar:createCalcLinkBtn
+                                                                growl"
+                                                        oncomplete="filterTree([{name:'widget', value:'calcTreeWidget'}, {name:'updateSelect', value:'true'}]);"
+                                                        action="#{linkerControllerWS.removeCalcLink()}"/>
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="NLSA" style="width: 150px;">
+                                            <p:menuitem value="Слинковать" process="@this"
+                                                        update="linkerForm:linkerTabView:objectTabView:settingCalcBar:removeCalcLinkBtn
+                                                                linkerForm:linkerTabView:objectTabView:settingCalcBar:createCalcLinkBtn
+                                                                growl"
+                                                        oncomplete="filterTree([{name:'widget', value:'calcTreeWidget'}, {name:'updateSelect', value:'true'}]);"
+                                                        action="#{linkerControllerWS.createCalcLink()}"/>
+                                        </p:contextMenu>
+                                        <p:contextMenu for="calcTree" nodeType="NLBOP" style="visibility: hidden;">
+                                        </p:contextMenu>
                                     </div>
 
                                     <f:facet name="actions">
