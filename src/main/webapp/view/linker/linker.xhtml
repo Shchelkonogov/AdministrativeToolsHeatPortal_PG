@@ -14,6 +14,7 @@
     <h:outputStylesheet name="/font-awesome/6.4.2/css/all.min-jsf.css" library="webjars"/>
     <h:outputStylesheet name="/font-awesome/6.4.2/css/v4-shims.min-jsf.css" library="webjars"/>
     <h:outputScript name="linker/script.js" library="js"/>
+    <h:outputScript name="system/mainScript.js" library="js"/>
 </h:head>
 <h:body>
     <error:expired/>
@@ -26,6 +27,9 @@
     <p:ajaxStatus onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" delay="350"/>
 
     <h:form>
+        <p:remoteCommand autoRun="true" onstart="iframeStatus([{name:'inIframe', value:inIframe()}]);" />
+        <p:remoteCommand name="iframeStatus" action="#{linkerController.changeInIframe()}"/>
+
         <p:remoteCommand name="createMaskWrapper" action="#{linkerController.createMask()}" update="growl" />
         <p:remoteCommand name="updateParamTrees" action="#{linkerController.updateParamTreesWrapper()}"
                          oncomplete="handleMsg(xhr, status, args);" />
@@ -959,19 +963,19 @@
                                          itemLabel="Пересчет давления" style="margin-bottom: 5px;">
                     <p:ajax listener="#{linkerController.recount('PRESSURE')}"
                             onstart="changeVisible('recountForm');"
-                            update="growl"/>
+                            update="@this growl"/>
                 </p:selectBooleanCheckbox>
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['TIME']}"
                                          itemLabel="Пересчет времени" style="margin-bottom: 5px;">
                     <p:ajax listener="#{linkerController.recount('TIME')}"
                             onstart="changeVisible('recountForm');"
-                            update="growl"/>
+                            update="@this growl"/>
                 </p:selectBooleanCheckbox>
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['RESISTANCE']}"
                                          itemLabel="Пересчет сопротивления">
                     <p:ajax listener="#{linkerController.recount('RESISTANCE')}"
                             onstart="changeVisible('recountForm');"
-                            update="growl"/>
+                            update="@this growl"/>
                 </p:selectBooleanCheckbox>
             </div>
         </p:panel>

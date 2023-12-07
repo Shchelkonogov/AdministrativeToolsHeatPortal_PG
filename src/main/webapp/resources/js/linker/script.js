@@ -91,7 +91,6 @@ function initDragDropForTree(widget) {
     }
 
     if (nodeType !== undefined) {
-        console.log('init');
         PF(widget).jq.find(".ui-treenode-content")
             .filter((item, itemX) => itemX.parentNode.dataset.nodetype !== nodeType)
             .draggable({disabled: true});

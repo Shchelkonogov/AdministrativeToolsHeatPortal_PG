@@ -56,6 +56,8 @@ import java.util.stream.Stream;
 @ViewScoped
 public class LinkerControllerWS implements Serializable {
 
+    private boolean inIframe;
+
     private final Map<String, UIComponent> componentMap = new HashMap<>();
 
     // Закладка "Линкованные объекты / Объекты"
@@ -601,8 +603,12 @@ public class LinkerControllerWS implements Serializable {
             loadOpcObjectsForNoLink();
             objectsForLink.clear();
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление объекта", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Удаление объекта", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление объекта", e.getMessage()));
+            }
         }
     }
 
@@ -619,8 +625,12 @@ public class LinkerControllerWS implements Serializable {
             loadOpcObjectsForNoLink();
             objectsForLink.clear();
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление параметров", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Удаление параметров", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Удаление параметров", e.getMessage()));
+            }
         }
     }
 
@@ -650,8 +660,12 @@ public class LinkerControllerWS implements Serializable {
             PrimeFaces.current().executeScript("PF('showOpcObjectParamsDialogWidget').show(); PF('showOpcObjectParamsTableWidget').filter();");
             PrimeFaces.current().ajax().update("showOpcObjectParamsDialogHeader");
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Запрос параметров", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Запрос параметров", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Запрос параметров", e.getMessage()));
+            }
         }
     }
 
@@ -668,8 +682,12 @@ public class LinkerControllerWS implements Serializable {
             loadOpcObjectsForNoLink();
             objectsForLink.clear();
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Создание фиктивного узла учета", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Создание фиктивного узла учета", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Создание фиктивного узла учета", e.getMessage()));
+            }
         }
     }
 
@@ -710,8 +728,12 @@ public class LinkerControllerWS implements Serializable {
 
             PrimeFaces.current().executeScript("PF('schemaLinkDialogWidget').show(); PF('schemaLinkTableWidget').filter();");
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()));
+            }
         }
     }
 
@@ -784,11 +806,19 @@ public class LinkerControllerWS implements Serializable {
             PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'paramTreeWidget'}, {name:'updateSelect', value:'true'}, {name:'selectRowKey', value:'" + paramTree.getSelectedRowKeysAsString() + "'}]); " +
                     "filterTree([{name:'widget', value:'paramOpcTreeWidget'}, {name:'updateSelect', value:'true'}, {name:'selectRowKey', value:'" + paramOpcTree.getSelectedRowKeysAsString() + "'}]);");
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное создание связи"));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка", "Успешное создание связи").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное создание связи"));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            }
         }
 
         PrimeFaces.current().ajax().update("growl");
@@ -822,11 +852,19 @@ public class LinkerControllerWS implements Serializable {
             PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'paramTreeWidget'}, {name:'updateSelect', value:'true'}]); " +
                     "filterTree([{name:'widget', value:'paramOpcTreeWidget'}, {name:'updateSelect', value:'true'}]);");
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешный разрыв связи"));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка", "Успешный разрыв связи").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешный разрыв связи"));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            }
         }
 
         PrimeFaces.current().ajax().update("growl");
@@ -887,8 +925,12 @@ public class LinkerControllerWS implements Serializable {
                         // Бывает хитрый момент, когда связи нет в таблицы dz_par_dev_link, то надо писать сообщение
                         PrimeFaces.current().ajax().update("growl");
 
-                        FacesContext.getCurrentInstance()
-                                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Свяжите параметр с устройством в паспорте объекта"));
+                        if (inIframe) {
+                            new TeconMessage(TeconMessage.SEVERITY_WARN, "Линковка", "Свяжите параметр с устройством в паспорте объекта").send();
+                        } else {
+                            FacesContext.getCurrentInstance()
+                                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Свяжите параметр с устройством в паспорте объекта"));
+                        }
                     }
                 }
                 break;
@@ -933,8 +975,12 @@ public class LinkerControllerWS implements Serializable {
                         // Бывает хитрый момент, когда связи нет в таблицы dz_par_dev_link, то надо писать сообщение
                         PrimeFaces.current().ajax().update("growl");
 
-                        FacesContext.getCurrentInstance()
-                                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Связь не найдена"));
+                        if (inIframe) {
+                            new TeconMessage(TeconMessage.SEVERITY_WARN, "Линковка", "Связь не найдена").send();
+                        } else {
+                            FacesContext.getCurrentInstance()
+                                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Линковка", "Связь не найдена"));
+                        }
                     }
                 }
                 break;
@@ -1105,8 +1151,14 @@ public class LinkerControllerWS implements Serializable {
         if (!errorList.isEmpty()) {
             PrimeFaces.current().ajax().update("growl");
 
-            errorList.forEach(error -> FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", error)));
+            errorList.forEach(error -> {
+                if (inIframe) {
+                    new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", error).send();
+                } else {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", error));
+                }
+            });
         }
 
         if (update) {
@@ -1158,11 +1210,19 @@ public class LinkerControllerWS implements Serializable {
 
             selectedCalcTreeNode.setType("NLSA");
         } catch (ParseException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера"));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера"));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            }
         }
     }
 
@@ -1179,11 +1239,19 @@ public class LinkerControllerWS implements Serializable {
 
             selectedCalcTreeNode.setType("LSA");
         } catch (ParseException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера"));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", "Внутренняя ошибка сервера"));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            }
         }
     }
 
@@ -1226,11 +1294,19 @@ public class LinkerControllerWS implements Serializable {
 
         try {
             linkerBean.addLinkTemplate(templateName, selectedLinkedData);
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Шаблон линковки", "Успешная линковка параметров " + templateName));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Шаблон линковки", "Успешная линковка параметров " + templateName).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Шаблон линковки", "Успешная линковка параметров " + templateName));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Шаблон линковки", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Шаблон линковки", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Шаблон линковки", e.getMessage()));
+            }
         }
     }
 
@@ -1242,11 +1318,20 @@ public class LinkerControllerWS implements Serializable {
 
         try {
             linkerBean.updateOrgTree();
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Обновление", "Успешное обновление дерева организационной структуры"));
+
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Обновление", "Успешное обновление дерева организационной структуры").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Обновление", "Успешное обновление дерева организационной структуры"));
+            }
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Обновление", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Обновление", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Обновление", e.getMessage()));
+            }
         }
     }
 
@@ -1308,27 +1393,39 @@ public class LinkerControllerWS implements Serializable {
         } catch (SystemParamException e) {
             selectedLinkedData.getSchema().setName(oldValue);
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Схема", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Схема", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Схема", e.getMessage()));
+            }
         }
     }
 
     /**
-     * Обработчик выбора перерасчета
+     * Обработчик выбора пересчета
      *
-     * @param type тип перерасчета
+     * @param type тип пересчета
      */
     public void recount(RecountTypes type) {
         try {
             String message = linkerBean.recount(selectedLinkedData, type);
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Перерасчет", message));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Пересчет", message).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Пересчет", message));
+            }
         } catch (SystemParamException e) {
             selectedLinkedData.getRecount().put(type.name(), !selectedLinkedData.getRecount().get(type.name()));
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Перерасчет", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Пересчет", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пересчет", e.getMessage()));
+            }
         }
     }
 
@@ -1357,8 +1454,12 @@ public class LinkerControllerWS implements Serializable {
             try {
                 linkerBean.addLink(selectedLinkedData, entry, utilMB.getLogin(), utilMB.getIp());
             } catch (SystemParamException e) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка линковки", e.getMessage()));
+                if (inIframe) {
+                    new TeconMessage(TeconMessage.SEVERITY_ERROR, "Ошибка линковки", e.getMessage()).send();
+                } else {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка линковки", e.getMessage()));
+                }
             }
         }
 
@@ -1375,8 +1476,12 @@ public class LinkerControllerWS implements Serializable {
         try {
             linkerBean.removeLink(selectedLinkedData, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()));
+            }
         }
 
         linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
@@ -1392,8 +1497,12 @@ public class LinkerControllerWS implements Serializable {
         try {
             linkerBean.removeAllLinks(selectedLinkedData, utilMB.getLogin(), utilMB.getIp());
         } catch (SystemParamException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка разлинковки", e.getMessage()));
+            }
         }
 
         linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
@@ -1413,8 +1522,12 @@ public class LinkerControllerWS implements Serializable {
         } catch (SystemParamException e) {
             data.setSubscribed(!data.isSubscribed());
 
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Подпись", e.getMessage()));
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Подпись", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Подпись", e.getMessage()));
+            }
         }
     }
 
@@ -1722,5 +1835,10 @@ public class LinkerControllerWS implements Serializable {
     public void setParamOpcTreeFilter(InputText paramOpcTreeFilter) {
         componentMap.put(paramOpcTreeFilter.getWidgetVar(), paramOpcTreeFilter);
         this.paramOpcTreeFilter = paramOpcTreeFilter;
+    }
+
+    public void changeInIframe() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        inIframe = Boolean.parseBoolean(params.get("inIframe"));
     }
 }

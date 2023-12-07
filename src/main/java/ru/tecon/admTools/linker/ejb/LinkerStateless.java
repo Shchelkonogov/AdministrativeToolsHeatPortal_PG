@@ -108,7 +108,7 @@ public class LinkerStateless {
              PreparedStatement stm = connect.prepareStatement(SELECT_RECOUNT_DATA)) {
             stm.setInt(1, linkedData.getDbObject().getId());
             stm.setInt(2, linkedData.getObjIntKey());
-            stm.setString(3, linkedData.getOpcObject().getName());
+            stm.setString(3, linkedData.getDbObject().getName());
 
             ResultSet res = stm.executeQuery();
             if (res.next()) {
