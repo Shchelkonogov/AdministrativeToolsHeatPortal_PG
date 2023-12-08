@@ -311,28 +311,33 @@
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
                                         </div>
-                                        <div class="tc-word-settings" style="justify-content: space-between;">
-                                            <h:panelGroup id="recountBtn" layout="block" class="tc-word-settings" style="gap: 0;">
-                                                <p:commandButton value="Пересчет давлений АВТ" style="white-space: nowrap;"
-                                                                 styleClass="tc-no-loading tc-button-word"
-                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
-                                                                 action="#{linkerControllerWS.recount('PRESSURE')}"
-                                                                 update="growl"/>
-                                                <p:commandButton value="Пересчет давлений ТС" style="white-space: nowrap;"
-                                                                 styleClass="tc-no-loading tc-button-word"
-                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
-                                                                 action="#{linkerControllerWS.recount('PRESSURE_TC')}"
-                                                                 update="growl"/>
-                                                <p:commandButton value="Пересчет времен" style="white-space: nowrap;"
-                                                                 styleClass="tc-no-loading tc-button-word"
-                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
-                                                                 action="#{linkerControllerWS.recount('TIME')}"
-                                                                 update="growl"/>
-                                                <p:commandButton value="Пересчет сопротивлений" style="white-space: nowrap;"
-                                                                 styleClass="tc-no-loading tc-button-word"
-                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
-                                                                 action="#{linkerControllerWS.recount('RESISTANCE')}"
-                                                                 update="growl"/>
+                                        <div class="tc-word-settings" style="justify-content: space-between; margin-top: 1px;">
+                                            <h:panelGroup id="recountBtn" styleClass="ui-inputgroup tc-input-group">
+                                                <h:panelGroup styleClass="ui-inputgroup-addon">
+                                                    Пересчет
+                                                </h:panelGroup>
+                                                <h:panelGroup layout="block" class="tc-word-settings" style="gap: 0;">
+                                                    <p:commandButton value="давлений АВТ: #{linkerControllerWS.getRecountStatus('PRESSURE')}" style="white-space: nowrap;"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     action="#{linkerControllerWS.recount('PRESSURE')}"
+                                                                     update="@this growl"/>
+                                                    <p:commandButton value="давлений ТС: #{linkerControllerWS.getRecountStatus('PRESSURE_TC')}" style="white-space: nowrap;"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     action="#{linkerControllerWS.recount('PRESSURE_TC')}"
+                                                                     update="@this growl"/>
+                                                    <p:commandButton value="времен: #{linkerControllerWS.getRecountStatus('TIME')}" style="white-space: nowrap;"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     action="#{linkerControllerWS.recount('TIME')}"
+                                                                     update="@this growl"/>
+                                                    <p:commandButton value="сопротивлений: #{linkerControllerWS.getRecountStatus('RESISTANCE')}" style="white-space: nowrap;"
+                                                                     styleClass="tc-no-loading tc-button-word"
+                                                                     disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                     action="#{linkerControllerWS.recount('RESISTANCE')}"
+                                                                     update="@this growl"/>
+                                                </h:panelGroup>
                                             </h:panelGroup>
                                             <h:panelGroup id="linkBtnGroup" layout="block" class="tc-word-settings">
                                                 <div class="tc-word-settings" style="gap: 0;">

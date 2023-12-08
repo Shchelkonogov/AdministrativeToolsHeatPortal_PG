@@ -1409,6 +1409,7 @@ public class LinkerControllerWS implements Serializable {
      */
     public void recount(RecountTypes type) {
         try {
+            selectedLinkedData.getRecount().put(type.name(), !selectedLinkedData.getRecount().get(type.name()));
             String message = linkerBean.recount(selectedLinkedData, type);
 
             if (inIframe) {
@@ -1426,6 +1427,14 @@ public class LinkerControllerWS implements Serializable {
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пересчет", e.getMessage()));
             }
+        }
+    }
+
+    public String getRecountStatus(RecountTypes type) {
+        if (selectedLinkedData != null) {
+            return selectedLinkedData.getRecount().get(type.name()) ? "Вкл" : "Выкл";
+        } else {
+            return "НД";
         }
     }
 
