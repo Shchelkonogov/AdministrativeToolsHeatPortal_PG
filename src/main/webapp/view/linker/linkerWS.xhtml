@@ -313,10 +313,15 @@
                                         </div>
                                         <div class="tc-word-settings" style="justify-content: space-between;">
                                             <h:panelGroup id="recountBtn" layout="block" class="tc-word-settings" style="gap: 0;">
-                                                <p:commandButton value="Пересчет давлений" style="white-space: nowrap;"
+                                                <p:commandButton value="Пересчет давлений АВТ" style="white-space: nowrap;"
                                                                  styleClass="tc-no-loading tc-button-word"
                                                                  disabled="#{linkerControllerWS.disableLinksBtn}"
                                                                  action="#{linkerControllerWS.recount('PRESSURE')}"
+                                                                 update="growl"/>
+                                                <p:commandButton value="Пересчет давлений ТС" style="white-space: nowrap;"
+                                                                 styleClass="tc-no-loading tc-button-word"
+                                                                 disabled="#{linkerControllerWS.disableLinksBtn}"
+                                                                 action="#{linkerControllerWS.recount('PRESSURE_TC')}"
                                                                  update="growl"/>
                                                 <p:commandButton value="Пересчет времен" style="white-space: nowrap;"
                                                                  styleClass="tc-no-loading tc-button-word"

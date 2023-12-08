@@ -990,8 +990,14 @@
 
             <div style="margin: 3px; display: flex; flex-direction: column;">
                 <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['PRESSURE']}"
-                                         itemLabel="Пересчет давления" style="margin-bottom: 5px;">
+                                         itemLabel="Пересчет давления АВТ" style="margin-bottom: 5px;">
                     <p:ajax listener="#{linkerController.recount('PRESSURE')}"
+                            onstart="changeVisible('recountForm');"
+                            update="@this growl"/>
+                </p:selectBooleanCheckbox>
+                <p:selectBooleanCheckbox value="#{linkerController.selectedLinkedData.recount['PRESSURE_TC']}"
+                                         itemLabel="Пересчет давления ТС" style="margin-bottom: 5px;">
+                    <p:ajax listener="#{linkerController.recount('PRESSURE_TC')}"
                             onstart="changeVisible('recountForm');"
                             update="@this growl"/>
                 </p:selectBooleanCheckbox>

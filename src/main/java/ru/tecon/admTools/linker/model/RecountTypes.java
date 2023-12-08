@@ -9,6 +9,7 @@ package ru.tecon.admTools.linker.model;
 public enum RecountTypes {
 
     PRESSURE,
+    PRESSURE_TC,
     RESISTANCE,
     TIME
 }

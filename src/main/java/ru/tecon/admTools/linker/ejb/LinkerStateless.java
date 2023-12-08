@@ -27,6 +27,7 @@ public class LinkerStateless {
     private final static String SELECT_LINKED_OBJECTS_DATA = "select * from lnk_0001t.sel_linked_object(?, '', '', cast(0 as smallint), ?);";
     private final static String SELECT_RECOUNT_DATA = "select * from lnk_0001t.sel_obj_recalc_mode(?, ?, ?);";
     private final static String PROCEDURE_RECOUNT_PRESSURE = "call lnk_0001t.recalc_pressure(?, ?, ?, ?);";
+    private final static String PROCEDURE_RECOUNT_PRESSURE_TC = "call lnk_0001t.recalc_pressure_p1p2(?, ?, ?, ?);";
     private final static String PROCEDURE_RECOUNT_TIME = "call lnk_0001t.recalc_time(?, ?, ?, ?);";
     private final static String PROCEDURE_RECOUNT_RESISTANCE = "call lnk_0001t.recalc_resistance(?, ?, ?, ?);";
     private final static String PROCEDURE_SUBSCRIBE = "call lnk_0001t.set_subscribe(?, ?, ?, ?);";
@@ -113,6 +114,7 @@ public class LinkerStateless {
             ResultSet res = stm.executeQuery();
             if (res.next()) {
                 linkedData.getRecount().put(RecountTypes.PRESSURE.name(), res.getInt("pressure_recalc_mode") == 1);
+                linkedData.getRecount().put(RecountTypes.PRESSURE_TC.name(), res.getInt("pressure_p1p2_recalc_mode") == 1);
                 linkedData.getRecount().put(RecountTypes.RESISTANCE.name(), res.getInt("resistance_recalc_mode") == 1);
                 linkedData.getRecount().put(RecountTypes.TIME.name(), res.getInt("time_recalc_mode") == 1);
             }
@@ -142,6 +144,9 @@ public class LinkerStateless {
                     break;
                 case PRESSURE:
                     select = PROCEDURE_RECOUNT_PRESSURE;
+                    break;
+                case PRESSURE_TC:
+                    select = PROCEDURE_RECOUNT_PRESSURE_TC;
                     break;
                 case RESISTANCE:
                     select = PROCEDURE_RECOUNT_RESISTANCE;
