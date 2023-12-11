@@ -11,6 +11,7 @@ import ru.tecon.admTools.specificModel.model.additionalModel.AnalogData;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.SystemParamsUtilMB;
+import ru.tecon.admTools.utils.TeconMessage;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -72,6 +73,7 @@ public class SpecificModelMB implements Serializable {
     // Правая таблица с дополнительными данными
     private EnumerateData paramConditionDataModel;
     private List<Condition> conditions;
+    private boolean inIframe;
 
     @EJB
     private SpecificModelLocal bean;
@@ -210,8 +212,12 @@ public class SpecificModelMB implements Serializable {
             try {
                 bean.saveAParam(objectID, dataModel, utilMB.getLogin(), eco);
             } catch (SystemParamException e) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+                if (inIframe) {
+                    new TeconMessage(TeconMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()).send();
+                } else {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+                }
             }
             PrimeFaces.current().ajax().update("tabView");
         });
@@ -224,8 +230,12 @@ public class SpecificModelMB implements Serializable {
             try {
                 bean.saveEnumParam(objectID, dataModel, utilMB.getLogin());
             } catch (SystemParamException e) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+                if (inIframe) {
+                    new TeconMessage(TeconMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()).send();
+                } else {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка сохранения", e.getMessage()));
+                }
             }
             PrimeFaces.current().ajax().update("tabView:cTableForm");
         });
@@ -278,10 +288,10 @@ public class SpecificModelMB implements Serializable {
      * Метод обрабатывает нажатие на выбрать во всплывающем окне выбора графика
      */
     public void saveGraph() {
-            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectGraph.getName());
-            ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(selectGraph.getId());
-            changedDecreaseGraphItem.setChange(true);
-            PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphName(selectGraph.getName());
+        ((AnalogData) changedDecreaseGraphItem.getAdditionalData()).setGraphID(selectGraph.getId());
+        changedDecreaseGraphItem.setChange(true);
+        PrimeFaces.current().ajax().update("tabView:tableForm:tableData:" + rowIndex + ":graphValuePanel");
     }
 
     /**
@@ -563,6 +573,11 @@ public class SpecificModelMB implements Serializable {
                 return data.getaMin().toString();
             }
         }
+    }
+
+    public void changeInIframe() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        inIframe = Boolean.parseBoolean(params.get("inIframe"));
     }
 
     public void setOptValue(String optValue) {

@@ -126,7 +126,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_ENUMERABLE_DATA)) {
 
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 DataModel item = new DataModel(res.getInt("par_id"), res.getInt("stat_agr_id"));
@@ -151,7 +151,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         EnumerateData result = new EnumerateData();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_PARAM_CONDITION)) {
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             stm.setInt(2, parId);
             stm.setInt(3, statAgrID);
 
@@ -220,7 +220,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_ENUM_PARAMS)) {
 
-                for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
+            for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
                 if (item.isEdited()) {
                     try {
                         stm.setInt(1, objectID);
@@ -253,6 +253,7 @@ public class SpecificModelSB implements SpecificModelLocal {
     public void saveAParam(int objectID, DataModel saveData, String login, boolean eco) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(eco ? SAVE_ECO_ANALOG_PARAMS : SAVE_ANALOG_PARAMS)) {
+
             stm.setLong(1, objectID);
             stm.setLong(2, saveData.getParID());
             stm.setLong(3, saveData.getStatAgr());
@@ -357,7 +358,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         List<ParamHistory> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_HISTORY)) {
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             stm.setInt(2, paramID);
             stm.setInt(3, statAgrID);
 

@@ -113,14 +113,23 @@ public class ChangeRangesSB implements ChangeRangesLocal {
 
             ResultSet res = stm.executeQuery();
             while (res.next()) {
-                result.add(new ChangeRangesModel(res.getString("obj_name"),
+                ChangeRangesModel changeRangesModel = new ChangeRangesModel(res.getString("obj_name"),
                         res.getString("change_date"),
                         res.getString("par_memo"),
                         res.getString("stat_agr_name"),
                         res.getString("range_name"),
                         res.getString("old_val"),
                         res.getString("new_val"),
-                        res.getString("user_name")));
+                        res.getString("user_name"));
+
+                if (changeRangesModel.getOldValue() == null || changeRangesModel.getOldValue().equals("NULL")) {
+                    changeRangesModel.setOldValue("");
+                }
+                if (changeRangesModel.getNewValue() == null || changeRangesModel.getOldValue().equals("NULL")) {
+                    changeRangesModel.setNewValue("");
+                }
+
+                result.add(changeRangesModel);
             }
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "error load report data", e);

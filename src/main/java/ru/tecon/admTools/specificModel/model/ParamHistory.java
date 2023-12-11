@@ -38,6 +38,14 @@ public class ParamHistory {
         return newValue;
     }
 
+    public void setOldValue(String oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    public void setNewValue(String newValue) {
+        this.newValue = newValue;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", ParamHistory.class.getSimpleName() + "[", "]")

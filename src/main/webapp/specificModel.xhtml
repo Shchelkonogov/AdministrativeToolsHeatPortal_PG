@@ -9,8 +9,13 @@
 <h:head>
     <h:outputStylesheet library="css" name="style.css"/>
     <h:outputScript library="js" name="specificModelScript.js"/>
+    <h:outputScript name="system/mainScript.js" library="js"/>
 </h:head>
 <h:body>
+
+    <p:remoteCommand autoRun="true" onstart="iframeStatus([{name:'inIframe', value:inIframe()}]);" />
+    <p:remoteCommand name="iframeStatus" action="#{specificModel.changeInIframe()}"/>
+
         <p:growl id="growl" showDetail="true" />
     <table style="width: 100%;" id="specHeader">
         <tr>
@@ -32,7 +37,8 @@
             <h:form id="tableForm" style="height: calc(100% - 5px);">
                 <p:dataTable id="tableData" var="data" value="#{specificModel.tableModel}" rowHover="true" scrollable="true" scrollHeight="100%"
                              editable="true" editMode="cell" rowIndexVar="rowIdx" rowStyleClass="#{data.additionalData.color}" rowKey="#{data.id}"
-                             filteredValue="#{specificModel.filteredTableModel}" widgetVar="tableWidget" emptyMessage="#{global['table.empty.value']}">
+                             filteredValue="#{specificModel.filteredTableModel}" widgetVar="tableWidget" emptyMessage="#{global['table.empty.value']}"
+                             disableContextMenuIfEmpty="false">
 
                     <p:ajax event="cellEditInit" listener="#{specificModel.onCellEditInit}" />
                     <p:ajax event="cellEdit" listener="#{specificModel.onCellEdit}" update=":growl" />
