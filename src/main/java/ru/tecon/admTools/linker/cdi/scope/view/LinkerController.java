@@ -1380,6 +1380,13 @@ public class LinkerController implements Serializable {
 
             PrimeFaces.current().ajax().update(updateList);
             PrimeFaces.current().executeScript("PF('createMaskDialogWidget').hide();");
+
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Схема", "Схема линковки с именем \"" + newMaskName + "\" создана").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Схема", "Схема линковки с именем \"" + newMaskName + "\" создана"));
+            }
         } catch (SystemParamException e) {
             selectedLinkedData.getSchema().setName(oldValue);
 
