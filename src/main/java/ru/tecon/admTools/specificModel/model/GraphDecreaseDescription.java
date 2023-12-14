@@ -4,8 +4,8 @@ import java.util.StringJoiner;
 
 public class GraphDecreaseDescription {
 
-    private String x;
-    private String y;
+    private final String x;
+    private final String y;
 
     public GraphDecreaseDescription(String x, String y) {
         this.x = x;

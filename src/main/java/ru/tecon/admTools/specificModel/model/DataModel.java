@@ -8,12 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataModel implements Serializable {
 
-    private static AtomicInteger idGenerator = new AtomicInteger();
+    private static final AtomicInteger idGenerator = new AtomicInteger();
 
-    private int id;
+    private final int id;
 
-    private int parID;
-    private int statAgr;
+    private final int parID;
+    private final int statAgr;
 
     private String parName;
     private String parMemo;
@@ -29,9 +29,6 @@ public class DataModel implements Serializable {
     private boolean tempGraphRender = false;
     private boolean optValuesRender = false;
     private boolean decreaseValueRender = false;
-
-    public DataModel() {
-    }
 
     public DataModel(int parID, int statAgr) {
         this.id = idGenerator.getAndIncrement();

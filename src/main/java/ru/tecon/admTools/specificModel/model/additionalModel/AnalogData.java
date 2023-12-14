@@ -8,11 +8,11 @@ import java.util.StringJoiner;
  */
 public class AnalogData implements Serializable, Additional {
 
-    private GraphDecrease graph = new GraphDecrease();
-    private GraphDecrease decrease = new GraphDecrease();
+    private final GraphDecrease graph = new GraphDecrease();
+    private final GraphDecrease decrease = new GraphDecrease();
 
-    private Borders t = new Borders();
-    private Borders a = new Borders();
+    private final Borders t = new Borders();
+    private final Borders a = new Borders();
 
     private boolean absolute;
     private boolean color;
@@ -207,7 +207,7 @@ public class AnalogData implements Serializable, Additional {
         return color ? " red" : "";
     }
 
-    private class GraphDecrease {
+    private static class GraphDecrease {
 
         private Integer id;
         private String name;
@@ -226,7 +226,7 @@ public class AnalogData implements Serializable, Additional {
         }
     }
 
-    private class Borders {
+    private static class Borders {
 
         private Double min;
         private Double max;

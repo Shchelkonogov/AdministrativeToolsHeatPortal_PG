@@ -4,11 +4,11 @@ import java.util.StringJoiner;
 
 public class ParamHistory {
 
-    private String date;
-    private String userName;
-    private String description;
-    private String oldValue;
-    private String newValue;
+    private final String date;
+    private final String userName;
+    private final String description;
+    private final String oldValue;
+    private final String newValue;
 
     public ParamHistory(String date, String userName, String description, String oldValue, String newValue) {
         this.date = date;

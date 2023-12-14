@@ -14,7 +14,7 @@ import java.util.StringJoiner;
  */
 public class EnumerateData implements Serializable, Additional {
 
-    private List<ParamCondition> conditions = new ArrayList<>();
+    private final List<ParamCondition> conditions = new ArrayList<>();
 
     public EnumerateData() {
     }
@@ -34,10 +34,10 @@ public class EnumerateData implements Serializable, Additional {
                 .toString();
     }
 
-    public class ParamCondition {
+    public static class ParamCondition {
 
-        private int enumCode;
-        private String propValue;
+        private final int enumCode;
+        private final String propValue;
 
         private Condition condition;
 

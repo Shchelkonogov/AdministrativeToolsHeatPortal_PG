@@ -76,11 +76,12 @@ public interface SpecificModelLocal {
      */
     void saveEnumParam(int objectID, DataModel saveData, String login) throws SystemParamException;
 
+
     /**
      * Метод сохраняет изменения для аналоговых параметров
      * @param objectID id объекта
      * @param saveData данные для сохранения
-     * @return в случае ошибки сохранения возвращается сообщение об ошибке.
+     * @throws SystemParamException в случае ошибки сохранения возвращается сообщение об ошибке.
      */
     void saveAParam(int objectID, DataModel saveData, String login, boolean eco) throws SystemParamException;
 
@@ -112,6 +113,7 @@ public interface SpecificModelLocal {
      * @param objectID id объекта
      * @param parID id параметра
      * @param statAgrID id агрегата
+     * @param user идентификатор пользователя, от которого производится сброс границ
      */
-    void clearRanges (int objectID, int parID, int statAgrID, boolean eco) throws SystemParamException;
+    void clearRanges (int objectID, int parID, int statAgrID, boolean eco, String user) throws SystemParamException;
 }

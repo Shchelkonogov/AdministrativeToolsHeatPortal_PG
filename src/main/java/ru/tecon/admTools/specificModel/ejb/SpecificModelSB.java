@@ -1,16 +1,17 @@
 package ru.tecon.admTools.specificModel.ejb;
 
-import org.postgresql.util.PSQLException;
 import ru.tecon.admTools.specificModel.model.*;
 import ru.tecon.admTools.specificModel.model.additionalModel.AnalogData;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
 import ru.tecon.admTools.systemParams.SystemParamException;
+import ru.tecon.admTools.utils.AdmTools;
 
 import javax.annotation.Resource;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -19,13 +20,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 @Stateless
 @Local(SpecificModelLocal.class)
 public class SpecificModelSB implements SpecificModelLocal {
-
-    private static final Logger LOG = Logger.getLogger(SpecificModelSB.class.getName());
-
 
     private static final String SELECT_DATA = "select * from dsp_0031t.sel_a_params(?)";
     private static final String SELECT_ECO_DATA = "select * from dsp_0050t.sel_a_params(?)";
@@ -42,9 +39,11 @@ public class SpecificModelSB implements SpecificModelLocal {
     private static final String SAVE_ENUM_PARAMS = "call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?, ?)";
     private static final String SAVE_ANALOG_PARAMS = "call dsp_0031t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SAVE_ECO_ANALOG_PARAMS = "call dsp_0050t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String CLEAR_RANGES = "call dsp_0031t.clear_ranges(?, ?, ?)";
-    private static final String CLEAR_ECO_RANGES = "call dsp_0050t.clear_ranges(?, ?, ?)";
+    private static final String CLEAR_RANGES = "call dsp_0031t.clear_ranges(?, ?, ?, ?)";
+    private static final String CLEAR_ECO_RANGES = "call dsp_0050t.clear_ranges(?, ?, ?, ?)";
 
+    @Inject
+    private Logger logger;
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -98,7 +97,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 result.add(item);
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load analog data", e);
+            logger.log(Level.WARNING, "error load analog data", e);
         }
         return result;
     }
@@ -114,7 +113,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 return res.getString(1);
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load object path", e);
+            logger.log(Level.WARNING, "error load object path", e);
         }
 
         return "";
@@ -126,7 +125,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_ENUMERABLE_DATA)) {
 
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 DataModel item = new DataModel(res.getInt("par_id"), res.getInt("stat_agr_id"));
@@ -141,7 +140,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 result.add(item);
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load enumerable data", e);
+            logger.log(Level.WARNING, "error load enumerable data", e);
         }
         return result;
     }
@@ -151,7 +150,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         EnumerateData result = new EnumerateData();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_PARAM_CONDITION)) {
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             stm.setInt(2, parId);
             stm.setInt(3, statAgrID);
 
@@ -163,7 +162,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                         res.getString("prop_val_tech"));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load param condition", e);
+            logger.log(Level.WARNING, "error load param condition", e);
         }
         return result;
     }
@@ -178,7 +177,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 result.add(new Condition(res.getInt(1), res.getString(2)));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load conditions", e);
+            logger.log(Level.WARNING, "error load conditions", e);
         }
         return result;
     }
@@ -197,6 +196,7 @@ public class SpecificModelSB implements SpecificModelLocal {
 
     /**
      * Метод обертка, выполняет запрос на получения списка графиков или снижений
+     *
      * @param sql запрос
      * @return полученный список
      */
@@ -209,7 +209,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 result.add(new GraphDecreaseItemModel(res.getInt(1), res.getString(2), res.getString(3)));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load graph/decreases list", e);
+            logger.log(Level.WARNING, "error load graph/decreases list", e);
         }
         return result;
     }
@@ -220,7 +220,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(SAVE_ENUM_PARAMS)) {
 
-                for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
+            for (EnumerateData.ParamCondition item: ((EnumerateData) saveData.getAdditionalData()).getConditions()) {
                 if (item.isEdited()) {
                     try {
                         stm.setInt(1, objectID);
@@ -232,19 +232,13 @@ public class SpecificModelSB implements SpecificModelLocal {
                         stm.setString(7, login);
                         stm.executeUpdate();
                     } catch (SQLException e) {
-                        LOG.log(Level.WARNING, "saving error Enum Param", e);
-                        if (e.getSQLState().equals("11111")) {
-                            if (e instanceof PSQLException) {
-                                PSQLException exception = (PSQLException)e;
-                                String ex = exception.getServerErrorMessage().getMessage();
-                                throw new SystemParamException(ex);
-                            }
-                        } else throw new SystemParamException("Внутренняя ошибка сервера");
+                        logger.log(Level.WARNING, "saving error Enum Param", e);
+                        throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
                     }
                 }
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "saving error Enum Param", e);
+            logger.log(Level.WARNING, "saving error Enum Param", e);
         }
     }
 
@@ -309,14 +303,8 @@ public class SpecificModelSB implements SpecificModelLocal {
             stm.executeUpdate();
 
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "saving error A Params ", e);
-            if (e.getSQLState().equals("11111")) {
-                if (e instanceof PSQLException) {
-                    PSQLException exception = (PSQLException)e;
-                    String ex = exception.getServerErrorMessage().getMessage();
-                    throw new SystemParamException(ex);
-                }
-            } else throw new SystemParamException("Внутренняя ошибка сервера");
+            logger.log(Level.WARNING, "saving error A Params ", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
     }
 
@@ -333,7 +321,8 @@ public class SpecificModelSB implements SpecificModelLocal {
 
     /**
      * Метод обертка, выполняет запрос на получения списка графиков или снижений
-     * @param id id графика или суточного снижения
+     *
+     * @param id                        id графика или суточного снижения
      * @param selectDecreaseDescription select
      * @return полученный список
      */
@@ -347,7 +336,7 @@ public class SpecificModelSB implements SpecificModelLocal {
                 result.add(new GraphDecreaseDescription(res.getString("x"), res.getString("y")));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load graph/decrease description", e);
+            logger.log(Level.WARNING, "error load graph/decrease description", e);
         }
         return result;
     }
@@ -357,7 +346,7 @@ public class SpecificModelSB implements SpecificModelLocal {
         List<ParamHistory> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_HISTORY)) {
-                stm.setInt(1, objectID);
+            stm.setInt(1, objectID);
             stm.setInt(2, paramID);
             stm.setInt(3, statAgrID);
 
@@ -370,28 +359,23 @@ public class SpecificModelSB implements SpecificModelLocal {
                         res.getString("new_val")));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load param history", e);
+            logger.log(Level.WARNING, "error load param history", e);
         }
         return result;
     }
 
     @Override
-    public void clearRanges(int objectID, int parID, int statAgrID, boolean eco) throws SystemParamException {
+    public void clearRanges(int objectID, int parID, int statAgrID, boolean eco, String user) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement stm = connect.prepareCall(eco ? CLEAR_ECO_RANGES : CLEAR_RANGES)) {
             stm.setInt(1, objectID);
             stm.setInt(2, parID);
             stm.setInt(3, statAgrID);
+            stm.setString(4, user);
             stm.executeUpdate();
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error clearRanges ", e);
-            if (e.getSQLState().equals("11111")) {
-                if (e instanceof PSQLException) {
-                    PSQLException exception = (PSQLException)e;
-                    String ex = exception.getServerErrorMessage().getMessage();
-                    throw new SystemParamException(ex);
-                }
-            } else throw new SystemParamException("Внутренняя ошибка сервера");
+            logger.log(Level.WARNING, "error clearRanges ", e);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
     }
 }
