@@ -157,8 +157,10 @@ public class GenModelMB implements Serializable, AutoUpdate {
                     case "Температура":
                         if (selectedObjNode.getParent().getParent().getData().getName().equals("Горячее водоснабжение")) {
                             temperatureStatus = TemperatureStatus.DAILY_REDUCTION;
+                            graphOrDecreaseList = dailyReductionBean.getTemperatures();
                         } else {
                             temperatureStatus = TemperatureStatus.GRAPH;
+                            graphOrDecreaseList = tempGraphBean.getTemperatures();
                         }
                         break;
                     default:
