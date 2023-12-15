@@ -58,27 +58,47 @@
             <p:panel id="propPanel" styleClass="tc-panel" header="#{bean.headerProp}">
                 <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
                     <p:dataTable id="temperatureProp" value="#{bean.temperatureProps}" var="temperatureProp"
+                                 widgetVar="temperaturePropWidget" rowIndexVar="rowIndex"
                                  scrollable="true" scrollHeight="100%" selectionMode="single"
                                  selection="#{bean.selectedTemperatureProp}" rowKey="#{temperatureProp.id}"
-                                 emptyMessage="#{global['table.empty.value']}" scrollRows="100"
-                                 disabledSelection="#{!systemParamsUtil.write}">
+                                 emptyMessage="#{global['table.empty.value']}" editMode="cell" editInitEvent="dblclick"
+                                 disabledSelection="#{!systemParamsUtil.write}" editable="#{systemParamsUtil.write}">
 
                         <p:ajax event="rowSelect" listener="#{bean.onTemperaturePropSelect}"
                                 update="temperaturePanel:temperatureRemoveProp" />
+                        <p:ajax event="cellEdit" listener="#{bean.onCellEdit}" />
 
                         <p:column headerText="#{table2Header1Name == null ? 'Температура' : table2Header1Name}"
                                   style="text-align: center;">
-                            <h:outputText value="#{temperatureProp.tnv}" />
+                            <h:outputText value="#{temperatureProp.tnv}"/>
                         </p:column>
                         <p:column headerText="Значение" style="text-align: center;">
-                            <h:outputText value="#{temperatureProp.value}">
-                                <f:convertNumber minFractionDigits="0"/>
-                            </h:outputText>
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                                <f:facet name="output">
+                                    <div onclick="PF('temperaturePropWidget').selectRow(#{rowIndex}, false);">
+                                        <h:outputText value="#{temperatureProp.value}">
+                                            <f:convertNumber minFractionDigits="0" locale="en-US"/>
+                                        </h:outputText>
+                                    </div>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{temperatureProp.value}" style="width: 100%;"
+                                                   decimalSeparator="." decimalSeparatorAlternative=","
+                                                   minValue="#{bean.minYValue}" maxValue="#{bean.maxYValue}"/>
+                                </f:facet>
+                            </p:cellEditor>
                         </p:column>
                     </p:dataTable>
                 </div>
 
                 <f:facet name="actions">
+                    <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
+                                   onclick="PF('buiTable').show();" rendered="#{systemParamsUtil.write}"
+                                   action="#{bean.onSaveChanges}"
+                                   update="temperatureProp temperatureRemoveProp growl"
+                                   oncomplete="PF('buiTable').hide();">
+                        <h:outputText styleClass="ui-icon pi pi-save"/>
+                    </p:commandLink>
                     <p:commandLink id="temperatureAddProp" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
                                    disabled="#{bean.disableRemoveTemperatureBtn}" onclick="PF('addPropDialog').show();"
                                    rendered="#{systemParamsUtil.write}">
@@ -150,7 +170,8 @@
                                 <h:outputText value="#{prop.tnv}" />
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputNumber value="#{prop.tnv}" style="width: 100%;"/>
+                                <p:inputNumber value="#{prop.tnv}" style="width: 100%;"
+                                               minValue="#{bean.minXValue}" maxValue="#{bean.maxXValue}"/>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
@@ -158,11 +179,13 @@
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{prop.value}">
-                                    <f:convertNumber minFractionDigits="0"/>
+                                    <f:convertNumber minFractionDigits="0" locale="en-US"/>
                                 </h:outputText>
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputNumber value="#{prop.value}" style="width: 100%;"/>
+                                <p:inputNumber value="#{prop.value}" style="width: 100%;"
+                                               decimalSeparator="." decimalSeparatorAlternative=","
+                                               minValue="#{bean.minYValue}" maxValue="#{bean.maxYValue}"/>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
@@ -196,7 +219,8 @@
                     <div style="text-align: center; margin-bottom: 5px;">
                         <p:outputLabel value="#{table2Header1Name == null ? 'Температура' : table2Header1Name}" for="@next" style="margin-right: 5px;"/>
                         <p:inputNumber required="true" value="#{bean.newTemperatureProp.tnv}" styleClass="tc-width-280"
-                                       requiredMessage="#{global['validation.view.text']}" emptyValue="0"/>
+                                       requiredMessage="#{global['validation.view.text']}" emptyValue="0"
+                                       minValue="#{bean.minXValue}" maxValue="#{bean.maxXValue}"/>
                     </div>
                     <div style="display: flex;">
                         <p:message style="margin: auto" for="@previous" styleClass="tc-show-on-active" />
@@ -206,7 +230,9 @@
                     <div style="text-align: center; margin-bottom: 5px;">
                         <p:outputLabel value="Значение" for="@next" style="margin-right: 5px;"/>
                         <p:inputNumber required="true" value="#{bean.newTemperatureProp.value}" styleClass="tc-width-280"
-                                       requiredMessage="#{global['validation.view.text']}" emptyValue="0"/>
+                                       requiredMessage="#{global['validation.view.text']}" emptyValue="0"
+                                       decimalSeparator="." decimalSeparatorAlternative=","
+                                       minValue="#{bean.minYValue}" maxValue="#{bean.maxYValue}"/>
                     </div>
                     <div style="display: flex;">
                         <p:message style="margin: auto" for="@previous" styleClass="tc-show-on-active" />

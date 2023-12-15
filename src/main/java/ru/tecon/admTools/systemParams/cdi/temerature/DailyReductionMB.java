@@ -41,4 +41,24 @@ public class DailyReductionMB extends TemperatureMB {
     public String getHeaderAddDialog() {
         return HEADER_ADD_DIALOG;
     }
+
+    @Override
+    public long getMinXValue() {
+        return 0;
+    }
+
+    @Override
+    public long getMaxXValue() {
+        return 23;
+    }
+
+    @Override
+    public long getMinYValue() {
+        return -100;
+    }
+
+    @Override
+    public long getMaxYValue() {
+        return 100;
+    }
 }

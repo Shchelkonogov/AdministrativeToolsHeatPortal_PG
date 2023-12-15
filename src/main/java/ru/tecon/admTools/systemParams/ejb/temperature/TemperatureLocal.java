@@ -57,6 +57,16 @@ public interface TemperatureLocal {
     void addTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip) throws SystemParamException;
 
     /**
+     * Создание нового свойства для типа
+     * @param id идентификатор типа
+     * @param temperatureProp новое свойство
+     * @param login идентификатор пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошибки базы
+     */
+    void updateTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip) throws SystemParamException;
+
+    /**
      * Создание нового типа
      * @param temperature новый тип
      * @param login идентификатор пользователя

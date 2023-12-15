@@ -41,4 +41,24 @@ public class TempGraphsMB extends TemperatureMB {
     public String getHeaderAddDialog() {
         return HEADER_ADD_DIALOG;
     }
+
+    @Override
+    public long getMinXValue() {
+        return -40;
+    }
+
+    @Override
+    public long getMaxXValue() {
+        return 20;
+    }
+
+    @Override
+    public long getMinYValue() {
+        return 0;
+    }
+
+    @Override
+    public long getMaxYValue() {
+        return 200;
+    }
 }

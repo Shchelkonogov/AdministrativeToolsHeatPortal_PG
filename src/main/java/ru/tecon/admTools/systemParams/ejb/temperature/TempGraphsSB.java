@@ -23,6 +23,7 @@ public class TempGraphsSB implements TemperatureLocal {
     private static final String FUN_REMOVE_TEMP_GRAPH_PROP = "call sys_0001t.del_graph_value(?, ?, ?, ?, ?, ?)";
     private static final String FUN_CREATE_TEMP_GRAPH = "call sys_0001t.add_graph(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String FUN_CREATE_TEMP_GRAPH_PROP = "call sys_0001t.add_graph_value(?, ?, ?, ?, ?, ?)";
+    private static final String FUN_UPDATE_TEMP_GRAPH_PROP = "call sys_0001t.upd_graph_value(?, ?, ?, ?, ?, ?)";
     private static final String FIND_TEMP_BY_ID = "select * from dsp_0031t.sel_graph_list() where graph_id = ?";
 
     @EJB
@@ -51,6 +52,11 @@ public class TempGraphsSB implements TemperatureLocal {
     @Override
     public void addTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip) throws SystemParamException {
         wrapperTemperatureBean.addTemperatureProp(id, temperatureProp, login, ip, FUN_CREATE_TEMP_GRAPH_PROP);
+    }
+
+    @Override
+    public void updateTemperatureProp(int id, TemperatureProp temperatureProp, String login, String ip) throws SystemParamException {
+        wrapperTemperatureBean.addTemperatureProp(id, temperatureProp, login, ip, FUN_UPDATE_TEMP_GRAPH_PROP);
     }
 
     @Override

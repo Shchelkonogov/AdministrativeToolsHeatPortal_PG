@@ -3,6 +3,7 @@ package ru.tecon.admTools.systemParams.ejb.temperature;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
+import ru.tecon.admTools.utils.AdmTools;
 
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
@@ -157,7 +158,7 @@ public class TemperatureSB {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQLException", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(e));
         }
     }
 

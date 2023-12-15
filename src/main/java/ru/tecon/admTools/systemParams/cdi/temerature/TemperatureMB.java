@@ -1,6 +1,7 @@
 package ru.tecon.admTools.systemParams.cdi.temerature;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -41,6 +43,22 @@ public abstract class TemperatureMB implements Serializable, AutoUpdate {
     public abstract String getHeaderType();
     public abstract String getHeaderProp();
     public abstract String getHeaderAddDialog();
+
+    public long getMinXValue() {
+        return -10000000000000L;
+    }
+
+    public long getMaxXValue() {
+        return 10000000000000L;
+    }
+
+    public long getMinYValue() {
+        return -10000000000000L;
+    }
+
+    public long getMaxYValue() {
+        return 10000000000000L;
+    }
 
     @Inject
     private SystemParamsUtilMB utilMB;
@@ -137,6 +155,41 @@ public abstract class TemperatureMB implements Serializable, AutoUpdate {
 
     public void saveStructWrapper() {
         PrimeFaces.current().executeScript("saveTypeWrapper();");
+    }
+
+    public void onSaveChanges() {
+        List<String> errorMessages = new ArrayList<>();
+
+        selectedTemperatureType.getTemperatureProps().stream()
+                .filter(temperatureProp -> !temperatureProp.check())
+                .forEach(temperatureProp -> {
+                    LOGGER.log(Level.INFO, "update value {0}", temperatureProp);
+
+                    try {
+                        temperatureBean.updateTemperatureProp(selectedTemperatureType.getId(), temperatureProp, utilMB.getLogin(), utilMB.getIp());
+                    } catch (SystemParamException e) {
+                        errorMessages.add(e.getMessage());
+                        LOGGER.warning(e.getMessage());
+                    }
+                });
+
+        selectedTemperatureType.setTemperatureProps(temperatureBean.loadTemperatureProps(selectedTemperatureType));
+        selectedTemperatureProp = null;
+        disableRemovePropBtn = true;
+
+        if (!errorMessages.isEmpty()) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", String.join(", ", errorMessages)));
+        }
+    }
+
+    /**
+     * Обработчик изменения ячейки таблицы
+     * @param event событие изменения
+     */
+    public void onCellEdit(CellEditEvent<?> event) {
+        String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     /**
