@@ -275,7 +275,13 @@ public class LinkerControllerWS implements Serializable {
             case "Объекты":
                 linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
                 selectedLinkedData = null;
-                selectedLinkedObjectId = null;
+
+                if (selectedLinkedObjectId != null) {
+                    setSelectedLinkedData(linkedData.getData().stream().filter(data -> data.getDbObject().getId() == selectedLinkedObjectId).findFirst().orElse(null));
+                    linkerBean.loadRecountData(selectedLinkedData);
+
+                    selectedLinkedObjectId = null;
+                }
 
                 // Очищаю вкладку "Линкованные объекты / Вычислимые параметры"
                 filterCalcTreeValue = "";
@@ -311,9 +317,12 @@ public class LinkerControllerWS implements Serializable {
                         "linkerForm:linkerTabView:objectTabView:paramTreePanelHeader",
                         "linkerForm:linkerTabView:objectTabView:paramOpcTreePanelHeader");
 
-                PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); " +
-                        "PF('objectTabViewWidget').disable(2); " +
-                        "filterTree([{name:'widget', value:'calcTreeWidget'}]); " +
+                if (selectedLinkedData == null) {
+                    PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); " +
+                            "PF('objectTabViewWidget').disable(2);");
+                }
+
+                PrimeFaces.current().executeScript("filterTree([{name:'widget', value:'calcTreeWidget'}]); " +
                         "filterTree([{name:'widget', value:'paramTreeWidget'}]); " +
                         "filterTree([{name:'widget', value:'paramOpcTreeWidget'}]); " +
                         "addOnDblClickEvents(); " +
