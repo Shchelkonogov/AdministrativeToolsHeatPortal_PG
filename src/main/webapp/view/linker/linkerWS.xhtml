@@ -148,8 +148,10 @@
                         <div style="height: 100%; margin-right: 3px; width: 366px;">
                             <custom:navigateComponent id="navigate" bean="#{linkerControllerWS.navigationBean}"
                                                       selectedObject="#{linkerControllerWS.selectedNavigateObject}"
-                                                      selectedObjectType="#{linkerControllerWS.selectedNavigateObjectType}"
-                                                      updateOnReload="linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink">
+                                                      selectedObjectType="#{linkerControllerWS.selectedObjectType}"
+                                                      updateOnReload="linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink
+                                                                      linkerForm:linkerTabView:objectTabView:settingLinkBar:filterSelectOneMenu
+                                                                        linkerForm:linkerTabView:objectTabView:linkedDataPanelHeader">
                                 <p:ajax event="select"
                                         update="linkerForm:linkerTabView:settingNoLinkBar:linkBtnForNoLink
                                                 linkerForm:linkerTabView:settingNoLinkBar:paramBtns"/>

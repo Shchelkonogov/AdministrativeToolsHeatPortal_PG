@@ -21,7 +21,7 @@
    </composite:interface>
 
    <composite:implementation>
-      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);"
+      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);" process="@this"
                        update="navigateCustomBtn #{cc.attrs.updateOnReload}"/>
       <p:remoteCommand name="updateCustomBtn" update="navigateCustomBtn"/>
       <p:remoteCommand name="reloadNavigate" global="false" onstart="PF('navigateAllBui').show();"

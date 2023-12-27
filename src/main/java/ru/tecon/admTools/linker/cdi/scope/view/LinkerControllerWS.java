@@ -134,7 +134,6 @@ public class LinkerControllerWS implements Serializable {
     private OpcObjectForLinkData selectedOpcObjectsForNoLink = null;
 
     private LazyLoadingTreeNode<TreeNodeModel> selectedNavigateObject = null;
-    private ObjectType selectedNavigateObjectType;
 
     private final Set<OpcObjectForLinkData> objectsForLink = new HashSet<>();
 
@@ -191,7 +190,6 @@ public class LinkerControllerWS implements Serializable {
 
         // Загрузка объектов для линковки
         loadOpcObjectsForNoLink();
-        selectedNavigateObjectType = objectTypeController.getDefaultObjectType();
     }
 
     /**
@@ -257,7 +255,7 @@ public class LinkerControllerWS implements Serializable {
                         "PF('objectTabViewWidget').disable(2); " +
                         "updateEmptyRow(); " +
                         "PF('opcObjectsForNoLinkTableWidget').filter(); " +
-                        "reloadNavigate([{name:'reloadObjectType', value:'true'}]);");
+                        "reloadNavigate();");
                 break;
             case "Линкованные объекты":
                 selectedOpcObjectsForNoLink = null;
@@ -1726,14 +1724,6 @@ public class LinkerControllerWS implements Serializable {
         this.selectedNavigateObject = selectedNavigateObject;
     }
 
-    public ObjectType getSelectedNavigateObjectType() {
-        return selectedNavigateObjectType;
-    }
-
-    public void setSelectedNavigateObjectType(ObjectType selectedNavigateObjectType) {
-        this.selectedNavigateObjectType = selectedNavigateObjectType;
-    }
-
     public boolean isDisabledParamButtonsForNoLink() {
         return selectedOpcObjectsForNoLink == null;
     }
@@ -1743,7 +1733,7 @@ public class LinkerControllerWS implements Serializable {
     }
 
     public boolean isRenderNavigateCustomBtn() {
-        return selectedNavigateObjectType.getCode().equals("УУ");
+        return selectedObjectType.getCode().equals("УУ");
     }
 
     public boolean isRenderContextSubMenu() {
