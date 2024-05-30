@@ -211,6 +211,7 @@
                                          scrollable="true" scrollHeight="100%">
 
                                 <p:ajax event="rowSelect" listener="#{specificModel.onRowSelect}" update="tabView:conditionForm"/>
+                                <p:ajax event="contextMenu" update="tabView:cTableForm:contextMenuCountable"/>
 
                                 <p:column headerText="Обозн" width="90">
                                     <h:outputText value="#{data.parMemo}"/>
@@ -228,6 +229,13 @@
                                     <h:outputText value="#{data.techProcCode}"/>
                                 </p:column>
                             </p:dataTable>
+
+                            <p:contextMenu id="contextMenuCountable" for="@previous">
+                                <p:menuitem value="Посмотреть историю"
+                                            action="#{history.loadData(specificModel.selectedEnumerateItem.parMemo, specificModel.objectID, specificModel.selectedEnumerateItem.parID, specificModel.selectedEnumerateItem.statAgr)}"
+                                            oncomplete="PF('historyCountableDialog').show()"
+                                            update="historyCountableDialogID" process="@this"/>
+                            </p:contextMenu>
                         </h:form>
                         <h:form id="conditionForm" style="height: 100%; width: 350px;">
                             <p:dataTable var="condData" value="#{specificModel.paramConditionDataModel.conditions}" scrollable="true" scrollHeight="100%"
@@ -439,7 +447,9 @@
             <p:dataTable var="historyData" value="#{history.tableData}"
                          scrollable="true" scrollHeight="500">
                 <p:column headerText="Дата и время" width="150" styleClass="center">
-                    <h:outputText value="#{historyData.date}"/>
+                    <h:outputText value="#{historyData.date}">
+                        <f:convertDateTime type="localDateTime" pattern="dd.MM.yyyy HH:mm:ss"/>
+                    </h:outputText>
                 </p:column>
 
                 <p:column headerText="Имя пользователя" width="250" styleClass="center">
@@ -447,6 +457,41 @@
                 </p:column>
 
                 <p:column headerText="Свойство" width="100" styleClass="center">
+                    <h:outputText value="#{historyData.description}"/>
+                </p:column>
+
+                <p:column headerText="Старое" width="100" styleClass="center">
+                    <h:outputText value="#{historyData.oldValue}"/>
+                </p:column>
+
+                <p:column headerText="Новое" width="100" styleClass="center">
+                    <h:outputText value="#{historyData.newValue}"/>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </p:dialog>
+
+    <p:dialog id="historyCountableDialogID" header="История изменений параметра #{history.name}"
+              widgetVar="historyCountableDialog" modal="true"
+              resizable="false" width="800" styleClass="tc-panel">
+        <div style="padding: 3px 0 3px 3px;">
+            <p:dataTable var="historyData" value="#{history.tableData}"
+                         scrollable="true" scrollHeight="500">
+                <p:column headerText="Дата и время" width="150" styleClass="center">
+                    <h:outputText value="#{historyData.date}">
+                        <f:convertDateTime type="localDateTime" pattern="dd.MM.yyyy HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Имя пользователя" width="250" styleClass="center">
+                    <h:outputText value="#{historyData.userName}"/>
+                </p:column>
+
+                <p:column headerText="№" width="20" styleClass="center">
+                    <h:outputText value="#{historyData.propId}"/>
+                </p:column>
+
+                <p:column headerText="Объект" width="80" styleClass="center">
                     <h:outputText value="#{historyData.description}"/>
                 </p:column>
 

@@ -16,6 +16,8 @@ import java.util.List;
  */
 public final class ChangeRanges {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+
     /**
      * Метод формирует excel файл отчета "Отчет по изменению тех границ"
      * @param objType тип объекта
@@ -124,7 +126,7 @@ public final class ChangeRanges {
 
         for (int i = 0; i < data.size(); i++) {
             row = sheet.createRow(7 + i);
-            createStyledCell(row, 1, data.get(i).getDate(), borderCenterStyle);
+            createStyledCell(row, 1, data.get(i).getDate().format(formatter), borderCenterStyle);
             createStyledCell(row, 2, data.get(i).getObjectName(), borderCenterStyle);
             createStyledCell(row, 3, data.get(i).getParMemo(), borderCenterStyle);
             createStyledCell(row, 4, data.get(i).getStatAgrName(), borderCenterStyle);

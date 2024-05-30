@@ -27,11 +27,11 @@ public class ChangeRangesSB implements ChangeRangesLocal {
     private static final String SELECT_OBJECT_PATH = "select admin.get_obj_path_all(?)";
     private static final String SELECT_STRUCT_PATH = "select admin.get_struct_path_all(?)";
 
-    private static final String SELECT_LOAD_DATA = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
-            "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
+    private static final String SELECT_LOAD_DATA = "select change_date, obj_name, par_memo, stat_agr_name, range_name, " +
+                "old_val, new_val, user_name " +
             "from dsp_0031t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?)";
-    private static final String SELECT_LOAD_DATA_ECO = "select to_char(change_date, 'dd.mm.yyyy HH24:mi:ss') as change_date, " +
-            "obj_name, par_memo, stat_agr_name, range_name, old_val, new_val, user_name " +
+    private static final String SELECT_LOAD_DATA_ECO = "select change_date, obj_name, par_memo, stat_agr_name, " +
+                "range_name, old_val, new_val, user_name " +
             "from dsp_0050t.sel_rep_change_ranges(?, ?, ?, ?, ?, to_date(?, 'dd.mm.yyyy'), ?)";
 
     @Resource(name = "jdbc/DataSource")
@@ -114,7 +114,7 @@ public class ChangeRangesSB implements ChangeRangesLocal {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
                 result.add(new ChangeRangesModel(res.getString("obj_name"),
-                        res.getString("change_date"),
+                        res.getTimestamp("change_date").toLocalDateTime(),
                         res.getString("par_memo"),
                         res.getString("stat_agr_name"),
                         res.getString("range_name"),

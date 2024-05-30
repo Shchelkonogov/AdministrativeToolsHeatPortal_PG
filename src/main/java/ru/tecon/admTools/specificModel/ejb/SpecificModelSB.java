@@ -34,8 +34,8 @@ public class SpecificModelSB implements SpecificModelLocal {
     private static final String SELECT_GRAPHS = "select * from dsp_0031t.sel_graph_list() order by code";
     private static final String SELECT_GRAPH_DESCRIPTION = "select * from dsp_0031t.sel_graph_value(?)";
     private static final String SELECT_DECREASE_DESCRIPTION = "select * from dsp_0031t.sel_decrease_value(?)";
-    private static final String SELECT_HISTORY = "select to_char(system_date, 'dd.mm.yyyy hh24:mi:ss') as system_date, " +
-            "user_name, prop_name, old_val, new_val from dsp_0031t.sel_change_param_ranges(?, ?, ?)";
+    private static final String SELECT_HISTORY = "select prop_id, system_date, user_name, prop_name, old_val, new_val " +
+            "from dsp_0031t.sel_change_param_ranges(?, ?, ?)";
     private static final String SAVE_ENUM_PARAMS = "call dsp_0031t.save_p_param(?, ?, ?, ?, ?, ?, ?)";
     private static final String SAVE_ANALOG_PARAMS = "call dsp_0031t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SAVE_ECO_ANALOG_PARAMS = "call dsp_0050t.save_a_param(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -352,7 +352,8 @@ public class SpecificModelSB implements SpecificModelLocal {
 
             ResultSet res = stm.executeQuery();
             while (res.next()) {
-                result.add(new ParamHistory(res.getString("system_date"),
+                result.add(new ParamHistory(res.getInt("prop_id"),
+                        res.getTimestamp("system_date").toLocalDateTime(),
                         res.getString("user_name"),
                         res.getString("prop_name"),
                         res.getString("old_val"),

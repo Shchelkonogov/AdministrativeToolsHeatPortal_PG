@@ -426,3 +426,20 @@ body .ui-tabs.ui-tabs-bottom.tc-nav-left>.ui-tabs-nav li.ui-tabs-header {
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
 }
+
+.ui-datatable-frozen-container .ui-datatable-scrollable-body {
+    overflow: hidden !important;
+}
+.ui-datatable-frozen-container .ui-datatable-scrollable-header {
+    margin-right: 0;
+}
+.ui-datatable.ui-datatable-scrollable.ui-datatable-frozencolumn .ui-datatable-frozenlayout-right .ui-datatable-scrollable-header-box {
+    margin-right: 3px !important;
+}
+.ui-datatable.ui-datatable-scrollable.ui-datatable-frozencolumn .ui-datatable-frozenlayout-right .ui-datatable-scrollable-header {
+    margin-right: 0;
+}
+
+body .ui-datatable .ui-datatable-frozenlayout-right .ui-datatable-scrollable-header {
+    background: unset;
+}

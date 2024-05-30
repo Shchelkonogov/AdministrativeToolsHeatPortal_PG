@@ -1,16 +1,19 @@
 package ru.tecon.admTools.specificModel.model;
 
+import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
 public class ParamHistory {
 
-    private final String date;
+    private final int propId;
+    private final LocalDateTime date;
     private final String userName;
     private final String description;
     private final String oldValue;
     private final String newValue;
 
-    public ParamHistory(String date, String userName, String description, String oldValue, String newValue) {
+    public ParamHistory(int propId, LocalDateTime date, String userName, String description, String oldValue, String newValue) {
+        this.propId = propId;
         this.date = date;
         this.userName = userName;
         this.description = description;
@@ -18,7 +21,11 @@ public class ParamHistory {
         this.newValue = newValue;
     }
 
-    public String getDate() {
+    public int getPropId() {
+        return propId;
+    }
+
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -41,7 +48,8 @@ public class ParamHistory {
     @Override
     public String toString() {
         return new StringJoiner(", ", ParamHistory.class.getSimpleName() + "[", "]")
-                .add("date='" + date + "'")
+                .add("propId=" + propId)
+                .add("date=" + date)
                 .add("userName='" + userName + "'")
                 .add("description='" + description + "'")
                 .add("oldValue='" + oldValue + "'")

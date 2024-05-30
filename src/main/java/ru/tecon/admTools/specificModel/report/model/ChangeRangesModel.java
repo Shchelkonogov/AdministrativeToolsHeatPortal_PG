@@ -2,6 +2,7 @@ package ru.tecon.admTools.specificModel.report.model;
 
 import ru.tecon.admTools.specificModel.model.ParamHistory;
 
+import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
 /**
@@ -10,13 +11,13 @@ import java.util.StringJoiner;
  */
 public class ChangeRangesModel extends ParamHistory {
 
-    private String objectName;
-    private String parMemo;
-    private String statAgrName;
+    private final String objectName;
+    private final String parMemo;
+    private final String statAgrName;
 
-    public ChangeRangesModel(String objectName, String date, String parMemo, String statAgrName,
+    public ChangeRangesModel(String objectName, LocalDateTime date, String parMemo, String statAgrName,
                              String description, String oldValue, String newValue, String userName) {
-        super(date, userName, description, oldValue, newValue);
+        super(-1, date, userName, description, oldValue, newValue);
         this.objectName = objectName;
         this.parMemo = parMemo;
         this.statAgrName = statAgrName;
