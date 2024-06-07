@@ -142,6 +142,16 @@ public class SpecificModelMB implements Serializable {
 
         if (!eco) {
             enumerableTableModel = bean.getEnumerableData(objectID);
+
+            if (selectedEnumerateItem != null) {
+                selectedEnumerateItem = enumerableTableModel.stream()
+                        .filter(dataModel -> dataModel.getId().equals(selectedEnumerateItem.getId()))
+                        .findFirst().orElse(null);
+                if (selectedEnumerateItem != null) {
+                    selectedEnumerateItem.setAdditionalData(bean.getParamCondition(objectID, selectedEnumerateItem.getParID(), selectedEnumerateItem.getStatAgr()));
+                    paramConditionDataModel = (EnumerateData) selectedEnumerateItem.getAdditionalData();
+                }
+            }
         } else {
             enumerableTableModel = new ArrayList<>();
         }

@@ -4,13 +4,8 @@ import ru.tecon.admTools.specificModel.model.additionalModel.Additional;
 
 import java.io.Serializable;
 import java.util.StringJoiner;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataModel implements Serializable {
-
-    private static final AtomicInteger idGenerator = new AtomicInteger();
-
-    private final int id;
 
     private final int parID;
     private final int statAgr;
@@ -31,7 +26,6 @@ public class DataModel implements Serializable {
     private boolean decreaseValueRender = false;
 
     public DataModel(int parID, int statAgr) {
-        this.id = idGenerator.getAndIncrement();
         this.parID = parID;
         this.statAgr = statAgr;
     }
@@ -100,8 +94,8 @@ public class DataModel implements Serializable {
         return change;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return parID + "_" + statAgr;
     }
 
     public void setChange(boolean change) {
@@ -147,7 +141,7 @@ public class DataModel implements Serializable {
     @Override
     public String toString() {
         return new StringJoiner(", ", DataModel.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
+                .add("id=" + getId())
                 .add("parID=" + parID)
                 .add("statAgr=" + statAgr)
                 .add("parName='" + parName + "'")
