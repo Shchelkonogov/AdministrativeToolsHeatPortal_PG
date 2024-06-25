@@ -1,0 +1,146 @@
+.tc-fa-xs {
+    font-size: .75em !important;
+    line-height: .08333em;
+    vertical-align: 0.125em !important;
+}
+
+body .tc-nav-link {
+    font-size: .8rem;
+    padding: .35rem 2rem;
+    margin-right: 5px;
+    background-color: rgba(217, 217, 217, .45);
+    color: rgba(0,0,0,.45);
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+}
+
+body .tc-nav-link:hover {
+    color: black;
+    text-decoration: unset;
+}
+
+body .tc-nav-link.active {
+    color: black;
+    background-color: #d9d9d9;
+}
+
+body .ui-tooltip.tc-nav-tooltip .ui-tooltip-text {
+    background: #333;
+    padding: 3px 10px;
+    max-width: 150px;
+}
+
+body .tc-nav-selector {
+    display: flex;
+    padding: .25rem 5px;
+    background-color: #d9d9d9;
+}
+
+body .tc-nav-selector .tc-nav-label {
+    margin-right: 3px;
+    height: 32px;
+    line-height: 1.5;
+    font-size: 14px;
+    background-color: rgba(118, 121, 129, .61);
+    border: 1px solid #6b7281;
+    border-radius: .2rem;
+    padding: 5px;
+    color: #000;
+    font-family: Helvetica;
+}
+
+body .tc-nav-selector .tc-nav-one-menu {
+    height: 32px;
+    border-color: #6b7281;
+    min-width: unset !important;
+}
+
+body .tc-nav-selector .tc-nav-one-menu .ui-selectonemenu-label {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: .25rem .5rem;
+}
+
+body .ui-selectonemenu-panel.tc-nav-one-menu-panel .ui-selectonemenu-items .ui-selectonemenu-item {
+    font-size: 14px;
+    padding: .25rem .5rem;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container {
+    background-color: #d9d9d9;
+}
+
+body .tc-nav-input {
+    padding: 0 5px .25rem;
+    background-color: #d9d9d9;
+}
+
+body .tc-nav-input .ui-inputfield {
+    width: 100%;
+    font-size: 14px;
+    height: 32px;
+    border: 1px solid #6b7281;
+    border-radius: 5px;
+    color: #000;
+    padding: 0 5px;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode {
+    padding: 0;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-treenode-label {
+    font-size: 14px;
+    color: #000;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler {
+    height: 1.5rem;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-treenode-leaf-icon {
+    height: 1.5rem;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler:before {
+    font-size: 1em;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-treenode-icon {
+    color: rgb(0 0 0 / 60%);
+    font-size: 0.92rem;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler {
+    line-height: 1.2;
+    color: rgb(0 0 0 / 60%);
+    margin-right: 0.2rem;
+}
+
+body .ui-tree.tc-nav-tree .ui-tree-container .ui-treenode .ui-treenode-content::before {
+    height: 26px;
+    top: -14px;
+}
+
+body .tc-nav-selector .ui-selectonemenu .ui-selectonemenu-trigger .ui-icon:before {
+    content: "\f0d7";
+}
+
+body .tc-nav-selector .ui-selectonemenu .ui-selectonemenu-trigger .ui-icon {
+    font-family: "Font Awesome 6 Free", sans-serif !important;
+    font-weight: 900;
+    font-size: 14px;
+    color: #000;
+}
+
+.tc-nav-no-object {
+    bottom: 0;
+    position: absolute;
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+    padding: .75rem 1.25rem;
+    margin: .5rem .5rem 0;
+    width: calc(100% - 1rem);
+    font-size: .875rem;
+}

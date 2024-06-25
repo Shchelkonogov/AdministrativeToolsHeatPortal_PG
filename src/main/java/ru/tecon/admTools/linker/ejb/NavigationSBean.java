@@ -71,6 +71,26 @@ public class NavigationSBean implements NavigationBeanLocal {
     }
 
     @Override
+    public TreeNodeModel getRootTerTree() {
+        return new TreeNodeModel("S", "S");
+    }
+
+    @Override
+    public List<TreeNodeModel> getTerTree(int objectTypeId, long searchTypeId, String searchText, String userName, String parentNode) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public TreeNodeModel getRootLinkTree() {
+        return new TreeNodeModel("S", "S");
+    }
+
+    @Override
+    public List<TreeNodeModel> getLinkTree(int objectTypeId, long searchTypeId, String searchText, String userName, String parentNode) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<ObjTypePropertyModel> getObjTypeProps(long objTypeId) {
         List<ObjTypePropertyModel> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();

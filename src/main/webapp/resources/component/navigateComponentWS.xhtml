@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+   <composite:interface componentType="navigationComponentWS">
+      <composite:attribute name="bean" type="ru.tecon.admTools.components.navigation.ejb.NavigationBeanLocal"/>
+      <composite:attribute name="showTerTree" type="java.lang.Boolean" default="false"/>
+      <composite:attribute name="showLinkTree" type="java.lang.Boolean" default="false"/>
+      <composite:attribute name="selectedObject"/>
+      <composite:attribute name="selectedObjectType"/>
+      <composite:attribute name="updateOnReload"/>
+      <composite:clientBehavior name="select" targets="navigateOrgTree" event="select"/>
+   </composite:interface>
+
+   <composite:implementation>
+      <p:remoteCommand name="navigateRemoveSelect" onstart="unselectNode('navigateOrgTreeWidget', false);" process="@this"
+                       update="#{cc.attrs.updateOnReload}"/>
+      <p:remoteCommand name="reloadNavigate" global="false" onstart="PF('navigateBui').show();"
+                       action="#{cc.reloadNavigate()}"
+                       oncomplete="navigateRemoveSelect(); PF('navigateBui').hide();"
+                       update="navigateSelectObjectType navigateSelectSearchType navigateFilter navigateTree"/>
+      <p:remoteCommand name="clearNavigate" global="false" onstart="PF('navigateBui').show(); unselectNode('navigateOrgTreeWidget', false);"
+                       action="#{cc.clearNavigate()}"
+                       oncomplete="PF('navigateBui').hide(); navigateRemoveSelect();"
+                       update="navigateSelectObjectType navigateSelectSearchType navigateFilter navigateTree"/>
+
+      <p:remoteCommand name="openFirstNode" process="@this" action="#{cc.openFirstNode()}"/>
+
+      <h:outputStylesheet name="component/styleWS.css" library="css" target="header"/>
+
+      <div jsf:id="navDiv" style="height: 100%;">
+         <div jsf:id="tabs" style="display: flex;">
+            <p:commandLink styleClass="tc-nav-link #{cc.isActiveTree('org')}"
+                           action="#{cc.setSelectedTab('org')}" update="navigateTree tabs"
+                           global="false" onstart="PF('navigateBui').show();" oncomplete="openFirstNode()">
+               <i class="fa fa-sitemap fa-w-20"/>
+            </p:commandLink>
+            <p:tooltip for="@previous" styleClass="tc-nav-tooltip"
+                       value="Организационная структура" position="right"/>
+            <p:commandLink styleClass="tc-nav-link #{cc.isActiveTree('ter')}"
+                           action="#{cc.setSelectedTab('ter')}" update="navigateTree tabs"
+                           rendered="#{cc.attrs.showTerTree}" global="false"
+                           onstart="PF('navigateBui').show();" oncomplete="openFirstNode()">
+               <i class="fa fa-city fa-w-20"/>
+            </p:commandLink>
+            <p:tooltip for="@previous" styleClass="tc-nav-tooltip"
+                       value="Территориальная структура города" position="right" rendered="#{cc.attrs.showTerTree}"/>
+            <p:commandLink styleClass="tc-nav-link #{cc.isActiveTree('link')}"
+                           action="#{cc.setSelectedTab('link')}" update="navigateTree tabs"
+                           rendered="#{cc.attrs.showLinkTree}" global="false"
+                           onstart="PF('navigateBui').show();" oncomplete="openFirstNode()">
+               <i class="fa fa-link fa-w-20"/>
+            </p:commandLink>
+            <p:tooltip for="@previous" styleClass="tc-nav-tooltip"
+                       value="Связи" position="right" rendered="#{cc.attrs.showLinkTree}"/>
+         </div>
+         <div class="tc-nav-selector" style="border-top-right-radius: .25rem;">
+            <p:outputLabel value="Тип объектов" styleClass="tc-nav-label" style="width: 100px;"/>
+            <p:selectOneMenu id="navigateSelectObjectType" widgetVar="navigateSelectObjectTypeWidget"
+                             styleClass="tc-nav-one-menu" panelStyleClass="tc-nav-one-menu-panel"
+                             style="width: calc(100% - 100px);"
+                             binding="#{cc.selectedObjectTypeUI}" value="#{cc.attrs.selectedObjectType}"
+                             title="#{objectTypeControllerApplication.defaultObjectType.name}" syncTooltip="true">
+               <p:ajax listener="#{cc.onObjectTypeChange}" global="false"
+                       onstart="PF('navigateBui').show();"
+                       oncomplete="navigateRemoveSelect();"
+                       update="navigateSelectSearchType navigateFilter navigateTree"/>
+               <f:converter converterId="objectTypeConverter"/>
+
+               <f:selectItems value="#{objectTypeControllerApplication.objectTypes}" var="objType"
+                              itemLabel="#{objType.name}" itemValue="#{objType}" itemDescription="#{objType.name}"/>
+            </p:selectOneMenu>
+         </div>
+         <div jsf:id="navigateTree" style="height: calc(100% - 145px); background-color: #d9d9d9; position: relative;" class="tc-custom-scroll">
+            <p:tree id="navigateOrgTree" widgetVar="navigateOrgTreeWidget" value="#{cc.orgTree}" var="node"
+                    dynamic="true" styleClass="ui-noborder tc-nav-tree" selectionMode="single" animate="true"
+                    selection="#{cc.attrs.selectedObject}">
+               <p:ajax event="expand" global="false"
+                       onstart="PF('navigateBui').show();"
+                       oncomplete="PF('navigateBui').hide();"/>
+               <p:ajax event="unselect" global="false"/>
+               <p:ajax event="select"/>
+
+               <p:treeNode expandedIcon="fa fa-cubes" collapsedIcon="fa fa-cubes">
+                  <h:outputText value="#{node.name}" title="#{node.name}"/>
+               </p:treeNode>
+               <p:treeNode type="firstDirectory" styleClass="tc-first-tree-item"
+                           expandedIcon="fa fa-cubes" collapsedIcon="fa fa-cubes">
+                  <h:outputText value="#{node.name}" title="#{node.name}"/>
+               </p:treeNode>
+               <p:treeNode type="firstLeaf" styleClass="tc-first-tree-item" icon="fa fa-link tc-fa-xs -rotate-90">
+                  <h:outputText value="#{node.name}" title="#{node.name}"/>
+               </p:treeNode>
+               <p:treeNode type="leaf" icon="fa fa-link tc-fa-xs -rotate-90">
+                  <h:outputText value="#{node.name}" title="#{node.name}"/>
+               </p:treeNode>
+            </p:tree>
+
+            <h:outputText rendered="#{cc.emptyOrgTree}" value="Объекты не найдены..." styleClass="tc-nav-no-object"/>
+         </div>
+         <div class="tc-nav-selector">
+            <p:outputLabel value="Свойство объекта" styleClass="tc-nav-label" style="width: 130px;"/>
+            <p:selectOneMenu id="navigateSelectSearchType" widgetVar="navigateSelectSearchTypeWidget"
+                             styleClass="tc-nav-one-menu" panelStyleClass="tc-nav-one-menu-panel"
+                             style="width: calc(100% - 100px);"
+                             value="#{cc.selectedSearch}"
+                             title="#{cc.searchList.get(0).objTypeValue}" syncTooltip="true">
+               <p:ajax listener="#{cc.onSearchTypeChange}" global="false"
+                       onstart="PF('navigateBui').show();"
+                       oncomplete="navigateRemoveSelect();"
+                       update="navigateFilter navigateTree"/>
+
+               <f:selectItems value="#{cc.searchList}" var="prop"
+                              itemLabel="#{prop.objTypeValue}" itemValue="#{prop.objTypeId}"
+                              itemDescription="#{prop.objTypeValue}"/>
+            </p:selectOneMenu>
+         </div>
+         <div class="tc-nav-input" style="border-bottom-right-radius: .25rem; border-bottom-left-radius: .25rem;">
+            <p:inputText id="navigateFilter" binding="#{cc.searchTextUI}"
+                         placeholder="Введите значение свойства для фильтрации"
+                         title="#{cc.searchTypeName}">
+               <p:ajax event="keyup" delay="500" listener="#{cc.onSearch}" global="false"
+                       onstart="PF('navigateBui').show();"
+                       oncomplete="navigateRemoveSelect();"
+                       update="navigateTree"/>
+            </p:inputText>
+         </div>
+      </div>
+
+      <p:blockUI block="navDiv" widgetVar="navigateBui"/>
+   </composite:implementation>
+</html>

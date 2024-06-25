@@ -43,4 +43,50 @@ public interface NavigationBeanLocal {
      */
     List<TreeNodeModel> getOrgTree(int objectTypeId, long searchTypeId, String searchText,
                                           String userName, String parentNode);
+
+    /**
+     * Получение начального элемента для дерева территориальной структуры.
+     * Поскольку в ленивой загрузки используется id родителя,
+     * а в каждой функции загрузки может быть разный родительский элемент.
+     * Например: new TreeNodeModel("S", "", "", "", "S");
+     *
+     * @return начальный элемент дерева
+     */
+    TreeNodeModel getRootTerTree();
+
+    /**
+     * Загрузка части дерева территориальной структуры.
+     *
+     * @param objectTypeId тип объекта
+     * @param searchTypeId тип свойства поиска
+     * @param searchText текст поиска
+     * @param userName имя пользователя
+     * @param parentNode id родительского элемента
+     * @return список элементов для добавления к родителю
+     */
+    List<TreeNodeModel> getTerTree(int objectTypeId, long searchTypeId, String searchText,
+                                   String userName, String parentNode);
+
+    /**
+     * Получение начального элемента для дерева структуры связи.
+     * Поскольку в ленивой загрузки используется id родителя,
+     * а в каждой функции загрузки может быть разный родительский элемент.
+     * Например: new TreeNodeModel("S", "", "", "", "S");
+     *
+     * @return начальный элемент дерева
+     */
+    TreeNodeModel getRootLinkTree();
+
+    /**
+     * Загрузка части дерева структуры связи.
+     *
+     * @param objectTypeId тип объекта
+     * @param searchTypeId тип свойства поиска
+     * @param searchText текст поиска
+     * @param userName имя пользователя
+     * @param parentNode id родительского элемента
+     * @return список элементов для добавления к родителю
+     */
+    List<TreeNodeModel> getLinkTree(int objectTypeId, long searchTypeId, String searchText,
+                                   String userName, String parentNode);
 }
