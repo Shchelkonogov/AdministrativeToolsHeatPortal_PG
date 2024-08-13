@@ -8,15 +8,18 @@ import org.primefaces.component.tree.TreeDragDropInfo;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.*;
-import org.primefaces.model.menu.DefaultMenuItem;
-import org.primefaces.model.menu.DefaultMenuModel;
-import org.primefaces.model.menu.MenuModel;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
+import org.primefaces.model.TreeNode;
 import org.primefaces.util.LangUtils;
 import ru.tecon.admTools.components.navigation.ejb.NavigationBeanLocal;
 import ru.tecon.admTools.components.navigation.model.LazyLoadingTreeNode;
 import ru.tecon.admTools.components.navigation.model.TreeNodeModel;
-import ru.tecon.admTools.linker.cdi.converter.*;
+import ru.tecon.admTools.linker.cdi.converter.LinkSchemaDataConverterWS;
+import ru.tecon.admTools.linker.cdi.converter.LinkedDataConverterWS;
+import ru.tecon.admTools.linker.cdi.converter.OpcObjectForLinkDataConverterWS;
+import ru.tecon.admTools.linker.cdi.converter.OpcObjectForNoLinkDataConverterWS;
 import ru.tecon.admTools.linker.ejb.LinkerStateless;
 import ru.tecon.admTools.linker.model.*;
 import ru.tecon.admTools.systemParams.SystemParamException;
@@ -123,7 +126,6 @@ public class LinkerControllerWS implements Serializable {
     // Данные для перехода на Источники данных
 
     private final List<Redirect> redirectList = new ArrayList<>();
-    private MenuModel redirectMenu;
 
     // Данные "Нелинкованные объекты"
 
@@ -172,21 +174,7 @@ public class LinkerControllerWS implements Serializable {
 
         PrimeFaces.current().executeScript("PF('objectTabViewWidget').disable(1); PF('objectTabViewWidget').disable(2);");
 
-        // Загрузка данных для redirect (Источники данных)
-        redirectMenu = new DefaultMenuModel();
-
-        for (Map.Entry<String, String> entry: linkerBean.getRedirect().entrySet()) {
-            DefaultMenuItem menuItem = DefaultMenuItem.builder()
-                    .value(entry.getKey())
-                    .url(entry.getValue())
-                    .target("_blank")
-                    .icon("pi pi-external-link")
-                    .onclick("changeVisible('redirectForm')")
-                    .build();
-            redirectMenu.getElements().add(menuItem);
-
-            redirectList.add(new Redirect(entry.getKey(), entry.getValue()));
-        }
+        redirectList.addAll(linkerBean.getRedirect());
 
         // Загрузка объектов для линковки
         loadOpcObjectsForNoLink();
@@ -1703,10 +1691,6 @@ public class LinkerControllerWS implements Serializable {
 
     public String getParamOpcTreePanelHeader() {
         return paramOpcTreePanelHeader;
-    }
-
-    public MenuModel getRedirectMenu() {
-        return redirectMenu;
     }
 
     public NavigationBeanLocal getNavigationBean() {

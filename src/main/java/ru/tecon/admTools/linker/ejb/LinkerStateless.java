@@ -624,13 +624,13 @@ public class LinkerStateless {
      *
      * @return map с данными
      */
-    public Map<String, String> getRedirect() {
-        Map<String, String> result = new HashMap<>();
+    public List<Redirect> getRedirect() {
+        List<Redirect> result = new ArrayList<>();
         try (Connection connect = ds.getConnection();
              PreparedStatement stm = connect.prepareStatement(SELECT_REDIRECT)) {
             ResultSet res = stm.executeQuery();
             while (res.next()) {
-                result.put(res.getString(1), res.getString(2));
+                result.add(new Redirect(res.getString(1), res.getString(2)));
             }
         } catch (SQLException e) {
             logger.log(Level.WARNING, "Error load redirect", e);

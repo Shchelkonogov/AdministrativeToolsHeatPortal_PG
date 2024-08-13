@@ -179,10 +179,10 @@ public class LinkerController implements Serializable {
         // Загрузка данных для redirect (Источники данных)
         redirectMenu = new DefaultMenuModel();
 
-        for (Map.Entry<String, String> entry: linkerBean.getRedirect().entrySet()) {
+        for (Redirect redirect: linkerBean.getRedirect()) {
             DefaultMenuItem menuItem = DefaultMenuItem.builder()
-                    .value(entry.getKey())
-                    .url(entry.getValue())
+                    .value(redirect.getName())
+                    .url(redirect.getValue())
                     .target("_blank")
                     .icon("pi pi-external-link")
                     .onclick("changeVisible('redirectForm')")
