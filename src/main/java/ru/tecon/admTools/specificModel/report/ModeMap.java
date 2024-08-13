@@ -28,7 +28,7 @@ public final class ModeMap {
      */
     public static Workbook generateModeMap(int objectID, ModeMapLocal bean) throws IOException {
         try (InputStream in = ModeMap.class.getResourceAsStream("/templates/specificModel/excel/modeMapTemplate.xlsx")) {
-            Workbook workbook = XSSFWorkbookFactory.create(in);
+            Workbook workbook = XSSFWorkbookFactory.create(Objects.requireNonNull(in));
 
             Map<String, String> singleData = bean.loadSingleData(objectID);
 

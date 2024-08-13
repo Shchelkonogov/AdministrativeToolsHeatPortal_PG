@@ -58,11 +58,13 @@ public class ReportServlet extends HttpServlet {
         try (OutputStream output = resp.getOutputStream()) {
             Report report = new Report(reportData);
             report.create();
-            Workbook workbook1 = report.getWorkbook();
-            workbook1.write(output);
 
-            if (workbook1 instanceof SXSSFWorkbook) {
-                ((SXSSFWorkbook) workbook1).dispose();
+            try (Workbook workbook = report.getWorkbook()) {
+                workbook.write(output);
+
+                if (workbook instanceof SXSSFWorkbook) {
+                    ((SXSSFWorkbook) workbook).dispose();
+                }
             }
 
             output.flush();

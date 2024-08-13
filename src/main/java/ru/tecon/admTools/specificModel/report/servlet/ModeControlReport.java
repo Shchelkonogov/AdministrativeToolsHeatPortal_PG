@@ -1,5 +1,6 @@
 package ru.tecon.admTools.specificModel.report.servlet;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.report.ModeControl;
 import ru.tecon.admTools.specificModel.report.ejb.ModeControlLocal;
@@ -51,12 +52,17 @@ public class ModeControlReport extends HttpServlet {
                 if (checkBean.checkSession(req.getParameter("sessionId"))) {
 
                     resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-                    resp.setHeader("Content-Disposition", "attachment; filename=\"" +
-                            URLEncoder.encode("Контроль режима.xlsx", "UTF-8") + "\"");
+                    resp.setHeader("Content-Disposition",
+                            "attachment; filename=\"" +
+                                    URLEncoder.encode("Контроль", "UTF-8") + " " +
+                                    URLEncoder.encode("режима.xlsx", "UTF-8") +
+                                    "\"");
                     resp.setCharacterEncoding("UTF-8");
 
-                    ModeControl.generateModeControl(objectType, 0, "", structID, paramID, user, bean).write(output);
-                    output.flush();
+                    try (Workbook workbook = ModeControl.generateModeControl(objectType, 0, "", structID, paramID, user, bean)) {
+                        workbook.write(output);
+                        output.flush();
+                    }
                 } else {
                     //             Авторизуйтесь в системе
                     logger.log(Level.WARNING, "authorization error");

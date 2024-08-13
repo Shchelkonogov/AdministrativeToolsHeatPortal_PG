@@ -50,7 +50,7 @@ public class LinkerStateless {
     private final static String PROCEDURE_UNLINK_PARAM = "call lnk_0001t.unlink_param(?, ?, ?, ?);";
     private final static String PROCEDURE_READ_OPC_PARAM = "call lnk_0001t.read_tsa_param(?)";
     private final static String PROCEDURE_REQUEST_OPC_PARAM = "call lnk_0001t.get_opc_param_list(?, ?)";
-    private final static String SELECT_REDIRECT = "select * from admin.opc_servers;";
+    private final static String SELECT_REDIRECT = "select * from admin.opc_servers order by name;";
     private final static String PROCEDURE_REMOVE_OPC_OBJECT = "call lnk_0001t.del_unlinked_opc_object(?, ?, ?);";
     private final static String PROCEDURE_REMOVE_OPC_OBJECT_PARAMS = "call lnk_0001t.clear_unlinked_opc_object(?, ?, ?);";
     private final static String PROCEDURE_CREATE_FICTITIOUS_YY = "call lnk_0001t.add_unlinked_fict_uu(?);";

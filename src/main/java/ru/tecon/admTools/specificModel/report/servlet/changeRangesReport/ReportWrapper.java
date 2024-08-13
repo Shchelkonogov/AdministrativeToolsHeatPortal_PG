@@ -1,5 +1,6 @@
 package ru.tecon.admTools.specificModel.report.servlet.changeRangesReport;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.report.ChangeRanges;
 import ru.tecon.admTools.specificModel.report.ejb.ChangeRangesLocal;
@@ -10,14 +11,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class ReportWrapper {
 
-    private static Logger log = Logger.getLogger(ReportWrapper.class.getName());
+    private static final Logger log = Logger.getLogger(ReportWrapper.class.getName());
 
     static void report(HttpServletRequest req, HttpServletResponse resp,
                        CheckUserSB checkBean, ChangeRangesLocal bean,
@@ -30,7 +29,6 @@ class ReportWrapper {
             Integer structID = null;
             Integer objID = null;
             String objName = "";
-            String curDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
             if (id.contains("O")) {
                 objID = Integer.parseInt(id.replace("O", ""));
@@ -41,14 +39,23 @@ class ReportWrapper {
                 structID = Integer.parseInt(id.replace("S", ""));
             }
 
+            String reportName = objName.replaceAll("[<>:\"/|?*\\\\]", "_");
 
             resp.setContentType("application/vnd.ms-excel; charset=UTF-8");
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" +
-                    URLEncoder.encode("Отчет по изменению тех границ " + objName + " " + curDate + ".xlsx", "UTF-8") + "\"");
+            resp.setHeader("Content-Disposition",
+                    "attachment; filename=\"" +
+                            URLEncoder.encode("Отчет", "UTF-8") + " " +
+                            URLEncoder.encode("по", "UTF-8") + " " +
+                            URLEncoder.encode("изменению", "UTF-8") + " " +
+                            URLEncoder.encode("тех", "UTF-8") + " " +
+                            URLEncoder.encode("границ", "UTF-8") + " " +
+                            URLEncoder.encode(reportName + ".xlsx", "UTF-8").replaceAll("\\+", " ") +
+                            "\"");
             resp.setCharacterEncoding("UTF-8");
 
-            try (OutputStream output = resp.getOutputStream()) {
-                ChangeRanges.generateChangeRanges(objectType, structID, objID, 0, "", date, user, bean, eco).write(output);
+            try (OutputStream output = resp.getOutputStream();
+                 Workbook workbook = ChangeRanges.generateChangeRanges(objectType, structID, objID, 0, "", date, user, bean, eco)) {
+                workbook.write(output);
                 output.flush();
             } catch (IOException e) {
                 log.log(Level.WARNING, "error send report", e);

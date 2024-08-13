@@ -1,5 +1,6 @@
 package ru.tecon.admTools.specificModel.report.servlet;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.report.ModeMap;
 import ru.tecon.admTools.specificModel.report.ejb.ModeMapLocal;
@@ -53,8 +54,10 @@ public class ModeMapReport extends HttpServlet {
                             URLEncoder.encode("Режимная карта " + objName + " " + curDate + ".xlsx", "UTF-8") + "\"");
                     resp.setCharacterEncoding("UTF-8");
 
-                    ModeMap.generateModeMap(object, bean).write(output);
-                    output.flush();
+                    try (Workbook workbook = ModeMap.generateModeMap(object, bean)) {
+                        workbook.write(output);
+                        output.flush();
+                    }
                 } else {
                     //             Авторизуйтесь в системе
                     logger.log(Level.WARNING, "authorization error");
