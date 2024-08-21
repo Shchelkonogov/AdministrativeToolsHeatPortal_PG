@@ -267,3 +267,7 @@ body .ui-dialog.ui-confirm-dialog .ui-dialog-buttonpane {
 body .ui-wizard .ui-wizard-step-titles .ui-wizard-step-title {
     padding: 0.4em;
 }
+
+body .tc-panel.blue-header>.ui-panel-titlebar {
+    background-color: #8cc2e3;
+}

@@ -25,6 +25,18 @@ public class NormIndicatorsSB {
 
     private static final Logger LOG = Logger.getLogger(NormIndicatorsSB.class.getName());
 
+    private static final String SEL_METROLOGY = "select * from sys_0001t.sel_ni_metro()";
+    private static final String FUN_UPD_METROLOGY = "call sys_0001t.upd_ni_metro(?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SEL_BORDER_VALUES_CO = "select * from sys_0001t.sel_ni_rs_co()";
+    private static final String FUN_BORDER_VALUES_CO = "call sys_0001t.upd_ni_rs_co(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SEL_BORDER_VALUES_VENT = "select * from sys_0001t.sel_ni_rs_vent()";
+    private static final String FUN_BORDER_VALUES_VENT = "call sys_0001t.upd_ni_rs_vent(?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SEL_BORDER_VALUES_GVS = "select * from sys_0001t.sel_ni_rs_gvs()";
+    private static final String FUN_BORDER_VALUES_GVS = "call sys_0001t.upd_ni_rs_gvs(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
     private static final String SEL_TV = "select * from sys_0001t.sel_norm_ind_tv()";
     private static final String FUN_UPD_TV = "call sys_0001t.upd_norm_ind_tv(?, ?, ?, ?, ?, ?)";
 
@@ -36,9 +48,6 @@ public class NormIndicatorsSB {
 
     private static final String SEL_VENT = "select * from sys_0001t.sel_norm_ind_vent(?)";
     private static final String FUN_UPD_VENT = "call sys_0001t.upd_norm_ind_vent(?, ?, ?, ?, ?, ?)";
-
-    private static final String SEL_OTHER = "select * from sys_0001t.sel_norm_ind_other()";
-    private static final String FUN_UPD_OTHER = "call sys_0001t.upd_norm_ind_other(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SEL_T7 = "select * from sys_0001t.sel_norm_ind_t7_uu()";
     private static final String FUN_UPD_T7_ITP = "call sys_0001t.upd_norm_ind_t7_uu_itp(?, ?, ?, ?, ?, ?, ?)";
@@ -270,74 +279,6 @@ public class NormIndicatorsSB {
     }
 
     /**
-     * Получение списка общих нормативных показателей
-     * @return список данных
-     */
-    public List<IndicatorOther> getOther() {
-        List<IndicatorOther> result = new ArrayList<>();
-        try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SEL_OTHER)) {
-            ResultSet res = stm.executeQuery();
-            if (res.next()) {
-                result.add(new IndicatorOther(res.getDouble("gvs_t7"), res.getDouble("gvs_dt7"), res.getDouble("kt"), res.getDouble("kto"),
-                        res.getDouble("kg"), res.getDouble("kv"), res.getDouble("co_ku"), res.getDouble("vent_ku"), res.getDouble("gvs_ku"),
-                        res.getDouble("kpco"), res.getDouble("kdgco"), res.getDouble("k1"), res.getDouble("k2"),
-                        res.getDouble("kpgvs"), res.getDouble("kdggvs"), res.getDouble("kqgvsl"), res.getDouble("gvs_dt"),
-                        res.getDouble("kgvsc")));
-            }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load VENT indicator", e);
-        }
-        return result;
-    }
-
-    /**
-     * Запись в базу данных изменений общих нормативных показателей
-     * @param indicatorOther измененные общие нормативные показатели
-     * @param login идентификатор пользователя
-     * @param ip адрес
-     * @throws SystemParamException ошибка записи в базу
-     */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void updateOther(IndicatorOther indicatorOther, String login, String ip) throws SystemParamException {
-        try (Connection connect = ds.getConnection();
-             CallableStatement cStm = connect.prepareCall(FUN_UPD_OTHER)) {
-            cStm.setObject(1, indicatorOther.getT7(), Types.NUMERIC);
-            cStm.setObject(2, indicatorOther.getDt7(), Types.NUMERIC);
-            cStm.setObject(3, indicatorOther.getKt(), Types.NUMERIC);
-            cStm.setObject(4, indicatorOther.getKto(), Types.NUMERIC);
-            cStm.setObject(5, indicatorOther.getKg(), Types.NUMERIC);
-            cStm.setObject(6, indicatorOther.getKv(), Types.NUMERIC);
-            cStm.setObject(7, indicatorOther.getKuco(), Types.NUMERIC);
-            cStm.setObject(8, indicatorOther.getKuvent(), Types.NUMERIC);
-            cStm.setObject(9, indicatorOther.getKugvs(), Types.NUMERIC);
-            cStm.setObject(10, indicatorOther.getKpco(), Types.NUMERIC);
-            cStm.setObject(11, indicatorOther.getKdgco(), Types.NUMERIC);
-            cStm.setObject(12, indicatorOther.getK1(), Types.NUMERIC);
-            cStm.setObject(13, indicatorOther.getK2(), Types.NUMERIC);
-            cStm.setObject(14, indicatorOther.getKpgvs(), Types.NUMERIC);
-            cStm.setObject(15, indicatorOther.getKdggvs(), Types.NUMERIC);
-            cStm.setObject(16, indicatorOther.getKqgvsl(), Types.NUMERIC);
-            cStm.setObject(17, indicatorOther.getGvsdt(), Types.NUMERIC);
-            cStm.setObject(18, indicatorOther.getKgvsc(), Types.NUMERIC);
-            cStm.setString(19, login);
-            cStm.setString(20, ip);
-            cStm.registerOutParameter(21, Types.SMALLINT);
-
-            cStm.executeUpdate();
-
-            LOG.info("update norm indicator other " + indicatorOther + " result " + cStm.getShort(21));
-
-            if (cStm.getShort(21) != 0) {
-                throw new SystemParamException("Ошибка обновления граничных значений");
-            }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "SQLException", e);
-            throw new SystemParamException("Внутренняя ошибка сервера");
-        }
-    }
-
-    /**
      * Получение списка показателей T7
      * @return список данных
      */
@@ -511,6 +452,238 @@ public class NormIndicatorsSB {
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя недоотпуск");
+        }
+    }
+
+    /**
+     * Получение списка показателей метрологических погрешностей
+     *
+     * @return список данных
+     */
+    public List<IndicatorMetrology> getMetrology() {
+        List<IndicatorMetrology> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SEL_METROLOGY)) {
+            ResultSet res = stm.executeQuery();
+            if (res.next()) {
+                result.add(new IndicatorMetrology(res.getDouble("kt"),
+                        res.getDouble("kp"),
+                        res.getDouble("kg"),
+                        res.getDouble("kq")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load VENT indicator", e);
+        }
+        return result;
+    }
+
+    /**
+     * Обновление списка показателей метрологических погрешностей
+     *
+     * @param indicatorMetrology новые значения
+     * @param login идентификатор пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошибки записи в базу
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateMetrology(IndicatorMetrology indicatorMetrology, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(FUN_UPD_METROLOGY)) {
+            cStm.setObject(1, indicatorMetrology.getKt(), Types.NUMERIC);
+            cStm.setObject(2, indicatorMetrology.getKp(), Types.NUMERIC);
+            cStm.setObject(3, indicatorMetrology.getKgKv(), Types.NUMERIC);
+            cStm.setObject(4, indicatorMetrology.getKq(), Types.NUMERIC);
+            cStm.setString(5, login);
+            cStm.setString(6, ip);
+            cStm.registerOutParameter(7, Types.SMALLINT);
+
+            cStm.executeUpdate();
+
+            LOG.info("update metrology indicator " + indicatorMetrology + " result " + cStm.getShort(7));
+
+            if (cStm.getShort(7) != 0) {
+                throw new SystemParamException("Ошибка обновления показателя метрологических погрешностей");
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "SQLException", e);
+            throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя метрологических погрешностей");
+        }
+    }
+
+    /**
+     * Получение списка показателей граничные значения цо
+     *
+     * @return список данных
+     */
+    public List<IndicatorBorderCo> getBorderValuesCo() {
+        List<IndicatorBorderCo> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SEL_BORDER_VALUES_CO)) {
+            ResultSet res = stm.executeQuery();
+            if (res.next()) {
+                result.add(new IndicatorBorderCo(res.getDouble("co_kdt"),
+                        res.getDouble("co_kdto"),
+                        res.getDouble("co_ku"),
+                        res.getDouble("kdgco"),
+                        res.getDouble("kpco"),
+                        res.getDouble("k1"),
+                        res.getDouble("k2")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load border co indicator", e);
+        }
+        return result;
+    }
+
+    /**
+     * Обновление списка показателей граничные значения - центральное отопление
+     *
+     * @param indicatorBorderCo новые значения
+     * @param login идентификатор пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошибки записи в базу
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateBorderValuesCo(IndicatorBorderCo indicatorBorderCo, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(FUN_BORDER_VALUES_CO)) {
+            cStm.setObject(1, indicatorBorderCo.getKdt(), Types.NUMERIC);
+            cStm.setObject(2, indicatorBorderCo.getKdto(), Types.NUMERIC);
+            cStm.setObject(3, indicatorBorderCo.getKy(), Types.NUMERIC);
+            cStm.setObject(4, indicatorBorderCo.getKdq(), Types.NUMERIC);
+            cStm.setObject(5, indicatorBorderCo.getK(), Types.NUMERIC);
+            cStm.setObject(6, indicatorBorderCo.getK1(), Types.NUMERIC);
+            cStm.setObject(7, indicatorBorderCo.getK2(), Types.NUMERIC);
+            cStm.setString(8, login);
+            cStm.setString(9, ip);
+            cStm.registerOutParameter(10, Types.SMALLINT);
+
+            cStm.executeUpdate();
+
+            LOG.info("update border values co " + indicatorBorderCo + " result " + cStm.getShort(10));
+
+            if (cStm.getShort(10) != 0) {
+                throw new SystemParamException("Ошибка обновления показателя граничные значения - центральное отопление");
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "SQLException", e);
+            throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя граничные значения - центральное отопление");
+        }
+    }
+
+    /**
+     * Получение списка показателей граничные значения вентиляции
+     *
+     * @return список данных
+     */
+    public List<IndicatorBorderVent> getBorderValuesVent() {
+        List<IndicatorBorderVent> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SEL_BORDER_VALUES_VENT)) {
+            ResultSet res = stm.executeQuery();
+            if (res.next()) {
+                result.add(new IndicatorBorderVent(res.getDouble("vent_kdt"),
+                        res.getDouble("vent_kdto"),
+                        res.getDouble("vent_ku"),
+                        res.getDouble("kdgvent")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load border vent indicator", e);
+        }
+        return result;
+    }
+
+    /**
+     * Обновление списка показателей граничные значения - вентиляция
+     *
+     * @param indicatorBorderVent новые значения
+     * @param login идентификатор пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошибки записи в базу
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateBorderValuesVent(IndicatorBorderVent indicatorBorderVent, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(FUN_BORDER_VALUES_VENT)) {
+            cStm.setObject(1, indicatorBorderVent.getKdt(), Types.NUMERIC);
+            cStm.setObject(2, indicatorBorderVent.getKdto(), Types.NUMERIC);
+            cStm.setObject(3, indicatorBorderVent.getKy(), Types.NUMERIC);
+            cStm.setObject(4, indicatorBorderVent.getKdg(), Types.NUMERIC);
+            cStm.setString(5, login);
+            cStm.setString(6, ip);
+            cStm.registerOutParameter(7, Types.SMALLINT);
+
+            cStm.executeUpdate();
+
+            LOG.info("update border values vent " + indicatorBorderVent + " result " + cStm.getShort(7));
+
+            if (cStm.getShort(7) != 0) {
+                throw new SystemParamException("Ошибка обновления показателя граничные значения - вентиляция");
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "SQLException", e);
+            throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя граничные значения - вентиляция");
+        }
+    }
+
+    /**
+     * Получение списка показателей граничные значения гвс
+     *
+     * @return список данных
+     */
+    public List<IndicatorBorderGvs> getBorderValuesGvs() {
+        List<IndicatorBorderGvs> result = new ArrayList<>();
+        try (Connection connect = ds.getConnection();
+             PreparedStatement stm = connect.prepareStatement(SEL_BORDER_VALUES_GVS)) {
+            ResultSet res = stm.executeQuery();
+            if (res.next()) {
+                result.add(new IndicatorBorderGvs(res.getDouble("gvs_kdt"),
+                        res.getDouble("gvs_kdto"),
+                        res.getDouble("gvs_ku"),
+                        res.getDouble("gvs_dt"),
+                        res.getDouble("gvs_dt7"),
+                        res.getDouble("gvs_t7"),
+                        res.getDouble("kpgvs")));
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "error load border gvs indicator", e);
+        }
+        return result;
+    }
+
+    /**
+     * Обновление списка показателей граничные значения - гвс
+     *
+     * @param indicatorBorderGvs новые значения
+     * @param login идентификатор пользователя
+     * @param ip адрес пользователя
+     * @throws SystemParamException в случае ошибки записи в базу
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateBorderValuesGvs(IndicatorBorderGvs indicatorBorderGvs, String login, String ip) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(FUN_BORDER_VALUES_GVS)) {
+            cStm.setObject(1, indicatorBorderGvs.getKdt(), Types.NUMERIC);
+            cStm.setObject(2, indicatorBorderGvs.getKdto(), Types.NUMERIC);
+            cStm.setObject(3, indicatorBorderGvs.getKy(), Types.NUMERIC);
+            cStm.setObject(4, indicatorBorderGvs.getDt(), Types.NUMERIC);
+            cStm.setObject(5, indicatorBorderGvs.getDt7(), Types.NUMERIC);
+            cStm.setObject(6, indicatorBorderGvs.getT7(), Types.NUMERIC);
+            cStm.setObject(7, indicatorBorderGvs.getKgvs(), Types.NUMERIC);
+            cStm.setString(8, login);
+            cStm.setString(9, ip);
+            cStm.registerOutParameter(10, Types.SMALLINT);
+
+            cStm.executeUpdate();
+
+            LOG.info("update border values gvs " + indicatorBorderGvs + " result " + cStm.getShort(10));
+
+            if (cStm.getShort(10) != 0) {
+                throw new SystemParamException("Ошибка обновления показателя граничные значения - гвс");
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.WARNING, "SQLException", e);
+            throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя граничные значения - гвс");
         }
     }
 }

@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,14 +26,47 @@ import java.util.logging.Logger;
 @ViewScoped
 public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
+    private static final List<String> METROLOGY_HEADER_NAME =
+            Arrays.asList("Температура K<sub>t</sub> [%]",
+                    "Давление Kp [%]",
+                    "Расход K<sub>g</sub>, K<sub>v</sub> [%]",
+                    "Энергия K<sub>q</sub> [%]");
+
+    private static final List<String> BORDER_VALUES_CO_HEADER_NAME =
+            Arrays.asList("Тепловая потеря в подаче КΔт<sub>цо</sub> [%]",
+                    "Тепловая потеря в обратке КΔт о<sub>цо</sub> [%]",
+                    "Утечка Ку<sub>цо</sub> [тонн]",
+                    "Расход тепла норматив КΔ<sub>Qцо</sub> [%]",
+                    "К<sub>цо</sub>",
+                    "Недоотпуск К1",
+                    "Перетоп К2");
+
+    private static final List<String> BORDER_VALUES_VENT_HEADER_NAME =
+            Arrays.asList("Тепловая потеря в подаче КΔт<sub>в</sub> [%]",
+                    "Тепловая потеря в обратке КΔт о<sub>в</sub> [%]",
+                    "Утечка Ку<sub>в</sub> [тонн]",
+                    "Расход тепла норматив КΔ<sub>Qв</sub> [%]");
+
+    private static final List<String> BORDER_VALUES_GVS_HEADER_NAME =
+            Arrays.asList("Тепловая потеря в подаче КΔт<sub>гвс</sub> [%]",
+                    "Тепловая потеря в обратке КΔт о<sub>гвс</sub> [%]",
+                    "Утечка Ку<sub>гвс</sub> [тонн]",
+                    "ΔTг",
+                    "ΔT7[°C] (T7 ТП - T7потр.)",
+                    "T7 норм[°C]",
+                    "К<sub>гвс</sub>");
+
+    private List<IndicatorMetrology> indicatorMetrologyList = new ArrayList<>();
     private List<IndicatorTV> indicatorTVList = new ArrayList<>();
     private List<IndicatorCO> indicatorCOList = new ArrayList<>();
     private List<IndicatorGVS> indicatorGVSList = new ArrayList<>();
     private List<IndicatorVENT> indicatorVENTList = new ArrayList<>();
-    private List<IndicatorOther> indicatorOtherList = new ArrayList<>();
     private List<IndicatorT7> indicatorT7List = new ArrayList<>();
     private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
     private List<IndicatorUnderSupply> indicatorUnderSupplyList = new ArrayList<>();
+    private List<IndicatorBorderCo> indicatorBorderCoList = new ArrayList<>();
+    private List<IndicatorBorderVent> indicatorBorderVentList = new ArrayList<>();
+    private List<IndicatorBorderGvs> indicatorBorderGvsList = new ArrayList<>();
 
     @Inject
     private transient Logger logger;
@@ -54,14 +88,17 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
      * Загрузка данных формы
      */
     private void loadData() {
+        indicatorMetrologyList = normIndicatorsBean.getMetrology();
         indicatorTVList = normIndicatorsBean.getTV();
         indicatorCOList = normIndicatorsBean.getCO();
         indicatorGVSList = normIndicatorsBean.getGVS();
         indicatorVENTList = normIndicatorsBean.getVENT();
-        indicatorOtherList = normIndicatorsBean.getOther();
         indicatorT7List = normIndicatorsBean.getT7();
         indicatorDT7List = normIndicatorsBean.getDT7();
         indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
+        indicatorBorderCoList = normIndicatorsBean.getBorderValuesCo();
+        indicatorBorderVentList = normIndicatorsBean.getBorderValuesVent();
+        indicatorBorderGvsList = normIndicatorsBean.getBorderValuesGvs();
     }
 
     /**
@@ -73,7 +110,22 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
         List<String> errorMessages = new ArrayList<>();
 
         switch (type) {
-            case "TV": {
+            case "metrology": {
+                indicatorMetrologyList.stream().filter(IndicatorMetrology::isChange).forEach(indicatorMetrology -> {
+                    logger.info("update metrology indicator " + indicatorMetrology);
+
+                    try {
+                        normIndicatorsBean.updateMetrology(indicatorMetrology, utilMB.getLogin(), utilMB.getIp());
+                    } catch (SystemParamException e) {
+                        errorMessages.add("Метрологические погрешности");
+                        logger.warning(e.getMessage());
+                    }
+                });
+
+                indicatorMetrologyList = normIndicatorsBean.getMetrology();
+                break;
+            }
+            case "efficiency": {
                 indicatorTVList.stream().filter(IndicatorTV::isChange).forEach(indicatorTV -> {
                     logger.info("update norm indicator TV " + indicatorTV);
 
@@ -86,9 +138,7 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 });
 
                 indicatorTVList = normIndicatorsBean.getTV();
-                break;
-            }
-            case "CO": {
+
                 indicatorCOList.stream().filter(IndicatorCO::isChange).forEach(indicatorCO -> {
                     logger.info("update norm indicator CO " + indicatorCO);
 
@@ -101,9 +151,7 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 });
 
                 indicatorCOList = normIndicatorsBean.getCO();
-                break;
-            }
-            case "GVS": {
+
                 indicatorGVSList.stream().filter(IndicatorGVS::isChange).forEach(indicatorGVS -> {
                     logger.info("update norm indicator GVS " + indicatorGVS);
 
@@ -116,9 +164,7 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 });
 
                 indicatorGVSList = normIndicatorsBean.getGVS();
-                break;
-            }
-            case "VENT": {
+
                 indicatorVENTList.stream().filter(IndicatorVENT::isChange).forEach(indicatorVENT -> {
                     logger.info("update norm indicator VENT " + indicatorVENT);
 
@@ -133,52 +179,48 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 indicatorVENTList = normIndicatorsBean.getVENT();
                 break;
             }
-            case "Other": {
-                indicatorOtherList.stream().filter(IndicatorOther::isChange).forEach(indicatorOther -> {
-                    logger.info("update norm indicator other " + indicatorOther);
+            case "borderValues": {
+                indicatorBorderCoList.stream().filter(IndicatorBorderCo::isChange).forEach(indicatorBorderCo -> {
+                    logger.info("update border indicator CO " + indicatorBorderCo);
 
                     try {
-                        normIndicatorsBean.updateOther(indicatorOther, utilMB.getLogin(), utilMB.getIp());
+                        normIndicatorsBean.updateBorderValuesCo(indicatorBorderCo, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
-                        errorMessages.add("Источник - Потребитель");
+                        errorMessages.add("Граничные значения - центральное отопление");
                         logger.warning(e.getMessage());
                     }
                 });
 
-                indicatorOtherList = normIndicatorsBean.getOther();
-                break;
-            }
-            case "T7": {
-                indicatorT7List.stream().filter(IndicatorT7::isChange).forEach(indicatorT7 -> {
-                    logger.info("update T7 indicator " + indicatorT7);
+                indicatorBorderCoList = normIndicatorsBean.getBorderValuesCo();
+
+                indicatorBorderVentList.stream().filter(IndicatorBorderVent::isChange).forEach(indicatorBorderVent -> {
+                    logger.info("update border indicator vent " + indicatorBorderVent);
 
                     try {
-                        normIndicatorsBean.updateT7(indicatorT7, utilMB.getLogin(), utilMB.getIp());
+                        normIndicatorsBean.updateBorderValuesVent(indicatorBorderVent, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
-                        errorMessages.add("Анализ потребителей T7");
+                        errorMessages.add("Граничные значения - вентиляция");
                         logger.warning(e.getMessage());
                     }
                 });
 
-                indicatorT7List = normIndicatorsBean.getT7();
-                break;
-            }
-            case "dT7": {
-                indicatorDT7List.stream().filter(IndicatorDT7::isChange).forEach(indicatorDT7 -> {
-                    logger.info("update dT7 indicator " + indicatorDT7);
+                indicatorBorderVentList = normIndicatorsBean.getBorderValuesVent();
+
+                indicatorBorderGvsList.stream().filter(IndicatorBorderGvs::isChange).forEach(indicatorBorderGvs -> {
+                    logger.info("update border indicator gvs " + indicatorBorderGvs);
 
                     try {
-                        normIndicatorsBean.updateDT7(indicatorDT7, utilMB.getLogin(), utilMB.getIp());
+                        normIndicatorsBean.updateBorderValuesGvs(indicatorBorderGvs, utilMB.getLogin(), utilMB.getIp());
                     } catch (SystemParamException e) {
-                        errorMessages.add("Анализ потребителей ΔT7");
+                        errorMessages.add("Граничные значения - гвс");
                         logger.warning(e.getMessage());
                     }
                 });
 
-                indicatorDT7List = normIndicatorsBean.getDT7();
+                indicatorBorderGvsList = normIndicatorsBean.getBorderValuesGvs();
                 break;
             }
-            case "underSupply": {
+            case "analysis": {
                 indicatorUnderSupplyList.stream().filter(IndicatorUnderSupply::isChange).forEach(indicatorUnderSupply -> {
                     logger.info("update underSupply indicator " + indicatorUnderSupply);
 
@@ -191,6 +233,32 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 });
 
                 indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
+
+                indicatorT7List.stream().filter(IndicatorT7::isChange).forEach(indicatorT7 -> {
+                    logger.info("update T7 indicator " + indicatorT7);
+
+                    try {
+                        normIndicatorsBean.updateT7(indicatorT7, utilMB.getLogin(), utilMB.getIp());
+                    } catch (SystemParamException e) {
+                        errorMessages.add("Анализ потребителей T7");
+                        logger.warning(e.getMessage());
+                    }
+                });
+
+                indicatorT7List = normIndicatorsBean.getT7();
+
+                indicatorDT7List.stream().filter(IndicatorDT7::isChange).forEach(indicatorDT7 -> {
+                    logger.info("update dT7 indicator " + indicatorDT7);
+
+                    try {
+                        normIndicatorsBean.updateDT7(indicatorDT7, utilMB.getLogin(), utilMB.getIp());
+                    } catch (SystemParamException e) {
+                        errorMessages.add("Анализ потребителей ΔT7");
+                        logger.warning(e.getMessage());
+                    }
+                });
+
+                indicatorDT7List = normIndicatorsBean.getDT7();
                 break;
             }
         }
@@ -226,10 +294,6 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
         return indicatorVENTList;
     }
 
-    public List<IndicatorOther> getIndicatorOtherList() {
-        return indicatorOtherList;
-    }
-
     public List<IndicatorT7> getIndicatorT7List() {
         return indicatorT7List;
     }
@@ -240,5 +304,37 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
     public List<IndicatorUnderSupply> getIndicatorUnderSupplyList() {
         return indicatorUnderSupplyList;
+    }
+
+    public List<IndicatorMetrology> getIndicatorMetrologyList() {
+        return indicatorMetrologyList;
+    }
+
+    public List<IndicatorBorderCo> getIndicatorBorderCoList() {
+        return indicatorBorderCoList;
+    }
+
+    public List<IndicatorBorderVent> getIndicatorBorderVentList() {
+        return indicatorBorderVentList;
+    }
+
+    public List<IndicatorBorderGvs> getIndicatorBorderGvsList() {
+        return indicatorBorderGvsList;
+    }
+
+    public String getMetrologyHeaderName(int index) {
+        return METROLOGY_HEADER_NAME.get(index);
+    }
+
+    public String getBorderValuesCOHeaderName(int index) {
+        return BORDER_VALUES_CO_HEADER_NAME.get(index);
+    }
+
+    public String getBorderValuesVentHeaderName(int index) {
+        return BORDER_VALUES_VENT_HEADER_NAME.get(index);
+    }
+
+    public String getBorderValuesGVSHeaderName(int index) {
+        return BORDER_VALUES_GVS_HEADER_NAME.get(index);
     }
 }
