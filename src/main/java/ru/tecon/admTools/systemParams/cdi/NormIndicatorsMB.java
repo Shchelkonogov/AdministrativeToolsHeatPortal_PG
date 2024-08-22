@@ -15,6 +15,7 @@ import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,32 +29,48 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
     private static final List<String> METROLOGY_HEADER_NAME =
             Arrays.asList("Температура K<sub>t</sub> [%]",
-                    "Давление Kp [%]",
+                    "Давление K<sub>p</sub> [%]",
                     "Расход K<sub>g</sub>, K<sub>v</sub> [%]",
                     "Энергия K<sub>q</sub> [%]");
 
+    private static final List<String> INDICATOR_TV_HEADER_NAME =
+            Arrays.asList("Подпитка нормированная К<sub>п_н</sub> [%]",
+                    "Удельный расход К<sub>з_тв</sub> [тонн/Гкал]",
+                    "Коэффициент подпитки К<sub>п_тв</sub> [%]");
+
+    private static final List<String> INDICATOR_CO_HEADER_NAME =
+            Arrays.asList("Удельный расход К<sub>з_цо</sub> [тонн/Гкал]",
+                    "Коэффициент подпитки К<sub>п_цо</sub> [%]");
+
+    private static final List<String> INDICATOR_GVS_HEADER_NAME =
+            Collections.singletonList("Коэффициент циркуляции К<sub>ц</sub> [%]");
+
+    private static final List<String> INDICATOR_VENT_HEADER_NAME =
+            Arrays.asList("Удельный расход К<sub>з_в</sub> [тонн/Гкал]",
+                    "Коэффициент подпитки К<sub>п_в</sub> [%]");
+
     private static final List<String> BORDER_VALUES_CO_HEADER_NAME =
-            Arrays.asList("Тепловая потеря в подаче КΔт<sub>цо</sub> [%]",
-                    "Тепловая потеря в обратке КΔт о<sub>цо</sub> [%]",
-                    "Утечка Ку<sub>цо</sub> [тонн]",
-                    "Расход тепла норматив КΔ<sub>Qцо</sub> [%]",
+            Arrays.asList("Тепловая потеря в подаче К<sub>Δт_цо</sub> [%]",
+                    "Тепловая потеря в обратке К<sub>Δт_о_цо</sub> [%]",
+                    "Утечка К<sub>у_цо</sub> [тонн]",
+                    "Расход тепла норматив К<sub>ΔQ_цо</sub> [%]",
                     "К<sub>цо</sub>",
                     "Недоотпуск К1",
                     "Перетоп К2");
 
     private static final List<String> BORDER_VALUES_VENT_HEADER_NAME =
-            Arrays.asList("Тепловая потеря в подаче КΔт<sub>в</sub> [%]",
-                    "Тепловая потеря в обратке КΔт о<sub>в</sub> [%]",
-                    "Утечка Ку<sub>в</sub> [тонн]",
-                    "Расход тепла норматив КΔ<sub>Qв</sub> [%]");
+            Arrays.asList("Тепловая потеря в подаче К<sub>Δт_в</sub> [%]",
+                    "Тепловая потеря в обратке К<sub>Δт_о_в</sub> [%]",
+                    "Утечка К<sub>у_в</sub> [тонн]",
+                    "Расход тепла норматив К<sub>ΔQ_в</sub> [%]");
 
     private static final List<String> BORDER_VALUES_GVS_HEADER_NAME =
-            Arrays.asList("Тепловая потеря в подаче КΔт<sub>гвс</sub> [%]",
-                    "Тепловая потеря в обратке КΔт о<sub>гвс</sub> [%]",
-                    "Утечка Ку<sub>гвс</sub> [тонн]",
-                    "ΔTг",
-                    "ΔT7[°C] (T7 ТП - T7потр.)",
-                    "T7 норм[°C]",
+            Arrays.asList("Тепловая потеря в подаче К<sub>Δт_гвс</sub> [%]",
+                    "Тепловая потеря в обратке К<sub>Δт_о_гвс</sub> [%]",
+                    "Утечка К<sub>у_гвс</sub> [тонн]",
+                    "ΔT<sub>гвс</sub> [°C]",
+                    "ΔT7 [°C] (T7<sub>ТП</sub> - T7<sub>потр</sub>)",
+                    "T7<sub>норм</sub> [°C]",
                     "К<sub>гвс</sub>");
 
     private List<IndicatorMetrology> indicatorMetrologyList = new ArrayList<>();
@@ -336,5 +353,21 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
     public String getBorderValuesGVSHeaderName(int index) {
         return BORDER_VALUES_GVS_HEADER_NAME.get(index);
+    }
+
+    public String getIndicatorTVHeaderName(int index) {
+        return INDICATOR_TV_HEADER_NAME.get(index);
+    }
+
+    public String getIndicatorCOHeaderName(int index) {
+        return INDICATOR_CO_HEADER_NAME.get(index);
+    }
+
+    public String getIndicatorGVSHeaderName(int index) {
+        return INDICATOR_GVS_HEADER_NAME.get(index);
+    }
+
+    public String getIndicatorVentHeaderName(int index) {
+        return INDICATOR_VENT_HEADER_NAME.get(index);
     }
 }

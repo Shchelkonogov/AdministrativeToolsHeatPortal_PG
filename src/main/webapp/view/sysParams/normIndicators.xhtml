@@ -115,7 +115,7 @@
                                             <p:column headerText="Тип объекта" >
                                                 <h:outputText value="Источник"/>
                                             </p:column>
-                                            <p:column id="K" headerText="Подпитка нормированная Кп_н [%]" style="text-align: center;">
+                                            <p:column id="K" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;|#{tv.kpn}|%"/>
@@ -124,8 +124,12 @@
                                                         <p:inputNumber value="#{tv.kpn}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorTVHeaderName(0)}"/>
+                                                </f:facet>
                                             </p:column>
-                                            <p:column id="KzTv" headerText="Удельный расход Кз тв [тонн/Гкал]" style="text-align: center;">
+                                            <p:column id="KzTv" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{tv.kz}"/>
@@ -134,8 +138,12 @@
                                                         <p:inputNumber value="#{tv.kz}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorTVHeaderName(1)}"/>
+                                                </f:facet>
                                             </p:column>
-                                            <p:column id="KpTv" headerText="Коэффициент подпитки Кп тв [%]" style="text-align: center;">
+                                            <p:column id="KpTv" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{tv.kp}"/>
@@ -144,6 +152,10 @@
                                                         <p:inputNumber value="#{tv.kp}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorTVHeaderName(2)}"/>
+                                                </f:facet>
                                             </p:column>
                                         </p:dataTable>
 
@@ -173,7 +185,7 @@
                                             <p:column headerText="Тип объекта">
                                                 <h:outputText value="#{co.name}"/>
                                             </p:column>
-                                            <p:column id="KzCo" headerText="Удельный расход Кз цо [тонн/Гкал]" style="text-align: center;">
+                                            <p:column id="KzCo" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{co.kz}"/>
@@ -182,8 +194,12 @@
                                                         <p:inputNumber value="#{co.kz}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorCOHeaderName(0)}"/>
+                                                </f:facet>
                                             </p:column>
-                                            <p:column id="KpCo" headerText="Коэффициент подпитки Кп цо [%]" style="text-align: center;">
+                                            <p:column id="KpCo" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{co.kp}"/>
@@ -192,6 +208,10 @@
                                                         <p:inputNumber value="#{co.kp}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorCOHeaderName(1)}"/>
+                                                </f:facet>
                                             </p:column>
                                         </p:dataTable>
 
@@ -220,7 +240,7 @@
                                             <p:column headerText="Тип объекта" >
                                                 <h:outputText value="#{gvs.name}"/>
                                             </p:column>
-                                            <p:column id="KcGvs" headerText="Коэффициент циркуляции Кц [%]" style="text-align: center;">
+                                            <p:column id="KcGvs" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&gt;#{gvs.kc}%"/>
@@ -229,6 +249,10 @@
                                                         <p:inputNumber value="#{gvs.kc}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorGVSHeaderName(0)}"/>
+                                                </f:facet>
                                             </p:column>
                                         </p:dataTable>
 
@@ -252,7 +276,7 @@
                                             <p:column headerText="Тип объекта">
                                                 <h:outputText value="#{vent.name}"/>
                                             </p:column>
-                                            <p:column id="KzVent" headerText="Удельный расход Кз в [тонн/Гкал]" style="text-align: center;">
+                                            <p:column id="KzVent" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{vent.kz}"/>
@@ -261,8 +285,12 @@
                                                         <p:inputNumber value="#{vent.kz}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorVentHeaderName(0)}"/>
+                                                </f:facet>
                                             </p:column>
-                                            <p:column id="KpVent" headerText="Коэффициент подпитки Кп в [%]" style="text-align: center;">
+                                            <p:column id="KpVent" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
                                                         <h:outputText value="&lt;#{vent.kp}"/>
@@ -271,6 +299,10 @@
                                                         <p:inputNumber value="#{vent.kp}" decimalPlaces="2"/>
                                                     </f:facet>
                                                 </p:cellEditor>
+
+                                                <f:facet name="header">
+                                                    <h:outputText escape="false" value="#{normIndicators.getIndicatorVentHeaderName(1)}"/>
+                                                </f:facet>
                                             </p:column>
                                         </p:dataTable>
 
@@ -686,8 +718,8 @@
 
                                         <p:columnGroup type="header">
                                             <p:row>
-                                                <p:column id="T3" colspan="3" headerText="По Т3"/>
-                                                <p:column id="T4" colspan="3" headerText="По Т4"/>
+                                                <p:column id="T3" colspan="3" headerText="Недоотпуск по Т3 [°C]"/>
+                                                <p:column id="T4" colspan="3" headerText="Недоотпуск по Т4 [°C]"/>
                                             </p:row>
                                             <p:row>
                                                 <p:column headerText="k1" />
@@ -784,7 +816,7 @@
 
                                                 <p:columnGroup type="header">
                                                     <p:row>
-                                                        <p:column colspan="5" headerText="Т7"/>
+                                                        <p:column colspan="5" headerText="Т7 [°C]"/>
                                                     </p:row>
                                                     <p:row>
                                                         <p:column headerText="Тип объекта" />
@@ -864,7 +896,7 @@
 
                                                 <p:columnGroup type="header">
                                                     <p:row>
-                                                        <p:column colspan="3" headerText="ΔТ7"/>
+                                                        <p:column colspan="3" headerText="ΔТ7 [°C]"/>
                                                     </p:row>
                                                     <p:row>
                                                         <p:column id="Tmin" headerText="ΔTmin" />
