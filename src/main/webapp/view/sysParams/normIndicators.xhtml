@@ -74,16 +74,16 @@
 
                         <h:panelGroup id="metrologyTooltip" layout="block">
                             <p:tooltip for="normIndicators:metrology:m_Kt" position="bottom" showDelay="500">
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                                <p:graphicImage name="tooltip/metrology/K_t.jpg" library="normIndicators"/>
                             </p:tooltip>
                             <p:tooltip for="normIndicators:metrology:m_Kp" position="bottom" showDelay="500">
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                                <p:graphicImage name="tooltip/metrology/K_p.jpg" library="normIndicators"/>
                             </p:tooltip>
                             <p:tooltip for="normIndicators:metrology:m_KgKv" position="bottom" showDelay="500">
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                                <p:graphicImage name="tooltip/metrology/K_g-K_v.jpg" library="normIndicators"/>
                             </p:tooltip>
-                            <p:tooltip for="normIndicators:metrology:m_Kq" position="bottom" showDelay="500">
-                                <p:graphicImage name="inWork.gif" library="images"/>
+                            <p:tooltip for="normIndicators:metrology:m_Kq" position="left" showDelay="500">
+                                <p:graphicImage name="tooltip/metrology/K_q.jpg" library="normIndicators"/>
                             </p:tooltip>
                         </h:panelGroup>
                     </div>
@@ -161,13 +161,13 @@
 
                                         <h:panelGroup id="indicatorTVTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorTVTable:K" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/K.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_p_n.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorTVTable:KzTv" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kz tv.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_z_tv.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorTVTable:KpTv" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kp tv.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_p_tv.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -217,10 +217,10 @@
 
                                         <h:panelGroup id="indicatorCOTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorCOTable:KzCo" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kz co.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_z_co.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorCOTable:KpCo" position="left" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kp co.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_p_co.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -243,7 +243,7 @@
                                             <p:column id="KcGvs" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
-                                                        <h:outputText value="&gt;#{gvs.kc}%"/>
+                                                        <h:outputText value="&lt;#{gvs.kc}%"/>
                                                     </f:facet>
                                                     <f:facet name="input">
                                                         <p:inputNumber value="#{gvs.kc}" decimalPlaces="2"/>
@@ -258,7 +258,7 @@
 
                                         <h:panelGroup id="indicatorGVSTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorGVSTable:KcGvs" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kc gvs.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_c.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -308,10 +308,10 @@
 
                                         <h:panelGroup id="indicatorVENTTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorVENTTable:KzVent" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kz vent.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_z_v.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorVENTTable:KpVent" position="left" showDelay="500">
-                                                <p:graphicImage name="tooltip/Kp vent.jpg" library="normIndicators"/>
+                                                <p:graphicImage name="tooltip/efficiency/K_p_v.jpg" library="normIndicators"/>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -445,25 +445,25 @@
 
                                     <h:panelGroup id="borderValuesCOTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K_dt_co.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtoco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K_dt_o_co.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kyco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K_u_co.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:KdQco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K_dq_co.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K_co.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:K1" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesCo/K1.jpg" library="normIndicators"/>
                                         </p:tooltip>
-                                        <p:tooltip for="normIndicators:borderValuesCO:K2" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                        <p:tooltip for="normIndicators:borderValuesCO:K2" position="left" showDelay="500">
+                                            <p:graphicImage name="tooltip/borderValuesCo/K2.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -541,16 +541,16 @@
 
                                     <h:panelGroup id="borderValuesVentTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesV/K_dt_v.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtovent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesV/K_dt_o_v.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kyvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesV/K_u_v.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:KdQvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesV/K_dq_v.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -667,25 +667,25 @@
 
                                     <h:panelGroup id="borderValuesGVSTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtgvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/K_dt_gvs.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtogvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/K_dt_o_gvs.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kygvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/K_u_gvs.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:dtr" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/dT_gvs.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:dt7" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/dT7.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:t7" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                            <p:graphicImage name="tooltip/borderValuesGvs/T7_norm.jpg" library="normIndicators"/>
                                         </p:tooltip>
-                                        <p:tooltip for="normIndicators:borderValuesGVS:Kgvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="inWork.gif" library="images"/>
+                                        <p:tooltip for="normIndicators:borderValuesGVS:Kgvs" position="left" showDelay="500">
+                                            <p:graphicImage name="tooltip/borderValuesGvs/K_gvs.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -718,16 +718,16 @@
 
                                         <p:columnGroup type="header">
                                             <p:row>
-                                                <p:column id="T3" colspan="3" headerText="Недоотпуск по Т3 [°C]"/>
-                                                <p:column id="T4" colspan="3" headerText="Недоотпуск по Т4 [°C]"/>
+                                                <p:column id="T3" colspan="3" headerText="Недоотпуск по Т3 [°C] / Перерасход по Т4 [°C]"/>
+                                                <p:column id="T4" colspan="3" headerText="Недосъем по Т4 [°C]"/>
                                             </p:row>
                                             <p:row>
-                                                <p:column headerText="k1" />
-                                                <p:column headerText="k2" />
-                                                <p:column headerText="k3" />
-                                                <p:column headerText="k1" />
-                                                <p:column headerText="k2" />
-                                                <p:column headerText="k3" />
+                                                <p:column id="T3K1" headerText="K1" />
+                                                <p:column id="T3K2" headerText="K2" />
+                                                <p:column id="T3K3" headerText="K3" />
+                                                <p:column id="T4K1" headerText="K1" />
+                                                <p:column id="T4K2" headerText="K2" />
+                                                <p:column id="T4K3" headerText="K3" />
                                             </p:row>
                                         </p:columnGroup>
                                         <p:column style="text-align: center;">
@@ -794,10 +794,28 @@
 
                                     <h:panelGroup id="underSupplyValuesTooltip" layout="block">
                                         <p:tooltip for="normIndicators:underSupplyValues:T3" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/T3UnderSupply.jpg" library="normIndicators"/>
+                                            <p:graphicImage name="tooltip/analyzeCo/T3.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T3K1" position="bottom" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t3/K1.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T3K2" position="bottom" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t3/K2.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T3K3" position="bottom" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t3/K3.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:underSupplyValues:T4" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/T4UnderSupply.jpg" library="normIndicators"/>
+                                            <p:graphicImage name="tooltip/analyzeCo/T4.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T4K1" position="bottom" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t4/K1.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T4K2" position="bottom" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t4/K2.jpg" library="normIndicators"/>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T4K3" position="left" showDelay="500">
+                                            <p:graphicImage name="tooltip/analyzeCo/t4/K3.jpg" library="normIndicators"/>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -874,16 +892,16 @@
 
                                             <h:panelGroup id="consumerAnalisisT7TableTooltip" layout="block">
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7ming" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/T7min g.jpg" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_min_g.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxg" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/T7max g.jpg" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_max_g.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7minp" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/T7min p.jpg" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_min_p.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxp" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/T7max p.jpg" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_max_p.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                             </h:panelGroup>
                                         </div>
@@ -939,13 +957,13 @@
 
                                             <h:panelGroup id="consumerAnalisisDeltaT7TableTooltip" layout="block">
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmin" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/Tmin.png" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_min.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmax" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/Tmax.png" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_max.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tnorm" position="left" showDelay="500">
-                                                    <p:graphicImage name="tooltip/Tnorm.png" library="normIndicators"/>
+                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_norm.jpg" library="normIndicators"/>
                                                 </p:tooltip>
                                             </h:panelGroup>
                                         </div>
