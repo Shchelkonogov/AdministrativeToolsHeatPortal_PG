@@ -234,6 +234,7 @@ body .ui-treetable .ui-treetable-data>tr>td .ui-treetable-toggler {
 
 body .ui-tooltip .ui-tooltip-text {
     background: white;
+    color: black;
     padding: 3px 3px 0 3px;
 }
 
@@ -442,4 +443,21 @@ body .ui-tabs.ui-tabs-bottom.tc-nav-left>.ui-tabs-nav li.ui-tabs-header {
 
 body .ui-datatable .ui-datatable-frozenlayout-right .ui-datatable-scrollable-header {
     background: unset;
+}
+
+.supsub {
+    display: inline-block;
+    text-indent: 0;
+}
+
+.supsub sup,
+.supsub sub {
+    position: relative;
+    display: block;
+    font-size: .5em;
+    line-height: 1.2;
+}
+
+.supsub sub {
+    top: .3em;
 }

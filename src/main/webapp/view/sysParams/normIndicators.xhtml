@@ -3,6 +3,9 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
+    <h:form>
+        <p:remoteCommand autoRun="true" oncomplete="MathJax.typesetPromise();"/>
+    </h:form>
     <h:form id="normIndicators" style="height: 100%; overflow: auto;">
         <p:panel id="rootPanel" styleClass="tc-panel" header="Нормативные показатели">
             <div style="margin-bottom: 5px;">
@@ -74,16 +77,40 @@
 
                         <h:panelGroup id="metrologyTooltip" layout="block">
                             <p:tooltip for="normIndicators:metrology:m_Kt" position="bottom" showDelay="500">
-                                <p:graphicImage name="tooltip/metrology/K_t.jpg" library="normIndicators"/>
+                                <div style="display: flex; width: 540px; padding: 5px;">
+                                    <div>
+                                        \[\mathrm {\mathbf{К_t}\&#160;\lbrack\&#37;\rbrack}\]
+                                    </div>
+                                    <p:outputLabel value=" - максимально допустимая погрешность измерения температур."
+                                                   style="margin: auto;"/>
+                                </div>
                             </p:tooltip>
                             <p:tooltip for="normIndicators:metrology:m_Kp" position="bottom" showDelay="500">
-                                <p:graphicImage name="tooltip/metrology/K_p.jpg" library="normIndicators"/>
+                                <div style="display: flex; width: 530px; padding: 5px;">
+                                    <div>
+                                        \[\mathrm {\mathbf{К_p}\&#160;\lbrack\&#37;\rbrack}\]
+                                    </div>
+                                    <p:outputLabel value=" - максимально допустимая погрешность измерения давлений."
+                                                   style="margin: auto;"/>
+                                </div>
                             </p:tooltip>
                             <p:tooltip for="normIndicators:metrology:m_KgKv" position="bottom" showDelay="500">
-                                <p:graphicImage name="tooltip/metrology/K_g-K_v.jpg" library="normIndicators"/>
+                                <div style="display: flex; width: 560px; padding: 5px;">
+                                    <div>
+                                        \[\mathrm {\mathbf{К_g,\&#160; К_v}\&#160;\lbrack\&#37;\rbrack}\]
+                                    </div>
+                                    <p:outputLabel value=" - максимально допустимая погрешность измерения расходов."
+                                                   style="margin: auto;"/>
+                                </div>
                             </p:tooltip>
                             <p:tooltip for="normIndicators:metrology:m_Kq" position="left" showDelay="500">
-                                <p:graphicImage name="tooltip/metrology/K_q.jpg" library="normIndicators"/>
+                                <div style="display: flex; width: 520px; padding: 5px;">
+                                    <div>
+                                        \[\mathrm {\mathbf{К_q}\&#160;\lbrack\&#37;\rbrack}\]
+                                    </div>
+                                    <p:outputLabel value=" - максимально допустимая погрешность измерения энергий."
+                                                   style="margin: auto;"/>
+                                </div>
                             </p:tooltip>
                         </h:panelGroup>
                     </div>
@@ -161,13 +188,58 @@
 
                                         <h:panelGroup id="indicatorTVTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorTVTable:K" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_p_n.jpg" library="normIndicators"/>
+                                                <div style="width: 550px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Подпитка нормированная
+                                                    </h4>
+                                                        \[\mathrm{\mathbf{К_{П\_Н}}\&#160;\lbrack\&#37;\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Изменение текущей подпитки по отношению к средней
+                                                        (рассчитанной на основе измерений за выбранный
+                                                        интервал времени) в процентах:
+                                                    </div>
+                                                        \[\mathrm{{K_{П\_Н}}={G_П-G_{П\_СР}\over G_{П\_СР}}*100}\]
+                                                </div>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorTVTable:KzTv" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_z_tv.jpg" library="normIndicators"/>
+                                                <div style="width: 455px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент загрузки ТВ (удельный расход)
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{З\_ТВ}}\&#160;\lbrackтонн/Гкал\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Отражает массу теплоносителя, прокачанную через ТВ ТП
+                                                        для доставки 1 Гкал тепловой энергии:
+                                                    </div>
+                                                    \[\mathrm{{K_{З\_ТВ}}={G1\over Q_{ТВ}}}\]
+                                                </div>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorTVTable:KpTv" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_p_tv.jpg" library="normIndicators"/>
+                                                <div style="width: 650px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент подпитки ТВ
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{П\_ТВ}}\&#160;\lbrack\&#37;\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Отношение массы подпитки теплоносителя к массе теплоносителя,
+                                                        циркулирующего в закрытых (с полным возвратом теплоносителя)
+                                                        теплосистемах на выходе ТП (отопление, вентиляция):
+                                                    </div>
+                                                    \[\mathrm{{К_{П\_ТВ}}={G_П\over \sum (G3 + G31)}*100\&#37;}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        где G<sub>п</sub> - среднесуточная величина подпитки.
+                                                        Может быть определена по суточной массе теплоносителя,
+                                                        зафиксированной расходомером подпитки на тепловом вводе
+                                                        (теплосчетчиком на ТВ) – на ТП независимая схема подключения
+                                                        системы отопления; или по разности масс G<sub>п</sub>=G1-G2 на прямом и
+                                                        обратном трубопроводе теплового ввода (теплосчетчиком на ТВ) -
+                                                        на ТП зависимая или смешанная схема подключения системы отопления.
+                                                        На ряде объектов могут отсутствовать измерения расходов на выходе ТП.
+                                                        В случае отсутствия таких измерений, коэффициент подпитки
+                                                        рассчитывается на основании показаний со счетчика на тепловом вводе ТП.
+                                                    </div>
+                                                    \[\mathrm{{K_{П\_ТВ}}= {G_П\over G1}*100\&#37;}\]
+                                                </div>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -217,10 +289,31 @@
 
                                         <h:panelGroup id="indicatorCOTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorCOTable:KzCo" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_z_co.jpg" library="normIndicators"/>
+                                                <div style="width: 455px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент загрузки ЦО (удельный расход)
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{З\_ЦО}}\&#160;\lbrackтонн/Гкал\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Отражает массу теплоносителя, прокачанную через теплосистему
+                                                        ЦО для доставки 1 Гкал тепловой энергии:
+                                                    </div>
+                                                    \[\mathrm{K_{З\_ЦО}={G3\over Q_Ц}}\]
+                                                </div>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorCOTable:KpCo" position="left" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_p_co.jpg" library="normIndicators"/>
+                                                <div style="width: 455px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент подпитки ЦО
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{П\_ЦО}}\&#160;\lbrack\&#37;\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Отношение величины подпитки теплоносителя, рассчитанной на
+                                                        основании приборного учета по выходу ТП к массе циркуляции
+                                                        теплоносителя в системе ЦО:
+                                                    </div>
+                                                    \[\mathrm{{К_{П\_ЦО}}={G3 - G4\over G3}*100\&#37;}\]
+                                                </div>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -258,7 +351,60 @@
 
                                         <h:panelGroup id="indicatorGVSTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorGVSTable:KcGvs" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_c.jpg" library="normIndicators"/>
+                                                <div style="width: 900px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент циркуляции ГВС
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_Ц}\&#160;\lbrack\&#37;\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Соотношение объема доставленной потребителям горячей
+                                                        воды (доходная часть) к объему циркуляции (накладные расходы
+                                                        для предоставления услуги ГВС). Если есть водосчетчик
+                                                        подпитки ГВС из системы ХВС:
+                                                    </div>
+                                                    \[\mathrm{К_Ц={G_П\over G7}*100\&#37;}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Если есть двухпоточный счетчик, измеряющий расход на
+                                                        подающем и циркуляционном трубопроводах:
+                                                    </div>
+                                                    \[\mathrm{К_Ц={G13\over G7}*100\&#37;}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Данный коэффициент определяется как для ТП, так и
+                                                        для потребителей, подключенных к данному ТП.
+                                                    </div>
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Чем меньше данный коэффициент, тем эффективнее функционирует
+                                                        система ГВС (алгоритм сигнализирует о выявленном
+                                                        отклонении (цветовая индикация)).
+                                                    </div>
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Подавляющее большинство ТП не оборудовано средствами измерения
+                                                        объемов ГВС по выходу. Для таких случаев предлагается оценивать
+                                                        коэффициент циркуляции ГВС по отношению тепловой энергии
+                                                        дневного и ночного потребления, измеренной прибором учета на
+                                                        тепловом вводе ТП в неотопительный период.
+                                                    </div>
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        В этом случае расчет производится по следующей формуле:
+                                                    </div>
+                                                    \[\mathrm{K_Ц= {Q_{ТВ\_ноч}\over Q_{ТВ\_сут}}*100\&#37;}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Q<sub>ТВ_ноч</sub> тепловая энергия, зафиксированная
+                                                        счетчиком на ТВ ТП в промежутке с 00:00 по 04:59
+                                                        (потраченная на циркуляцию ГВС);
+                                                    </div>
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Q<sub>ТВ_сут</sub> тепловая энергия, зафиксированная
+                                                        счетчиком на ТВ ТП в промежутке с 00:00 по 23:59
+                                                        (потраченная на подогрев и циркуляцию ГВС);
+                                                    </div>
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Приоритетом для расчета К<sub>ц</sub> являются измерения
+                                                        соответствующих расходов. В случае отсутствия данных измерений,
+                                                        К<sub>ц</sub> рассчитывается по показаниям счетчика на ТВ и
+                                                        только в неотопительный период.
+                                                    </div>
+                                                </div>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -308,10 +454,30 @@
 
                                         <h:panelGroup id="indicatorVENTTableTooltip" layout="block">
                                             <p:tooltip for="normIndicators:indicatorVENTTable:KzVent" position="bottom" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_z_v.jpg" library="normIndicators"/>
+                                                <div style="width: 550px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент загрузки вентиляции (удельный расход)
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{З\_В}}\&#160;\lbrackтонн/Гкал\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Масса теплоносителя, прокачанная через систему
+                                                        вентиляции для доставки 1 Гкал тепловой энергии:
+                                                    </div>
+                                                    \[\mathrm{K_{З\_В}={G31\over Q_В}}\]
+                                                </div>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorVENTTable:KpVent" position="left" showDelay="500">
-                                                <p:graphicImage name="tooltip/efficiency/K_p_v.jpg" library="normIndicators"/>
+                                                <div style="width: 455px; padding: 5px;">
+                                                    <h4 style="text-align: center;">
+                                                        Коэффициент подпитки вентиляции
+                                                    </h4>
+                                                    \[\mathrm {\mathbf{К_{П\_В}}\&#160;\lbrack\&#37;\rbrack}\]
+                                                    <div style="text-indent: 20px; text-align: justify;">
+                                                        Отношение массы подпитки теплоносителя к массе теплоносителя,
+                                                        циркулирующего в системе вентиляции:
+                                                    </div>
+                                                    \[\mathrm{К_{П\_В}={G31 - G41\over G31}*100\&#37;}\]
+                                                </div>
                                             </p:tooltip>
                                         </h:panelGroup>
                                     </div>
@@ -341,7 +507,8 @@
                                                  editable="#{systemParamsUtil.write}" editMode="cell"
                                                  emptyMessage="#{global['table.empty.value']}">
 
-                                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+                                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}"
+                                                update="normIndicators:CO_K normIndicators:CO_K1 normIndicators:CO_K2" />
 
                                         <p:column id="Kdtco" style="text-align: center;">
                                             <p:cellEditor disabled="#{!systemParamsUtil.write}">
@@ -445,25 +612,151 @@
 
                                     <h:panelGroup id="borderValuesCOTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K_dt_co.jpg" library="normIndicators"/>
+                                            <div style="width: 455px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в подаче ЦО
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_ЦО}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур теплоносителя
+                                                    в подающем трубопроводе на входе у каждого потребителя Т3<sub>потр</sub> с
+                                                    фактическим значением на выходе из теплового пункта Т3<sub>ЦТП</sub>.
+                                                    Данный показатель информирует о тепловых потерях на распределительных сетях.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т3<sub>ЦТП</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_ЦО}={T3_{ЦТП} - T3_{потр}\over T3_{ЦТП}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtoco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K_dt_o_co.jpg" library="normIndicators"/>
+                                            <div style="width: 455px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в обратке ЦО
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_{О\_ЦО}}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур теплоносителя
+                                                    в обратном трубопроводе на выходе у каждого потребителя Т4<sub>потр</sub>
+                                                    с фактическим значением на входе в тепловой пункт Т4<sub>ЦТП</sub>.
+                                                    Данный показатель информирует о тепловых потерях на распределительных сетях.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т4<sub>потр</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_{О\_ЦО}}={T4_{потр}-T4_{ЦТП}\over T4_{потр}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kyco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K_u_co.jpg" library="normIndicators"/>
+                                            <div style="width: 455px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Утечка в системе ЦО
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{У\_ЦО}\&#160;}\lbrackтонн\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Анализ осуществляется по результатам измерений на выходе ТП за
+                                                    соседние сутки. Анализ осуществляется только в том случае, когда
+                                                    выполняются условия: температура теплоносителя в подающем
+                                                    трубопроводе соответствующей системы больше 40 ⁰С и в одни из
+                                                    анализируемых суток не было планового отключения данной системы.
+                                                </div>
+                                                \[\mathrm{К_{У\_ЦО}=G3_i-G3_{i-1}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G3<sub>i</sub>  - суточный расход воды в подающем трубопроводе ЦО в анализируемые сутки;
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G3<sub>i-1</sub> - суточный расход воды в подающем трубопроводе ЦО в
+                                                    предыдущие относительно анализируемых суток.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:KdQco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K_dq_co.jpg" library="normIndicators"/>
+                                            <div style="width: 455px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Расход тепла в системе ЦО
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; Q\_{ЦО}}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактического значения потребляемой тепловой
+                                                    нагрузки для каждого потребителя
+                                                    Q<span class="supsub"><sup>факт</sup><sub>ЦО</sub></span>
+                                                    с нормативным значением
+                                                    Q<span class="supsub"><sup>корр</sup><sub>ЦО</sub></span>
+                                                    (вычисленным по фактической температуре наружного воздуха
+                                                    полигона, к которому относится ТП).
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно
+                                                    Q<span class="supsub"><sup>корр</sup><sub>ЦО</sub></span>
+                                                </div>
+                                                \[\mathrm{К_{&#916; Q\_ЦО}={Q_{ЦО}^{корр}-Q_{ЦО}^{факт}\over Q_{ЦО}^{корр}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kco" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K_co.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Коэффициент допустимого отклонения давления ЦО
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Посредством анализа динамики изменения параметров P3 и P4
+                                                    возможно выявлять повреждения и утечки в системе центрального отопления
+                                                </div>
+                                                \[\mathrm{P3\leq  {{(P3_{i-1}+P3_{i-2}+P3_{i-3})}*K_{ЦО}\over 3}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    или
+                                                </div>
+                                                \[\mathrm{P4\leq  {{(P4_{i-1}+P4_{i-2}+P4_{i-3})}*K_{ЦО}\over 3}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    K<sub>ЦО</sub>=
+                                                    <p:outputLabel id="CO_K" value="#{normIndicators.indicatorBorderCoList.get(0).k}"/>
+                                                    – коэффициент допустимого отклонения давления,
+                                                    заданный в справочнике «Нормативные значения показателей».
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:K1" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K1.jpg" library="normIndicators"/>
+                                            <div style="width: 410px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Недоотпуск K1
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Оценивается коэффициент недоотпуска К1:
+                                                </div>
+                                                \[\mathrm{K1={|T3 - T3_{min}|\over T3_{min}}*100\&#37;}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    При выполнении условий:
+                                                </div>
+                                                \[\mathrm{T3\leq  T3_{min}}\]
+                                                \[\mathrm{&#916; P=(P1-P2)\geq &#916; P_{min}=0,05}\]
+                                                \[\mathrm{T1\geq T1_{min}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    При условии К1&lt;
+                                                    <p:outputLabel id="CO_K1" value="#{normIndicators.indicatorBorderCoList.get(0).k1}"/>
+                                                    , диагностируется недоотпуск тепловой энергии.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:K2" position="left" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesCo/K2.jpg" library="normIndicators"/>
+                                            <div style="width: 390px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Перетоп K2
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Оценивается коэффициент перетопа К2:
+                                                </div>
+                                                \[\mathrm{K2={|T4 - T4_{min}|\over T4_{min}}*100\&#37;}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    При выполнении условий:
+                                                </div>
+                                                \[\mathrm{T3\geq T3_{min}}\]
+                                                \[\mathrm{&#916; P=(P3-P4)\geq &#916; P_{min}=0,02}\]
+                                                \[\mathrm{T4&lt;T4_{min}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    При условии К2&lt;
+                                                    <p:outputLabel id="CO_K2" value="#{normIndicators.indicatorBorderCoList.get(0).k2}"/>
+                                                    , диагностируется перетоп.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -541,16 +834,88 @@
 
                                     <h:panelGroup id="borderValuesVentTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesV/K_dt_v.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в подаче вентиляции
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_В}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур теплоносителя
+                                                    в подающем трубопроводе на входе у каждого потребителя
+                                                    Т31<sub>потр</sub> с фактическим значением на выходе из
+                                                    теплового пункта Т31<sub>ЦТП</sub>. Данный показатель
+                                                    информирует о тепловых потерях на распределительных сетях.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т31<sub>ЦТП</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_В}={T31_{ЦТП} - T31_{потр}\over T31_{ЦТП}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtovent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesV/K_dt_o_v.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в обратке вентиляции
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_{О\_В}}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур теплоносителя
+                                                    в обратном трубопроводе на выходе у каждого потребителя
+                                                    Т41<sub>потр</sub> с фактическим значением на входе в тепловой
+                                                    пункт Т41<sub>ЦТП</sub> Данный показатель информирует о тепловых
+                                                    потерях на распределительных сетях.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т41<sub>потр</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_{О\_В}}={T41_{потр}-T41_{ЦТП}\over T41_{потр}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kyvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesV/K_u_v.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Утечка в системе вентиляции
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{У\_В}\&#160;}\lbrackтонн\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Анализ осуществляется по результатам измерений на выходе ТП.
+                                                    Анализ осуществляется только в том случае, когда выполняются
+                                                    условия: температура теплоносителя в подающем трубопроводе
+                                                    соответствующей системы больше 40 ⁰С и в одни из анализируемых
+                                                    суток не было планового отключения данной системы.
+                                                </div>
+                                                \[\mathrm{К_{У\_В}=G31_i-G31_{i-1}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G31<sub>i</sub> - суточный расход воды в подающем
+                                                    трубопроводе вентиляции в анализируемые сутки;
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G31<sub>i-1</sub> - суточный расход воды в подающем трубопроводе
+                                                    вентиляции в предыдущие относительно анализируемых суток.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:KdQvent" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesV/K_dq_v.jpg" library="normIndicators"/>
+                                            <div style="width: 490px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Расход тепла в системе вентиляции
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; Q\_{В}}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактического значения потребляемой тепловой
+                                                    нагрузки для каждого потребителя
+                                                    Q<span class="supsub"><sup>факт</sup><sub>В</sub></span>
+                                                    с нормативным значением
+                                                    Q<span class="supsub"><sup>корр</sup><sub>В</sub></span>
+                                                    (по фактической температуре наружного воздуха полигона,
+                                                    к которому относится ТП).
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно
+                                                    Q<span class="supsub"><sup>корр</sup><sub>В</sub></span>
+                                                </div>
+                                                \[\mathrm{К_{&#916; Q\_В}={Q_{В}^{корр}-Q_{В}^{факт}\over Q_{В}^{корр}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -563,7 +928,8 @@
                                                  editable="#{systemParamsUtil.write}" editMode="cell"
                                                  emptyMessage="#{global['table.empty.value']}">
 
-                                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}" />
+                                        <p:ajax event="cellEdit" listener="#{normIndicators.onCellEdit}"
+                                                update="normIndicators:GVS_kgvs"/>
 
                                         <p:column id="Kdtgvs" style="text-align: center;">
                                             <p:cellEditor disabled="#{!systemParamsUtil.write}">
@@ -667,25 +1033,124 @@
 
                                     <h:panelGroup id="borderValuesGVSTooltip" layout="block">
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtgvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/K_dt_gvs.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в подаче ГВС
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_ГВС}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур горячей
+                                                    воды в подающем трубопроводе на входе у каждого потребителя
+                                                    Т7<sub>потр</sub> с фактическим значением на выходе из
+                                                    теплового пункта Т7<sub>ЦТП</sub>. Данный показатель информирует о
+                                                    тепловых потерях на распределительных сетях и уровне циркуляции
+                                                    для каждой системы ГВС.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т7<sub>ЦТП</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_ГВС}={T7_{ЦТП} - T7_{потр}\over T7_{ЦТП}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtogvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/K_dt_o_gvs.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Тепловая потеря в обратке ГВС
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{&#916; T\_{О\_ГВС}}\&#160;}\lbrack\&#37;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температур горячей
+                                                    воды в обратном трубопроводе на выходе у каждого потребителя
+                                                    Т13<sub>потр</sub> с фактическим значением на входе в
+                                                    тепловой пункт Т13<sub>ЦТП</sub>. Данный показатель информирует о
+                                                    тепловых потерях на распределительных сетях и уровне циркуляции
+                                                    для каждой системы ГВС.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Показатель рассчитывается в % относительно Т13<sub>потр</sub>
+                                                </div>
+                                                \[\mathrm{К_{&#916; T\_{О\_ГВС}}={T13_{потр}-T13_{ЦТП}\over T13_{потр}}*100\&#37;}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kygvs" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/K_u_gvs.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Утечка в системе ГВС
+                                                </h4>
+                                                \[\mathrm {\mathbf{К_{У\_ГВС}\&#160;}\lbrackтонн\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Анализ осуществляется по результатам измерений на выходе ТП.
+                                                    Анализ проводится при условии нахождения температуры подачи
+                                                    ГВС Т7 на ТП в заданных технологом границах (состоянии «Норма»).
+                                                </div>
+                                                \[\mathrm{К_{У\_ГВС}=G7_i-G7_{i-1}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G7<sub>i</sub> - суточный расход воды в подающем
+                                                    трубопроводе ГВС в анализируемые сутки;
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    G7<sub>i-1</sub> - суточный расход воды в подающем трубопроводе
+                                                    ГВС в предыдущие относительно анализируемых суток.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:dtr" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/dT_gvs.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Рассогласование температурного перепада в системе ГВС
+                                                </h4>
+                                                \[\mathrm{\mathbf{&#916; T_{ГВС}\&#160;}\lbrack &#8451;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Сравнение (отклонение) фактических значений температурных перепадов
+                                                    горячей воды у каждого ТП и потребителя ΔТ=Т7–Т13 с нормативным
+                                                    температурным перепадом ΔТ (определено в паспорте каждого объекта)
+                                                    с учетом заданного рассогласования. Данный показатель информирует о
+                                                    качестве работы внутренней системы ГВС и наличии разбалансировки
+                                                    тепловой сети и (или) внутренней системы ГВС.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:dt7" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/dT7.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Потери по температуре
+                                                </h4>
+                                                \[\mathrm{\mathbf{&#916; T7\&#160;}\lbrack &#8451;\rbrack}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Разница температур горячей воды на выходе из теплового пункта и
+                                                    на входе присоединённого строения.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:t7" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/T7_norm.jpg" library="normIndicators"/>
+                                            <div style="width: 340px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Нормативное значение температуры ГВС
+                                                </h4>
+                                                \[\mathrm{\mathbf{T7_{НОРМ}\&#160;}\lbrack &#8451;\rbrack}\]
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kgvs" position="left" showDelay="500">
-                                            <p:graphicImage name="tooltip/borderValuesGvs/K_gvs.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Коэффициент допустимого отклонения давления ГВС
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Посредством анализа динамики изменения параметров P7 и P13
+                                                    возможно выявлять повреждения и утечки в системе ГВС
+                                                </div>
+                                                \[\mathrm{P7\leq  {{(P7_{i-1}+P7_{i-2}+P7_{i-3})}*K_{ГВС}\over 3}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    или
+                                                </div>
+                                                \[\mathrm{P13\leq  {{(P13_{i-1}+P13_{i-2}+P13_{i-3})}*K_{ГВС}\over 3}}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    K<sub>ГВС</sub>=
+                                                    <p:outputLabel id="GVS_kgvs" value="#{normIndicators.indicatorBorderGvsList.get(0).kgvs}"/>
+                                                    – коэффициент допустимого отклонения давления, заданный
+                                                    в справочнике «Нормативные значения показателей».
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -793,29 +1258,55 @@
                                     </p:dataTable>
 
                                     <h:panelGroup id="underSupplyValuesTooltip" layout="block">
-                                        <p:tooltip for="normIndicators:underSupplyValues:T3" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/T3.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T3K1" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t3/K1.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T3K2" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t3/K2.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T3K3" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t3/K3.jpg" library="normIndicators"/>
+                                        <p:tooltip for="normIndicators:underSupplyValues:T3" position="right" showDelay="500">
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Недоотпуск по Т3 [°C]
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Занижение температуры в подающем трубопроводе в системе ЦО
+                                                </div>
+                                                \[\mathrm{T3\leq T3_{ГР}-T3_{ГР}*K_i}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Т3<sub>гр</sub> – Температура в подающем трубопроводе,
+                                                    соответствующая текущим климатическим условиям.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Ki – коэффициент установленного отклонения.
+                                                </div>
+                                                <h4 style="text-align: center;">
+                                                    Перерасход по Т4 [°C]
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Перерасход тепловой энергии в обратном трубопроводе в системе ЦО
+                                                </div>
+                                                \[\mathrm{T4\leq T4_{ГР}-T4_{ГР}*K_i}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Т4<sub>гр</sub> - Температура в циркуляционном трубопроводе,
+                                                    соответствующая текущим климатическим условиям.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Ki – коэффициент установленного отклонения.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:underSupplyValues:T4" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/T4.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T4K1" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t4/K1.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T4K2" position="bottom" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t4/K2.jpg" library="normIndicators"/>
-                                        </p:tooltip>
-                                        <p:tooltip for="normIndicators:underSupplyValues:T4K3" position="left" showDelay="500">
-                                            <p:graphicImage name="tooltip/analyzeCo/t4/K3.jpg" library="normIndicators"/>
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Недосъем по Т4 [°C]
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Недосъём тепловой энергии в обратном трубопроводе в системе ЦО
+                                                </div>
+                                                \[\mathrm{T4\geq T4_{ГР}+T4_{ГР}*K_i}\]
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Т4<sub>гр</sub> - Температура в циркуляционном трубопроводе,
+                                                    соответствующая текущим климатическим условиям.
+                                                </div>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    Ki – коэффициент установленного отклонения.
+                                                </div>
+                                            </div>
                                         </p:tooltip>
                                     </h:panelGroup>
                                 </div>
@@ -892,16 +1383,54 @@
 
                                             <h:panelGroup id="consumerAnalisisT7TableTooltip" layout="block">
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7ming" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_min_g.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Минимальная температура горячей воды на выходе из теплового
+                                                            пункта и на входе присоединённого строения, в соответствии с
+                                                            назначением категории данного строения, указанного в паспорте объекта.
+                                                        </div>
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Литера «Ж» обозначает категорию «Жилье».
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxg" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_max_g.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Максимальная температура горячей воды на выходе из теплового
+                                                            пункта и на входе присоединённого строения, в соответствии с
+                                                            назначением категории данного строения, указанного в паспорте объекта.
+                                                        </div>
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Литера «Ж» обозначает категорию «Жилье».
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7minp" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_min_p.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Минимальная температура горячей воды на выходе из теплового
+                                                            пункта и на входе присоединённого строения, в соответствии с
+                                                            назначением категории данного строения, указанного в паспорте объекта.
+                                                        </div>
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Литера «П» обозначает категорию «Прочее», которая может
+                                                            включать в себя различные назначения строений – например, «бюджет».
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisT7Table:T7maxp" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/T7_max_p.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Максимальная температура горячей воды на выходе из теплового
+                                                            пункта и на входе присоединённого строения, в соответствии с
+                                                            назначением категории данного строения, указанного в паспорте объекта.
+                                                        </div>
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Литера «П» обозначает категорию «Прочее», которая может
+                                                            включать в себя различные назначения строений – например, «бюджет».
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                             </h:panelGroup>
                                         </div>
@@ -957,13 +1486,28 @@
 
                                             <h:panelGroup id="consumerAnalisisDeltaT7TableTooltip" layout="block">
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmin" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_min.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Минимальная разница температур горячей воды на выходе из
+                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmax" position="bottom" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_max.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Максимальная разница температур горячей воды на выходе из
+                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tnorm" position="left" showDelay="500">
-                                                    <p:graphicImage name="tooltip/analyzeGvs/dT_norm.jpg" library="normIndicators"/>
+                                                    <div style="width: 480px; padding: 5px;">
+                                                        <div style="text-indent: 20px; text-align: justify;">
+                                                            Нормативная разница температур горячей воды на выходе из
+                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                        </div>
+                                                    </div>
                                                 </p:tooltip>
                                             </h:panelGroup>
                                         </div>
