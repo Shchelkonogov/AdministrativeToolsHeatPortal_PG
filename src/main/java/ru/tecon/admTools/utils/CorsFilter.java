@@ -32,7 +32,15 @@ import java.util.List;
  * @author Maksim Shchelkonogov
  * 30.09.2024
  */
-@WebFilter(urlPatterns = "/linker/report")
+@WebFilter(
+        urlPatterns = {
+                "/linker/report",
+                "/specificModel/report/modeMap",
+                "/specificModel/report/modeControl",
+                "/specificModel/report/technicalLimitsChangeReport",
+                "/ecoSpecificModel/report/technicalLimitsChangeReport"
+        }
+)
 public class CorsFilter implements Filter {
 
     public static final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";
