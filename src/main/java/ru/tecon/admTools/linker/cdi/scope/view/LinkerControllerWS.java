@@ -32,11 +32,13 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
@@ -1542,9 +1544,20 @@ public class LinkerControllerWS implements Serializable {
     }
 
     public void openReport() {
-        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        openReport(selectedLinkedObjectId);
+    }
 
-        PrimeFaces.current().executeScript("window.open('" + contextPath + "/linker/report?objectId=" + selectedLinkedObjectId + "', '_blank').focus();");
+    public void openReport(int id) {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        String contextPath = externalContext.getRequestContextPath();
+
+        if (inIframe) {
+            HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
+            String url = request.getScheme() + "://" + request.getLocalAddr() + ":" + request.getLocalPort() + contextPath + "/linker/report?objectId=" + id;
+            PrimeFaces.current().executeScript("window.parent.postMessage({fileUrl: '" + url + "'}, '*');");
+        } else {
+            PrimeFaces.current().executeScript("window.open('" + contextPath + "/linker/report?objectId=" + id + "', '_blank').focus();");
+        }
     }
 
     public String getFullObjectName() {

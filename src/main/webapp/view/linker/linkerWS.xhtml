@@ -397,7 +397,7 @@
                                 <wordStyle:customToolbarDropdown id="linkReports" text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
                                                                  disabled="#{linkerControllerWS.disableLinksBtn}" icon="fa fa-clone">
                                     <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
-                                                     onclick="window.open('#{request.contextPath}/linker/report?objectId=#{linkerControllerWS.selectedLinkedData.dbObject.id}', '_blank').focus();"
+                                                     action="#{linkerControllerWS.openReport(linkerControllerWS.selectedLinkedData.dbObject.id)}"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
@@ -589,12 +589,13 @@
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
-                                <wordStyle:customToolbarDropdown text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
+                                <wordStyle:customToolbarDropdown id="linkReports_1" text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
                                                                  icon="fa fa-clone">
                                     <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
                                                      action="#{linkerControllerWS.openReport}"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
-                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                                     style="width: 100%; text-align: initial; color: #000;"
+                                                     update="linkerForm:linkerTabView:objectTabView:linkReports_1" />
                                 </wordStyle:customToolbarDropdown>
                             </div>
                         </div>
@@ -811,12 +812,13 @@
                                                      style="width: 100%; text-align: initial; color: #000;" />
                                 </wordStyle:customToolbarDropdown>
                                 <wordStyle:customToolbarButton text="График" icon="fa fa-bar-chart"/>
-                                <wordStyle:customToolbarDropdown text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
+                                <wordStyle:customToolbarDropdown id="linkReports_2" text="Отчет" value="#{linkerControllerWS.reportList}" var="report"
                                                                  icon="fa fa-clone">
                                     <p:commandButton icon="pi pi-file-excel" value="Отчет по линковке"
                                                      action="#{linkerControllerWS.openReport}"
                                                      styleClass="ui-button-flat ui-button-plain tc-no-loading"
-                                                     style="width: 100%; text-align: initial; color: #000;" />
+                                                     style="width: 100%; text-align: initial; color: #000;"
+                                                     update="linkerForm:linkerTabView:objectTabView:linkReports_2"/>
                                 </wordStyle:customToolbarDropdown>
                             </div>
                         </div>
