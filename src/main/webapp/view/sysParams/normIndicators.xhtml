@@ -194,11 +194,11 @@
                                                     </h4>
                                                         \[\mathrm{\mathbf{К_{П\_Н}}\&#160;\lbrack\&#37;\rbrack}\]
                                                     <div style="text-indent: 20px; text-align: justify;">
-                                                        Изменение текущей подпитки по отношению к средней
-                                                        (рассчитанной на основе измерений за выбранный
-                                                        интервал времени) в процентах:
+                                                        Изменение текущего коэффициента подпитки по отношению к
+                                                        среднему коэффициенту подпитки (рассчитанного на основе
+                                                        измерений за выбранный интервал времени) в процентах:
                                                     </div>
-                                                        \[\mathrm{{K_{П\_Н}}={G_П-G_{П\_СР}\over G_{П\_СР}}*100}\]
+                                                    \[\mathrm{{K_{П\_Н}}= {K_{П\_ТВ}-K_{П\_ТВ}^{ср}\over K_{П\_ТВ}^{ср}}*100}\]
                                                 </div>
                                             </p:tooltip>
                                             <p:tooltip for="normIndicators:indicatorTVTable:KzTv" position="bottom" showDelay="500">
@@ -225,7 +225,7 @@
                                                         циркулирующего в закрытых (с полным возвратом теплоносителя)
                                                         теплосистемах на выходе ТП (отопление, вентиляция):
                                                     </div>
-                                                    \[\mathrm{{К_{П\_ТВ}}={G_П\over \sum (G3 + G31)}*100\&#37;}\]
+                                                    \[\mathrm{{К_{П\_ТВ}}={G_П\over \sum (G3 + G31)}*100}\]
                                                     <div style="text-indent: 20px; text-align: justify;">
                                                         где G<sub>п</sub> - среднесуточная величина подпитки.
                                                         Может быть определена по суточной массе теплоносителя,
@@ -238,7 +238,7 @@
                                                         В случае отсутствия таких измерений, коэффициент подпитки
                                                         рассчитывается на основании показаний со счетчика на тепловом вводе ТП.
                                                     </div>
-                                                    \[\mathrm{{K_{П\_ТВ}}= {G_П\over G1}*100\&#37;}\]
+                                                    \[\mathrm{{K_{П\_ТВ}}= {G_П\over G1}*100}\]
                                                 </div>
                                             </p:tooltip>
                                         </h:panelGroup>
@@ -312,7 +312,7 @@
                                                         основании приборного учета по выходу ТП к массе циркуляции
                                                         теплоносителя в системе ЦО:
                                                     </div>
-                                                    \[\mathrm{{К_{П\_ЦО}}={G3 - G4\over G3}*100\&#37;}\]
+                                                    \[\mathrm{{К_{П\_ЦО}}={G3 - G4\over G3}*100}\]
                                                 </div>
                                             </p:tooltip>
                                         </h:panelGroup>
@@ -362,12 +362,12 @@
                                                         для предоставления услуги ГВС). Если есть водосчетчик
                                                         подпитки ГВС из системы ХВС:
                                                     </div>
-                                                    \[\mathrm{К_Ц={G_П\over G7}*100\&#37;}\]
+                                                    \[\mathrm{К_Ц={G_П\over G7}*100}\]
                                                     <div style="text-indent: 20px; text-align: justify;">
                                                         Если есть двухпоточный счетчик, измеряющий расход на
                                                         подающем и циркуляционном трубопроводах:
                                                     </div>
-                                                    \[\mathrm{К_Ц={G13\over G7}*100\&#37;}\]
+                                                    \[\mathrm{К_Ц={G13\over G7}*100}\]
                                                     <div style="text-indent: 20px; text-align: justify;">
                                                         Данный коэффициент определяется как для ТП, так и
                                                         для потребителей, подключенных к данному ТП.
@@ -387,7 +387,7 @@
                                                     <div style="text-indent: 20px; text-align: justify;">
                                                         В этом случае расчет производится по следующей формуле:
                                                     </div>
-                                                    \[\mathrm{K_Ц= {Q_{ТВ\_ноч}\over Q_{ТВ\_сут}}*100\&#37;}\]
+                                                    \[\mathrm{K_Ц= {Q_{ТВ\_ноч}\over Q_{ТВ\_сут}}*100}\]
                                                     <div style="text-indent: 20px; text-align: justify;">
                                                         Q<sub>ТВ_ноч</sub> тепловая энергия, зафиксированная
                                                         счетчиком на ТВ ТП в промежутке с 00:00 по 04:59
@@ -476,7 +476,7 @@
                                                         Отношение массы подпитки теплоносителя к массе теплоносителя,
                                                         циркулирующего в системе вентиляции:
                                                     </div>
-                                                    \[\mathrm{К_{П\_В}={G31 - G41\over G31}*100\&#37;}\]
+                                                    \[\mathrm{К_{П\_В}={G31 - G41\over G31}*100}\]
                                                 </div>
                                             </p:tooltip>
                                         </h:panelGroup>
@@ -626,7 +626,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т3<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_ЦО}={T3_{ЦТП} - T3_{потр}\over T3_{ЦТП}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_ЦО}={T3_{ЦТП} - T3_{потр}\over T3_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtoco" position="bottom" showDelay="500">
@@ -644,7 +644,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т4<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_ЦО}}={T4_{потр}-T4_{ЦТП}\over T4_{потр}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_ЦО}}={T4_{потр}-T4_{ЦТП}\over T4_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kyco" position="bottom" showDelay="500">
@@ -689,7 +689,7 @@
                                                     Показатель рассчитывается в % относительно
                                                     Q<span class="supsub"><sup>корр</sup><sub>ЦО</sub></span>
                                                 </div>
-                                                \[\mathrm{К_{&#916; Q\_ЦО}={Q_{ЦО}^{корр}-Q_{ЦО}^{факт}\over Q_{ЦО}^{корр}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; Q\_ЦО}={Q_{ЦО}^{корр}-Q_{ЦО}^{факт}\over Q_{ЦО}^{корр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kco" position="bottom" showDelay="500">
@@ -721,7 +721,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Оценивается коэффициент недоотпуска К1:
                                                 </div>
-                                                \[\mathrm{K1={|T3 - T3_{min}|\over T3_{min}}*100\&#37;}\]
+                                                \[\mathrm{K1={|T3 - T3_{min}|\over T3_{min}}*100}\]
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     При выполнении условий:
                                                 </div>
@@ -743,7 +743,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Оценивается коэффициент перетопа К2:
                                                 </div>
-                                                \[\mathrm{K2={|T4 - T4_{min}|\over T4_{min}}*100\&#37;}\]
+                                                \[\mathrm{K2={|T4 - T4_{min}|\over T4_{min}}*100}\]
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     При выполнении условий:
                                                 </div>
@@ -848,7 +848,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т31<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_В}={T31_{ЦТП} - T31_{потр}\over T31_{ЦТП}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_В}={T31_{ЦТП} - T31_{потр}\over T31_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtovent" position="bottom" showDelay="500">
@@ -867,7 +867,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т41<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_В}}={T41_{потр}-T41_{ЦТП}\over T41_{потр}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_В}}={T41_{потр}-T41_{ЦТП}\over T41_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kyvent" position="bottom" showDelay="500">
@@ -913,7 +913,7 @@
                                                     Показатель рассчитывается в % относительно
                                                     Q<span class="supsub"><sup>корр</sup><sub>В</sub></span>
                                                 </div>
-                                                \[\mathrm{К_{&#916; Q\_В}={Q_{В}^{корр}-Q_{В}^{факт}\over Q_{В}^{корр}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; Q\_В}={Q_{В}^{корр}-Q_{В}^{факт}\over Q_{В}^{корр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                     </h:panelGroup>
@@ -1048,7 +1048,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т7<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_ГВС}={T7_{ЦТП} - T7_{потр}\over T7_{ЦТП}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_ГВС}={T7_{ЦТП} - T7_{потр}\over T7_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtogvs" position="bottom" showDelay="500">
@@ -1068,7 +1068,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т13<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_ГВС}}={T13_{потр}-T13_{ЦТП}\over T13_{потр}}*100\&#37;}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_ГВС}}={T13_{потр}-T13_{ЦТП}\over T13_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kygvs" position="bottom" showDelay="500">
