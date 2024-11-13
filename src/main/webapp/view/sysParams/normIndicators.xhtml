@@ -975,7 +975,7 @@
                                         <p:column id="dtr" style="text-align: center;">
                                             <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                 <f:facet name="output">
-                                                    <h:outputText value="#{borderValuesGVS.dt}"/>
+                                                    <h:outputText value="≥#{borderValuesGVS.dt}"/>
                                                 </f:facet>
                                                 <f:facet name="input">
                                                     <p:inputNumber value="#{borderValuesGVS.dt}" decimalPlaces="2"/>
@@ -1473,7 +1473,7 @@
                                                 <p:column style="text-align: center;">
                                                     <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                         <f:facet name="output">
-                                                            <h:outputText value="#{dT7.dtNorm}"/>
+                                                            <h:outputText value="≥#{dT7.dtNorm}"/>
                                                         </f:facet>
                                                         <f:facet name="input">
                                                             <p:inputNumber value="#{dT7.dtNorm}" decimalPlaces="2"/>
@@ -1486,24 +1486,21 @@
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmin" position="bottom" showDelay="500">
                                                     <div style="width: 480px; padding: 5px;">
                                                         <div style="text-indent: 20px; text-align: justify;">
-                                                            Минимальная разница температур горячей воды на выходе из
-                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                            Минимальное значение разности температур (Т7-Т13) для потребителей категории "жилье"
                                                         </div>
                                                     </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tmax" position="bottom" showDelay="500">
                                                     <div style="width: 480px; padding: 5px;">
                                                         <div style="text-indent: 20px; text-align: justify;">
-                                                            Максимальная разница температур горячей воды на выходе из
-                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                            Максимальное значение разности температур (Т7-Т13) для потребителей категории "жилье"
                                                         </div>
                                                     </div>
                                                 </p:tooltip>
                                                 <p:tooltip for="normIndicators:consumerAnalisisDeltaT7Table:Tnorm" position="left" showDelay="500">
                                                     <div style="width: 480px; padding: 5px;">
                                                         <div style="text-indent: 20px; text-align: justify;">
-                                                            Нормативная разница температур горячей воды на выходе из
-                                                            теплового пункта Т7 и на входе присоединённого строения.
+                                                            Значение разности температур (Т7-Т13) для потребителей категории "прочее"
                                                         </div>
                                                     </div>
                                                 </p:tooltip>
