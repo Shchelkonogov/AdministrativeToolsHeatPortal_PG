@@ -1,5 +1,11 @@
 package ru.tecon.admTools.components.navigation;
 
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.NamingContainer;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.component.UINamingContainer;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AjaxBehaviorEvent;
 import org.primefaces.PrimeFaces;
 import org.primefaces.component.inputtext.InputText;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
@@ -12,12 +18,6 @@ import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController
 import ru.tecon.admTools.systemParams.model.ObjectType;
 import ru.tecon.admTools.utils.AdmTools;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.NamingContainer;
-import javax.faces.component.UIComponentBase;
-import javax.faces.component.UINamingContainer;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,9 @@
 package ru.tecon.admTools.linker.report;
 
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

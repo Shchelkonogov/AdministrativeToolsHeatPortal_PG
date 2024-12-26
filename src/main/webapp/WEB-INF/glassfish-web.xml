@@ -2,18 +2,20 @@
 <!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Servlet 3.0//EN"
     "http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
 <glassfish-web-app>
+    <session-config>
+        <cookie-properties>
+            <property name="cookieName" value="JSESSIONID"/>
+            <property name="cookieSecure" value="true"/>
+            <property name="cookieHttpOnly" value="true"/>
+            <property name="cookiePath" value="admTools"/>
+            <property name="cookieSameSite" value="None"/>
+        </cookie-properties>
+    </session-config>
+
     <resource-ref>
         <res-ref-name>jdbc/DataSource</res-ref-name>
         <jndi-name>jdbc/PostgresDataSource</jndi-name>
     </resource-ref>
-    <class-loader delegate="false"/>
 
-    <session-config>
-        <cookie-properties>
-            <property name="cookieName" value="SID"/>
-            <property name="cookieSecure" value="true"/>
-            <property name="cookieHttpOnly" value="true"/>
-            <property name="cookiePath" value="admTools;SameSite=none"/>
-        </cookie-properties>
-    </session-config>
+    <class-loader delegate="false"/>
 </glassfish-web-app>

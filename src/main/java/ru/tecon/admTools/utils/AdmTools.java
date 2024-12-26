@@ -1,8 +1,8 @@
 package ru.tecon.admTools.utils;
 
+import jakarta.faces.context.FacesContext;
 import org.postgresql.util.PSQLException;
 
-import javax.faces.context.FacesContext;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.sql.SQLException;

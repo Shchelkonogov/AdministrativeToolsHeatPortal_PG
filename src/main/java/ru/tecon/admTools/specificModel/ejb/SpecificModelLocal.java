@@ -1,10 +1,10 @@
 package ru.tecon.admTools.specificModel.ejb;
 
+import jakarta.ejb.Local;
 import ru.tecon.admTools.specificModel.model.*;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
 import ru.tecon.admTools.systemParams.SystemParamException;
 
-import javax.ejb.Local;
 import java.util.List;
 
 /**

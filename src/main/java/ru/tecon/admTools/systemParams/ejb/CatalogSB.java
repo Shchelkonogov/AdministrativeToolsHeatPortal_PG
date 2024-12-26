@@ -1,11 +1,14 @@
 package ru.tecon.admTools.systemParams.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogProp;
 import ru.tecon.admTools.systemParams.model.catalog.CatalogType;
 
-import javax.annotation.Resource;
-import javax.ejb.*;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;

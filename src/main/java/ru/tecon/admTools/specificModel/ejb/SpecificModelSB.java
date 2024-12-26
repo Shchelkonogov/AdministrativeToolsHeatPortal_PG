@@ -1,17 +1,17 @@
 package ru.tecon.admTools.specificModel.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
+import jakarta.inject.Inject;
 import ru.tecon.admTools.specificModel.model.*;
 import ru.tecon.admTools.specificModel.model.additionalModel.AnalogData;
 import ru.tecon.admTools.specificModel.model.additionalModel.EnumerateData;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.utils.AdmTools;
 
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;

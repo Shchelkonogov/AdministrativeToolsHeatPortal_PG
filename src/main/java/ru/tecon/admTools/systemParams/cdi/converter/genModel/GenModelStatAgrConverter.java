@@ -1,20 +1,19 @@
 package ru.tecon.admTools.systemParams.cdi.converter.genModel;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 import ru.tecon.admTools.systemParams.cdi.GenModelMB;
 import ru.tecon.admTools.systemParams.model.statAggr.StatAggrTable;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 /**
  * Конвертер для выбора типа объекта
  * @author Aleksey Sergeev
  */
 @FacesConverter("genModelStatAgrConverter")
-public class GenModelStatAgrConverter implements Converter {
+public class GenModelStatAgrConverter implements Converter<Object> {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

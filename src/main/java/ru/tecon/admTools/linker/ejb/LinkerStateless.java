@@ -1,12 +1,12 @@
 package ru.tecon.admTools.linker.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.*;
+import jakarta.inject.Inject;
 import ru.tecon.admTools.linker.model.*;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.utils.AdmTools;
 
-import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;

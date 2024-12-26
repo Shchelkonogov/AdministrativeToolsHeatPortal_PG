@@ -1,12 +1,12 @@
 package ru.tecon.admTools.specificModel.report.servlet.changeRangesReport;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 import ru.tecon.admTools.specificModel.report.ChangeRanges;
 import ru.tecon.admTools.specificModel.report.ejb.ChangeRangesLocal;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;

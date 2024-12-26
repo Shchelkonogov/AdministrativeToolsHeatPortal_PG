@@ -1,11 +1,11 @@
 package ru.tecon.admTools.specificModel.cdi;
 
+import jakarta.ejb.EJB;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
 import ru.tecon.admTools.specificModel.ejb.SpecificModelLocal;
 import ru.tecon.admTools.specificModel.model.ParamHistory;
 
-import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 

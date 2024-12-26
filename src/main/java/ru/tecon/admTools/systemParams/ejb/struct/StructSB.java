@@ -1,11 +1,11 @@
 package ru.tecon.admTools.systemParams.ejb.struct;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.*;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
-import javax.annotation.Resource;
-import javax.ejb.*;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;

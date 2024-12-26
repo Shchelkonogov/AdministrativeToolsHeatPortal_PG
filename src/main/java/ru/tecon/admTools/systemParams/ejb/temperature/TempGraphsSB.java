@@ -1,12 +1,12 @@
 package ru.tecon.admTools.systemParams.ejb.temperature;
 
+import jakarta.ejb.EJB;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.temperature.Temperature;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureProp;
 
-import javax.ejb.EJB;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
 import java.util.List;
 
 /**

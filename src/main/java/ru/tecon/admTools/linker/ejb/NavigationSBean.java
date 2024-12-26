@@ -1,14 +1,14 @@
 package ru.tecon.admTools.linker.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import ru.tecon.admTools.components.navigation.ejb.NavigationBeanLocal;
 import ru.tecon.admTools.components.navigation.model.ObjTypePropertyModel;
 import ru.tecon.admTools.components.navigation.model.TreeNodeModel;
 import ru.tecon.admTools.utils.AlphaNumComparator;
 
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

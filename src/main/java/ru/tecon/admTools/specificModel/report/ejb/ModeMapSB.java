@@ -1,9 +1,10 @@
 package ru.tecon.admTools.specificModel.report.ejb;
 
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Startup;
-import javax.ejb.Stateless;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import jakarta.ejb.Startup;
+import jakarta.ejb.Stateless;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

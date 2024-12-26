@@ -1,9 +1,9 @@
 package ru.tecon.admTools.components.navigation.ejb;
 
+import jakarta.ejb.Local;
 import ru.tecon.admTools.components.navigation.model.ObjTypePropertyModel;
 import ru.tecon.admTools.components.navigation.model.TreeNodeModel;
 
-import javax.ejb.Local;
 import java.util.List;
 
 /**

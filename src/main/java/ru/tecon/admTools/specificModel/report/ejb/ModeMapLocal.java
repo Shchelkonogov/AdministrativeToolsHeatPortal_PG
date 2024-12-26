@@ -1,6 +1,7 @@
 package ru.tecon.admTools.specificModel.report.ejb;
 
-import javax.ejb.Local;
+import jakarta.ejb.Local;
+
 import java.util.List;
 import java.util.Map;
 

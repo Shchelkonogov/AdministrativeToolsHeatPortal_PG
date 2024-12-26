@@ -1,16 +1,16 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.StructType;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

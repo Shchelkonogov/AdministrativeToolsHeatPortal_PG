@@ -1,20 +1,19 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 import ru.tecon.admTools.systemParams.cdi.scope.application.MeasureController;
 import ru.tecon.admTools.systemParams.model.Measure;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 /**
  * Конвертер для единиц измерений свойств структур
  * @author Maksim Shchelkonogov
  */
 @FacesConverter("measureConverter")
-public class MeasureConverter implements Converter {
+public class MeasureConverter implements Converter<Object> {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

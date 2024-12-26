@@ -1,7 +1,8 @@
 package ru.tecon.admTools.systemParams;
 
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+
 import java.util.logging.Logger;
 
 /**

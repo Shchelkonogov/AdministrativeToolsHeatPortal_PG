@@ -1,13 +1,13 @@
 package ru.tecon.admTools.systemParams.cdi;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.primefaces.PrimeFaces;
 import ru.tecon.admTools.systemParams.model.SystemParamsCategories;
 import ru.tecon.admTools.utils.AdmTools;
 
-import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;

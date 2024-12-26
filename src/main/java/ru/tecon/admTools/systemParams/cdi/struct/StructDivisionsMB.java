@@ -1,12 +1,12 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Named;
 import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
 import java.io.Serializable;
 
 /**

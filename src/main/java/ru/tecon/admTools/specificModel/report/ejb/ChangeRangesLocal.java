@@ -1,8 +1,8 @@
 package ru.tecon.admTools.specificModel.report.ejb;
 
+import jakarta.ejb.Local;
 import ru.tecon.admTools.specificModel.report.model.ChangeRangesModel;
 
-import javax.ejb.Local;
 import java.util.List;
 
 /**

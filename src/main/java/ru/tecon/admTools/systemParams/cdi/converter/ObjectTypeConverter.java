@@ -1,13 +1,12 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 import ru.tecon.admTools.systemParams.cdi.scope.application.ObjectTypeController;
 import ru.tecon.admTools.systemParams.model.ObjectType;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 /**
  * Конвертер для выбора типа объекта
@@ -15,7 +14,7 @@ import javax.faces.convert.FacesConverter;
  * @author Maksim Shchelkonogov
  */
 @FacesConverter("objectTypeConverter")
-public class ObjectTypeConverter implements Converter {
+public class ObjectTypeConverter implements Converter<Object> {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

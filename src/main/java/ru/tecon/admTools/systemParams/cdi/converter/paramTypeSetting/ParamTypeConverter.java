@@ -1,20 +1,19 @@
 package ru.tecon.admTools.systemParams.cdi.converter.paramTypeSetting;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 import ru.tecon.admTools.systemParams.cdi.ParamTypeSettingMB;
 import ru.tecon.admTools.systemParams.model.paramTypeSetting.ParamType;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 /**
  * @author Maksim Shchelkonogov
  * 01.03.2023
  */
 @FacesConverter("paramTypeConverter")
-public class ParamTypeConverter implements Converter {
+public class ParamTypeConverter implements Converter<Object> {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

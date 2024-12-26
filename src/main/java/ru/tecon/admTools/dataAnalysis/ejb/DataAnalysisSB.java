@@ -1,10 +1,10 @@
 package ru.tecon.admTools.dataAnalysis.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import ru.tecon.admTools.dataAnalysis.model.Criterion;
 
-import javax.annotation.Resource;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

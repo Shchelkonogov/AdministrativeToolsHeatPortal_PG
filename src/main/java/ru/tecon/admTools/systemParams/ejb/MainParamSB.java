@@ -1,13 +1,13 @@
 package ru.tecon.admTools.systemParams.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.mainParam.MPTable;
 import ru.tecon.admTools.systemParams.model.mainParam.TechProc;
 import ru.tecon.admTools.systemParams.model.mainParam.TechProcParam;
 
-import javax.annotation.Resource;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

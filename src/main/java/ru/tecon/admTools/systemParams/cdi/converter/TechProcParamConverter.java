@@ -1,20 +1,19 @@
 package ru.tecon.admTools.systemParams.cdi.converter;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 import ru.tecon.admTools.systemParams.cdi.MainParamMB;
 import ru.tecon.admTools.systemParams.model.mainParam.TechProcParam;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 /**
  * Конвертер для выбора параметров техпроцесса
  * @author Aleksey Sergeev
  */
 @FacesConverter("parametrsTypeConverter")
-public class TechProcParamConverter implements Converter {
+public class TechProcParamConverter implements Converter<Object> {
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         ValueExpression vex = context.getApplication().getExpressionFactory()

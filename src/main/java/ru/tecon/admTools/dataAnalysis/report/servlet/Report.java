@@ -1,5 +1,9 @@
 package ru.tecon.admTools.dataAnalysis.report.servlet;
 
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -8,13 +12,8 @@ import ru.tecon.admTools.dataAnalysis.report.ejb.DataAnalysisReportSB;
 import ru.tecon.admTools.dataAnalysis.report.model.ReportRequestModel;
 import ru.tecon.admTools.specificModel.ejb.CheckUserSB;
 
-import javax.ejb.EJB;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;

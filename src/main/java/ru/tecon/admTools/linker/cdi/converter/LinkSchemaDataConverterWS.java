@@ -1,12 +1,11 @@
 package ru.tecon.admTools.linker.cdi.converter;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
 import ru.tecon.admTools.linker.cdi.scope.view.LinkerControllerWS;
 import ru.tecon.admTools.linker.model.OpcObjectForLinkData;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
 
 /**
  * Конвертер для определения id для таблицы в окне схемы линковки "Нелинкованные объекты"
@@ -14,7 +13,7 @@ import javax.faces.convert.Converter;
  * @author Maksim Shchelkonogov
  * 02.08.2023
  */
-public class LinkSchemaDataConverterWS implements Converter {
+public class LinkSchemaDataConverterWS implements Converter<Object> {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

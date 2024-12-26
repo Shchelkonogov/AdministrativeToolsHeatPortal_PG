@@ -1,5 +1,8 @@
 package ru.tecon.admTools.systemParams.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.*;
+import jakarta.inject.Inject;
 import org.postgresql.util.PGobject;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.ejb.temperature.TemperatureLocal;
@@ -10,9 +13,6 @@ import ru.tecon.admTools.systemParams.model.statAggr.StatAggrTable;
 import ru.tecon.admTools.systemParams.model.temperature.TemperatureStatus;
 import ru.tecon.admTools.utils.AdmTools;
 
-import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;

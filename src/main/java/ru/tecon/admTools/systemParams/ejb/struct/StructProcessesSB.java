@@ -1,12 +1,14 @@
 package ru.tecon.admTools.systemParams.ejb.struct;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.Measure;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
-import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

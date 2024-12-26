@@ -1,10 +1,12 @@
 package ru.tecon.admTools.systemParams.ejb.struct;
 
+import jakarta.ejb.EJB;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.systemParams.model.struct.StructType;
 import ru.tecon.admTools.systemParams.model.struct.StructTypeProp;
 
-import javax.ejb.*;
 import java.util.ArrayList;
 import java.util.List;
 

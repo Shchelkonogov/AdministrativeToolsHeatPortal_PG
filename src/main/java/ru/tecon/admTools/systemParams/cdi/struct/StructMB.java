@@ -1,5 +1,10 @@
 package ru.tecon.admTools.systemParams.cdi.struct;
 
+import jakarta.ejb.EJB;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AjaxBehaviorEvent;
+import jakarta.inject.Inject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -12,11 +17,6 @@ import ru.tecon.admTools.systemParams.ejb.struct.StructCurrentLocal;
 import ru.tecon.admTools.systemParams.ejb.struct.StructSB;
 import ru.tecon.admTools.systemParams.model.struct.*;
 
-import javax.ejb.EJB;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

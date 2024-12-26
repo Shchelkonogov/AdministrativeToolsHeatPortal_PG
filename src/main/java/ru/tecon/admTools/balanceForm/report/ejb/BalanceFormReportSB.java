@@ -1,12 +1,12 @@
 package ru.tecon.admTools.balanceForm.report.ejb;
 
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
 import ru.tecon.admTools.balanceForm.report.model.CellValue;
 import ru.tecon.admTools.balanceForm.report.model.ConsumerModel;
 import ru.tecon.admTools.balanceForm.report.model.DataModel;
 
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

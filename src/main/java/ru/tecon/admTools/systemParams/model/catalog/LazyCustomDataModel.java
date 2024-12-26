@@ -1,5 +1,6 @@
 package ru.tecon.admTools.systemParams.model.catalog;
 
+import jakarta.faces.context.FacesContext;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
@@ -9,7 +10,6 @@ import org.primefaces.util.LocaleUtils;
 import ru.tecon.admTools.utils.AdmTools;
 import ru.tecon.admTools.utils.LazySorter;
 
-import javax.faces.context.FacesContext;
 import java.beans.IntrospectionException;
 import java.util.*;
 import java.util.stream.Collectors;

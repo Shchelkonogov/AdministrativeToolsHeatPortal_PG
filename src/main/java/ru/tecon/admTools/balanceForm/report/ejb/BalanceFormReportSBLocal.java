@@ -1,10 +1,10 @@
 package ru.tecon.admTools.balanceForm.report.ejb;
 
+import jakarta.ejb.Local;
 import ru.tecon.admTools.balanceForm.report.model.CellValue;
 import ru.tecon.admTools.balanceForm.report.model.ConsumerModel;
 import ru.tecon.admTools.balanceForm.report.model.DataModel;
 
-import javax.ejb.Local;
 import java.time.LocalDate;
 import java.util.List;
 

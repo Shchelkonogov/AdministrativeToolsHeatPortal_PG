@@ -1,5 +1,9 @@
 package ru.tecon.admTools.matrixProblems.report.servlet;
 
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -10,13 +14,8 @@ import ru.tecon.admTools.matrixProblems.report.ejb.ReportBean;
 import ru.tecon.admTools.matrixProblems.report.model.ReportRequestModel;
 import ru.tecon.admTools.matrixProblems.report.model.tSheetType;
 
-import javax.ejb.EJB;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
