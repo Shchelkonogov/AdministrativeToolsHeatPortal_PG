@@ -1,3 +1,61 @@
+document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.code === 'KeyA') {
+        cheat();
+    }
+});
+
+var code = '';
+
+document.addEventListener('keyup', (e) => {
+    switch (e.code) {
+        case 'KeyI':
+            if (code === '') {
+                code = 'i';
+            } else {
+                code = '';
+            }
+            break;
+        case 'KeyD':
+            if ((code === 'i')) {
+                code = 'id';
+            } else {
+                if ((code === 'id')) {
+                    code = 'idd';
+                } else {
+                    if ((code === 'iddq')) {
+                        cheatDOOM();
+                        code = '';
+                    } else {
+                        code = '';
+                    }
+                }
+            }
+            break;
+        case 'KeyQ':
+            if (code === 'idd') {
+                code = 'iddq';
+            } else {
+                code = '';
+            }
+            break;
+        default:
+            code = '';
+    }
+});
+
+var audioElement = document.createElement('audio');
+audioElement.setAttribute('src', '/admTools/resources/sound/doom.mp3');
+
+function playSound() {
+    audioElement.loop = true;
+    audioElement.play();
+}
+
+function stopSound() {
+    audioElement.pause();
+    audioElement.currentTime = 0;
+}
+
 /**
  * Изменение видимости для переданного элемента, используется для отображения и закрытия окошек около кнопок
  * @param id окна

@@ -11,10 +11,11 @@
       xmlns:error="http://xmlns.jcp.org/jsf/composite/component/error">
 <h:head>
     <h:outputStylesheet name="system/style.css" library="css"/>
+    <h:outputStylesheet name="system/cheat.css" library="css"/>
     <h:outputStylesheet name="primeflex/3.3.1/primeflex.min.css" library="webjars"/>
     <h:outputStylesheet name="/font-awesome/6.4.2/css/all.min-jsf.css" library="webjars"/>
     <h:outputStylesheet name="/font-awesome/6.4.2/css/v4-shims.min-jsf.css" library="webjars"/>
-    <h:outputScript name="linker/script.js" library="js"/>
+    <h:outputScript name="linker/script.js?v=0.0.3" library="js"/>
     <h:outputScript name="system/mainScript.js" library="js"/>
 </h:head>
 <h:body>
@@ -25,7 +26,7 @@
 
     <p:growl id="growl" showDetail="true" />
 
-    <p:ajaxStatus onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" delay="300"/>
+    <p:ajaxStatus onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" delay="500"/>
 
     <h:form>
         <p:remoteCommand autoRun="true" onstart="iframeStatus([{name:'inIframe', value:inIframe()}]);" />
@@ -40,6 +41,9 @@
         <p:remoteCommand name="schemaLinkDialogClose" action="#{linkerControllerWS.schemaLinkDialogClose()}"
                          oncomplete="PF('schemaLinkDialogWidget').hide();"/>
         <p:remoteCommand name="filterTree" action="#{linkerControllerWS.customFilter()}"/>
+
+        <p:remoteCommand name="cheat" action="#{linkerControllerWS.cheat()}"/>
+        <p:remoteCommand name="cheatDOOM" action="#{linkerControllerWS.cheatDOOM()}"/>
     </h:form>
 
     <h:form id="linkerForm" style="height: 100%">
@@ -1127,6 +1131,84 @@
                              process="@this"
                              onclick="PF('schemaLinkDialogWidget').hide();"/>
         </h:form>
+    </p:dialog>
+
+    <p:dialog id="cheatDOOMDialog" widgetVar="cheatDOOMDialogWidget"
+              width="710" height="150" modal="true" resizable="false"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <f:facet name="header">
+            <h:outputText id="cheatDOOMDialogHeader" value="!!! КОДАМИ ПОЛЬЗОВАТЬСЯ НЕ ХОРОШО. АДМИНИСТРАТОР ОБ ЭТОМ УЗНАЕТ !!!" style="color: red;"/>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{linkerControllerWS.closeCheatDOOM()}" resetValues="true"/>
+
+        <h:form id="cheatDOOMForm" style="padding: 3px 0 3px 3px; height: 100%;">
+            <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                <div style="display: grid; text-align: center;">
+                    <h:outputText id="objectCheatDOOMName" style="margin: 10px; font-weight: bold; font-size: 20px;"
+                                  value="'#{linkerControllerWS.selectedLinkedData.dbObject.name}'"/>
+                    <h:outputText value="!ВЫБЕРИТЕ КОД ДЛЯ ПРИМЕНЕНИЯ!" style="color: red;"/>
+                    <p:commandButton value="Привязка параметров к устройству." process="@this"
+                                     styleClass="tc-no-loading" action="#{linkerControllerWS.enableCheat1(true)}"
+                                     oncomplete="PF('cheatDOOMDialogWidget').hide();" update="growl"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="cheatDialog" widgetVar="cheatDialogWidget"
+              width="400" height="150" modal="true" resizable="false"
+              styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <f:facet name="header">
+            <h:outputText id="cheatDialogHeader" value="#{linkerControllerWS.selectedLinkedData.dbObject.name}"/>
+        </f:facet>
+
+        <p:ajax event="close" resetValues="true"/>
+
+        <h:form id="cheatForm" style="padding: 3px 0 3px 3px; height: 100%;">
+            <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                <div style="display: grid; text-align: center;">
+                    <p:commandButton value="Привязка параметров к устройству." process="@this"
+                                     styleClass="tc-no-loading" action="#{linkerControllerWS.enableCheat1(false)}"
+                                     oncomplete="PF('cheatDialogWidget').hide();" update="growl"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="doom1" modal="false" widgetVar="doom1Dialog" width="200" height="200" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="left top" onShow="PF('statusDialog').initPosition();">
+        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+            <div>
+                <p:graphicImage name="doomguy.gif" library="images"/>
+            </div>
+        </div>
+    </p:dialog>
+    <p:dialog id="doom2" modal="false" widgetVar="doom2Dialog" width="200" height="200" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="left bottom" onShow="PF('statusDialog').initPosition();">
+        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+            <div>
+                <p:graphicImage name="doomguy.gif" library="images"/>
+            </div>
+        </div>
+    </p:dialog>
+    <p:dialog id="doom3" modal="false" widgetVar="doom3Dialog" width="200" height="200" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="right bottom" onShow="PF('statusDialog').initPosition();">
+        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+            <div>
+                <p:graphicImage name="doomguy.gif" library="images"/>
+            </div>
+        </div>
+    </p:dialog>
+    <p:dialog id="doom4" modal="false" widgetVar="doom4Dialog" width="200" height="200" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="right top" onShow="PF('statusDialog').initPosition();">
+        <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+            <div>
+                <p:graphicImage name="doomguy.gif" library="images"/>
+            </div>
+        </div>
     </p:dialog>
 
     <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"

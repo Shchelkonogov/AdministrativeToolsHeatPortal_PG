@@ -1,0 +1,19 @@
+#doom1, #doom2, #doom3, #doom4 {
+    border: none;
+}
+
+#doom1 .ui-dialog-titlebar,
+#doom2 .ui-dialog-titlebar,
+#doom3 .ui-dialog-titlebar,
+#doom4 .ui-dialog-titlebar {
+    display: none;
+}
+
+#doom1_content,
+#doom2_content,
+#doom3_content,
+#doom4_content {
+    background-color: transparent;
+    border: none;
+    overflow: hidden;
+}

@@ -63,6 +63,8 @@ public class LinkerStateless {
     private final static String PROCEDURE_ADD_LINK_BY_TEMPLATE = "call lnk_0001t.add_uu_zone(?, ?, ?, ?)";
     private final static String PROCEDURE_UPDATE_ORG_TREE = "call lnk_0001t.refresh_vtp_struct_tree()";
 
+    private final static String CHEAT_1 = "call lnk_0001t.dev_link(?)";
+
     @Inject
     private Logger logger;
 
@@ -894,6 +896,19 @@ public class LinkerStateless {
             cStm.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error update org tree", ex);
+            throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
+        }
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void cheat1(int id) throws SystemParamException {
+        try (Connection connect = ds.getConnection();
+             CallableStatement cStm = connect.prepareCall(CHEAT_1)) {
+            cStm.setInt(1, id);
+
+            cStm.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, "Error execute cheat 1", ex);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
         }
     }

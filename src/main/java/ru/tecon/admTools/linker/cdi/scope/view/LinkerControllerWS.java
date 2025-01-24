@@ -65,6 +65,8 @@ public class LinkerControllerWS implements Serializable {
 
     private final Map<String, UIComponent> componentMap = new HashMap<>();
 
+    private boolean cheat = false;
+
     // Закладка "Линкованные объекты / Объекты"
 
     private ObjectType selectedObjectType;
@@ -192,6 +194,7 @@ public class LinkerControllerWS implements Serializable {
 
         switch (event.getTab().getTitle()) {
             case "Нелинкованные объекты":
+                cheat = false;
                 // Загрузка объектов для линковки
                 loadOpcObjectsForNoLink();
 
@@ -248,6 +251,7 @@ public class LinkerControllerWS implements Serializable {
                         "reloadNavigate();");
                 break;
             case "Линкованные объекты":
+                cheat = false;
                 selectedOpcObjectsForNoLink = null;
                 opcObjectsForNoLinkData.getData().clear();
                 objectsForLink.clear();
@@ -263,6 +267,7 @@ public class LinkerControllerWS implements Serializable {
                         "clearNavigate();");
                 break;
             case "Объекты":
+                cheat = true;
                 linkedData.setData(linkerBean.getLinkedData(selectedObjectType.getId(), utilMB.getLogin()));
                 selectedLinkedData = null;
 
@@ -320,6 +325,7 @@ public class LinkerControllerWS implements Serializable {
                         "PF('filterParamOpcTreeSelectOneMenuWidget').selectValue(1);");
                 break;
             case "Параметры":
+                cheat = false;
                 linkedData.getData().clear();
 
                 if (selectedLinkedData != null) {
@@ -340,6 +346,7 @@ public class LinkerControllerWS implements Serializable {
                         "filterTree([{name:'widget', value:'paramOpcTreeWidget'}]);");
                 break;
             case "Вычислимые параметры":
+                cheat = false;
                 linkedData.getData().clear();
 
                 if (selectedLinkedData != null) {
@@ -378,6 +385,60 @@ public class LinkerControllerWS implements Serializable {
     public void doCollapseAll(TreeNode<?> tree) {
         for (TreeNode<?> element: tree.getChildren()) {
             collapsingOrExpanding(element, false);
+        }
+    }
+
+    public void cheatDOOM() {
+        if (cheat && (selectedLinkedData != null)) {
+            PrimeFaces.current().ajax().update("cheatDOOMForm:objectCheatDOOMName");
+            PrimeFaces.current().executeScript("PF('cheatDOOMDialogWidget').show(); " +
+                    "PF('doom1Dialog').show(); " +
+                    "PF('doom2Dialog').show(); " +
+                    "PF('doom3Dialog').show(); " +
+                    "PF('doom4Dialog').show(); " +
+                    "playSound();");
+        }
+    }
+
+    public void closeCheatDOOM() {
+        if (cheat) {
+            PrimeFaces.current().executeScript(
+                    "PF('doom1Dialog').hide(); " +
+                    "PF('doom2Dialog').hide(); " +
+                    "PF('doom3Dialog').hide(); " +
+                    "PF('doom4Dialog').hide(); " +
+                    "stopSound();");
+        }
+    }
+
+    public void cheat() {
+        if (cheat && (selectedLinkedData != null)) {
+            PrimeFaces.current().ajax().update("cheatDialogHeader");
+            PrimeFaces.current().executeScript("PF('cheatDialogWidget').show();");
+        }
+    }
+
+    public void enableCheat1(boolean doom) {
+        logger.log(Level.INFO, "Применяем код 1 для " + selectedLinkedData.getDbObject());
+        try {
+            linkerBean.cheat1(selectedLinkedData.getDbObject().getId());
+
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка", "Успешное применение кода").send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное применение кода"));
+            }
+        } catch (SystemParamException e) {
+            if (inIframe) {
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Линковка", e.getMessage()).send();
+            } else {
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Линковка", e.getMessage()));
+            }
+        }
+        if (doom) {
+            closeCheatDOOM();
         }
     }
 
