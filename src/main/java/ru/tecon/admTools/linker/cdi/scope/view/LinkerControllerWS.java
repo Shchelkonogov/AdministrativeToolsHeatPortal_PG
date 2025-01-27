@@ -427,7 +427,9 @@ public class LinkerControllerWS implements Serializable {
                 new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка", "Успешное применение кода").send();
             } else {
                 FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка", "Успешное применение кода"));
+                        .addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка",
+                                doom ? "Успешное применение кода: 'Параметры привязаны к устройству'" : "Параметры привязаны к устройству"));
             }
         } catch (SystemParamException e) {
             if (inIframe) {
