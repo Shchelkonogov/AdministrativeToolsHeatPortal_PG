@@ -145,7 +145,7 @@
                                             <p:column id="K" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
-                                                        <h:outputText value="&lt;|#{tv.kpn}|%"/>
+                                                        <h:outputText value="&lt;|#{tv.kpn}|"/>
                                                     </f:facet>
                                                     <f:facet name="input">
                                                         <p:inputNumber value="#{tv.kpn}" decimalPlaces="2"/>
@@ -336,7 +336,7 @@
                                             <p:column id="KcGvs" style="text-align: center;">
                                                 <p:cellEditor disabled="#{!systemParamsUtil.write}">
                                                     <f:facet name="output">
-                                                        <h:outputText value="&lt;#{gvs.kc}%"/>
+                                                        <h:outputText value="&lt;#{gvs.kc}"/>
                                                     </f:facet>
                                                     <f:facet name="input">
                                                         <p:inputNumber value="#{gvs.kc}" decimalPlaces="2"/>
