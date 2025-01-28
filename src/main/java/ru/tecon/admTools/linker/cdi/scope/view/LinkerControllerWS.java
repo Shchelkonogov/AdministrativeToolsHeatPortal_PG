@@ -424,7 +424,8 @@ public class LinkerControllerWS implements Serializable {
             linkerBean.cheat1(selectedLinkedData.getDbObject().getId());
 
             if (inIframe) {
-                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка", "Успешное применение кода").send();
+                new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка",
+                        doom ? "Успешное применение кода: 'Параметры привязаны к устройству'" : "Параметры привязаны к устройству").send();
             } else {
                 FacesContext.getCurrentInstance()
                         .addMessage(null,
