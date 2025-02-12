@@ -421,7 +421,7 @@ public class LinkerControllerWS implements Serializable {
     public void enableCheat1(boolean doom) {
         logger.log(Level.INFO, "Применяем код 1 для " + selectedLinkedData.getDbObject());
         try {
-            linkerBean.cheat1(selectedLinkedData.getDbObject().getId());
+            linkerBean.cheat1(selectedLinkedData.getDbObject().getId(), selectedLinkedData.getServerName(), selectedObjectType.getId());
 
             if (inIframe) {
                 new TeconMessage(TeconMessage.SEVERITY_SUCCESS, "Линковка",

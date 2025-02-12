@@ -63,7 +63,7 @@ public class LinkerStateless {
     private final static String PROCEDURE_ADD_LINK_BY_TEMPLATE = "call lnk_0001t.add_uu_zone(?, ?, ?, ?)";
     private final static String PROCEDURE_UPDATE_ORG_TREE = "call lnk_0001t.refresh_vtp_struct_tree()";
 
-    private final static String CHEAT_1 = "call lnk_0001t.dev_link(?)";
+    private final static String CHEAT_1 = "call lnk_0001t.dev_link(?, ?, ?)";
 
     @Inject
     private Logger logger;
@@ -901,10 +901,12 @@ public class LinkerStateless {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void cheat1(int id) throws SystemParamException {
+    public void cheat1(int id, String serverName, int objType) throws SystemParamException {
         try (Connection connect = ds.getConnection();
              CallableStatement cStm = connect.prepareCall(CHEAT_1)) {
             cStm.setInt(1, id);
+            cStm.setString(2, serverName);
+            cStm.setInt(3, objType);
 
             cStm.executeUpdate();
         } catch (SQLException ex) {
