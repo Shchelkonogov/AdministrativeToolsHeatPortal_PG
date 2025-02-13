@@ -4,7 +4,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
     <h:form>
-        <p:remoteCommand autoRun="true" oncomplete="MathJax.typesetPromise();"/>
+        <p:remoteCommand name="mathJax" autoRun="true" oncomplete="MathJax.typesetPromise();"/>
     </h:form>
     <h:form id="normIndicators" style="height: 100%; overflow: auto;">
         <p:panel id="rootPanel" styleClass="tc-panel" header="Нормативные показатели">
@@ -120,7 +120,7 @@
                                        onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
                                        action="#{normIndicators.onSaveChanges('metrology')}"
                                        update="metrology metrologyTooltip growl"
-                                       oncomplete="PF('statusDialog').hide();">
+                                       oncomplete="PF('statusDialog').hide(); mathJax();">
                             <h:outputText styleClass="ui-icon pi pi-save"/>
                         </p:commandLink>
                     </f:facet>
@@ -491,7 +491,7 @@
                                        onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
                                        action="#{normIndicators.onSaveChanges('efficiency')}"
                                        update="indicatorTVTable indicatorTVTableTooltip indicatorCOTable indicatorCOTableTooltip indicatorGVSTable indicatorGVSTableTooltip indicatorVENTTable indicatorVENTTableTooltip growl"
-                                       oncomplete="PF('statusDialog').hide();">
+                                       oncomplete="PF('statusDialog').hide(); mathJax();">
                             <h:outputText styleClass="ui-icon pi pi-save"/>
                         </p:commandLink>
                     </f:facet>
@@ -1161,7 +1161,7 @@
                                        onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
                                        action="#{normIndicators.onSaveChanges('borderValues')}"
                                        update="borderValuesCO borderValuesCOTooltip borderValuesVent borderValuesVentTooltip borderValuesGVS borderValuesGVSTooltip growl"
-                                       oncomplete="PF('statusDialog').hide();">
+                                       oncomplete="PF('statusDialog').hide(); mathJax();">
                             <h:outputText styleClass="ui-icon pi pi-save"/>
                         </p:commandLink>
                     </f:facet>
@@ -1517,7 +1517,7 @@
                                        onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
                                        action="#{normIndicators.onSaveChanges('analysis')}"
                                        update="underSupplyValues underSupplyValuesTooltip consumerAnalisisT7Table consumerAnalisisT7TableTooltip consumerAnalisisDeltaT7Table consumerAnalisisDeltaT7TableTooltip growl"
-                                       oncomplete="PF('statusDialog').hide();">
+                                       oncomplete="PF('statusDialog').hide(); mathJax();">
                             <h:outputText styleClass="ui-icon pi pi-save"/>
                         </p:commandLink>
                     </f:facet>
