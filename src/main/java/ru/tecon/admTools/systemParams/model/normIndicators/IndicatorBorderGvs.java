@@ -15,10 +15,11 @@ public class IndicatorBorderGvs {
     private double dt7;
     private double t7;
     private double kgvs;
+    private double kvgvs;
 
     private boolean change = false;
 
-    public IndicatorBorderGvs(double kdt, double kdto, double ky, double dt, double dt7, double t7, double kgvs) {
+    public IndicatorBorderGvs(double kdt, double kdto, double ky, double dt, double dt7, double t7, double kgvs, double kvgvs) {
         this.kdt = kdt;
         this.kdto = kdto;
         this.ky = ky;
@@ -26,6 +27,7 @@ public class IndicatorBorderGvs {
         this.dt7 = dt7;
         this.t7 = t7;
         this.kgvs = kgvs;
+        this.kvgvs = kvgvs;
     }
 
     public double getKdt() {
@@ -91,6 +93,15 @@ public class IndicatorBorderGvs {
         this.kgvs = kgvs;
     }
 
+    public double getKvgvs() {
+        return kvgvs;
+    }
+
+    public void setKvgvs(double kvgvs) {
+        change = true;
+        this.kvgvs = kvgvs;
+    }
+
     public boolean isChange() {
         return change;
     }
@@ -105,6 +116,7 @@ public class IndicatorBorderGvs {
                 .add("dt7=" + dt7)
                 .add("t7=" + t7)
                 .add("kgvs=" + kgvs)
+                .add("kvgvs=" + kvgvs)
                 .toString();
     }
 }

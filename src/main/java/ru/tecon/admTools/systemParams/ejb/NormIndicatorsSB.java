@@ -35,7 +35,7 @@ public class NormIndicatorsSB {
     private static final String FUN_BORDER_VALUES_VENT = "call sys_0001t.upd_ni_rs_vent(?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SEL_BORDER_VALUES_GVS = "select * from sys_0001t.sel_ni_rs_gvs()";
-    private static final String FUN_BORDER_VALUES_GVS = "call sys_0001t.upd_ni_rs_gvs(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String FUN_BORDER_VALUES_GVS = "call sys_0001t.upd_ni_rs_gvs(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SEL_TV = "select * from sys_0001t.sel_norm_ind_tv()";
     private static final String FUN_UPD_TV = "call sys_0001t.upd_norm_ind_tv(?, ?, ?, ?, ?, ?)";
@@ -643,7 +643,8 @@ public class NormIndicatorsSB {
                         res.getDouble("gvs_dt"),
                         res.getDouble("gvs_dt7"),
                         res.getDouble("gvs_t7"),
-                        res.getDouble("kpgvs")));
+                        res.getDouble("kpgvs"),
+                        res.getDouble("kdggvs")));
             }
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "error load border gvs indicator", e);
@@ -670,15 +671,16 @@ public class NormIndicatorsSB {
             cStm.setObject(5, indicatorBorderGvs.getDt7(), Types.NUMERIC);
             cStm.setObject(6, indicatorBorderGvs.getT7(), Types.NUMERIC);
             cStm.setObject(7, indicatorBorderGvs.getKgvs(), Types.NUMERIC);
-            cStm.setString(8, login);
-            cStm.setString(9, ip);
-            cStm.registerOutParameter(10, Types.SMALLINT);
+            cStm.setObject(8, indicatorBorderGvs.getKvgvs(), Types.NUMERIC);
+            cStm.setString(9, login);
+            cStm.setString(10, ip);
+            cStm.registerOutParameter(11, Types.SMALLINT);
 
             cStm.executeUpdate();
 
-            LOG.info("update border values gvs " + indicatorBorderGvs + " result " + cStm.getShort(10));
+            LOG.info("update border values gvs " + indicatorBorderGvs + " result " + cStm.getShort(11));
 
-            if (cStm.getShort(10) != 0) {
+            if (cStm.getShort(11) != 0) {
                 throw new SystemParamException("Ошибка обновления показателя граничные значения - гвс");
             }
         } catch (SQLException e) {

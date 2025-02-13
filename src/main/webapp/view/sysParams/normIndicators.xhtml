@@ -1028,6 +1028,20 @@
                                                 <h:outputText escape="false" value="#{normIndicators.getBorderValuesGVSHeaderName(6)}"/>
                                             </f:facet>
                                         </p:column>
+                                        <p:column id="Kvgvs" style="text-align: center;">
+                                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{borderValuesGVS.kvgvs}"/>
+                                                </f:facet>
+                                                <f:facet name="input">
+                                                    <p:inputNumber value="#{borderValuesGVS.kvgvs}" decimalPlaces="2"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+
+                                            <f:facet name="header">
+                                                <h:outputText escape="false" value="#{normIndicators.getBorderValuesGVSHeaderName(7)}"/>
+                                            </f:facet>
+                                        </p:column>
                                     </p:dataTable>
 
                                     <h:panelGroup id="borderValuesGVSTooltip" layout="block">

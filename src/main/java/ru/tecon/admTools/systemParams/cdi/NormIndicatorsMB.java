@@ -71,7 +71,8 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                     "ΔT<sub>гвс</sub> [°C]",
                     "ΔT7 [°C] (T7<sub>ТП</sub> - T7<sub>потр</sub>)",
                     "T7<sub>норм</sub> [°C]",
-                    "К<sub>гвс</sub>");
+                    "К<sub>гвс</sub>",
+                    "Kvgvs");
 
     private List<IndicatorMetrology> indicatorMetrologyList = new ArrayList<>();
     private List<IndicatorTV> indicatorTVList = new ArrayList<>();
