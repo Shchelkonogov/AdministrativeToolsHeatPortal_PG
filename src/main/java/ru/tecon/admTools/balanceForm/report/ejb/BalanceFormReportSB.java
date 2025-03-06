@@ -130,7 +130,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
             try {
                 return new CellValue(new BigDecimal(cStm.getString(8).trim()).setScale(2, RoundingMode.HALF_EVEN).toString(), cStm.getShort(7));
             } catch (Exception ignore) {
-                return new CellValue("", 0);
+                return new CellValue(cStm.getString(8).trim(), cStm.getShort(7));
             }
         } catch (SQLException e) {
             logger.log(Level.WARNING, "error load data for object: " + object, e);
