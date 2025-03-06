@@ -49,7 +49,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
     private static final String SELECT_IN_PARAMETERS = "select * from dsp_0045t.get_Rnet_CTP_otch_data(?, ?, ?)";
     private static final String SELECT_OUT_PARAMETERS = "select * from dsp_0045t.get_Rnet_CTP_out_otch_data(?, ?, ?)";
 
-    private static final String SELECT_VALUE = "{? = call dsp_0045t.get_Rnet_UU_otch_data(?, ?, ?, ?, ?, ?, ?)}";
+    private static final String SELECT_VALUE = "call dsp_0045t.get_Rnet_UU_otch_data(?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_TOTAL_DATA = "select * from dsp_0045t.get_Rnet_CTP_otch_data_itog(?, ?, ?)";
 
@@ -117,18 +117,18 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
     public CellValue getValue(int parentID, int object, int id, int statId, LocalDate startDate, LocalDate endDate) {
         try (Connection connection = ds.getConnection();
              CallableStatement cStm = connection.prepareCall(SELECT_VALUE)) {
-            cStm.registerOutParameter(1, Types.VARCHAR);
-            cStm.setInt(2, parentID);
-            cStm.setInt(3, object);
-            cStm.setInt(4, id);
-            cStm.setInt(5, statId);
-            cStm.setDate(6, Date.valueOf(startDate));
-            cStm.setDate(7, Date.valueOf(endDate));
-            cStm.registerOutParameter(8, Types.INTEGER);
+            cStm.setInt(1, parentID);
+            cStm.setInt(2, object);
+            cStm.setInt(3, id);
+            cStm.setInt(4, statId);
+            cStm.setDate(5, Date.valueOf(startDate));
+            cStm.setDate(6, Date.valueOf(endDate));
+            cStm.registerOutParameter(7, Types.SMALLINT);
+            cStm.registerOutParameter(8, Types.VARCHAR);
             cStm.executeUpdate();
 
             try {
-                return new CellValue(new BigDecimal(cStm.getString(1).trim()).setScale(2, RoundingMode.HALF_EVEN).toString(), cStm.getInt(8));
+                return new CellValue(new BigDecimal(cStm.getString(8).trim()).setScale(2, RoundingMode.HALF_EVEN).toString(), cStm.getShort(7));
             } catch (Exception ignore) {
                 return new CellValue("", 0);
             }
