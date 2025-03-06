@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * local интерфейс для получения данных для excel отчета
+ * Local интерфейс для получения данных для excel отчета
  * @author Maksim Shchelkonogov
  */
 @Local
@@ -37,7 +37,7 @@ public interface BalanceFormReportSBLocal {
     String getFilial(int object);
 
     /**
-     * Полечение имени организации
+     * Получение имени организации
      * @param object id объекта
      * @return имя организации
      */
@@ -65,7 +65,7 @@ public interface BalanceFormReportSBLocal {
     List<ConsumerModel> getObjectNames(int object);
 
     /**
-     * Получение списка входный параметров
+     * Получение списка входных параметров
      * @param object id объекта
      * @param startDate начальная дата
      * @param endDate конечная дата
@@ -83,7 +83,7 @@ public interface BalanceFormReportSBLocal {
     List<DataModel> getOutParameters(int object, LocalDate startDate, LocalDate endDate);
 
     /**
-     * Получние значений по парамтру
+     * Получение значений по параметру
      * @param parentID id цтп
      * @param object id объекта
      * @param id id параметра

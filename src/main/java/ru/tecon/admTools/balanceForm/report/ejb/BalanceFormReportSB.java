@@ -3,6 +3,7 @@ package ru.tecon.admTools.balanceForm.report.ejb;
 import jakarta.annotation.Resource;
 import jakarta.ejb.Local;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import ru.tecon.admTools.balanceForm.report.model.CellValue;
 import ru.tecon.admTools.balanceForm.report.model.ConsumerModel;
 import ru.tecon.admTools.balanceForm.report.model.DataModel;
@@ -24,34 +25,33 @@ import java.util.logging.Logger;
 @Local(BalanceFormReportSBLocal.class)
 public class BalanceFormReportSB implements BalanceFormReportSBLocal {
 
-    private static final Logger LOG = Logger.getLogger(BalanceFormReportSB.class.getName());
+    @Inject
+    private Logger logger;
 
-    private static final String ALTER = "alter session set nls_numeric_characters = '.,'";
-
-    private static final String SELECT_CTP = "select obj_name from obj_object where obj_id = ?";
-    private static final String SELECT_CONNECT_SCHEMA = "select val from obj_object_properties " +
+    private static final String SELECT_CTP = "select obj_name from admin.obj_object where obj_id = ?";
+    private static final String SELECT_CONNECT_SCHEMA = "select val from admin.obj_object_properties " +
             "where obj_type_id = 1 and prop_id = 20 and obj_id = ?";
-    private static final String SELECT_FILIAL = "select get_obj_filial(?) from dual";
-    private static final String SELECT_COMPANY = "select get_obj_pred(?) from dual";
-    private static final String SELECT_SOURCE = "select val from obj_object_properties " +
+    private static final String SELECT_FILIAL = "select admin.get_obj_filial(?)";
+    private static final String SELECT_COMPANY = "select admin.get_obj_pred(?)";
+    private static final String SELECT_SOURCE = "select val from admin.obj_object_properties " +
             "where obj_type_id = 1 and prop_id = 14 and obj_id = ?";
-    private static final String SELECT_ADDRESS = "select get_obj_address(?) from dual";
+    private static final String SELECT_ADDRESS = "select admin.get_obj_address(?)";
 
-    private static final String SELECT_CONSUMERS = "select distinct(obj_id2) as obj_id, " +
-            "(select obj_name from obj_object where obj_id = obj_id2) as obj_name " +
-            "from (select x.dev_agr_type, x.obj_id1, x.dev_agr_id2, x.obj_id2 " +
-            "from dev_agr_link x, obj_object xx, dev_agr xxx " +
-            "where xx.obj_id = x.obj_id2 and x.obj_id1 = ? " +
-//            "and x.dev_agr_type = 514 " +
-            "and x.dev_agr_id2 = xxx.agr_id) " +
+    private static final String SELECT_CONSUMERS =
+            "select distinct(obj_id2) as obj_id, " +
+                    "(select obj_name from admin.obj_object where obj_id = obj_id2) as obj_name " +
+            "from (select x.obj_id2 from admin.dev_agr_link x, admin.obj_object xx, admin.dev_agr xxx " +
+                    "where xx.obj_id = x.obj_id2 and x.obj_id1 = ? " +
+//                            "and x.dev_agr_type = 514 " +
+                            "and x.dev_agr_id2 = xxx.agr_id) as xx2 " +
             "order by obj_name";
 
-    private static final String SELECT_IN_PARAMETERS = "select * from table(dsp_0045t.get_Rnet_CTP_otch_data(?, ?, ?))";
-    private static final String SELECT_OUT_PARAMETERS = "select * from table(dsp_0045t.get_Rnet_CTP_out_otch_data(?, ?, ?))";
+    private static final String SELECT_IN_PARAMETERS = "select * from dsp_0045t.get_Rnet_CTP_otch_data(?, ?, ?)";
+    private static final String SELECT_OUT_PARAMETERS = "select * from dsp_0045t.get_Rnet_CTP_out_otch_data(?, ?, ?)";
 
     private static final String SELECT_VALUE = "{? = call dsp_0045t.get_Rnet_UU_otch_data(?, ?, ?, ?, ?, ?, ?)}";
 
-    private static final String SELECT_TOTAL_DATA = "select * from table(dsp_0045t.get_Rnet_CTP_otch_data_itog(?, ?, ?))";
+    private static final String SELECT_TOTAL_DATA = "select * from dsp_0045t.get_Rnet_CTP_otch_data_itog(?, ?, ?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -98,7 +98,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
                 result.add(new ConsumerModel(res.getString(2), res.getInt(1)));
             }
         } catch (SQLException e) {
-            LOG.warning("error load consumers for object: " + object);
+            logger.warning("error load consumers for object: " + object);
         }
         return result;
     }
@@ -133,7 +133,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
                 return new CellValue("", 0);
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load data for object: " + object, e);
+            logger.log(Level.WARNING, "error load data for object: " + object, e);
         }
         return null;
     }
@@ -156,7 +156,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
                 }
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load total data for object: " + objectID, e);
+            logger.log(Level.WARNING, "error load total data for object: " + objectID, e);
         }
         return result;
     }
@@ -164,10 +164,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
     private List<DataModel> loadParameters(int object, LocalDate startDate, LocalDate endDate, String select) {
         List<DataModel> result = new ArrayList<>();
         try (Connection connection = ds.getConnection();
-             PreparedStatement stmAlter = connection.prepareStatement(ALTER);
              PreparedStatement stm = connection.prepareStatement(select)) {
-            stmAlter.executeQuery();
-
             stm.setInt(1, object);
             stm.setDate(2, Date.valueOf(startDate));
             stm.setDate(3, Date.valueOf(endDate));
@@ -177,7 +174,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
                 result.add(new DataModel(res.getString(1), res.getString(4), res.getInt(2), res.getInt(3), res.getInt(5)));
             }
         } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load data select: " + select +
+            logger.log(Level.WARNING, "error load data select: " + select +
                     " for object: " + object + " startDate: " + startDate + " endDate: " + endDate, e);
         }
         return result;
@@ -193,7 +190,7 @@ public class BalanceFormReportSB implements BalanceFormReportSBLocal {
                 return res.getString(1);
             }
         } catch (SQLException e) {
-            LOG.warning("error load data select: " + select + " for object: " + object);
+            logger.warning("error load data select: " + select + " for object: " + object);
         }
         return "";
     }

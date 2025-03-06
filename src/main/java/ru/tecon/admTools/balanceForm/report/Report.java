@@ -269,7 +269,7 @@ public final class Report {
     }
 
     /**
-     * Создание ячейки с стилем
+     * Создание ячейки со стилем
      * @param row строка
      * @param index колонка
      * @param value значение
