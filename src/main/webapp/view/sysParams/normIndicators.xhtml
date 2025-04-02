@@ -608,6 +608,7 @@
                                                 <h:outputText escape="false" value="#{normIndicators.getBorderValuesCOHeaderName(6)}"/>
                                             </f:facet>
                                         </p:column>
+                                        <p:column/>
                                     </p:dataTable>
 
                                     <h:panelGroup id="borderValuesCOTooltip" layout="block">
@@ -626,7 +627,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т3<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_ЦО}={T3_{ЦТП} - T3_{потр}\over T3_{ЦТП}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_ЦО}={|T3_{ЦТП} - T3_{потр}|\over T3_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kdtoco" position="bottom" showDelay="500">
@@ -644,7 +645,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т4<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_ЦО}}={T4_{потр}-T4_{ЦТП}\over T4_{потр}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_ЦО}}={|T4_{потр}-T4_{ЦТП}|\over T4_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesCO:Kyco" position="bottom" showDelay="500">
@@ -709,7 +710,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     K<sub>ЦО</sub>=
                                                     <p:outputLabel id="CO_K" value="#{normIndicators.indicatorBorderCoList.get(0).k}"/>
-                                                    – коэффициент допустимого отклонения давления ЦО.
+                                                    (по умолчанию) – коэффициент допустимого отклонения давления ЦО.
                                                 </div>
                                             </div>
                                         </p:tooltip>
@@ -729,9 +730,9 @@
                                                 \[\mathrm{&#916; P=(P1-P2)\geq &#916; P_{min}=0,05}\]
                                                 \[\mathrm{T1\geq T1_{min}}\]
                                                 <div style="text-indent: 20px; text-align: justify;">
-                                                    При условии К1&lt;
+                                                    При условии К1≤
                                                     <p:outputLabel id="CO_K1" value="#{normIndicators.indicatorBorderCoList.get(0).k1}"/>
-                                                    , диагностируется недоотпуск тепловой энергии.
+                                                    (по умолчанию), диагностируется недоотпуск тепловой энергии.
                                                 </div>
                                             </div>
                                         </p:tooltip>
@@ -751,9 +752,9 @@
                                                 \[\mathrm{&#916; P=(P3-P4)\geq &#916; P_{min}=0,02}\]
                                                 \[\mathrm{T4&lt;T4_{min}}\]
                                                 <div style="text-indent: 20px; text-align: justify;">
-                                                    При условии К2&lt;
+                                                    При условии К2≤
                                                     <p:outputLabel id="CO_K2" value="#{normIndicators.indicatorBorderCoList.get(0).k2}"/>
-                                                    , диагностируется перетоп.
+                                                    (по умолчанию), диагностируется перетоп.
                                                 </div>
                                             </div>
                                         </p:tooltip>
@@ -829,6 +830,7 @@
                                         <p:column/>
                                         <p:column/>
                                         <p:column/>
+                                        <p:column/>
                                     </p:dataTable>
 
                                     <h:panelGroup id="borderValuesVentTooltip" layout="block">
@@ -848,7 +850,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т31<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_В}={T31_{ЦТП} - T31_{потр}\over T31_{ЦТП}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_В}={|T31_{ЦТП} - T31_{потр}|\over T31_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kdtovent" position="bottom" showDelay="500">
@@ -867,7 +869,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т41<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_В}}={T41_{потр}-T41_{ЦТП}\over T41_{потр}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_В}}={|T41_{потр}-T41_{ЦТП}|\over T41_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesVent:Kyvent" position="bottom" showDelay="500">
@@ -1062,7 +1064,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т7<sub>ЦТП</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_ГВС}={T7_{ЦТП} - T7_{потр}\over T7_{ЦТП}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_ГВС}={|T7_{ЦТП} - T7_{потр}|\over T7_{ЦТП}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kdtogvs" position="bottom" showDelay="500">
@@ -1082,7 +1084,7 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     Показатель рассчитывается в % относительно Т13<sub>потр</sub>
                                                 </div>
-                                                \[\mathrm{К_{&#916; T\_{О\_ГВС}}={T13_{потр}-T13_{ЦТП}\over T13_{потр}}*100}\]
+                                                \[\mathrm{К_{&#916; T\_{О\_ГВС}}={|T13_{потр}-T13_{ЦТП}|\over T13_{потр}}*100}\]
                                             </div>
                                         </p:tooltip>
                                         <p:tooltip for="normIndicators:borderValuesGVS:Kygvs" position="bottom" showDelay="500">
@@ -1096,13 +1098,13 @@
                                                     Анализ проводится при условии нахождения температуры подачи
                                                     ГВС Т7 на ТП в заданных технологом границах (состоянии «Норма»).
                                                 </div>
-                                                \[\mathrm{К_{У\_ГВС}=G7_i-G7_{i-1}}\]
+                                                \[\mathrm{К_{У\_ГВС}=V7_i-V7_{i-1}}\]
                                                 <div style="text-indent: 20px; text-align: justify;">
-                                                    G7<sub>i</sub> - суточный расход воды в подающем
+                                                    V7<sub>i</sub> - суточный расход воды в подающем
                                                     трубопроводе ГВС в анализируемые сутки;
                                                 </div>
                                                 <div style="text-indent: 20px; text-align: justify;">
-                                                    G7<sub>i-1</sub> - суточный расход воды в подающем трубопроводе
+                                                    V7<sub>i-1</sub> - суточный расход воды в подающем трубопроводе
                                                     ГВС в предыдущие относительно анализируемых суток.
                                                 </div>
                                             </div>
@@ -1160,7 +1162,17 @@
                                                 <div style="text-indent: 20px; text-align: justify;">
                                                     K<sub>ГВС</sub>=
                                                     <p:outputLabel id="GVS_kgvs" value="#{normIndicators.indicatorBorderGvsList.get(0).kgvs}"/>
-                                                    – коэффициент допустимого отклонения давления ГВС.
+                                                    (по умолчанию) – коэффициент допустимого отклонения давления ГВС.
+                                                </div>
+                                            </div>
+                                        </p:tooltip>
+                                        <p:tooltip for="normIndicators:borderValuesGVS:Kvgvs" position="left" showDelay="500">
+                                            <div style="width: 480px; padding: 5px;">
+                                                <h4 style="text-align: center;">
+                                                    Коэффициент потребления ГВС
+                                                </h4>
+                                                <div style="text-indent: 20px; text-align: justify;">
+                                                    К<sub>Δv_гвс</sub> - Коэффициент потребления ГВС
                                                 </div>
                                             </div>
                                         </p:tooltip>
