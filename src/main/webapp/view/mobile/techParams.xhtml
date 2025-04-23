@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <h:outputStylesheet name="/mobile/m.style.css" library="css"/>
+    <h:outputScript name="/mobile/m.script.js" library="js"/>
+</h:head>
+<h:body style="margin: 0;">
+    <h:form>
+        <p:remoteCommand autoRun="true" onstart="if (mobileCheck()) {mobile();} else {window.location.replace('#{techParam.redirect}');}"/>
+        <p:remoteCommand name="mobile" action="#{techParam.setMobile(true)}" update="main"/>
+        <p:remoteCommand name="search" action="#{techParam.loadData()}" oncomplete="PF('statusDialog').hide();" update="main:dataTable main:asyncDataTable"/>
+    </h:form>
+    <h:form id="main" style="height: 100%;">
+        <h:panelGroup layout="block" rendered="#{techParam.mobile}" style="height: 100%;">
+            <div class="menuBar" style="height: 100px; display: flex;">
+                <div style="padding: 0 10px;">
+                    <a href="#{techParam.rootRedirect}">
+                        <p:graphicImage name="moek_logo_small_white.png" library="images" style="max-height: 100%; max-width: 100%;"/>
+                    </a>
+                </div>
+                <h:panelGroup id="btnBar" layout="block" style="margin-left: auto; padding: 0 10px;">
+                    <div style="display: flex; height: 100%; gap: 20px;">
+                        <p:commandLink styleClass="tc-no-loading tc-m-menu" style="margin: auto;"
+                                       onclick="PF('statusDialog').show();" rendered="#{!techParam.archive}"
+                                       actionListener="#{techParam.setArchive(true)}" action="#{techParam.loadData()}"
+                                       update="dataTable asyncDataTable btnBar" oncomplete="PF('statusDialog').hide();" process="@this">
+                            <h:outputText styleClass="ui-icon pi pi-table"/>
+                        </p:commandLink>
+                        <p:commandLink styleClass="tc-no-loading tc-m-menu" style="margin: auto;"
+                                       onclick="PF('statusDialog').show();" rendered="#{techParam.archive}"
+                                       actionListener="#{techParam.setArchive(false)}" action="#{techParam.loadData()}"
+                                       update="dataTable asyncDataTable btnBar" oncomplete="PF('statusDialog').hide();" process="@this">
+                            <h:outputText styleClass="ui-icon pi pi-sitemap" style="transform: rotate(270deg);"/>
+                        </p:commandLink>
+                        <p:commandLink styleClass="tc-no-loading tc-m-menu" style="margin: auto;"
+                                       onclick="PF('filterDialog').show();" process="@this">
+                            <h:outputText styleClass="ui-icon pi pi-filter"/>
+                        </p:commandLink>
+                        <p:commandLink styleClass="tc-no-loading tc-m-menu" style="margin: auto;"
+                                       onclick="PF('searchDialog').show();" process="@this">
+                            <h:outputText styleClass="ui-icon pi pi-search"/>
+                        </p:commandLink>
+                    </div>
+                </h:panelGroup>
+            </div>
+            <div style="text-align: center;">
+                <p:outputLabel id="objectName" value="#{techParam.name}"/>
+            </div>
+            <div id="tableDiv" style="height: 100%;">
+                <p:dataTable id="dataTable" value="#{techParam.objectData}" var="data"
+                             scrollable="true" scrollHeight="100%" scrollWidth="100%" style="#{techParam.archiveDisplayCss()}"
+                             emptyMessage="#{global['table.empty.value']}" frozenColumns="1">
+                    <p:column headerText="Обозн." width="270">
+                        <h:outputText value="#{data.name}"/>
+                    </p:column>
+                    <p:columns var="column" value="#{techParam.dataTableColumns}" columnIndexVar="index"
+                               headerText="#{column}" width="250"
+                               style="white-space: nowrap; text-overflow: ellipsis; text-align: center; #{data.values.get(index).colorCss}">
+                        <h:outputText value="#{data.values.get(index).value}"/>
+                    </p:columns>
+                </p:dataTable>
+                <p:dataTable id="asyncDataTable" value="#{techParam.asyncData}" var="asyncData"
+                             scrollable="true" scrollHeight="100%" scrollWidth="100%" style="#{techParam.asyncDisplayCss()}"
+                             emptyMessage="#{global['table.empty.value']}" frozenColumns="1">
+                    <p:column headerText="Обозн." width="270">
+                        <h:outputText value="#{asyncData.name}"/>
+                    </p:column>
+                    <p:column headerText="Время" width="300" style="text-align: center;">
+                        <h:outputText value="#{asyncData.dateTime}"/>
+                    </p:column>
+                    <p:column headerText="Значение" width="300"
+                              style="white-space: nowrap; text-overflow: ellipsis; text-align: center; #{asyncData.colorCss}">
+                        <h:outputText value="#{asyncData.value}"/>
+                    </p:column>
+                    <p:column headerText="Состояние" width="320" style="text-align: center;">
+                        <h:outputText value="#{asyncData.state}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:panelGroup>
+    </h:form>
+
+    <p:dialog id="searchDialog" header="Поиск"
+              widgetVar="searchDialog" modal="true" resizable="false" closable="false" onShow="PF('searchDialog').initPosition();"
+              styleClass="tc-panel tc-m-top-100" showEffect="fade" hideEffect="fade" width="100vw">
+        <h:form id="searchForm">
+            <div>
+                <div style="display: flex; margin-bottom: 1rem; gap: 10px;">
+                    <p:outputLabel value="Название" for="@next"/>
+                    <p:autoComplete value="#{techParam.userObject}" styleClass="tc-m-autocomplete"
+                                    var="userObject" itemLabel="#{userObject.name}" itemValue="#{userObject}"
+                                    completeMethod="#{techParam.completeText}" scrollHeight="500"
+                                    converter="#{userObjectConverter}"/>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <p:commandButton value="Поиск" styleClass="tc-no-loading" style="flex: auto;"
+                                     onclick="PF('searchDialog').hide(); PF('statusDialog').show();"
+                                     action="#{techParam.loadObjectName()}"
+                                     oncomplete="adjustSize(); search();" update="main:objectName"/>
+                    <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="flex: auto;"
+                                     onclick="PF('searchDialog').hide();" process="@this"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="filterDialog" header="Фильтр"
+              widgetVar="filterDialog" modal="true" resizable="false" closable="false" onShow="PF('filterDialog').initPosition();"
+              styleClass="tc-panel tc-m-top-100" showEffect="fade" hideEffect="fade" width="100vw">
+        <h:form id="filterForm">
+            <div>
+                <div style="display: flex; margin-bottom: 1rem; gap: 10px;">
+                    <p:outputLabel value="Все параметры" for="@next"/>
+                    <p:toggleSwitch value="#{techParam.allParam}" onIcon="pi pi-check" offIcon="pi pi-times" style="margin: auto;" />
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <p:commandButton value="Применить" styleClass="tc-no-loading" style="flex: auto;"
+                                     onclick="PF('filterDialog').hide(); PF('statusDialog').show();"
+                                     oncomplete="PF('statusDialog').hide();"
+                                     action="#{techParam.loadData()}" update="main:dataTable main:asyncDataTable"/>
+                    <p:commandButton value="Отмена" styleClass="ui-button-secondary tc-no-loading" style="flex: auto;"
+                                     onclick="PF('filterDialog').hide();" process="@this"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="statusDialog" modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+              resizable="false" style="box-shadow: none;" position="center center" onShow="PF('statusDialog').initPosition();">
+        <i class="pi pi-spinner pi-spin" style="font-size: 10rem;" />
+    </p:dialog>
+</h:body>
+</html>

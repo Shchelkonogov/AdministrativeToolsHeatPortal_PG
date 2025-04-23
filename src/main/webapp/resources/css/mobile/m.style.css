@@ -1,0 +1,103 @@
+/*Стили для всей страницы*/
+
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+}
+
+
+
+.menuBar {
+    background: linear-gradient(60deg, #0073e6, #0059b3) !important;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px #0059b3;
+}
+
+/*Не отображаю шестеренку при ожидании ajax после нажатия на кнопку*/
+
+html .tc-no-loading.ui-state-loading.ui-button-text-only .ui-icon-loading + .ui-button-text {
+    opacity: inherit;
+}
+
+html .tc-no-loading.ui-state-loading .ui-icon-loading {
+    display: none;
+}
+
+html .tc-no-loading.ui-state-loading .ui-icon:not(.ui-icon-loading) {
+    display: inline-block;
+}
+
+
+
+.tc-m-top-100 {
+    top: 100px !important;
+}
+
+body .ui-widget,
+body .tc-m-menu .ui-icon,
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-title {
+    font-size: 4rem;
+}
+
+body .tc-m-menu.ui-commandlink {
+    color: white;
+}
+
+body .tc-m-menu.ui-commandlink:hover {
+    color: #dcdcde;
+}
+
+
+
+body .tc-m-autocomplete.ui-autocomplete .ui-autocomplete-input {
+    width: 100%;
+}
+
+body .ui-autocomplete-panel {
+    width: 100vw !important;
+}
+
+/*Стиль для dialog показывающий статус загрузки*/
+
+#statusDialog {
+    border: none;
+}
+
+#statusDialog .ui-dialog-titlebar {
+    display: none;
+}
+
+#statusDialog_content {
+    background-color: transparent;
+    border: none;
+    overflow: hidden;
+}
+
+/* Свойства для toggleSwitch */
+
+body .ui-toggleswitch {
+    width: 10rem;
+    height: 4.75rem;
+}
+
+body .ui-toggleswitch .ui-toggleswitch-handler {
+    width: 4.25rem;
+    height: 4.25rem;
+    line-height: 4.25rem;
+    top: unset;
+}
+
+body .ui-toggleswitch.ui-toggleswitch-checked .ui-toggleswitch-handler {
+    transform: translateX(5.25rem);
+}
+
+body .ui-toggleswitch .ui-toggleswitch-handler span {
+    font-size: 1.625rem;
+}
