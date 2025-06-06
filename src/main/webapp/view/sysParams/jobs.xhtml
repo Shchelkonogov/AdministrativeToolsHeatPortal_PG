@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form id="jobsPanel" style="height: 100%;">
+        <div style="height: 50%;">
+            <p:panel id="jobsTypePanel" styleClass="tc-panel" header="Фоновые процессы" style="padding-bottom: 5px;">
+                <div style="height: 100%; padding: 3px 0 3px 3px;">
+                    <p:dataTable id="jobsType" value="#{jobs.jobsList}" var="jobType" scrollable="true" scrollHeight="100%"
+                                 selectionMode="single" selection="#{jobs.selectedJobType}" rowKey="#{jobType.id}"
+                                 emptyMessage="#{global['table.empty.value']}" widgetVar="jobsTypeWidget">
+
+                        <p:ajax event="rowSelect" listener="#{jobs.onJobTypeSelect}"
+                                update="jobsPanel:jobsPropPanel"
+                                onstart="PF('buiTable').show();"
+                                oncomplete="PF('buiTable').hide();"/>
+
+                        <p:column headerText="Описание" width="250">
+                            <h:outputText value="#{jobType.comment}"/>
+                        </p:column>
+                        <p:column headerText="Вызываемая процедура">
+                            <h:outputText value="#{jobType.what}"/>
+                        </p:column>
+                        <p:column headerText="Дата запуска" width="100" styleClass="center">
+                            <h:outputText value="#{jobType.lastDate}">
+                                <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" type="localDateTime"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Следующий запуск" width="100" styleClass="center">
+                            <h:outputText value="#{jobType.nextDate}">
+                                <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" type="localDateTime"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </p:panel>
+        </div>
+        <div style="height: 50%;">
+            <p:panel id="jobsPropPanel" styleClass="tc-panel" header="История запусков#{jobs.jobHistoryHeader}" style="position: relative;">
+                <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
+                    <p:dataTable id="jobsProp" value="#{jobs.jobHistories}" var="jobProp"
+                                 scrollable="true" scrollHeight="100%"
+                                 emptyMessage="#{global['table.empty.value']}"
+                                 widgetVar="jobsPropWidget" rowKey="#{jobProp.id}"
+                                 scrollRows="100" virtualScroll="true" lazy="true">
+
+                        <p:ajax event="virtualScroll"/>
+
+                        <p:column headerText="Дата логирования" width="100" styleClass="center">
+                            <h:outputText value="#{jobProp.logDate}">
+                                <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" type="localDateTime"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Статус">
+                            <h:outputText value="#{jobProp.status}"/>
+                        </p:column>
+                        <p:column headerText="Время старта" width="100" styleClass="center">
+                            <h:outputText value="#{jobProp.actualStartDate}">
+                                <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" type="localDateTime"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Продолжительность" width="50" styleClass="center">
+                            <h:outputText value="#{jobProp.runDuration}"/>
+                        </p:column>
+                        <p:column headerText="Дополнительная информация" width="250">
+                            <h:outputText value="#{jobProp.additionalInfo}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:blockUI block="jobsProp" widgetVar="buiTable"/>
+                </div>
+            </p:panel>
+        </div>
+    </h:form>
+</ui:composition>
