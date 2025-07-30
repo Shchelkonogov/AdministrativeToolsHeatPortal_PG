@@ -44,7 +44,7 @@ public class SystemParamsMB implements Serializable {
             {"Расцветка параметров", new SystemParamsCategories("/view/sysParams/paramColor.xhtml", "paramColor")},
             {"Приоритет проблем", new SystemParamsCategories("/view/sysParams/problemPriority.xhtml", "problemPriority")},
             {"Нормативные показатели", new SystemParamsCategories("/view/sysParams/normIndicators.xhtml", "normIndicators")},
-            {"Тнв по многолетним наблюдениям", new SystemParamsCategories("/view/sysParams/multiYearTemp.xhtml", "multiYearTemp")},
+            {"Среднемесячная температура", new SystemParamsCategories("/view/sysParams/multiYearTemp.xhtml", "multiYearTemp")},
             {"Основные параметры", new SystemParamsCategories("/view/sysParams/mainParam.xhtml", "mainParamMB")},
             {"Статистические агрегаты", new SystemParamsCategories("/view/sysParams/statAggr.xhtml", "statAggrMB")},
             {"Переключение сезона", new SystemParamsCategories("/view/sysParams/seasonChange.xhtml", "seasonChangeMB")},

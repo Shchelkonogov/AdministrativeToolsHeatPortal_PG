@@ -3,6 +3,7 @@ package ru.tecon.admTools.systemParams.cdi;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -13,6 +14,7 @@ import ru.tecon.admTools.systemParams.ejb.MultiYearTempSB;
 import ru.tecon.admTools.systemParams.model.MultiYearTemp;
 
 import java.io.Serializable;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,6 +28,8 @@ import java.util.logging.Logger;
 public class MultiYearTempMB implements Serializable, AutoUpdate {
 
     private List<MultiYearTemp> multiYearTemps = new ArrayList<>();
+    private int year;
+    private double boostValue;
 
     @Inject
     private transient Logger logger;
@@ -40,7 +44,13 @@ public class MultiYearTempMB implements Serializable, AutoUpdate {
     public void update() {
         logger.info("load form data");
 
-        multiYearTemps = multiYearTempSB.getMultiTnv();
+        year = Year.now().getValue();
+        load();
+    }
+
+    private void load() {
+        multiYearTemps = multiYearTempSB.getMultiTnv(year);
+        boostValue = multiYearTempSB.getBoostValue(year);
     }
 
     /**
@@ -56,7 +66,7 @@ public class MultiYearTempMB implements Serializable, AutoUpdate {
             logger.info("update for login " + utilMB.getLogin() + " and ip " + utilMB.getIp() + " temperature " + multiYearTemp);
 
             try {
-                multiYearTempSB.updateMultiYearTemp(multiYearTemp, utilMB.getLogin(), utilMB.getIp());
+                multiYearTempSB.updateMultiYearTemp(multiYearTemp, year, utilMB.getLogin(), utilMB.getIp());
                 multiYearTemp.updateTemperature();
             } catch (SystemParamException e) {
                 multiYearTemp.revert();
@@ -65,7 +75,14 @@ public class MultiYearTempMB implements Serializable, AutoUpdate {
             }
         });
 
-        update();
+        try {
+            multiYearTempSB.updateBoostValue(year, boostValue, utilMB.getLogin(), utilMB.getIp());
+        } catch (SystemParamException e) {
+            errorMessages.add(e.getMessage());
+            logger.warning(e.getMessage());
+        }
+
+        load();
 
         if (!errorMessages.isEmpty()) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка записи", String.join(", ", errorMessages)));
@@ -81,7 +98,41 @@ public class MultiYearTempMB implements Serializable, AutoUpdate {
         PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
+    /**
+     * Обработчик выбора года
+     *
+     * @param event событие изменения годы
+     */
+    public void handleSpinnerValueChange(final AjaxBehaviorEvent event) {
+        load();
+    }
+
+    /**
+     * Обработчик изменения планового увеличения нагрузки
+     *
+     * @param event событие изменения планового увеличения нагрузки
+     */
+    public void handleBoostValueChange(final AjaxBehaviorEvent event) {
+        PrimeFaces.current().executeScript("document.getElementById('multiYearTemp:boostValue_input').style.backgroundColor = 'lightgrey'");
+    }
+
     public List<MultiYearTemp> getMultiYearTemps() {
         return multiYearTemps;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public double getBoostValue() {
+        return boostValue;
+    }
+
+    public void setBoostValue(double boostValue) {
+        this.boostValue = boostValue;
     }
 }

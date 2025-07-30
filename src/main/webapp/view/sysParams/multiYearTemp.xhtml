@@ -4,34 +4,50 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
     <h:form id="multiYearTemp" style="height: 100%;">
-        <p:panel styleClass="tc-panel" header="Тнв по многолетним наблюдениям">
-            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
-                <p:dataTable id="tempTable" var="tempData" value="#{multiYearTemp.multiYearTemps}"
-                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
-                             editable="#{systemParamsUtil.write}" editMode="cell">
+        <p:panel styleClass="tc-panel" header="Среднемесячная температура">
+            <div style="height: calc(100% - 6px);">
+                <div style="display: flex; align-items: center; justify-content: center; padding: 3px;">
+                    <p:outputLabel for="@next" value="Год" style="margin-right: 5px; font-weight: bold;"/>
+                    <p:spinner value="#{multiYearTemp.year}" min="1980" max="2100" stepFactor="1" thousandSeparator=""
+                               style="width: 95px;">
+                        <p:ajax event="valueChange" listener="#{multiYearTemp.handleSpinnerValueChange}" update="tempTable boostValue"/>
+                    </p:spinner>
 
-                    <p:ajax event="cellEdit" listener="#{multiYearTemp.onCellEdit}" />
+                    <p:outputLabel for="@next" value="Плановое увеличение нагрузки, %"
+                                   style="margin-right: 5px; margin-left: 20px; font-weight: bold;"/>
+                    <p:inputNumber id="boostValue" value="#{multiYearTemp.boostValue}" minValue="-100.00" maxValue="100.00"
+                                   decimalPlaces="2" decimalSeparator="." inputStyle="width: 70px;">
+                        <p:ajax event="valueChange" listener="#{multiYearTemp.handleBoostValueChange}" />
+                    </p:inputNumber>
+                </div>
+                <div style="height: calc(100% - 40px); padding: 0 0 3px 3px;">
+                    <p:dataTable id="tempTable" var="tempData" value="#{multiYearTemp.multiYearTemps}"
+                                 scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                                 editable="#{systemParamsUtil.write}" editMode="cell">
 
-                    <p:column headerText="Месяц">
-                        <h:outputText style="display: block;" value="#{tempData.name}" />
-                    </p:column>
-                    <p:column headerText="Температура" width="200" style="white-space: nowrap; text-align: center;">
-                        <p:cellEditor disabled="#{!systemParamsUtil.write}">
-                            <f:facet name="output">
-                                <h:outputText style="display: block;" value="#{tempData.value}" />
-                            </f:facet>
-                            <f:facet name="input">
-                                <p:inputNumber value="#{tempData.value}" decimalPlaces="2"/>
-                            </f:facet>
-                        </p:cellEditor>
-                    </p:column>
-                </p:dataTable>
+                        <p:ajax event="cellEdit" listener="#{multiYearTemp.onCellEdit}" />
+
+                        <p:column headerText="Месяц">
+                            <h:outputText style="display: block;" value="#{tempData.name}" />
+                        </p:column>
+                        <p:column headerText="Температура" width="200" style="white-space: nowrap; text-align: center;">
+                            <p:cellEditor disabled="#{!systemParamsUtil.write}">
+                                <f:facet name="output">
+                                    <h:outputText style="display: block;" value="#{tempData.value}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{tempData.value}" decimalPlaces="2"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                    </p:dataTable>
+                </div>
             </div>
 
             <f:facet name="actions">
                 <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading tc-small"
                                onclick="PF('statusDialog').show();" rendered="#{systemParamsUtil.write}"
-                               action="#{multiYearTemp.onSaveChanges}" update="tempTable growl"
+                               action="#{multiYearTemp.onSaveChanges}" update="tempTable boostValue growl"
                                oncomplete="PF('statusDialog').hide();">
                     <h:outputText styleClass="ui-icon pi pi-save"/>
                 </p:commandLink>
