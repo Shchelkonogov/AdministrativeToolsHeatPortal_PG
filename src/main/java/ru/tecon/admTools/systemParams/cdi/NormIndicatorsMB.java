@@ -34,9 +34,8 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                     "Энергия K<sub>q</sub> [%]");
 
     private static final List<String> INDICATOR_TV_HEADER_NAME =
-            Arrays.asList("Подпитка нормированная К<sub>п_н</sub> [%]",
-                    "Удельный расход К<sub>з_тв</sub> [тонн/Гкал]",
-                    "Коэффициент подпитки К<sub>п_тв</sub> [%]");
+            Arrays.asList("Нормированная подпитка ΔК<sub>п</sub> [%]",
+                    "Удельный расход К<sub>з_тв</sub> [тонн/Гкал]");
 
     private static final List<String> INDICATOR_CO_HEADER_NAME =
             Arrays.asList("Удельный расход К<sub>з_цо</sub> [тонн/Гкал]",
@@ -52,27 +51,24 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
     private static final List<String> BORDER_VALUES_CO_HEADER_NAME =
             Arrays.asList("Тепловая потеря в подаче К<sub>Δт_цо</sub> [%]",
                     "Тепловая потеря в обратке К<sub>Δт_о_цо</sub> [%]",
-                    "Утечка К<sub>у_цо</sub> [тонн]",
-                    "Расход тепла норматив К<sub>ΔQ_цо</sub> [%]",
-                    "К<sub>цо</sub>",
-                    "Недоотпуск К1",
-                    "Перетоп К2");
+                    "Утечка ΔG<sub>i_цо</sub> [тонн]",
+                    "К<sub>ΔG_цо</sub>",
+                    "Расход тепла норматив К<sub>ΔQ_цо</sub> [%]");
 
     private static final List<String> BORDER_VALUES_VENT_HEADER_NAME =
             Arrays.asList("Тепловая потеря в подаче К<sub>Δт_в</sub> [%]",
                     "Тепловая потеря в обратке К<sub>Δт_о_в</sub> [%]",
-                    "Утечка К<sub>у_в</sub> [тонн]",
+                    "Утечка ΔG<sub>i_в</sub> [тонн]",
+                    "К<sub>ΔG_в</sub>",
                     "Расход тепла норматив К<sub>ΔQ_в</sub> [%]");
 
     private static final List<String> BORDER_VALUES_GVS_HEADER_NAME =
             Arrays.asList("Тепловая потеря в подаче К<sub>Δт_гвс</sub> [%]",
                     "Тепловая потеря в обратке К<sub>Δт_о_гвс</sub> [%]",
-                    "Утечка К<sub>у_гвс</sub> [тонн]",
-                    "ΔT<sub>гвс</sub> [°C]",
+                    "Утечка ΔV<sub>i_гвс</sub> [тонн]",
+                    "К<sub>Δv_гвс</sub>",
                     "ΔT7 [°C] (T7<sub>ТП</sub> - T7<sub>потр</sub>)",
-                    "T7<sub>норм</sub> [°C]",
-                    "К<sub>гвс</sub>",
-                    "К<sub>Δv_гвс</sub>");
+                    "T7<sub>норм</sub> [°C]");
 
     private List<IndicatorMetrology> indicatorMetrologyList = new ArrayList<>();
     private List<IndicatorTV> indicatorTVList = new ArrayList<>();
@@ -81,7 +77,6 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
     private List<IndicatorVENT> indicatorVENTList = new ArrayList<>();
     private List<IndicatorT7> indicatorT7List = new ArrayList<>();
     private List<IndicatorDT7> indicatorDT7List = new ArrayList<>();
-    private List<IndicatorUnderSupply> indicatorUnderSupplyList = new ArrayList<>();
     private List<IndicatorBorderCo> indicatorBorderCoList = new ArrayList<>();
     private List<IndicatorBorderVent> indicatorBorderVentList = new ArrayList<>();
     private List<IndicatorBorderGvs> indicatorBorderGvsList = new ArrayList<>();
@@ -113,7 +108,6 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
         indicatorVENTList = normIndicatorsBean.getVENT();
         indicatorT7List = normIndicatorsBean.getT7();
         indicatorDT7List = normIndicatorsBean.getDT7();
-        indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
         indicatorBorderCoList = normIndicatorsBean.getBorderValuesCo();
         indicatorBorderVentList = normIndicatorsBean.getBorderValuesVent();
         indicatorBorderGvsList = normIndicatorsBean.getBorderValuesGvs();
@@ -239,19 +233,6 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
                 break;
             }
             case "analysis": {
-                indicatorUnderSupplyList.stream().filter(IndicatorUnderSupply::isChange).forEach(indicatorUnderSupply -> {
-                    logger.info("update underSupply indicator " + indicatorUnderSupply);
-
-                    try {
-                        normIndicatorsBean.updateUnderSupply(indicatorUnderSupply, utilMB.getLogin(), utilMB.getIp());
-                    } catch (SystemParamException e) {
-                        errorMessages.add(e.getMessage());
-                        logger.warning(e.getMessage());
-                    }
-                });
-
-                indicatorUnderSupplyList = normIndicatorsBean.getUnderSupply();
-
                 indicatorT7List.stream().filter(IndicatorT7::isChange).forEach(indicatorT7 -> {
                     logger.info("update T7 indicator " + indicatorT7);
 
@@ -318,10 +299,6 @@ public class NormIndicatorsMB implements Serializable, AutoUpdate {
 
     public List<IndicatorDT7> getIndicatorDT7List() {
         return indicatorDT7List;
-    }
-
-    public List<IndicatorUnderSupply> getIndicatorUnderSupplyList() {
-        return indicatorUnderSupplyList;
     }
 
     public List<IndicatorMetrology> getIndicatorMetrologyList() {

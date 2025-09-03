@@ -56,9 +56,6 @@ public class NormIndicatorsSB {
     private static final String SEL_DT7 = "select * from sys_0001t.sel_norm_ind_dt_uu()";
     private static final String FUN_UPD_DT7 = "call sys_0001t.upd_norm_ind_dt_uu(?, ?, ?, ?, ?, ?)";
 
-    private static final String SEL_UNDERSUPPLY = "select * from sys_0001t.sel_norm_ind_no()";
-    private static final String FUN_UPD_UNDERSUPPLY = "call sys_0001t.upd_norm_ind_no(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
@@ -399,59 +396,6 @@ public class NormIndicatorsSB {
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "SQLException", e);
             throw new SystemParamException("Внутренняя ошибка сервера");
-        }
-    }
-
-    /**
-     * Получение списка показателей недоотпуска
-     * @return список данных
-     */
-    public List<IndicatorUnderSupply> getUnderSupply() {
-        List<IndicatorUnderSupply> result = new ArrayList<>();
-        try (Connection connect = ds.getConnection();
-             PreparedStatement stm = connect.prepareStatement(SEL_UNDERSUPPLY)) {
-            ResultSet res = stm.executeQuery();
-            if (res.next()) {
-                result.add(new IndicatorUnderSupply(res.getDouble("t3_k1"), res.getDouble("t3_k2"), res.getDouble("t3_k3"),
-                        res.getDouble("t4_k1"), res.getDouble("t4_k2"), res.getDouble("t4_k3")));
-            }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "error load underSupply indicator", e);
-        }
-        return result;
-    }
-
-    /**
-     * Обновление списка показателей недоотпуска
-     * @param indicatorUnderSupply новые значения
-     * @param login идентификатор пользователя
-     * @param ip адрес пользователя
-     * @throws SystemParamException в случае ошибки записи в базу
-     */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void updateUnderSupply(IndicatorUnderSupply indicatorUnderSupply, String login, String ip) throws SystemParamException {
-        try (Connection connect = ds.getConnection();
-             CallableStatement cStm = connect.prepareCall(FUN_UPD_UNDERSUPPLY)) {
-            cStm.setObject(1, indicatorUnderSupply.getT3K1(), Types.NUMERIC);
-            cStm.setObject(2, indicatorUnderSupply.getT3K2(), Types.NUMERIC);
-            cStm.setObject(3, indicatorUnderSupply.getT3K3(), Types.NUMERIC);
-            cStm.setObject(4, indicatorUnderSupply.getT4K1(), Types.NUMERIC);
-            cStm.setObject(5, indicatorUnderSupply.getT4K2(), Types.NUMERIC);
-            cStm.setObject(6, indicatorUnderSupply.getT4K3(), Types.NUMERIC);
-            cStm.setString(7, login);
-            cStm.setString(8, ip);
-            cStm.registerOutParameter(9, Types.SMALLINT);
-
-            cStm.executeUpdate();
-
-            LOG.info("update underSupply indicator " + indicatorUnderSupply + " result " + cStm.getShort(9));
-
-            if (cStm.getShort(9) != 0) {
-                throw new SystemParamException("Ошибка обновления показателя недоотпуск");
-            }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "SQLException", e);
-            throw new SystemParamException("Внутренняя ошибка сервера при обновлении показателя недоотпуск");
         }
     }
 
