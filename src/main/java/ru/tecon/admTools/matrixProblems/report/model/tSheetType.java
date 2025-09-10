@@ -16,7 +16,7 @@ public enum tSheetType {
     Qco("dgv"),
     Qgvs("dgv");
 
-    private String ratio;
+    private final String ratio;
 
     tSheetType(String ratio) {
         this.ratio = ratio;

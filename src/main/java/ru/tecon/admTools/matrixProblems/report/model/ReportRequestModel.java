@@ -27,7 +27,7 @@ public class ReportRequestModel implements Serializable {
     }
 
     /**
-     * Контструктор
+     * Конструктор
      * @param structID id структуры
      * @param filterID id фильтра
      * @param filterValue значение фильтра

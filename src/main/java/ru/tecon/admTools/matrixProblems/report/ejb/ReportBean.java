@@ -1,9 +1,11 @@
 package ru.tecon.admTools.matrixProblems.report.ejb;
 
 import jakarta.annotation.Resource;
+import jakarta.ejb.AsyncResult;
 import jakarta.ejb.Asynchronous;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -36,30 +38,29 @@ import java.util.stream.Stream;
 @LocalBean
 public class ReportBean {
 
-    private static final Logger LOGGER = Logger.getLogger(ReportBean.class.getName());
+    @Inject
+    private Logger logger;
 
-    private static final String ALTER_SQL = "alter session set NLS_NUMERIC_CHARACTERS = '.,'";
+    private static final String SELECT_T_DATA_CO = "select * from ul_report.sel_co_t(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy'))";
+    private static final String SELECT_T_DATA_GVS = "select * from ul_report.sel_gvs_t(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy'))";
+    private static final String SELECT_V_DATA = "select * from ul_report.sel_gvs_v(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy'))";
+    private static final String SELECT_G_DATA = "select * from ul_report.SEL_co_g(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy'))";
+    private static final String SELECT_Q_DATA_CO = "select * from ul_report.sel_co_qc(?, ?, ?, 'ADMIN', to_date(?, 'dd.mm.yyyy'))";
+    private static final String SELECT_Q_DATA_GVS = "select * from ul_report.sel_gvs_qgvs(?, ?, ?, 'ADMIN', to_date(?, 'dd.mm.yyyy'))";
 
-    private static final String SELECT_T_DATA_CO = "select * from table(ul_report.sel_co_t(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy')))";
-    private static final String SELECT_T_DATA_GVS = "select * from table(ul_report.sel_gvs_t(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy')))";
-    private static final String SELECT_V_DATA = "select * from table(ul_report.sel_gvs_v(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy')))";
-    private static final String SELECT_G_DATA = "select * from table(ul_report.SEL_co_g(?, ?, ?, 'ADMIN', ?, to_date(?, 'dd.mm.yyyy')))";
-    private static final String SELECT_Q_DATA_CO = "select * from table(ul_report.sel_co_qc(?, ?, ?, 'ADMIN', to_date(?, 'dd.mm.yyyy')))";
-    private static final String SELECT_Q_DATA_GVS = "select * from table(ul_report.sel_gvs_qgvs(?, ?, ?, 'ADMIN', to_date(?, 'dd.mm.yyyy')))";
+    private static final String SELECT_TNV = "select tnv from ul_report.get_tnv(?, to_date(?, 'dd.mm.yyyy')) order by time_stamp";
 
-    private static final String SELECT_TNV = "select tnv from table(ul_report.get_tnv(?, to_date(?, 'dd.mm.yyyy'))) order by time_stamp";
+    private static final String SELECT_RATIO = "select dt, dto, dgv, dgvo from admin.dz_norm_koef where obj_type_id = 1";
 
-    private static final String SELECT_RATIO = "select dt, dto, dgv, dgvo from dz_norm_koef where obj_type_id = 1";
-
-    private static final String SELECT_FULL_PATH = "select dsp_0091t.get_full_path(?) from dual";
+    private static final String SELECT_FULL_PATH = "select dsp_0091t.get_full_path(?)";
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
 
     /**
-     * Асинхронный метод для создания excel страницы (модицикация переданной в виде параметра)
+     * Асинхронный метод для создания excel страницы (модификация переданной в виде параметра)
      * @param requestModel модель данных для отчета
-     * @param sheetType тип строищейся страницы
+     * @param sheetType тип строящейся страницы
      * @param sheet excel страница
      * @param rowStyleCtp стиль ячейки цтп
      * @param rowStyleCtpError стиль ячейки цтп с ошибочными данными
@@ -68,13 +69,13 @@ public class ReportBean {
      * @param headerStyle стиль заголовка
      * @param errorStyle стиль ошибочных данных
      * @param styles набор стилей
-     * @return ничего не возвращет (используется для ожидания выполнения)
+     * @return ничего не возвращает (используется для ожидания выполнения)
      */
     @Asynchronous
-    public Future<Void> createSheetT(ReportRequestModel requestModel, tSheetType sheetType, SXSSFSheet sheet,
-                                     CellStyle rowStyleCtp, CellStyle rowStyleCtpError,
-                                     CellStyle rowStyleSum, CellStyle rowStyleSumError,
-                                     CellStyle headerStyle, CellStyle errorStyle, Map<String, CellStyle> styles) {
+    public Future<Boolean> createSheetT(ReportRequestModel requestModel, tSheetType sheetType, SXSSFSheet sheet,
+                                        CellStyle rowStyleCtp, CellStyle rowStyleCtpError,
+                                        CellStyle rowStyleSum, CellStyle rowStyleSumError,
+                                        CellStyle headerStyle, CellStyle errorStyle, Map<String, CellStyle> styles) {
         // Переменные для определения времени выполнения
         long startTime = System.currentTimeMillis();
         long stopTime;
@@ -117,12 +118,10 @@ public class ReportBean {
         }
 
         try (Connection connect = ds.getConnection();
-             PreparedStatement alter = connect.prepareStatement(ALTER_SQL);
              PreparedStatement stm = connect.prepareStatement(select);
              PreparedStatement stmTnv = connect.prepareStatement(SELECT_TNV);
              PreparedStatement stmRatio = connect.prepareStatement(SELECT_RATIO);
              PreparedStatement stmFullPath = connect.prepareStatement(SELECT_FULL_PATH)) {
-            alter.executeQuery();
 
             // Строка заголовка
             Row row = sheet.createRow(1);
@@ -146,7 +145,7 @@ public class ReportBean {
                     cell.setCellValue(res.getString(1));
                 }
             } catch (SQLException e) {
-                LOGGER.log(Level.WARNING, "error load full path for " + requestModel.getStructID(), e);
+                logger.log(Level.WARNING, "error load full path for " + requestModel.getStructID(), e);
             }
 
             cell.setCellStyle(styles.get("center"));
@@ -311,10 +310,11 @@ public class ReportBean {
             sheet.createFreezePane(1, 0);
 
             stopTime = System.currentTimeMillis();
-            LOGGER.info("Matrix problems report sheet execution time: " + (stopTime - startTime));
+            logger.info("Matrix problems report sheet execution time: " + (stopTime - startTime));
         } catch (SQLException e) {
-            LOGGER.warning(e.getMessage());
+            logger.warning(e.getMessage());
+            return new AsyncResult<>(false);
         }
-        return null;
+        return new AsyncResult<>(true);
     }
 }
