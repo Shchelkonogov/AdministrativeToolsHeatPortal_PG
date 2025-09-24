@@ -404,10 +404,10 @@ public class LinkerControllerWS implements Serializable {
         if (cheat) {
             PrimeFaces.current().executeScript(
                     "PF('doom1Dialog').hide(); " +
-                    "PF('doom2Dialog').hide(); " +
-                    "PF('doom3Dialog').hide(); " +
-                    "PF('doom4Dialog').hide(); " +
-                    "stopSound();");
+                            "PF('doom2Dialog').hide(); " +
+                            "PF('doom3Dialog').hide(); " +
+                            "PF('doom4Dialog').hide(); " +
+                            "stopSound();");
         }
     }
 
@@ -430,7 +430,7 @@ public class LinkerControllerWS implements Serializable {
                 FacesContext.getCurrentInstance()
                         .addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Линковка",
-                                doom ? "Успешное применение кода: 'Параметры привязаны к устройству'" : "Параметры привязаны к устройству"));
+                                        doom ? "Успешное применение кода: 'Параметры привязаны к устройству'" : "Параметры привязаны к устройству"));
             }
         } catch (SystemParamException e) {
             if (inIframe) {
@@ -784,16 +784,25 @@ public class LinkerControllerWS implements Serializable {
     public void linkNoLinkedObjects() {
         logger.log(Level.INFO, "link no linked object {0} {1}", new Object[]{selectedNavigateObject, objectsForLink});
 
-        try {
-            linkSchemaTable.setData(linkerBean.getSchemaListForLink(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink)));
+        if (linkerBean.checkLicense(selectedNavigateObject.getData().getItemId(), utilMB.getSessionId())) {
+            try {
+                linkSchemaTable.setData(linkerBean.getSchemaListForLink(selectedNavigateObject.getData().getMyId(), new ArrayList<>(objectsForLink)));
 
-            PrimeFaces.current().executeScript("PF('schemaLinkDialogWidget').show(); PF('schemaLinkTableWidget').filter();");
-        } catch (SystemParamException e) {
+                PrimeFaces.current().executeScript("PF('schemaLinkDialogWidget').show(); PF('schemaLinkTableWidget').filter();");
+            } catch (SystemParamException e) {
+                if (inIframe) {
+                    new TeconMessage(TeconMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()).send();
+                } else {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()));
+                }
+            }
+        } else {
             if (inIframe) {
-                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()).send();
+                new TeconMessage(TeconMessage.SEVERITY_ERROR, "Загрузка схем линковки", "Отсутствует лицензия на объект").send();
             } else {
                 FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", e.getMessage()));
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Загрузка схем линковки", "Отсутствует лицензия на объект"));
             }
         }
     }

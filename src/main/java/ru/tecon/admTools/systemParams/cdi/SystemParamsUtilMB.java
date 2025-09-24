@@ -25,6 +25,7 @@ public class SystemParamsUtilMB implements Serializable {
     private String login;
     private String ip;
     private boolean write;
+    private String sessionId;
 
     @Inject
     private transient Logger logger;
@@ -38,12 +39,12 @@ public class SystemParamsUtilMB implements Serializable {
 
         Map<String, String> parameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 
-        String sessionID = parameterMap.get("sessionId");
+        sessionId = parameterMap.get("sessionId");
 
         ip = parameterMap.get("ip");
-        login = checkUserSB.getUser(sessionID);
+        login = checkUserSB.getUser(sessionId);
         try {
-            write = checkUserSB.checkSessionWrite(sessionID, Integer.parseInt(parameterMap.get("formId")));
+            write = checkUserSB.checkSessionWrite(sessionId, Integer.parseInt(parameterMap.get("formId")));
         } catch (NumberFormatException ignore) {
             logger.log(Level.WARNING, "Error parse \"formId\" parameter: {0}", parameterMap.get("formId"));
             write = false;
@@ -74,12 +75,17 @@ public class SystemParamsUtilMB implements Serializable {
         this.write = write;
     }
 
+    public String getSessionId() {
+        return sessionId;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", SystemParamsUtilMB.class.getSimpleName() + "[", "]")
                 .add("login='" + login + "'")
                 .add("ip='" + ip + "'")
                 .add("write=" + write)
+                .add("sessionId='" + sessionId + "'")
                 .toString();
     }
 }

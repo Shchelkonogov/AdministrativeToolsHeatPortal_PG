@@ -1,13 +1,24 @@
 package ru.tecon.admTools.linker.ejb;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.ejb.*;
 import jakarta.inject.Inject;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import ru.tecon.admTools.linker.model.*;
 import ru.tecon.admTools.systemParams.SystemParamException;
 import ru.tecon.admTools.utils.AdmTools;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -23,6 +34,13 @@ import java.util.logging.Logger;
 @Stateless
 @LocalBean
 public class LinkerStateless {
+
+    private static final int httpTimeout = 1;
+
+    private static final String scheme = "http";
+    private static final String host = "10.230.2.101";
+    private static final int port = 1337;
+    private static final List<String> path = List.of("api", "Linker", "CheckObjectLicense");
 
     private final static String SELECT_LINKED_OBJECTS_DATA = "select * from lnk_0001t.sel_linked_object(?, '', '', cast(0 as smallint), ?);";
     private final static String SELECT_RECOUNT_DATA = "select * from lnk_0001t.sel_obj_recalc_mode(?, ?, ?);";
@@ -67,6 +85,9 @@ public class LinkerStateless {
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private ObjectMapper objectMapper;
 
     @Resource(name = "jdbc/DataSource")
     private DataSource ds;
@@ -722,6 +743,46 @@ public class LinkerStateless {
         return result;
     }
 
+    public boolean checkLicense(String objectId, String sessionId) {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(httpTimeout * 60 * 1000)
+                .setConnectionRequestTimeout(httpTimeout * 60 * 1000)
+                .setSocketTimeout(httpTimeout * 60 * 1000).build();
+
+        URIBuilder uriBuilder = new URIBuilder()
+                .setScheme(scheme)
+                .setHost(host)
+                .setPort(port)
+                .setPathSegments(path)
+                .addParameter("objectId", objectId);
+
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build()) {
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+
+            httpGet.addHeader("Content-Type", "application/json");
+            httpGet.addHeader("X-TD-AUTH", sessionId);
+
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    License license = objectMapper.readValue(
+                            EntityUtils.toString(response.getEntity()),
+                            new TypeReference<License>() {
+                            }
+                    );
+
+                    logger.log(Level.INFO, "license {0}", license);
+                    return license.isLicensed;
+                } else {
+                    logger.log(Level.WARNING, "Error request license. Error code {0}", response.getStatusLine().getStatusCode());
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            logger.log(Level.WARNING, "Error request license", e);
+        }
+
+        return false;
+    }
+
     /**
      * Получение списка схем линковки
      * @param systemObjectId объект системы
@@ -912,6 +973,29 @@ public class LinkerStateless {
         } catch (SQLException ex) {
             logger.log(Level.WARNING, "Error execute cheat 1", ex);
             throw new SystemParamException(AdmTools.getSQLExceptionMessage(ex));
+        }
+    }
+
+    private static class License {
+
+        private boolean isLicensed;
+
+        public License() {
+        }
+
+        public void setIsLicensed(boolean licensed) {
+            isLicensed = licensed;
+        }
+
+        public boolean isLicensed() {
+            return isLicensed;
+        }
+
+        @Override
+        public String toString() {
+            return "License{" +
+                    "isLicensed=" + isLicensed +
+                    '}';
         }
     }
 }
