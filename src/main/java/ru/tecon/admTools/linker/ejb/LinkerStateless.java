@@ -38,7 +38,10 @@ public class LinkerStateless {
     private static final int httpTimeout = 1;
 
     private static final String scheme = "http";
-    private static final String host = "10.230.2.101";
+
+    @Resource(name = "licenseIp")
+    private String host;
+
     private static final int port = 1337;
     private static final List<String> path = List.of("api", "Linker", "CheckObjectLicense");
 

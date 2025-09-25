@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form>
+        <p:remoteCommand name="saveSourceWrapper" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                         action="#{dataSourceMB.onSaveChanges}" rendered="#{systemParamsUtil.write}"
+                         update="sourceForm:sourceTable growl" />
+    </h:form>
+
+    <h:form id="sourceForm" style="height: 100%;">
+        <p:panel styleClass="tc-panel" header="Источники данных">
+            <div style="height: calc(100% - 6px); padding: 3px 0 3px 3px;">
+                <p:dataTable id="sourceTable" var="sourceData" widgetVar="sourceTable" value="#{dataSourceMB.sourceTable}"
+                             scrollable="true" scrollHeight="100%" emptyMessage="#{global['table.empty.value']}"
+                             editable="#{systemParamsUtil.write}"
+                             selectionMode="single" selection="#{dataSourceMB.selectedSource}"
+                             rowKey="#{sourceData.id}" disabledSelection="#{!systemParamsUtil.write}">
+
+                    <p:ajax event="rowSelect" listener="#{dataSourceMB.onRowSelect}" update="sourceForm:btnRemove" />
+
+                    <p:column headerText="Название">
+                        <h:outputText value="#{sourceData.name}" />
+                    </p:column>
+
+                    <p:column headerText="Адрес" styleClass="center">
+                        <h:outputText value="#{sourceData.url}" />
+                    </p:column>
+
+                    <p:column headerText="Статус лицензии" styleClass="center">
+                        <h:outputText value="#{sourceData.status}" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <f:facet name="actions">
+                <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-success tc-no-loading"
+                               update="sourceForm:sourceTable" onclick="PF('addNewSource').show();"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-plus-circle"/>
+                </p:commandLink>
+                <p:commandLink id="btnRemove" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default tc-danger tc-no-loading"
+                               disabled="#{dataSourceMB.disableRemoveBtn}" action="#{dataSourceMB.onRemoveTableSource}"
+                               onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
+                               update="sourceForm:sourceTable btnRemove growl"
+                               rendered="#{systemParamsUtil.write}">
+                    <h:outputText styleClass="ui-icon pi pi-minus-circle"/>
+                </p:commandLink>
+            </f:facet>
+        </p:panel>
+    </h:form>
+
+    <p:dialog id="dialog" header="Добавление нового источника данных" widgetVar="addNewSource" modal="true"
+              resizable="false" rendered="#{systemParamsUtil.write}" styleClass="tc-panel" showEffect="fade" hideEffect="fade">
+
+        <p:ajax event="close" listener="#{dataSourceMB.onDialogClose}" update="addSourceForm" resetValues="true"/>
+
+        <h:form id="addSourceForm">
+            <h:panelGrid columns="2" style="margin-bottom: 45px;">
+                <p:outputLabel value="Название" for="@next"/>
+                <p:inputText id="inputName" required="true" value="#{dataSourceMB.newSource.name}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 290px;"/>
+
+                <h:panelGroup layout="block"/>
+                <p:message for="inputName" styleClass="tc-show-on-active"/>
+
+                <p:outputLabel value="Адрес" for="@next"/>
+                <p:inputText id="inputUrl" required="true" value="#{dataSourceMB.newSource.url}"
+                             requiredMessage="#{global['validation.view.text']}" style="width: 290px;"/>
+
+                <h:panelGroup layout="block"/>
+                <p:message for="inputUrl" styleClass="tc-show-on-active"/>
+            </h:panelGrid>
+
+            <p:commandButton value="Сохранить" id="btnSave" action="#{dataSourceMB.onSaveChangesWrapper}"
+                             style="position: absolute; bottom: 5px; right: 100px;"
+                             validateClient="true" update="@form" styleClass="tc-no-loading"/>
+            <p:commandButton value="Отмена" id="btnCanc" oncomplete="PF('addNewSource').hide();"
+                             styleClass="ui-button-secondary tc-no-loading" style="position: absolute; bottom: 5px; right: 5px;" process="@this"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
