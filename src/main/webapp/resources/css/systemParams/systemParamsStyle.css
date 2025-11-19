@@ -55,6 +55,7 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 
 /*Отступы для формы Нормативные показатели*/
 
+#integrationPanel\:rootPanel_content,
 #normIndicators\:rootPanel_content {
     padding: 3px;
 }
@@ -67,6 +68,7 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 
 /*Устанавливаем свойства scrollbar для категорий настроечных параметров и нормативных показателей*/
 
+#integrationPanel\:rootPanel_content,
 #normIndicators\:rootPanel_content,
 #menuPanel_content {
     overflow-y: auto;
@@ -78,6 +80,7 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar,
 #normIndicators\:rootPanel_content::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -91,6 +94,7 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-thumb,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar-thumb,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-thumb,
 #menuPanel_content::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.2);
@@ -101,12 +105,14 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-thumb:hover,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar-thumb:hover,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-thumb:hover,
 #menuPanel_content::-webkit-scrollbar-thumb:hover {
     background: rgba(0,0,0,.35)
 }
 
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-track,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar-track,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-track,
 #menuPanel_content::-webkit-scrollbar-track {
     background: rgba(0,0,0,0);
@@ -120,6 +126,9 @@ html body .custom.ui-button.ui-state-loading.ui-button-text-only .ui-icon-loadin
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-button,
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-scrollbar-corner,
 #normIndicators\:borderValues .ui-datatable-tablewrapper::-webkit-resizer,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar-button,
+#integrationPanel\:rootPanel_content::-webkit-scrollbar-corner,
+#integrationPanel\:rootPanel_content::-webkit-resizer,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-button,
 #normIndicators\:rootPanel_content::-webkit-scrollbar-corner,
 #normIndicators\:rootPanel_content::-webkit-resizer,
