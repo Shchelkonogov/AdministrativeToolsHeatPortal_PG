@@ -20,7 +20,7 @@
                          onstart="PF('statusDialog').show();"
                          action="#{specificModel.loadData()}"
                          oncomplete="PF('statusDialog').hide();"
-                         update="tabView:tableForm:tableData tabView:cTableForm"/>
+                         update="tabView:tableForm:tableData tabView:cTableForm tabView:conditionForm"/>
     </h:form>
 
     <p:growl id="growl" showDetail="true"/>
@@ -256,6 +256,7 @@
                                         </f:facet>
                                         <f:facet name="input">
                                             <h:selectOneMenu value="#{condData.conditionSer}" style="width:100%">
+                                                <f:selectItem itemLabel="Выберите..." itemValue=""/>
                                                 <f:selectItems value="#{specificModel.conditions}" var="condition"
                                                                itemLabel="#{condition.name}" itemValue="#{condition.condSer}" />
                                             </h:selectOneMenu>

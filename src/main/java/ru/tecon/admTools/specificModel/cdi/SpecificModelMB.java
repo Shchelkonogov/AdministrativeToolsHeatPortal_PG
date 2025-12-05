@@ -329,16 +329,18 @@ public class SpecificModelMB implements Serializable {
     public void onCellEnumEdit(CellEditEvent<?> event) {
         ((EnumerateData) selectedEnumerateItem.getAdditionalData()).getConditions().get(event.getRowIndex()).setEdited(true);
         selectedEnumerateItem.setChange(true);
+        String clientID = event.getColumn().getChildren().get(0).getClientId().replaceAll(":", "\\:");
+        PrimeFaces.current().executeScript("document.getElementById('" + clientID + "').parentNode.style.backgroundColor = 'lightgrey'");
     }
 
     /**
-     * Метод обрабатывает нажание кнопки выбрать в диалоговом окне выбора оптимального значения
+     * Метод обрабатывает нажатие кнопки выбрать в диалоговом окне выбора оптимального значения
      */
     public void saveOptValue() {
         AnalogData data = (AnalogData) changedDecreaseGraphItem.getAdditionalData();
         List<String> updateList = new ArrayList<>();
 
-        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().equals(""))) {
+        if ((data.getGraphID() != null) || (data.getGraphName() == null) || (data.getGraphName().isEmpty())) {
             data.setA(-10d, 10d, false, false, true);
             data.setT(-5d, 5d, false, false, true);
             data.setAbsolute(true);
